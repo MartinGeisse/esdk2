@@ -7,17 +7,18 @@ package name.martingeisse.esdk.rtl;
 import com.google.common.collect.ImmutableList;
 
 /**
- *
+ * Note: Unlike other object fields, the list of signals must be determined in advance. This is to ensure that the
+ * result width doesn't change.
  */
 public final class RtlConcatenation extends RtlItem implements RtlVectorSignal {
 
 	private final ImmutableList<RtlSignal> signals;
 	private final int width;
 
-	/**
-	 * Unlike other object fields, the list of signals must be determined in advance. This is to ensure that the
-	 * result width doesn't change.
-	 */
+	public RtlConcatenation(RtlDesign design, RtlSignal... signals) {
+		this(design, ImmutableList.copyOf(signals));
+	}
+
 	public RtlConcatenation(RtlDesign design, ImmutableList<RtlSignal> signals) {
 		super(design);
 
