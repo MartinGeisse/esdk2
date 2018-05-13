@@ -18,6 +18,8 @@ public final class RtlProceduralBitSignalAssignment extends RtlProceduralSignalA
 
 	public RtlProceduralBitSignalAssignment(RtlDesign design, RtlProceduralBitSignal destination, RtlBitSignal source) {
 		super(design);
+		checkSameDesign(destination);
+		checkSameDesign(source);
 		this.destination = destination;
 		this.source = source;
 	}

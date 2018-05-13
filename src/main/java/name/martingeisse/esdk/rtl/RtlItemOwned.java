@@ -7,5 +7,8 @@ package name.martingeisse.esdk.rtl;
 /**
  *
  */
-public interface RtlSignal extends RtlItemOwned {
+public interface RtlItemOwned {
+
+	RtlItem getRtlItem();
+
 }

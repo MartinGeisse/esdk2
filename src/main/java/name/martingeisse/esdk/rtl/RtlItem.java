@@ -7,7 +7,7 @@ package name.martingeisse.esdk.rtl;
 /**
  *
  */
-public abstract class RtlItem {
+public abstract class RtlItem implements RtlItemOwned {
 
 	private final RtlDesign design;
 
@@ -19,10 +19,18 @@ public abstract class RtlItem {
 		return design;
 	}
 
-	protected final void checkSameDesign(RtlItem item) {
+	protected final void checkSameDesign(RtlItemOwned itemOwned) {
+		RtlItem item = itemOwned.getRtlItem();
 		if (item.getDesign() != design) {
-			throw new IllegalArgumentException("the specified item (" + item + ") is not part of the same design as this item (" + this + ")");
+			String argumentDescription = (item == itemOwned) ?
+				("item (" + item + ")") : ("object (" + itemOwned + " from item " + item + ")");
+			throw new IllegalArgumentException("the specified " + argumentDescription + " is not part of the same design as this item (" + this + ")");
 		}
+	}
+
+	@Override
+	public final RtlItem getRtlItem() {
+		return this;
 	}
 
 }

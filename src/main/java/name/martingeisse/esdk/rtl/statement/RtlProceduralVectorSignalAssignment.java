@@ -16,6 +16,8 @@ public final class RtlProceduralVectorSignalAssignment extends RtlProceduralSign
 
 	public RtlProceduralVectorSignalAssignment(RtlDesign design, RtlProceduralVectorSignal destination, RtlVectorSignal source) {
 		super(design);
+		checkSameDesign(destination);
+		checkSameDesign(source);
 		if (destination.getWidth() != source.getWidth()) {
 			throw new IllegalArgumentException("destination width (" + destination.getWidth() + ") and source width (" + source.getWidth() + ") differ");
 		}
