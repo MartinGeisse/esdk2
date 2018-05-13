@@ -36,11 +36,6 @@ public final class RtlVectorOperation extends RtlItem implements RtlVectorSignal
 	}
 
 	@Override
-	public RtlItem getRtlItem() {
-		return this;
-	}
-
-	@Override
 	public int getWidth() {
 		return leftOperand.getWidth();
 	}

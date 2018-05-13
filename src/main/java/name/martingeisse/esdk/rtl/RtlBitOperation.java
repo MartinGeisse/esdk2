@@ -32,11 +32,6 @@ public final class RtlBitOperation extends RtlItem implements RtlBitSignal {
 		return rightOperand;
 	}
 
-	@Override
-	public RtlItem getRtlItem() {
-		return this;
-	}
-
 	public enum Operator {
 		AND,
 		OR,

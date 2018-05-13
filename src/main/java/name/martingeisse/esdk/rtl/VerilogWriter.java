@@ -30,14 +30,11 @@ public class VerilogWriter {
 		endIndentation();
 		out.println(");");
 		out.println();
-		startIndentation();
-		indent();
 		out.println("input clk;");
 		out.println();
 	}
 
 	public void writeOutro() {
-		endIndentation();
 		out.println("endmodule;");
 		out.println();
 	}

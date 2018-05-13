@@ -20,9 +20,4 @@ public final class RtlBitConstant extends RtlItem implements RtlBitSignal {
 		return value;
 	}
 
-	@Override
-	public RtlItem getRtlItem() {
-		return this;
-	}
-
 }

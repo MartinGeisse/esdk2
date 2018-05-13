@@ -22,9 +22,4 @@ public abstract class RtlProceduralSignal extends RtlItem implements RtlSignal {
 		return block;
 	}
 
-	@Override
-	public RtlItem getRtlItem() {
-		return this;
-	}
-
 }

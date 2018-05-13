@@ -24,11 +24,6 @@ public final class RtlVectorConstant extends RtlItem implements RtlVectorSignal 
 	}
 
 	@Override
-	public RtlItem getRtlItem() {
-		return this;
-	}
-
-	@Override
 	public int getWidth() {
 		return width;
 	}

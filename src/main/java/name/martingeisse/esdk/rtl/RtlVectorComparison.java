@@ -35,11 +35,6 @@ public final class RtlVectorComparison extends RtlItem implements RtlBitSignal {
 		return rightOperand;
 	}
 
-	@Override
-	public RtlItem getRtlItem() {
-		return this;
-	}
-
 	public enum Operator {
 		EQUAL,
 		NOT_EQUAL,
