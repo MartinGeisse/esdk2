@@ -13,4 +13,10 @@ public final class RtlAsynchronousBlock extends RtlBlock {
 		super(design);
 	}
 
+	public void printVerilogBlocks(VerilogWriter out) {
+		out.startProceduralAlwaysBlock("*");
+		getStatements().printVerilogStatements(out);
+		out.endProceduralAlwaysBlock();
+	}
+
 }

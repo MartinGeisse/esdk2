@@ -29,8 +29,14 @@ public abstract class RtlBlock extends RtlItem {
 		proceduralSignals.add(proceduralSignal);
 	}
 
+	public Iterable<RtlProceduralSignal> getProceduralSignals() {
+		return proceduralSignals;
+	}
+
 	public RtlStatementSequence getStatements() {
 		return statements;
 	}
+
+	public abstract void printVerilogBlocks(VerilogWriter out);
 
 }

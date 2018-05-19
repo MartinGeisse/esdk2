@@ -4,12 +4,12 @@
  */
 package name.martingeisse.esdk.rtl.xilinx;
 
-import name.martingeisse.esdk.rtl.RtlDesign;
-import name.martingeisse.esdk.rtl.VerilogDesignGenerator;
-import name.martingeisse.esdk.rtl.VerilogWriter;
+import name.martingeisse.esdk.rtl.*;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 
 /**
@@ -21,12 +21,17 @@ public class ProjectGenerator {
 	private final String name;
 	private final File outputFolder;
 	private final String fpgaPartId;
+	private final List<String> additionalUcfLines = new ArrayList<>();
 
 	public ProjectGenerator(RtlDesign design, String name, File outputFolder, String fpgaPartId) {
 		this.design = design;
 		this.name = name;
 		this.outputFolder = outputFolder;
 		this.fpgaPartId = fpgaPartId;
+	}
+
+	public void addUcfLine(String line) {
+		additionalUcfLines.add(line);
 	}
 
 	public void generate() throws IOException {
@@ -67,6 +72,20 @@ public class ProjectGenerator {
 
 		generateFile("upload.sh", out -> {
 			out.println("ssh martin@ise ./auto-ise/upload.sh");
+		});
+
+		generateFile("build.ucf", out -> {
+			for (RtlPin pin : design.getPins()) {
+				RtlPinConfiguration pinConfiguration = pin.getConfiguration();
+				if (!(pinConfiguration instanceof XilinxPinConfiguration)) {
+					throw new RuntimeException("cannot process pin configuration (not a XilinxPinConfiguration): " + pinConfiguration);
+				}
+				XilinxPinConfiguration xilinxPinConfiguration = (XilinxPinConfiguration)pinConfiguration;
+				xilinxPinConfiguration.writeUcf(pin, out);
+			}
+			for (String additionalUcfLine : additionalUcfLines) {
+				out.println(additionalUcfLine);
+			}
 		});
 
 	}
