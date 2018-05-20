@@ -141,4 +141,38 @@ public class VerilogWriter {
 		out.println("end");
 	}
 
+	//
+	// expressions
+	//
+
+	public void printExpression(RtlSignal signal) {
+		signal.printVerilogExpression(new VerilogExpressionWriter() {
+
+			@Override
+			public VerilogExpressionWriter print(String s) {
+				out.print(s);
+				return this;
+			}
+
+			@Override
+			public VerilogExpressionWriter print(int i) {
+				out.print(i);
+				return this;
+			}
+
+			@Override
+			public VerilogExpressionWriter print(char c) {
+				out.print(c);
+				return this;
+			}
+
+			@Override
+			public VerilogExpressionWriter print(RtlSignal signal, VerilogDesignGenerator.VerilogExpressionNesting nesting) {
+				TODO
+				return null;
+			}
+
+		});
+	}
+
 }

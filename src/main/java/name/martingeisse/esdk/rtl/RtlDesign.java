@@ -40,4 +40,12 @@ public final class RtlDesign {
 		return blocks;
 	}
 
+	public RtlClockNetworkBuilder createClockNetwork() {
+		return new RtlClockNetworkBuilder(this);
+	}
+
+	public RtlAsynchronousBlock createAsynchronousBlock() {
+		return new RtlAsynchronousBlock(this);
+	}
+
 }

@@ -14,4 +14,8 @@ public final class RtlClockNetwork extends RtlItem {
 		design.registerClockNetwork(this);
 	}
 
+	public RtlClockedBlock createBlock() {
+		return new RtlClockedBlock(getDesign(), this);
+	}
+
 }
