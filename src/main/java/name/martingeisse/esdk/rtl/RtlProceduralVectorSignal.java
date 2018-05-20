@@ -7,7 +7,7 @@ package name.martingeisse.esdk.rtl;
 /**
  *
  */
-public final class RtlProceduralVectorSignal extends RtlProceduralSignal implements RtlVectorSignal {
+public final class RtlProceduralVectorSignal extends RtlProceduralSignal implements RtlVectorSignal, RtlVectorAssignmentTarget {
 
 	private final int width;
 
@@ -19,6 +19,16 @@ public final class RtlProceduralVectorSignal extends RtlProceduralSignal impleme
 	@Override
 	public int getWidth() {
 		return width;
+	}
+
+	@Override
+	public void printVerilogLExpression(VerilogExpressionWriter out) {
+		TODO
+	}
+
+	@Override
+	public void printVerilogExpression(VerilogExpressionWriter out) {
+		TODO
 	}
 
 }

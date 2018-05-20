@@ -5,7 +5,6 @@
 package name.martingeisse.esdk.rtl;
 
 import java.io.PrintWriter;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -15,11 +14,16 @@ public class VerilogWriter {
 
 	private final PrintWriter out;
 	private int indentation = 0;
-	private final Map<RtlClockNetwork, String> clockNames = new HashMap<>();
-	private final Map<RtlSignal, String> signalNames = new HashMap<>();
+	private Map<RtlClockNetwork, String> clockNames;
+	private Map<RtlSignal, String> declaredSignals;
 
-	public VerilogWriter(PrintWriter out) {
+	VerilogWriter(PrintWriter out) {
 		this.out = out;
+	}
+
+	void prepare(Map<RtlClockNetwork, String> clockNames, Map<RtlSignal, String> declaredSignals) {
+		this.clockNames = clockNames;
+		this.declaredSignals = declaredSignals;
 	}
 
 	public PrintWriter getOut() {
@@ -49,7 +53,11 @@ public class VerilogWriter {
 	//
 
 	public String getClockName(RtlClockNetwork clockNetwork) {
-		return getNameInternal(clockNames, clockNetwork, "clk");
+		String name = clockNames.get(clockNetwork);
+		if (name == null) {
+			throw new IllegalArgumentException("could not find name for clock network: " + clockNetwork);
+		}
+		return name;
 	}
 
 	public void printClockName(RtlClockNetwork clockNetwork) {
@@ -57,20 +65,15 @@ public class VerilogWriter {
 	}
 
 	public String getSignalName(RtlSignal signal) {
-		return getNameInternal(signalNames, signal, "s");
+		String name = declaredSignals.get(signal);
+		if (name == null) {
+			throw new IllegalArgumentException("could not find name for signal: " + signal);
+		}
+		return name;
 	}
 
 	public void printSignalName(RtlSignal signal) {
 		out.print(getSignalName(signal));
-	}
-
-	private <T> String getNameInternal(Map<T, String> nameMap, T object, String prefix) {
-		String name = nameMap.get(object);
-		if (name == null) {
-			name = prefix + nameMap.size();
-			nameMap.put(object, name);
-		}
-		return name;
 	}
 
 	//
@@ -168,8 +171,13 @@ public class VerilogWriter {
 
 			@Override
 			public VerilogExpressionWriter print(RtlSignal signal, VerilogDesignGenerator.VerilogExpressionNesting nesting) {
-				TODO
-				return null;
+				String name = declaredSignals.get(signal);
+				if (name == null) {
+					printExpression(signal);
+				} else {
+					out.print(name);
+				}
+				return this;
 			}
 
 		});

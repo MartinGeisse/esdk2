@@ -4,17 +4,19 @@
  */
 package name.martingeisse.esdk.rtl.statement;
 
-import name.martingeisse.esdk.rtl.*;
+import name.martingeisse.esdk.rtl.RtlDesign;
+import name.martingeisse.esdk.rtl.RtlVectorAssignmentTarget;
+import name.martingeisse.esdk.rtl.RtlVectorSignal;
 
 /**
  *
  */
-public final class RtlProceduralVectorSignalAssignment extends RtlProceduralSignalAssignment {
+public final class RtlVectorAssignment extends RtlAssignment {
 
-	private final RtlProceduralVectorSignal destination;
+	private final RtlVectorAssignmentTarget destination;
 	private final RtlVectorSignal source;
 
-	public RtlProceduralVectorSignalAssignment(RtlDesign design, RtlProceduralVectorSignal destination, RtlVectorSignal source) {
+	public RtlVectorAssignment(RtlDesign design, RtlVectorAssignmentTarget destination, RtlVectorSignal source) {
 		super(design);
 		checkSameDesign(destination);
 		checkSameDesign(source);
@@ -26,7 +28,7 @@ public final class RtlProceduralVectorSignalAssignment extends RtlProceduralSign
 	}
 
 	@Override
-	public RtlProceduralVectorSignal getDestination() {
+	public RtlVectorAssignmentTarget getDestination() {
 		return destination;
 	}
 

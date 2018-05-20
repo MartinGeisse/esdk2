@@ -4,9 +4,7 @@
  */
 package name.martingeisse.esdk.rtl.statement;
 
-import name.martingeisse.esdk.rtl.RtlBitSignal;
-import name.martingeisse.esdk.rtl.RtlDesign;
-import name.martingeisse.esdk.rtl.VerilogWriter;
+import name.martingeisse.esdk.rtl.*;
 
 /**
  *
@@ -30,6 +28,15 @@ public final class RtlWhenStatement extends RtlStatement {
 
 	public RtlStatementSequence getOtherwiseBranch() {
 		return otherwiseBranch;
+	}
+
+	@Override
+	public void printExpressionsDryRun(VerilogExpressionWriter expressionWriter) {
+		expressionWriter.print(condition, VerilogDesignGenerator.VerilogExpressionNesting.ALL);
+		thenBranch.printExpressionsDryRun(expressionWriter);
+		if (otherwiseBranch != null) {
+			otherwiseBranch.printExpressionsDryRun(expressionWriter);
+		}
 	}
 
 	@Override

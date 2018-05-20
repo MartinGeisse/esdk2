@@ -4,7 +4,10 @@
  */
 package name.martingeisse.esdk.rtl.xilinx;
 
-import name.martingeisse.esdk.rtl.*;
+import name.martingeisse.esdk.rtl.RtlDesign;
+import name.martingeisse.esdk.rtl.RtlPin;
+import name.martingeisse.esdk.rtl.RtlPinConfiguration;
+import name.martingeisse.esdk.rtl.VerilogDesignGenerator;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -38,9 +41,7 @@ public class ProjectGenerator {
 		outputFolder.mkdirs();
 
 		generateFile(name + ".v", out -> {
-			VerilogWriter verilogWriter = new VerilogWriter(out);
-			VerilogDesignGenerator designGenerator = new VerilogDesignGenerator(verilogWriter, design, name);
-			designGenerator.generate();
+			new VerilogDesignGenerator(out, design, name).generate();
 		});
 
 		generateFile("environment.sh", out -> {
@@ -80,7 +81,7 @@ public class ProjectGenerator {
 				if (!(pinConfiguration instanceof XilinxPinConfiguration)) {
 					throw new RuntimeException("cannot process pin configuration (not a XilinxPinConfiguration): " + pinConfiguration);
 				}
-				XilinxPinConfiguration xilinxPinConfiguration = (XilinxPinConfiguration)pinConfiguration;
+				XilinxPinConfiguration xilinxPinConfiguration = (XilinxPinConfiguration) pinConfiguration;
 				xilinxPinConfiguration.writeUcf(pin, out);
 			}
 			for (String additionalUcfLine : additionalUcfLines) {

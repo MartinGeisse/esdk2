@@ -4,8 +4,8 @@
  */
 package name.martingeisse.esdk.rtl;
 
-import name.martingeisse.esdk.rtl.statement.RtlStatement;
-
+import java.io.PrintWriter;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -20,76 +20,32 @@ public class VerilogDesignGenerator {
 	private final String name;
 
 	private Set<RtlSignal> allSignals;
-	private Set<RtlSignal> declaredSignals;
+	private Map<RtlSignal, String> declaredSignals;
+	private VerilogExpressionWriter dryRunExpressionWriter;
 
-	public VerilogDesignGenerator(VerilogWriter out, RtlDesign design, String name) {
-		this.out = out;
+
+	public VerilogDesignGenerator(PrintWriter out, RtlDesign design, String name) {
+		this.out = new VerilogWriter(out);
 		this.design = design;
 		this.name = name;
 	}
 
 	public void generate() {
 		analyzeSignals();
+		out.prepare(new HashMap<>(), declaredSignals);
 		out.printIntro(name, design.getPins());
 		printSignalDeclarations();
 		out.printOutro();
 	}
 
+	//
+	// analysis
+	//
+
 	private void analyzeSignals() {
 		allSignals = new HashSet<>();
-		declaredSignals = new HashSet<>();
-
-		// procedural signals must be declared
-		for (RtlBlock block : design.getBlocks()) {
-			for (RtlProceduralSignal signal : block.getProceduralSignals()) {
-				allSignals.add(signal);
-				declaredSignals.add(signal);
-			}
-		}
-
-		// analyze output and output-enable signals for signals to extract
-		for (RtlPin pin : design.getPins()) {
-			if (pin instanceof RtlOutputPin) {
-				RtlOutputPin outputPin = (RtlOutputPin)pin;
-				analyzeSignal(outputPin.getOutputSignal(), VerilogExpressionNesting.ALL);
-			} else if (pin instanceof RtlBidirectionalPin) {
-				RtlBidirectionalPin bidirectionalPin = (RtlBidirectionalPin)pin;
-				analyzeSignal(bidirectionalPin.getOutputSignal(), VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
-				analyzeSignal(bidirectionalPin.getOutputEnableSignal(), VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
-			}
-		}
-
-		// analyze signal "expressions" in blocks for signals to extract
-		for (RtlBlock block : design.getBlocks()) {
-			analyzeSignals(block.getStatements());
-			if (block instanceof RtlClockedBlock) {
-				analyzeSignals(((RtlClockedBlock) block).getInitializerStatements());
-			}
-		}
-
-	}
-
-	private void analyzeSignals(RtlStatement statement) {
-		statement.foreachSignalDependency(signal -> analyzeSignal(signal, VerilogExpressionNesting.ALL));
-	}
-
-	private void analyzeSignal(RtlSignal signal, VerilogExpressionNesting nesting) {
-
-		// extract all signals that are used in more than one place. Those have been analyzed already.
-		if (!allSignals.add(signal)) {
-			declaredSignals.add(signal);
-			return;
-		}
-
-		// also extract signals that do not comply with the current nesting level
-		boolean compliesWithNesting = signal.compliesWith(nesting);
-		if (!compliesWithNesting) {
-			declaredSignals.add(signal);
-		}
-
-		// Analyze signals for sub-expressions by calling a "dry-run" printing process. While this sounds more complex,
-		// it concentrates the complexity here, in one place, and simplifies the RtlSignal implementations.
-		signal.printVerilogExpression(new VerilogExpressionWriter() {
+		declaredSignals = new HashMap<>();
+		dryRunExpressionWriter = new VerilogExpressionWriter() {
 
 			@Override
 			public VerilogExpressionWriter print(String s) {
@@ -112,8 +68,65 @@ public class VerilogDesignGenerator {
 				return this;
 			}
 
-		});
+		};
 
+		// procedural signals must be declared
+		for (RtlBlock block : design.getBlocks()) {
+			for (RtlProceduralSignal signal : block.getProceduralSignals()) {
+				allSignals.add(signal);
+				declareSignal(signal);
+			}
+		}
+
+		// analyze output and output-enable signals for signals to extract
+		for (RtlPin pin : design.getPins()) {
+			if (pin instanceof RtlOutputPin) {
+				RtlOutputPin outputPin = (RtlOutputPin)pin;
+				analyzeSignal(outputPin.getOutputSignal(), VerilogExpressionNesting.ALL);
+			} else if (pin instanceof RtlBidirectionalPin) {
+				RtlBidirectionalPin bidirectionalPin = (RtlBidirectionalPin)pin;
+				analyzeSignal(bidirectionalPin.getOutputSignal(), VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
+				analyzeSignal(bidirectionalPin.getOutputEnableSignal(), VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
+			}
+		}
+
+		// analyze signal "expressions" in blocks for signals to extract
+		for (RtlBlock block : design.getBlocks()) {
+			block.getStatements().printExpressionsDryRun(dryRunExpressionWriter);
+			if (block instanceof RtlClockedBlock) {
+				((RtlClockedBlock) block).getInitializerStatements().printExpressionsDryRun(dryRunExpressionWriter);
+			}
+		}
+
+	}
+
+	private void analyzeSignal(RtlSignal signal, VerilogExpressionNesting nesting) {
+
+		// extract all signals that are used in more than one place. Those have been analyzed already.
+		if (!allSignals.add(signal)) {
+			declareSignal(signal);
+			return;
+		}
+
+		// also extract signals that do not comply with the current nesting level
+		boolean compliesWithNesting = signal.compliesWith(nesting);
+		if (!compliesWithNesting) {
+			declareSignal(signal);
+		}
+
+		// Analyze signals for sub-expressions by calling a "dry-run" printing process. While this sounds more complex,
+		// it concentrates the complexity here, in one place, and simplifies the RtlSignal implementations.
+		signal.printVerilogExpression(dryRunExpressionWriter);
+
+	}
+
+	private String declareSignal(RtlSignal signal) {
+		String name = declaredSignals.get(signal);
+		if (name == null) {
+			name = "s" + declaredSignals.size();
+			declaredSignals.put(signal, name);
+		}
+		return name;
 	}
 
 	public enum VerilogExpressionNesting {
@@ -122,8 +135,14 @@ public class VerilogDesignGenerator {
 		SIGNALS_AND_CONSTANTS
 	}
 
+	//
+	// code generation
+	//
+
 	private void printSignalDeclarations() {
-		for (RtlSignal signal : declaredSignals) {
+		for (Map.Entry<RtlSignal, String> signalEntry : declaredSignals.entrySet()) {
+			RtlSignal signal = signalEntry.getKey();
+			String signalName = signalEntry.getValue();
 			if (signal instanceof RtlProceduralSignal) {
 				out.getOut().print("reg");
 			} else {
@@ -139,7 +158,7 @@ public class VerilogDesignGenerator {
 			} else {
 				throw new RuntimeException("signal is neither a bit signal nor a vector signal: " + signal);
 			}
-			out.printSignalName(signal);
+			out.getOut().print(signalName);
 		}
 	}
 

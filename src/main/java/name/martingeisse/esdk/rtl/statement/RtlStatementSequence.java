@@ -6,6 +6,7 @@ package name.martingeisse.esdk.rtl.statement;
 
 import name.martingeisse.esdk.rtl.RtlBitSignal;
 import name.martingeisse.esdk.rtl.RtlDesign;
+import name.martingeisse.esdk.rtl.VerilogExpressionWriter;
 import name.martingeisse.esdk.rtl.VerilogWriter;
 
 import java.util.ArrayList;
@@ -31,6 +32,13 @@ public class RtlStatementSequence extends RtlStatement {
 		RtlWhenStatement whenStatement = new RtlWhenStatement(getDesign(), condition);
 		addStatement(whenStatement);
 		return whenStatement;
+	}
+
+	@Override
+	public void printExpressionsDryRun(VerilogExpressionWriter expressionWriter) {
+		for (RtlStatement statement : statements) {
+			statement.printExpressionsDryRun(expressionWriter);
+		}
 	}
 
 	@Override

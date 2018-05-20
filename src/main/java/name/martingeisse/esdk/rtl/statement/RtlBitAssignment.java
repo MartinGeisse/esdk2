@@ -4,19 +4,19 @@
  */
 package name.martingeisse.esdk.rtl.statement;
 
+import name.martingeisse.esdk.rtl.RtlBitAssignmentTarget;
 import name.martingeisse.esdk.rtl.RtlBitSignal;
 import name.martingeisse.esdk.rtl.RtlDesign;
-import name.martingeisse.esdk.rtl.RtlProceduralBitSignal;
 
 /**
  *
  */
-public final class RtlProceduralBitSignalAssignment extends RtlProceduralSignalAssignment {
+public final class RtlBitAssignment extends RtlAssignment {
 
-	private final RtlProceduralBitSignal destination;
+	private final RtlBitAssignmentTarget destination;
 	private final RtlBitSignal source;
 
-	public RtlProceduralBitSignalAssignment(RtlDesign design, RtlProceduralBitSignal destination, RtlBitSignal source) {
+	public RtlBitAssignment(RtlDesign design, RtlBitAssignmentTarget destination, RtlBitSignal source) {
 		super(design);
 		checkSameDesign(destination);
 		checkSameDesign(source);
@@ -25,7 +25,7 @@ public final class RtlProceduralBitSignalAssignment extends RtlProceduralSignalA
 	}
 
 	@Override
-	public RtlProceduralBitSignal getDestination() {
+	public RtlBitAssignmentTarget getDestination() {
 		return destination;
 	}
 

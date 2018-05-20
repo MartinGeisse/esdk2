@@ -7,7 +7,7 @@ package name.martingeisse.esdk.rtl;
 /**
  *
  */
-public abstract class RtlProceduralSignal extends RtlItem implements RtlSignal {
+public abstract class RtlProceduralSignal extends RtlItem implements RtlSignal, RtlAssignmentTarget {
 
 	private final RtlBlock block;
 
