@@ -12,8 +12,8 @@ import name.martingeisse.esdk.rtl.VerilogExpressionWriter;
 public interface RtlAssignmentTarget extends RtlItemOwned {
 
 	/**
-	 * Writes a Verilog L-expression for this assignment target.
+	 * Writes a Verilog assignment target for this assignment target.
 	 */
-	void printVerilogLExpression(VerilogExpressionWriter out);
+	void printVerilogAssignmentTarget(VerilogWriter out);
 
 }
