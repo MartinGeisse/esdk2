@@ -27,4 +27,6 @@ public interface VerilogExpressionWriter {
 
 	VerilogExpressionWriter print(RtlSignal signal, VerilogDesignGenerator.VerilogExpressionNesting nesting);
 
+	VerilogExpressionWriter printProceduralSignalName(RtlProceduralSignal signal);
+
 }

@@ -68,6 +68,11 @@ public class VerilogDesignGenerator {
 				return this;
 			}
 
+			@Override
+			public VerilogExpressionWriter printProceduralSignalName(RtlProceduralSignal signal) {
+				return this;
+			}
+
 		};
 
 		// procedural signals must be declared

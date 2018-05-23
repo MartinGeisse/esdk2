@@ -145,7 +145,7 @@ public class VerilogWriter {
 	}
 
 	//
-	// expressions
+	// expressions and assignment targets
 	//
 
 	public void printExpression(RtlSignal signal) {
@@ -180,7 +180,21 @@ public class VerilogWriter {
 				return this;
 			}
 
+			@Override
+			public VerilogExpressionWriter printProceduralSignalName(RtlProceduralSignal signal) {
+				VerilogWriter.this.printProceduralSignalName(signal);
+				return this;
+			}
+
 		});
+	}
+
+	public void printProceduralSignalName(RtlProceduralSignal signal) {
+		String name = declaredSignals.get(signal);
+		if (name == null) {
+			throw new IllegalArgumentException("no name allocated for procedural signal " + signal);
+		}
+		out.print(name);
 	}
 
 }

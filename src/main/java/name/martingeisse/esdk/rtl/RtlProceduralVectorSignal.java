@@ -23,14 +23,12 @@ public final class RtlProceduralVectorSignal extends RtlProceduralSignal impleme
 
 	@Override
 	public void printVerilogAssignmentTarget(VerilogWriter out) {
-		TODO
+		out.printProceduralSignalName(this);
 	}
 
 	@Override
 	public void printVerilogExpression(VerilogExpressionWriter out) {
-		// the VerilogExpressionWriter should not call this method again but print
-		// the allocated signal name instead, so this won't go into an infinite loop
-		out.print(this);
+		out.printProceduralSignalName(this);
 	}
 
 }
