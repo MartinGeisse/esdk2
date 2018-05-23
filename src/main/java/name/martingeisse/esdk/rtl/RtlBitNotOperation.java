@@ -20,4 +20,10 @@ public final class RtlBitNotOperation extends RtlItem implements RtlBitSignal {
 		return operand;
 	}
 
+	@Override
+	public void printVerilogExpression(VerilogExpressionWriter out) {
+		out.print('~');
+		out.print(operand, VerilogDesignGenerator.VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
+	}
+
 }

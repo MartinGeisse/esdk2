@@ -21,10 +21,6 @@ public interface VerilogExpressionWriter {
 	VerilogExpressionWriter print(int i);
 	VerilogExpressionWriter print(char c);
 
-	default VerilogExpressionWriter print(RtlSignal signal) {
-		return print(signal, VerilogDesignGenerator.VerilogExpressionNesting.SIGNALS_AND_CONSTANTS);
-	}
-
 	VerilogExpressionWriter print(RtlSignal signal, VerilogDesignGenerator.VerilogExpressionNesting nesting);
 
 	VerilogExpressionWriter printProceduralSignalName(RtlProceduralSignal signal);

@@ -7,24 +7,18 @@ package name.martingeisse.esdk.rtl;
 /**
  *
  */
-public final class RtlConditionalVectorOperation extends RtlItem implements RtlVectorSignal {
+public final class RtlConditionalVectorOperation extends RtlConditionalOperation implements RtlVectorSignal {
 
-	private final RtlBitSignal condition;
 	private final RtlVectorSignal onTrue;
 	private final RtlVectorSignal onFalse;
 
 	public RtlConditionalVectorOperation(RtlDesign design, RtlBitSignal condition, RtlVectorSignal onTrue, RtlVectorSignal onFalse) {
-		super(design);
+		super(design, condition);
 		if (onTrue.getWidth() != onFalse.getWidth()) {
 			throw new IllegalArgumentException("onTrue has width " + onTrue.getWidth() + " but onFalse has width " + onFalse.getWidth());
 		}
-		this.condition = condition;
 		this.onTrue = onTrue;
 		this.onFalse = onFalse;
-	}
-
-	public RtlBitSignal getCondition() {
-		return condition;
 	}
 
 	public RtlVectorSignal getOnTrue() {
@@ -34,5 +28,10 @@ public final class RtlConditionalVectorOperation extends RtlItem implements RtlV
 	public RtlVectorSignal getOnFalse() {
 		return onFalse;
 	}
-	
+
+	@Override
+	public int getWidth() {
+		return onTrue.getWidth();
+	}
+
 }

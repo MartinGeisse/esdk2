@@ -32,11 +32,31 @@ public final class RtlBitOperation extends RtlItem implements RtlBitSignal {
 		return rightOperand;
 	}
 
+	@Override
+	public void printVerilogExpression(VerilogExpressionWriter out) {
+		out.print(leftOperand, VerilogDesignGenerator.VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
+		out.print(' ');
+		out.print(operator.getSymbol());
+		out.print(' ');
+		out.print(rightOperand, VerilogDesignGenerator.VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
+	}
+
 	public enum Operator {
-		AND,
-		OR,
-		XOR,
-		XNOR,
+		AND("&"),
+		OR("|"),
+		XOR("^"),
+		XNOR("==");
+
+		private final String symbol;
+
+		Operator(String symbol) {
+			this.symbol = symbol;
+		}
+
+		public String getSymbol() {
+			return symbol;
+		}
+
 	}
 
 }

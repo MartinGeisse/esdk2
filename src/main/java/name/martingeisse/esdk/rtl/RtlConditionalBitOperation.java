@@ -7,21 +7,15 @@ package name.martingeisse.esdk.rtl;
 /**
  *
  */
-public final class RtlConditionalBitOperation extends RtlItem implements RtlBitSignal {
+public final class RtlConditionalBitOperation extends RtlConditionalOperation implements RtlBitSignal {
 
-	private final RtlBitSignal condition;
 	private final RtlBitSignal onTrue;
 	private final RtlBitSignal onFalse;
 
 	public RtlConditionalBitOperation(RtlDesign design, RtlBitSignal condition, RtlBitSignal onTrue, RtlBitSignal onFalse) {
-		super(design);
-		this.condition = condition;
+		super(design, condition);
 		this.onTrue = onTrue;
 		this.onFalse = onFalse;
-	}
-
-	public RtlBitSignal getCondition() {
-		return condition;
 	}
 
 	public RtlBitSignal getOnTrue() {
