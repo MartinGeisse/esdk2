@@ -4,12 +4,10 @@
  */
 package name.martingeisse.esdk.rtl.statement;
 
-import name.martingeisse.esdk.rtl.RtlBitSignal;
-import name.martingeisse.esdk.rtl.RtlDesign;
-import name.martingeisse.esdk.rtl.VerilogExpressionWriter;
-import name.martingeisse.esdk.rtl.VerilogWriter;
+import name.martingeisse.esdk.rtl.*;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
 
 /**
@@ -26,6 +24,35 @@ public class RtlStatementSequence extends RtlStatement {
 	public final void addStatement(RtlStatement statement) {
 		checkSameDesign(statement);
 		statements.add(statement);
+	}
+
+	public final RtlBitAssignment assign(RtlBitAssignmentTarget destination, RtlBitSignal source) {
+		RtlBitAssignment assignment = new RtlBitAssignment(getDesign(), destination, source);
+		addStatement(assignment);
+		return assignment;
+	}
+
+	public final RtlBitAssignment assignBit(RtlBitAssignmentTarget destination, boolean value) {
+		RtlBitConstant constant = new RtlBitConstant(getDesign(), value);
+		RtlBitAssignment assignment = new RtlBitAssignment(getDesign(), destination, constant);
+		addStatement(assignment);
+		return assignment;
+	}
+
+	public final RtlVectorAssignment assign(RtlVectorAssignmentTarget destination, RtlVectorSignal source) {
+		RtlVectorAssignment assignment = new RtlVectorAssignment(getDesign(), destination, source);
+		addStatement(assignment);
+		return assignment;
+	}
+
+	public final RtlVectorAssignment assignUnsigned(RtlVectorAssignmentTarget destination, int value) {
+		if (value < 0) {
+			throw new IllegalArgumentException("assignUnsigned called with negative value: " + value);
+		}
+		RtlVectorConstant constant = RtlVectorConstant.from(getDesign(), destination.getWidth(), value);
+		RtlVectorAssignment assignment = new RtlVectorAssignment(getDesign(), destination, constant);
+		addStatement(assignment);
+		return assignment;
 	}
 
 	public final RtlWhenStatement when(RtlBitSignal condition) {

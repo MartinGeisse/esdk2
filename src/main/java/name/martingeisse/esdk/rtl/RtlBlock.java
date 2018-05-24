@@ -39,4 +39,12 @@ public abstract class RtlBlock extends RtlItem {
 
 	public abstract void printVerilogBlocks(VerilogWriter out);
 
+	public RtlProceduralBitSignal createBit() {
+		return new RtlProceduralBitSignal(getDesign(), this);
+	}
+
+	public RtlProceduralVectorSignal createVector(int width) {
+		return new RtlProceduralVectorSignal(getDesign(), this, width);
+	}
+
 }
