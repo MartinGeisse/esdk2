@@ -40,16 +40,33 @@ public final class RtlVectorOperation extends RtlItem implements RtlVectorSignal
 		return leftOperand.getWidth();
 	}
 
+	@Override
+	public void printVerilogExpression(VerilogExpressionWriter out) {
+		out.print(leftOperand, VerilogDesignGenerator.VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
+		out.print(' ');
+		out.print(operator.getSymbol());
+		out.print(' ');
+		out.print(rightOperand, VerilogDesignGenerator.VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
+	}
+
 	public enum Operator {
-		ADD,
-		SUBTRACT,
-		MULTIPLY,
-		AND,
-		NAND,
-		OR,
-		NOR,
-		XOR,
-		XNOR,
+		ADD("+"),
+		SUBTRACT("-"),
+		MULTIPLY("*"),
+		AND("&"),
+		OR("|"),
+		XOR("^");
+
+		private final String symbol;
+
+		Operator(String symbol) {
+			this.symbol = symbol;
+		}
+
+		public String getSymbol() {
+			return symbol;
+		}
+
 	}
 
 }
