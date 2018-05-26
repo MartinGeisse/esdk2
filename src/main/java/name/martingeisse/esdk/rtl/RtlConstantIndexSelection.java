@@ -1,0 +1,35 @@
+/*
+ * Copyright (c) 2018 Martin Geisse
+ * This file is distributed under the terms of the MIT license.
+ */
+package name.martingeisse.esdk.rtl;
+
+/**
+ * Unlike {@link RtlIndexSelection} with an {@link RtlVectorConstant} as the index, this class can select the upper
+ * bits of a vector whose width is not a power-of-two. A non-constant selection cannot do that because it cannot
+ * statically prove that the index is always within range.
+ */
+public final class RtlConstantIndexSelection extends RtlItem implements RtlBitSignal {
+
+	private final RtlVectorSignal containerSignal;
+	private final int index;
+
+	public RtlConstantIndexSelection(RtlDesign design, RtlVectorSignal containerSignal, int index) {
+		super(design);
+		checkSameDesign(containerSignal);
+		if (index >= containerSignal.getWidth()) {
+			throw new IllegalArgumentException("index " + index + " out of bounds for width " + containerSignal.getWidth());
+		}
+		this.containerSignal = containerSignal;
+		this.index = index;
+	}
+
+	public RtlVectorSignal getContainerSignal() {
+		return containerSignal;
+	}
+
+	public int getIndex() {
+		return index;
+	}
+
+}

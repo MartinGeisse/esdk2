@@ -35,17 +35,33 @@ public final class RtlVectorComparison extends RtlItem implements RtlBitSignal {
 		return rightOperand;
 	}
 
+	@Override
+	public void printVerilogExpression(VerilogExpressionWriter out) {
+		out.print(leftOperand, VerilogDesignGenerator.VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
+		out.print(' ');
+		out.print(operator.getSymbol());
+		out.print(' ');
+		out.print(rightOperand, VerilogDesignGenerator.VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
+	}
+
 	public enum Operator {
-		EQUAL,
-		NOT_EQUAL,
-		UNSIGNED_LESS_THAN,
-		UNSIGNED_LESS_THAN_OR_EQUAL,
-		UNSIGNED_GREATER_THAN,
-		UNSIGNED_GREATER_THAN_OR_EQUAL,
-		SIGNED_LESS_THAN,
-		SIGNED_LESS_THAN_OR_EQUAL,
-		SIGNED_GREATER_THAN,
-		SIGNED_GREATER_THAN_OR_EQUAL,
+		EQUAL("=="),
+		NOT_EQUAL("!="),
+		UNSIGNED_LESS_THAN("<"),
+		UNSIGNED_LESS_THAN_OR_EQUAL("<="),
+		UNSIGNED_GREATER_THAN(">"),
+		UNSIGNED_GREATER_THAN_OR_EQUAL(">=");
+
+		private final String symbol;
+
+		Operator(String symbol) {
+			this.symbol = symbol;
+		}
+
+		public String getSymbol() {
+			return symbol;
+		}
+
 	}
 
 }

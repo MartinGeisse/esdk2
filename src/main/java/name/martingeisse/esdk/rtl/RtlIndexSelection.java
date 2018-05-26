@@ -7,7 +7,7 @@ package name.martingeisse.esdk.rtl;
 /**
  *
  */
-public class RtlIndexSelection extends RtlItem implements RtlBitSignal {
+public final class RtlIndexSelection extends RtlItem implements RtlBitSignal {
 
 	private final RtlVectorSignal containerSignal;
 	private final RtlVectorSignal indexSignal;
