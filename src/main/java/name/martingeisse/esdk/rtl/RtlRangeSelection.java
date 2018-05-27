@@ -37,4 +37,24 @@ public class RtlRangeSelection extends RtlItem implements RtlVectorSignal {
 		return to;
 	}
 
+	@Override
+	public int getWidth() {
+		return from - to + 1;
+	}
+
+	@Override
+	public boolean compliesWith(VerilogDesignGenerator.VerilogExpressionNesting nesting) {
+		return nesting != VerilogDesignGenerator.VerilogExpressionNesting.SIGNALS_AND_CONSTANTS;
+	}
+
+	@Override
+	public void printVerilogExpression(VerilogExpressionWriter out) {
+		out.print(containerSignal, VerilogDesignGenerator.VerilogExpressionNesting.SIGNALS_AND_CONSTANTS);
+		out.print('[');
+		out.print(from);
+		out.print(':');
+		out.print(to);
+		out.print(']');
+	}
+
 }

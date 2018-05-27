@@ -31,4 +31,17 @@ public final class RtlIndexSelection extends RtlItem implements RtlBitSignal {
 		return indexSignal;
 	}
 
+	@Override
+	public boolean compliesWith(VerilogDesignGenerator.VerilogExpressionNesting nesting) {
+		return nesting != VerilogDesignGenerator.VerilogExpressionNesting.SIGNALS_AND_CONSTANTS;
+	}
+
+	@Override
+	public void printVerilogExpression(VerilogExpressionWriter out) {
+		out.print(containerSignal, VerilogDesignGenerator.VerilogExpressionNesting.SIGNALS_AND_CONSTANTS);
+		out.print('[');
+		out.print(indexSignal, VerilogDesignGenerator.VerilogExpressionNesting.SIGNALS_AND_CONSTANTS);
+		out.print(']');
+	}
+
 }

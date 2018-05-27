@@ -26,9 +26,9 @@ public abstract class RtlAssignment extends RtlStatement {
 	@Override
 	public void printVerilogStatements(VerilogWriter out) {
 		out.indent();
-		out.print(getDestination());
+		getDestination().printVerilogAssignmentTarget(out);
 		out.getOut().print(" <= ");
-		out.print(getSource());
+		out.printExpression(getSource());
 		out.getOut().println(";");
 	}
 

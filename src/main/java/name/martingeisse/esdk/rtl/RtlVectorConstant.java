@@ -46,4 +46,34 @@ public final class RtlVectorConstant extends RtlItem implements RtlVectorSignal 
 		return (BitSet) value.clone();
 	}
 
+	@Override
+	public boolean compliesWith(VerilogDesignGenerator.VerilogExpressionNesting nesting) {
+		return true;
+	}
+
+	@Override
+	public void printVerilogExpression(VerilogExpressionWriter out) {
+		out.print(width);
+		out.print("'h");
+		printDigits(0, out);
+	}
+
+	private void printDigits(int baseIndex, VerilogExpressionWriter out) {
+
+		// print digits for higher order bits
+		if (baseIndex < value.length()) {
+			printDigits(baseIndex + 4, out);
+		}
+
+		// print digit
+		int digitValue =
+			(value.get(0) ? 1 : 0) +
+			(value.get(1) ? 2 : 0) +
+			(value.get(2) ? 4 : 0) +
+			(value.get(3) ? 8 : 0);
+		int symbol = (digitValue < 10 ? (digitValue + '0') : (digitValue - 10 + 'a'));
+		out.print((char)symbol);
+
+	}
+
 }

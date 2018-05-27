@@ -52,4 +52,22 @@ public final class RtlConcatenation extends RtlItem implements RtlVectorSignal {
 		return width;
 	}
 
+	@Override
+	public void printVerilogExpression(VerilogExpressionWriter out) {
+		if (width == 0) {
+			throw new RuntimeException("cannot print zero-width concatenation");
+		}
+		out.print('{');
+		boolean first = true;
+		for (RtlSignal signal : signals) {
+			if (first) {
+				first = false;
+			} else {
+				out.print(", ");
+			}
+			out.print(signal, VerilogDesignGenerator.VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
+		}
+		out.print('}');
+	}
+
 }

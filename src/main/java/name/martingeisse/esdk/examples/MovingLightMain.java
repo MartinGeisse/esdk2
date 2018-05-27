@@ -24,7 +24,10 @@ public class MovingLightMain {
 		RtlProceduralVectorSignal leds = block.createVector(8);
 		block.getInitializerStatements().assignUnsigned(leds, 1);
 		RtlWhenStatement whenPrescalerZero = block.getStatements().when(prescaler.compareEqual(0));
-		whenPrescalerZero.getThenBranch().assign(leds, );
+		whenPrescalerZero.getThenBranch().assign(leds, new RtlConcatenation(design,
+			leds.select(0),
+			leds.select(7, 1)
+		));
 
 		ledPin(design, "F12", leds.select(0));
 		ledPin(design, "E12", leds.select(1));
