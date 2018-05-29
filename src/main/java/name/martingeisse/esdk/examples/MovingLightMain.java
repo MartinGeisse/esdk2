@@ -7,14 +7,17 @@ import name.martingeisse.esdk.rtl.pin.RtlOutputPin;
 import name.martingeisse.esdk.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.rtl.signal.RtlConcatenation;
 import name.martingeisse.esdk.rtl.statement.RtlWhenStatement;
+import name.martingeisse.esdk.rtl.xilinx.ProjectGenerator;
 import name.martingeisse.esdk.rtl.xilinx.XilinxPinConfiguration;
+
+import java.io.File;
 
 /**
  *
  */
 public class MovingLightMain {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 
 		RtlDesign design = new RtlDesign();
 		RtlClockNetwork clk = design.createClockNetwork();
@@ -42,6 +45,7 @@ public class MovingLightMain {
 		ledPin(design, "E9", leds.select(6));
 		ledPin(design, "F9", leds.select(7));
 
+		new ProjectGenerator(design, "MovingLight", new File("ise/moving_light"), "XC3S500E-FG320-4").generate();
 	}
 
 	private static RtlOutputPin ledPin(RtlDesign design, String id, RtlBitSignal outputSignal) {

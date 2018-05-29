@@ -175,6 +175,7 @@ public class VerilogDesignGenerator {
 				throw new RuntimeException("signal is neither a bit signal nor a vector signal: " + signal);
 			}
 			out.getOut().print(signalName);
+			out.getOut().println(';');
 		}
 	}
 
