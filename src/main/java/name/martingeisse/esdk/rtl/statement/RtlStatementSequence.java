@@ -5,9 +5,14 @@
 package name.martingeisse.esdk.rtl.statement;
 
 import name.martingeisse.esdk.rtl.*;
+import name.martingeisse.esdk.rtl.signal.RtlBitConstant;
+import name.martingeisse.esdk.rtl.signal.RtlBitSignal;
+import name.martingeisse.esdk.rtl.signal.RtlVectorConstant;
+import name.martingeisse.esdk.rtl.signal.RtlVectorSignal;
+import name.martingeisse.esdk.rtl.verilog.VerilogExpressionWriter;
+import name.martingeisse.esdk.rtl.verilog.VerilogWriter;
 
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.List;
 
 /**

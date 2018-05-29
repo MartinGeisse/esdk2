@@ -5,6 +5,10 @@
 package name.martingeisse.esdk.rtl.statement;
 
 import name.martingeisse.esdk.rtl.*;
+import name.martingeisse.esdk.rtl.signal.RtlBitSignal;
+import name.martingeisse.esdk.rtl.verilog.VerilogDesignGenerator;
+import name.martingeisse.esdk.rtl.verilog.VerilogExpressionWriter;
+import name.martingeisse.esdk.rtl.verilog.VerilogWriter;
 
 /**
  *

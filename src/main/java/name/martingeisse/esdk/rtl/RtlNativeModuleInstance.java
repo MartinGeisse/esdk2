@@ -5,8 +5,7 @@
 package name.martingeisse.esdk.rtl;
 
 import com.google.common.collect.ImmutableMap;
-
-import java.util.Map;
+import name.martingeisse.esdk.rtl.signal.RtlSignal;
 
 /**
  *

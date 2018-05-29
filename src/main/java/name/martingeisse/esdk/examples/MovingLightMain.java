@@ -1,7 +1,11 @@
 package name.martingeisse.esdk.examples;
 
 import name.martingeisse.esdk.rtl.*;
-import name.martingeisse.esdk.rtl.statement.RtlStatementSequence;
+import name.martingeisse.esdk.rtl.block.RtlClockedBlock;
+import name.martingeisse.esdk.rtl.block.RtlProceduralVectorSignal;
+import name.martingeisse.esdk.rtl.pin.RtlOutputPin;
+import name.martingeisse.esdk.rtl.signal.RtlBitSignal;
+import name.martingeisse.esdk.rtl.signal.RtlConcatenation;
 import name.martingeisse.esdk.rtl.statement.RtlWhenStatement;
 import name.martingeisse.esdk.rtl.xilinx.XilinxPinConfiguration;
 

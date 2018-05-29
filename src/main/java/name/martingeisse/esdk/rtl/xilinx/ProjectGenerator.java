@@ -5,9 +5,9 @@
 package name.martingeisse.esdk.rtl.xilinx;
 
 import name.martingeisse.esdk.rtl.RtlDesign;
-import name.martingeisse.esdk.rtl.RtlPin;
-import name.martingeisse.esdk.rtl.RtlPinConfiguration;
-import name.martingeisse.esdk.rtl.VerilogDesignGenerator;
+import name.martingeisse.esdk.rtl.pin.RtlPin;
+import name.martingeisse.esdk.rtl.pin.RtlPinConfiguration;
+import name.martingeisse.esdk.rtl.verilog.VerilogDesignGenerator;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;

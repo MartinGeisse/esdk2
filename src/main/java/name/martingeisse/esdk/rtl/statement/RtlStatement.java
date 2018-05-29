@@ -6,8 +6,8 @@ package name.martingeisse.esdk.rtl.statement;
 
 import name.martingeisse.esdk.rtl.RtlDesign;
 import name.martingeisse.esdk.rtl.RtlItem;
-import name.martingeisse.esdk.rtl.VerilogExpressionWriter;
-import name.martingeisse.esdk.rtl.VerilogWriter;
+import name.martingeisse.esdk.rtl.verilog.VerilogExpressionWriter;
+import name.martingeisse.esdk.rtl.verilog.VerilogWriter;
 
 /**
  *

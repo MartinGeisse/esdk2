@@ -5,8 +5,7 @@
 package name.martingeisse.esdk.rtl.statement;
 
 import name.martingeisse.esdk.rtl.RtlDesign;
-import name.martingeisse.esdk.rtl.RtlVectorAssignmentTarget;
-import name.martingeisse.esdk.rtl.RtlVectorSignal;
+import name.martingeisse.esdk.rtl.signal.RtlVectorSignal;
 
 /**
  *
