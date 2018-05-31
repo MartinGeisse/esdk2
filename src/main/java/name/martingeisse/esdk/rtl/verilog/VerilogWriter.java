@@ -57,18 +57,6 @@ public class VerilogWriter {
 	// naming
 	//
 
-	public String getClockName(RtlClockNetwork clockNetwork) {
-		String name = clockNames.get(clockNetwork);
-		if (name == null) {
-			throw new IllegalArgumentException("could not find name for clock network: " + clockNetwork);
-		}
-		return name;
-	}
-
-	public void printClockName(RtlClockNetwork clockNetwork) {
-		out.print(getClockName(clockNetwork));
-	}
-
 	public String getSignalName(RtlSignal signal) {
 		String name = declaredSignals.get(signal);
 		if (name == null) {

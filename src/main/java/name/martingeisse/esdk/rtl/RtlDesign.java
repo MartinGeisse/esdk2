@@ -7,6 +7,7 @@ package name.martingeisse.esdk.rtl;
 import name.martingeisse.esdk.rtl.block.RtlAsynchronousBlock;
 import name.martingeisse.esdk.rtl.block.RtlBlock;
 import name.martingeisse.esdk.rtl.pin.RtlPin;
+import name.martingeisse.esdk.rtl.signal.RtlBitSignal;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,8 +63,8 @@ public final class RtlDesign {
 		return blocks;
 	}
 
-	public RtlClockNetwork createClockNetwork() {
-		return new RtlClockNetwork(this);
+	public RtlClockNetwork createClockNetwork(RtlBitSignal clockSignal) {
+		return new RtlClockNetwork(this, clockSignal);
 	}
 
 	public RtlAsynchronousBlock createAsynchronousBlock() {

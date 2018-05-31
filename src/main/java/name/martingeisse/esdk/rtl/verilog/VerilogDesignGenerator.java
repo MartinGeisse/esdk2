@@ -46,6 +46,9 @@ public class VerilogDesignGenerator {
 		out.prepare(new HashMap<>(), declaredSignals);
 		out.printIntro(name, design.getPins());
 		printSignalDeclarations();
+		out.getOut().println();
+		printBlocks();
+		out.getOut().println();
 		out.printOutro();
 	}
 
@@ -179,4 +182,9 @@ public class VerilogDesignGenerator {
 		}
 	}
 
+	private void printBlocks() {
+		for (RtlBlock block : design.getBlocks()) {
+			block.printVerilogBlocks(out);
+		}
+	}
 }

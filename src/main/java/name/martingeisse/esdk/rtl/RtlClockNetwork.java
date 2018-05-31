@@ -6,18 +6,27 @@ package name.martingeisse.esdk.rtl;
 
 import name.martingeisse.esdk.rtl.block.RtlClockedBlock;
 import name.martingeisse.esdk.rtl.pin.RtlPin;
+import name.martingeisse.esdk.rtl.signal.RtlBitSignal;
 
 /**
  *
  */
 public final class RtlClockNetwork extends RtlItem {
 
-	public RtlClockNetwork(RtlDesign design) {
+	private final RtlBitSignal clockSignal;
+
+	public RtlClockNetwork(RtlDesign design, RtlBitSignal clockSignal) {
 		super(design);
+		checkSameDesign(clockSignal);
+		this.clockSignal = clockSignal;
 
 		DesignRegistrationKey key = new DesignRegistrationKey();
 		design.registerClockNetwork(key, this);
 		key.valid = false;
+	}
+
+	public RtlBitSignal getClockSignal() {
+		return clockSignal;
 	}
 
 	public RtlClockedBlock createBlock() {

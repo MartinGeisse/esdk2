@@ -5,13 +5,13 @@
 package name.martingeisse.esdk.rtl.pin;
 
 import name.martingeisse.esdk.rtl.RtlDesign;
+import name.martingeisse.esdk.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.rtl.verilog.VerilogExpressionWriter;
-import name.martingeisse.esdk.rtl.signal.RtlSignal;
 
 /**
  *
  */
-public final class RtlInputPin extends RtlPin implements RtlSignal {
+public final class RtlInputPin extends RtlPin implements RtlBitSignal {
 
 	public RtlInputPin(RtlDesign design) {
 		super(design);

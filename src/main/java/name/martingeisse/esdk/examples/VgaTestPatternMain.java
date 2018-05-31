@@ -9,10 +9,7 @@ import name.martingeisse.esdk.rtl.RtlDesign;
 public class VgaTestPatternMain {
 
 	public static void main(String[] args) {
-
-		RtlDesign design = new RtlDesign();
-		RtlClockNetwork clk = design.createClockNetwork();
-
+		// TODO
 	}
 
 }

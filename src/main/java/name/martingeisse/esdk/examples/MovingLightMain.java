@@ -3,6 +3,7 @@ package name.martingeisse.esdk.examples;
 import name.martingeisse.esdk.rtl.*;
 import name.martingeisse.esdk.rtl.block.RtlClockedBlock;
 import name.martingeisse.esdk.rtl.block.RtlProceduralVectorSignal;
+import name.martingeisse.esdk.rtl.pin.RtlInputPin;
 import name.martingeisse.esdk.rtl.pin.RtlOutputPin;
 import name.martingeisse.esdk.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.rtl.signal.RtlConcatenation;
@@ -20,7 +21,7 @@ public class MovingLightMain {
 	public static void main(String[] args) throws Exception {
 
 		RtlDesign design = new RtlDesign();
-		RtlClockNetwork clk = design.createClockNetwork();
+		RtlClockNetwork clk = design.createClockNetwork(clockPin(design));
 
 		RtlClockedBlock block = clk.createBlock();
 
@@ -61,6 +62,15 @@ public class MovingLightMain {
 		configuration.setDrive(8);
 		RtlOutputPin pin = new RtlOutputPin(design);
 		pin.setId(id);
+		pin.setConfiguration(new XilinxPinConfiguration());
+		return pin;
+	}
+
+	private static RtlInputPin clockPin(RtlDesign design) {
+		XilinxPinConfiguration configuration = new XilinxPinConfiguration();
+		configuration.setIostandard("LVCMOS33");
+		RtlInputPin pin = new RtlInputPin(design);
+		pin.setId("C9");
 		pin.setConfiguration(new XilinxPinConfiguration());
 		return pin;
 	}
