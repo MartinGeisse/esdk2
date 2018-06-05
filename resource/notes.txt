@@ -1,0 +1,33 @@
+
+
+
+
+
+bus.write(context, address, data);
+
+
+
+bus:
+getSlave(address & upper).write(context, address & lower, data);
+
+
+-->
+relationships müssen manuell gepflegt werden, aber das ist im highlevel model auch so
+es müssen keine event nodes und keine listener gebaut werden. der aufruf eines listeners passiert direkt
+asynchrone loops führen zu endlosrekursion --> an sich gut, das fällt sofort auf
+ein zeitverzögerter event führt zum einhängen eines Runnable für später
+wenn man das einhängen eines event-callbacks vergisst, dann passiert der effekt synchron-sofort
+
+"simplest thing"! Wenn o.g. so funktioniert, dann wäre das super-einfach.
+
+Was immer noch nötig ist, ist das erzeugen eines Simulationsmodells aus dem highlevel-modell, denn nur das
+sim model hat laufzeit-zustand. Probleme damit:
+
+- relationships müssen diese transformation überleben
+	Transformierte Objekte in einer Map speichern, dessen key ist:
+		class Key<UntransformiertesHighlevelObject, TransformiertesInterface>
+	(beides sind Typparameter, extends Object) und der value ist ein TransformiertesInterface.
+
+- evtl macht es sinn, an dieser stelle den context schon zu injecten, damit man ihn später nicht überall mitschleifen muss
+	- aber dann ist es einfach nur die transformation, die ihn stattdessen mitschleifen muss
+		- ja, aber die ist vermutlich weniger komplex --> beides ausprobieren!
