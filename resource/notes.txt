@@ -31,3 +31,15 @@ sim model hat laufzeit-zustand. Probleme damit:
 - evtl macht es sinn, an dieser stelle den context schon zu injecten, damit man ihn später nicht überall mitschleifen muss
 	- aber dann ist es einfach nur die transformation, die ihn stattdessen mitschleifen muss
 		- ja, aber die ist vermutlich weniger komplex --> beides ausprobieren!
+
+
+------------------------------------------------------------------------------------------------------------------------
+
+Die Alternative ist, dass die Highlevel-Objekte direkt simulierbar sind, was sehr viel Komplexität aus der Trafo
+herausnehmen würde. Die synth-Trafo wäre noch die gleiche, aber dort gibt es nur eine kleine Menge von Zielobjekten,
+d.h. die entsprechenden Interfaces müssten nicht generisch sein. Unschön wäre es vor allem deshalb, weil
+Model-Eigenschaften mit Runtime-State vermischt werden und nur noch durch Dokumentation getrennt werden können.
+
+Noch eine Alternative ist es, die Trafo zu vereinfachen, indem es keine Keys mehr gibt -- Objekte werden 1:1 abgebildet.
+Der Fall mit mehreren Keys muss dann durch mehrere Sub-Objekte abgebildet werden. Das wäre zumindest nicht allzu
+schlimm.
