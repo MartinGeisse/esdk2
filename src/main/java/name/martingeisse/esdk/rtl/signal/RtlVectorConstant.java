@@ -7,7 +7,9 @@ package name.martingeisse.esdk.rtl.signal;
 import name.martingeisse.esdk.rtl.*;
 import name.martingeisse.esdk.rtl.verilog.VerilogDesignGenerator;
 import name.martingeisse.esdk.rtl.verilog.VerilogExpressionWriter;
+import name.martingeisse.esdk.rtl.verilog.VerilogWriter;
 
+import java.io.PrintWriter;
 import java.util.BitSet;
 
 /**
@@ -65,7 +67,7 @@ public final class RtlVectorConstant extends RtlItem implements RtlVectorSignal 
 	private void printDigits(int baseIndex, VerilogExpressionWriter out) {
 
 		// print digits for higher order bits
-		if (baseIndex < value.length()) {
+		if (baseIndex + 4 < value.length()) {
 			printDigits(baseIndex + 4, out);
 		}
 

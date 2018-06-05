@@ -38,9 +38,7 @@ public final class RtlWhenStatement extends RtlStatement {
 	public void printExpressionsDryRun(VerilogExpressionWriter expressionWriter) {
 		expressionWriter.print(condition, VerilogDesignGenerator.VerilogExpressionNesting.ALL);
 		thenBranch.printExpressionsDryRun(expressionWriter);
-		if (otherwiseBranch != null) {
-			otherwiseBranch.printExpressionsDryRun(expressionWriter);
-		}
+		otherwiseBranch.printExpressionsDryRun(expressionWriter);
 	}
 
 	@Override
@@ -51,9 +49,11 @@ public final class RtlWhenStatement extends RtlStatement {
 		out.getOut().println(") begin");
 		out.startIndentation();
 		thenBranch.printVerilogStatements(out);
-		if (otherwiseBranch != null) {
+		if (!otherwiseBranch.isEmpty()) {
+			out.endIndentation();
 			out.indent();
 			out.getOut().println("end else begin");
+			out.startIndentation();
 			otherwiseBranch.printVerilogStatements(out);
 		}
 		out.endIndentation();

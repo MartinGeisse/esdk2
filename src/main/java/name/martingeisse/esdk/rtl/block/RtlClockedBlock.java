@@ -34,7 +34,7 @@ public final class RtlClockedBlock extends RtlBlock {
 		initializerStatements.printVerilogStatements(out);
 		out.endProceduralAlwaysBlock();
 
-		out.startProceduralAlwaysBlock(out.getSignalName(clockNetwork.getClockSignal()));
+		out.startProceduralAlwaysBlock("posedge " + out.getSignalName(clockNetwork.getClockSignal()));
 		getStatements().printVerilogStatements(out);
 		out.endProceduralAlwaysBlock();
 

@@ -26,6 +26,10 @@ public class RtlStatementSequence extends RtlStatement {
 		super(design);
 	}
 
+	public boolean isEmpty() {
+		return statements.isEmpty();
+	}
+
 	public final void addStatement(RtlStatement statement) {
 		checkSameDesign(statement);
 		statements.add(statement);

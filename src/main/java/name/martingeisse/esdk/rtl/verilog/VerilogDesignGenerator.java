@@ -9,6 +9,7 @@ import name.martingeisse.esdk.rtl.block.RtlBlock;
 import name.martingeisse.esdk.rtl.block.RtlClockedBlock;
 import name.martingeisse.esdk.rtl.block.RtlProceduralSignal;
 import name.martingeisse.esdk.rtl.pin.RtlBidirectionalPin;
+import name.martingeisse.esdk.rtl.pin.RtlInputPin;
 import name.martingeisse.esdk.rtl.pin.RtlOutputPin;
 import name.martingeisse.esdk.rtl.pin.RtlPin;
 import name.martingeisse.esdk.rtl.signal.RtlBitSignal;
@@ -88,6 +89,13 @@ public class VerilogDesignGenerator {
 			}
 
 		};
+
+		// pins are implicitly declared
+		for (RtlPin pin : design.getPins()) {
+			if (pin instanceof RtlInputPin) {
+				declaredSignals.put((RtlInputPin)pin, pin.getNetName());
+			}
+		}
 
 		// procedural signals must be declared
 		for (RtlBlock block : design.getBlocks()) {

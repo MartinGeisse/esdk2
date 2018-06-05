@@ -22,10 +22,11 @@ public class VerilogWriter {
 	private Map<RtlClockNetwork, String> clockNames;
 	private Map<RtlSignal, String> declaredSignals;
 
-	VerilogWriter(PrintWriter out) {
+	public VerilogWriter(PrintWriter out) {
 		this.out = out;
 	}
 
+	// note: the declaredSignals must include mappings for all input pins
 	void prepare(Map<RtlClockNetwork, String> clockNames, Map<RtlSignal, String> declaredSignals) {
 		this.clockNames = clockNames;
 		this.declaredSignals = declaredSignals;
