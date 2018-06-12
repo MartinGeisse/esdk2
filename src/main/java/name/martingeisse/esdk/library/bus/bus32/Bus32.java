@@ -2,11 +2,10 @@ package name.martingeisse.esdk.library.bus.bus32;
 
 import name.martingeisse.esdk.core.model.Design;
 import name.martingeisse.esdk.core.model.Item;
-import name.martingeisse.esdk.core.model.Simulatable;
+import name.martingeisse.esdk.core.simulation.SimulationContext;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.BiConsumer;
 
 /**
  * A simple bus using 32-bit address and data units.
@@ -41,17 +40,17 @@ public class Bus32 extends Item {
 	}
 
 	@Override
-	public SimulationModelContribution buildSimulationModel() {
+	public SimulationModelContribution buildSimulationModel(SimulationContext context) {
 		return new SimulationModelContribution() {
 
 			@Override
-			public <T> void registerSimulationObjects(BiConsumer<Simulatable<T>, T> consumer) {
-
+			public void registerSimulationObjects(SimulationObjectRegistry registry) {
+				// TODO
 			}
 
 			@Override
 			public void initializeSimulationObjects(DependencyProvider dependencyProvider) {
-
+				// TODO
 			}
 
 		};
