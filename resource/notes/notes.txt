@@ -43,3 +43,25 @@ Model-Eigenschaften mit Runtime-State vermischt werden und nur noch durch Dokume
 Noch eine Alternative ist es, die Trafo zu vereinfachen, indem es keine Keys mehr gibt -- Objekte werden 1:1 abgebildet.
 Der Fall mit mehreren Keys muss dann durch mehrere Sub-Objekte abgebildet werden. Das wäre zumindest nicht allzu
 schlimm.
+
+------------------------------------------------------------------------------------------------------------------------
+
+Weitere Überlegung dazu:
+
+- Vermischung von Model-Eigenschaften und Runtime State ist weniger schlimm als gedacht: Das Model kann erkennen,
+	wenn nicht synthetisierbarer Runtime State vorhanden ist, und dann z.B. eine Exception werfen, oder noch besser,
+	bei der Trafo dies als Fehler reporten, der gezielt in einzelnen Fällen von außen ignoriert werden kann.
+
+- die Komplexität in der Synth-Trafo ist schlimmer als gedacht, wenn die Synth mehrstufig abläuft. Das ist vor allem
+	zur Vermeidung der "Wasserfall-Nachteile" wichtig -- der Wasserfall darf nicht "ablaufen", sondern die gesamte
+	"Wasserfall-Timeline" muss gleichzeitig im Programm modelliert werden, damit man schnell und flexibel alte
+	Entscheidungen umstoßen kann.
+
+	Ist das realistisch? Beispiel: System -> Komponenten -> CPU und Peripherie -> RTL
+
+	... unklar. Schon der Schritt "Komponenten -> CPU und Peripherie" kann vermutlich nicht wirklich
+	konfiguriert-automatisch ablaufen, sondern man baut CPU+Komponenten als zweites, paralleles Modell neu. Damit
+	ist auch keine Trafo mit komplexen Output-Modell nötig -- die einzige Trafo ist die nach RTL, was ein sehr einfaches
+	Modell ist (wenige Knotentypen).
+
+
