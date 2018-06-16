@@ -4,10 +4,20 @@
  */
 package name.martingeisse.esdk.core.simulation;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.PriorityQueue;
 
 /**
+ * To obtain at least some degree of reproducible behavior, this simulation implements delta-cycles in a similar
+ * way as HDLs do: A "batch" of events that are scheduled for "now" is taken off the queue as a whole, then processed
+ * as a whole. If this schedules new events for "now", then the simulation still processes the whole "old" batch
+ * before looking at those new events. When the batch is finished, a new batch is taken and processed, again not looking
+ * at further events which get scheduled for "now" by the second batch.
  *
+ * No batching is done for events scheduled for later. This means, for example, that an event scheduled by the second
+ * "now"-batch for one second in the future may actually be processed *before* an event scheduled by the first
+ * "now"-batch for one second in the future.
  */
 public final class Simulation implements SimulationContext {
 
@@ -27,10 +37,16 @@ public final class Simulation implements SimulationContext {
 	}
 
 	public void run() {
+		List<ScheduledEvent> batch = new ArrayList<>();
 		while (!stopped && !eventQueue.isEmpty()) {
-			ScheduledEvent event = eventQueue.remove();
-			now = event.when;
-			event.callback.run();
+			now = eventQueue.peek().when;
+			batch.clear();
+			while (eventQueue.peek().when == now) {
+				batch.add(eventQueue.remove());
+			}
+			for (ScheduledEvent event : batch) {
+				event.callback.run();
+			}
 		}
 	}
 

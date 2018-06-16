@@ -4,6 +4,8 @@
  */
 package name.martingeisse.esdk.core.model;
 
+import name.martingeisse.esdk.core.simulation.SimulationContext;
+
 import java.util.function.BiConsumer;
 
 /**
@@ -22,7 +24,7 @@ public abstract class Item {
 		return design;
 	}
 
-	public abstract SimulationModelContribution buildSimulationModel();
+	public abstract SimulationModelContribution buildSimulationModel(SimulationContext context);
 
 	/**
 	 * When the simulation model gets built, first all contributions are collected. All contributions are then asked to
@@ -32,12 +34,16 @@ public abstract class Item {
 	 * code for registration and initialization.
 	 * <p>
 	 * A typical instance of this interface builds the simulation objects in its constructor, passes them to the
-	 * consumer argument in {@link #registerSimulationObjects(BiConsumer)} and initializes their state in
+	 * consumer argument in {@link #registerSimulationObjects(SimulationObjectRegistry)} and initializes their state in
 	 * {@link #initializeSimulationObjects(DependencyProvider)}.
 	 */
 	public interface SimulationModelContribution {
 
-		<T> void registerSimulationObjects(BiConsumer<Simulatable<T>, T> consumer);
+		void registerSimulationObjects(SimulationObjectRegistry registry);
+
+		interface SimulationObjectRegistry {
+			<T> void register(Simulatable<T> modelObject, T simulationObject);
+		}
 
 		void initializeSimulationObjects(DependencyProvider dependencyProvider);
 
