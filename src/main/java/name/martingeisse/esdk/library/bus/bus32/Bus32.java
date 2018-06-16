@@ -2,7 +2,6 @@ package name.martingeisse.esdk.library.bus.bus32;
 
 import name.martingeisse.esdk.core.model.Design;
 import name.martingeisse.esdk.core.model.Item;
-import name.martingeisse.esdk.core.simulation.SimulationContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,21 +38,35 @@ public class Bus32 extends Item {
 		addSlave(new SlaveEntry(address, addressMask, slave));
 	}
 
-	@Override
-	public SimulationModelContribution buildSimulationModel(SimulationContext context) {
-		return new SimulationModelContribution() {
-
-			@Override
-			public void registerSimulationObjects(SimulationObjectRegistry registry) {
-				// TODO
+	public SlaveEntry getMatchingEntry(int address) {
+		for (SlaveEntry slaveEntry : slaveEntries) {
+			if (slaveEntry.matchesAddress(address)) {
+				return slaveEntry;
 			}
+		}
+		return null;
+	}
 
-			@Override
-			public void initializeSimulationObjects(DependencyProvider dependencyProvider) {
-				// TODO
-			}
+	public void read(int address, ReadCallback callback) {
+		// no delay for now
+		// for now, reads 0 if no matching slave was found
+		SlaveEntry slaveEntry = getMatchingEntry(address);
+		if (slaveEntry == null) {
+			fire(() -> callback.onReadFinished(0), 0);
+		} else {
+			slaveEntry.read(address, callback);
+		}
+	}
 
-		};
+	public void write(int address, int data, WriteCallback callback) {
+		// no delay for now
+		// for now, does nothing (just calls the callback) if no matching slave was found
+		SlaveEntry slaveEntry = getMatchingEntry(address);
+		if (slaveEntry == null) {
+			fire(callback::onWriteFinished, 0);
+		} else {
+			slaveEntry.write(address, data, callback);
+		}
 	}
 
 }

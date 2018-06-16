@@ -13,9 +13,31 @@ import java.util.List;
 public class Design {
 
 	private final List<Item> items = new ArrayList<>();
+	private Simulation simulation;
 
 	void register(Item item) {
 		items.add(item);
+	}
+
+	public void fire(Runnable eventCallback, long ticks) {
+		needSimulation();
+		simulation.fire(eventCallback, ticks);
+	}
+
+	public void runSimulation() {
+		needSimulation();
+		simulation.run();
+	}
+
+	public void stopSimulation() {
+		needSimulation();
+		simulation.stop();
+	}
+
+	private void needSimulation() {
+		if (simulation == null) {
+			simulation = new Simulation();
+		}
 	}
 
 }

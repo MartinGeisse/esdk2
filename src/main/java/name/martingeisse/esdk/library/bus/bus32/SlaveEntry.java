@@ -42,4 +42,18 @@ public class SlaveEntry {
 		return slave;
 	}
 
+	public boolean matchesAddress(int address) {
+		return (address & upperAddressMask) == this.address;
+	}
+
+	// ignores upper address bits
+	void read(int address, ReadCallback callback) {
+		slave.read(address & lowerAddressMask, callback);
+	}
+
+	// ignores upper address bits
+	void write(int address, int data, WriteCallback callback) {
+		slave.write(address & lowerAddressMask, data, callback);
+	}
+
 }

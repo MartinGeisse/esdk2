@@ -2,7 +2,7 @@
  * Copyright (c) 2018 Martin Geisse
  * This file is distributed under the terms of the MIT license.
  */
-package name.martingeisse.esdk.core.simulation;
+package name.martingeisse.esdk.core.model;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,13 +19,12 @@ import java.util.PriorityQueue;
  * "now"-batch for one second in the future may actually be processed *before* an event scheduled by the first
  * "now"-batch for one second in the future.
  */
-public final class Simulation implements SimulationContext {
+final class Simulation {
 
 	private final PriorityQueue<ScheduledEvent> eventQueue = new PriorityQueue<>();
 	private long now = 0;
 	private boolean stopped = false;
 
-	@Override
 	public void fire(Runnable eventCallback, long ticks) {
 		if (eventCallback == null) {
 			throw new IllegalArgumentException("eventCallback cannot be null");

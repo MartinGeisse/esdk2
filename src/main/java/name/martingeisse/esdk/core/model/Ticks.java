@@ -1,4 +1,4 @@
-package name.martingeisse.esdk.core.simulation;
+package name.martingeisse.esdk.core.model;
 
 /**
  *
