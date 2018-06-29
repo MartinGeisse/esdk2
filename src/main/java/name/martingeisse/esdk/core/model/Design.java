@@ -24,8 +24,11 @@ public class Design {
 		simulation.fire(eventCallback, ticks);
 	}
 
-	public void runSimulation() {
+	public void simulate() {
 		needSimulation();
+		for (Item item : items) {
+			item.initializeSimulation();
+		}
 		simulation.run();
 	}
 

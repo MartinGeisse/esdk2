@@ -20,6 +20,9 @@ public abstract class Item {
 		return design;
 	}
 
+	protected void initializeSimulation() {
+	}
+
 	protected final void fire(Runnable callback, long ticks) {
 		design.fire(callback, ticks);
 	}
