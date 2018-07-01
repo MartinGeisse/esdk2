@@ -28,4 +28,9 @@ public final class RtlConditionalBitOperation extends RtlConditionalOperation im
 		return onFalse;
 	}
 
+	@Override
+	public boolean getValue() {
+		return getCondition().getValue() ? onTrue.getValue() : onFalse.getValue();
+	}
+
 }

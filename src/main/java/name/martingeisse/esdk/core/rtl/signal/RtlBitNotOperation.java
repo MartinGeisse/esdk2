@@ -31,4 +31,9 @@ public final class RtlBitNotOperation extends RtlItem implements RtlBitSignal {
 		out.print(operand, VerilogDesignGenerator.VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
 	}
 
+	@Override
+	public boolean getValue() {
+		return !operand.getValue();
+	}
+
 }

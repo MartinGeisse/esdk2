@@ -46,6 +46,11 @@ public final class RtlBitOperation extends RtlItem implements RtlBitSignal {
 		out.print(rightOperand, VerilogDesignGenerator.VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
 	}
 
+	@Override
+	public boolean getValue() {
+		return operator.evaluate(leftOperand.getValue(), rightOperand.getValue());
+	}
+
 	public enum Operator {
 		AND("&"),
 		OR("|"),
@@ -60,6 +65,27 @@ public final class RtlBitOperation extends RtlItem implements RtlBitSignal {
 
 		public String getSymbol() {
 			return symbol;
+		}
+
+		public boolean evaluate(boolean leftOperand, boolean rightOperand) {
+			switch (this) {
+
+				case AND:
+					return leftOperand & rightOperand;
+
+				case OR:
+					return leftOperand | rightOperand;
+
+				case XOR:
+					return leftOperand ^ rightOperand;
+
+				case XNOR:
+					return leftOperand == rightOperand;
+
+				default:
+					throw new UnsupportedOperationException();
+
+			}
 		}
 
 	}

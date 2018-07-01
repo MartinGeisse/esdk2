@@ -5,9 +5,9 @@
 package name.martingeisse.esdk.core.rtl.signal;
 
 import name.martingeisse.esdk.core.rtl.RtlDesign;
+import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogDesignGenerator;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
-import name.martingeisse.esdk.core.rtl.RtlItem;
 
 /**
  *
@@ -49,6 +49,11 @@ public final class RtlVectorComparison extends RtlItem implements RtlBitSignal {
 		out.print(rightOperand, VerilogDesignGenerator.VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
 	}
 
+	@Override
+	public boolean getValue() {
+		return operator.evaluate(leftOperand.getValue(), rightOperand.getValue());
+	}
+
 	public enum Operator {
 		EQUAL("=="),
 		NOT_EQUAL("!="),
@@ -65,6 +70,38 @@ public final class RtlVectorComparison extends RtlItem implements RtlBitSignal {
 
 		public String getSymbol() {
 			return symbol;
+		}
+
+		public boolean evaluate(RtlVectorValue leftOperand, RtlVectorValue rightOperand) {
+			switch (this) {
+
+				case EQUAL:
+					return leftOperand.equals(rightOperand);
+
+				case NOT_EQUAL:
+					return !leftOperand.equals(rightOperand);
+
+				case UNSIGNED_LESS_THAN:
+					return compare(leftOperand, rightOperand, true, false);
+
+				case UNSIGNED_LESS_THAN_OR_EQUAL:
+					return compare(leftOperand, rightOperand, true, true);
+
+				case UNSIGNED_GREATER_THAN:
+					return compare(leftOperand, rightOperand, false, false);
+
+				case UNSIGNED_GREATER_THAN_OR_EQUAL:
+					return compare(leftOperand, rightOperand, false, true);
+
+				default:
+					throw new UnsupportedOperationException();
+
+			}
+		}
+
+		private boolean compare(RtlVectorValue leftOperand, RtlVectorValue rightOperand, boolean less, boolean equal) {
+			int raw = leftOperand.toUnsignedInteger().compareTo(rightOperand.toUnsignedInteger());
+			return raw == 0 ? equal : (raw < 0) == less;
 		}
 
 	}

@@ -36,4 +36,9 @@ public final class RtlConditionalVectorOperation extends RtlConditionalOperation
 		return onTrue.getWidth();
 	}
 
+	@Override
+	public RtlVectorValue getValue() {
+		return getCondition().getValue() ? onTrue.getValue() : onFalse.getValue();
+	}
+
 }

@@ -11,6 +11,8 @@ public interface RtlVectorSignal extends RtlSignal {
 
 	int getWidth();
 
+	RtlVectorValue getValue();
+
 	//
 	// selection
 	//

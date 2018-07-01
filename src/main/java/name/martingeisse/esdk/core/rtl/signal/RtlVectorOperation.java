@@ -55,6 +55,11 @@ public final class RtlVectorOperation extends RtlItem implements RtlVectorSignal
 		out.print(rightOperand, VerilogDesignGenerator.VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
 	}
 
+	@Override
+	public RtlVectorValue getValue() {
+		return operator.evaluate(leftOperand.getValue(), rightOperand.getValue());
+	}
+
 	public enum Operator {
 		ADD("+"),
 		SUBTRACT("-"),
@@ -71,6 +76,33 @@ public final class RtlVectorOperation extends RtlItem implements RtlVectorSignal
 
 		public String getSymbol() {
 			return symbol;
+		}
+
+		public RtlVectorValue evaluate(RtlVectorValue leftOperand, RtlVectorValue rightOperand) {
+			switch (this) {
+
+				case ADD:
+					return;
+
+				case SUBTRACT:
+					return;
+
+				case MULTIPLY:
+					return;
+
+				case AND:
+					return;
+
+				case OR:
+					return;
+
+				case XOR:
+					return;
+
+				default:
+					throw new UnsupportedOperationException();
+
+			}
 		}
 
 	}

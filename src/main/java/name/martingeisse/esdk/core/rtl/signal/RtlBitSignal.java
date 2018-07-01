@@ -9,6 +9,8 @@ package name.martingeisse.esdk.core.rtl.signal;
  */
 public interface RtlBitSignal extends RtlSignal {
 
+	boolean getValue();
+
 	default RtlBitNotOperation not() {
 		return new RtlBitNotOperation(getRtlItem().getDesign(), this);
 	}
