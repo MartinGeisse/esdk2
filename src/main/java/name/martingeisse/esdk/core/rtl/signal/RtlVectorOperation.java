@@ -9,6 +9,8 @@ import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogDesignGenerator;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
 
+import java.math.BigInteger;
+
 /**
  * See {@link RtlShiftOperation} for shifting. That class is separate because it has different width constraints on
  * the right operand.
@@ -79,32 +81,41 @@ public final class RtlVectorOperation extends RtlItem implements RtlVectorSignal
 		}
 
 		public RtlVectorValue evaluate(RtlVectorValue leftOperand, RtlVectorValue rightOperand) {
+			BigInteger left = leftOperand.convertUnsignedToBigInteger();
+			BigInteger right = rightOperand.convertUnsignedToBigInteger();
+			BigInteger result;
 			switch (this) {
 
 				case ADD:
-					return;
+					result = left.add(right);
+					break;
 
 				case SUBTRACT:
-					return;
+					result = left.subtract(right);
+					break;
 
 				case MULTIPLY:
-					return;
+					result = left.multiply(right);
+					break;
 
 				case AND:
-					return;
+					result = left.and(right);
+					break;
 
 				case OR:
-					return;
+					result = left.or(right);
+					break;
 
 				case XOR:
-					return;
+					result = left.xor(right);
+					break;
 
 				default:
 					throw new UnsupportedOperationException();
 
 			}
+			return RtlVectorValue.from(leftOperand.getWidth(), result);
 		}
-
 	}
 
 }

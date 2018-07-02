@@ -49,4 +49,9 @@ public final class RtlIndexSelection extends RtlItem implements RtlBitSignal {
 		out.print(']');
 	}
 
+	@Override
+	public boolean getValue() {
+		return containerSignal.getValue().getBit(indexSignal.getValue().convertUnsignedToSmallInteger());
+	}
+
 }

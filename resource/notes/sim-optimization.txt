@@ -1,0 +1,11 @@
+
+
+Try to use different subclasses of RtlVectorValue for small (<32, <64) vectors, storing the bits as an int or long.
+
+Demand that *all* small values use these subclasses, i.e. a BitSet is only used for >64. Then no mixed
+calculations can occur and we can just cast the "other operand".
+
+Also consider using BigInteger to store vectors instead of BitSet. Many operations have to convert to BigInteger
+anyway, and it seems to be more powerful in general.
+
+

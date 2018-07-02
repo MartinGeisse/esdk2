@@ -62,4 +62,9 @@ public class RtlRangeSelection extends RtlItem implements RtlVectorSignal {
 		out.print(']');
 	}
 
+	@Override
+	public RtlVectorValue getValue() {
+		return containerSignal.getValue().getRange(from, to);
+	}
+
 }

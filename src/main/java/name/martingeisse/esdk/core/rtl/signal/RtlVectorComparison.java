@@ -100,7 +100,7 @@ public final class RtlVectorComparison extends RtlItem implements RtlBitSignal {
 		}
 
 		private boolean compare(RtlVectorValue leftOperand, RtlVectorValue rightOperand, boolean less, boolean equal) {
-			int raw = leftOperand.toUnsignedInteger().compareTo(rightOperand.toUnsignedInteger());
+			int raw = leftOperand.convertUnsignedToBigInteger().compareTo(rightOperand.convertUnsignedToBigInteger());
 			return raw == 0 ? equal : (raw < 0) == less;
 		}
 

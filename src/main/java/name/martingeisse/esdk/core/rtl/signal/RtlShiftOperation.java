@@ -69,6 +69,21 @@ public final class RtlShiftOperation extends RtlItem implements RtlVectorSignal 
 		out.print(rightOperand, VerilogDesignGenerator.VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
 	}
 
+	@Override
+	public RtlVectorValue getValue() {
+		switch (direction) {
+
+			case LEFT:
+				return leftOperand.getValue().shiftLeft(rightOperand.getValue().convertUnsignedToSmallInteger());
+
+			case RIGHT:
+				return leftOperand.getValue().shiftRight(rightOperand.getValue().convertUnsignedToSmallInteger());
+
+			default:
+				throw new UnsupportedOperationException();
+		}
+	}
+
 	public enum Direction {
 		LEFT("<<"),
 		RIGHT(">>");
