@@ -53,6 +53,14 @@ public abstract class RtlBlock extends RtlItem {
 		return new RtlProceduralVectorSignal(getDesign(), this, width);
 	}
 
+	public void updateProceduralSignals(List<? super RtlProceduralSignal> changeCollector) {
+		for (RtlProceduralSignal signal : proceduralSignals) {
+			if (signal.updateValue()) {
+				changeCollector.add(signal);
+			}
+		}
+	}
+
 	/**
 	 * This class is used to ensure that {@link RtlDesign#registerBlock(DesignRegistrationKey, RtlBlock)} isn't called except through the
 	 * {@link RtlBlock} constructor.

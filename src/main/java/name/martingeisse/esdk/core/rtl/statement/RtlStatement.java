@@ -22,4 +22,6 @@ public abstract class RtlStatement extends RtlItem {
 
 	public abstract void printVerilogStatements(VerilogWriter out);
 
+	public abstract void execute();
+
 }

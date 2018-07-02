@@ -8,4 +8,7 @@ package name.martingeisse.esdk.core.rtl.statement;
  *
  */
 public interface RtlBitAssignmentTarget extends RtlAssignmentTarget {
+
+	void setNextValue(boolean nextValue);
+
 }

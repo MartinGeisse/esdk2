@@ -16,11 +16,13 @@ public final class RtlProceduralVectorSignal extends RtlProceduralSignal impleme
 
 	private final int width;
 	private RtlVectorValue value;
+	private RtlVectorValue nextValue;
 
 	public RtlProceduralVectorSignal(RtlDesign design, RtlBlock block, int width) {
 		super(design, block);
 		this.width = width;
 		this.value = RtlVectorValue.zeroes(width);
+		this.nextValue = value;
 	}
 
 	@Override
@@ -33,15 +35,21 @@ public final class RtlProceduralVectorSignal extends RtlProceduralSignal impleme
 		return value;
 	}
 
-	// TODO distinguish current / next value
-	void setValue(RtlVectorValue value) {
-		if (value == null) {
+	public void setNextValue(RtlVectorValue nextValue) {
+		if (nextValue == null) {
 			throw new IllegalArgumentException("value cannot be null");
 		}
-		if (value.getWidth() != width) {
-			throw new IllegalArgumentException("trying to set value of wrong width " + value.getWidth() + ", should be " + width);
+		if (nextValue.getWidth() != width) {
+			throw new IllegalArgumentException("trying to set next value of wrong width " + nextValue.getWidth() + ", should be " + width);
 		}
-		this.value = value;
+		this.nextValue = nextValue;
+	}
+
+	@Override
+	public boolean updateValue() {
+		boolean changed = !value.equals(nextValue);
+		value = nextValue;
+		return changed;
 	}
 
 }

@@ -8,4 +8,6 @@ calculations can occur and we can just cast the "other operand".
 Also consider using BigInteger to store vectors instead of BitSet. Many operations have to convert to BigInteger
 anyway, and it seems to be more powerful in general.
 
-
+RtlProceduralSignal.updateValue(): Add a parameter that tells this method whether the caller is interested in the
+return value. Allows to skip the check if the value changed if no procedural block is listening to such changes
+anyway.

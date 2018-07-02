@@ -14,6 +14,16 @@ import name.martingeisse.esdk.core.rtl.pin.RtlPin;
  *
  * Note that only pin-less RTL subdesigns are currently supported. In the future, it might make sense to attach
  * simulation signals to {@link RtlPin} objects and thus simulate whole RTL designs.
+ *
+ * TODO: asynchronous blocks cache their results implicitly, inside their RtlProceduralSignal objects.
+ * They have to be updated immediately when their inputs change (Verilog: always @(*) does that).
+ * But we can't right now. Solutions:
+ * - allow to register listeners to RtlSignal. Cumbersome for custom signal writers and we have to
+ *   implement some kind of "grouping" to avoid registering lots of event callbacks
+ * - don't allow custom RtlSignal implementations. Other models must set the value explicitly, and this
+ *   calls listeners / block execution.
+ * - additionally allow custom RtlSignal implementations that must support listeners. No advantages over
+ *   calling a setter -- code is still as complex and it's even more error-prone.
  */
 public final class RtlSubDesign extends Item {
 

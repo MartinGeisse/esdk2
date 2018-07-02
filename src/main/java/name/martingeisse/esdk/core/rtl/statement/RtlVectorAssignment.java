@@ -36,4 +36,9 @@ public final class RtlVectorAssignment extends RtlAssignment {
 		return source;
 	}
 
+	@Override
+	public void execute() {
+		destination.setNextValue(source.getValue());
+	}
+
 }

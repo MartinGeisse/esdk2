@@ -14,19 +14,26 @@ import name.martingeisse.esdk.core.rtl.statement.RtlBitAssignmentTarget;
 public final class RtlProceduralBitSignal extends RtlProceduralSignal implements RtlBitSignal, RtlBitAssignmentTarget {
 
 	private boolean value;
+	private boolean nextValue;
 
 	public RtlProceduralBitSignal(RtlDesign design, RtlBlock block) {
 		super(design, block);
 	}
 
-	// TODO distinguish current / next value
-	void setValue(boolean value) {
-		this.value = value;
-	}
-
 	@Override
 	public boolean getValue() {
 		return value;
+	}
+
+	public void setNextValue(boolean nextValue) {
+		this.nextValue = nextValue;
+	}
+
+	@Override
+	public boolean updateValue() {
+		boolean changed = (value != nextValue);
+		value = nextValue;
+		return changed;
 	}
 
 }

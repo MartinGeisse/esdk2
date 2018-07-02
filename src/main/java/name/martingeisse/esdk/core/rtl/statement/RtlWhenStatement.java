@@ -61,4 +61,13 @@ public final class RtlWhenStatement extends RtlStatement {
 		out.getOut().println("end");
 	}
 
+	@Override
+	public void execute() {
+		if (condition.getValue()) {
+			thenBranch.execute();
+		} else {
+			otherwiseBranch.execute();
+		}
+	}
+
 }

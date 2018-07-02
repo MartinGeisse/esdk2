@@ -84,4 +84,11 @@ public class RtlStatementSequence extends RtlStatement {
 		}
 	}
 
+	@Override
+	public void execute() {
+		for (RtlStatement statement : statements) {
+			statement.execute();
+		}
+	}
+
 }

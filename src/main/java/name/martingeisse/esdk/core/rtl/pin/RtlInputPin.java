@@ -27,4 +27,9 @@ public final class RtlInputPin extends RtlPin implements RtlBitSignal {
 		return "input";
 	}
 
+	@Override
+	public boolean getValue() {
+		throw new UnsupportedOperationException("cannot use RtlInputPin in simulation");
+	}
+
 }

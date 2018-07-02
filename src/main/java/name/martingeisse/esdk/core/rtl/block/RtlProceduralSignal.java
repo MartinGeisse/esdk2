@@ -39,4 +39,9 @@ public abstract class RtlProceduralSignal extends RtlItem implements RtlSignal, 
 		out.printProceduralSignalName(this);
 	}
 
+	/**
+	 * Updates the value from the stored next value. Returns true if the value actually changed.
+	 */
+	public abstract boolean updateValue();
+
 }
