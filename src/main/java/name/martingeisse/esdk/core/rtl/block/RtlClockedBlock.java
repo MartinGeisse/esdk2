@@ -24,6 +24,10 @@ public final class RtlClockedBlock extends RtlBlock {
 		this.initializerStatements = new RtlStatementSequence(design);
 	}
 
+	public RtlClockNetwork getClockNetwork() {
+		return clockNetwork;
+	}
+
 	public RtlStatementSequence getInitializerStatements() {
 		return initializerStatements;
 	}

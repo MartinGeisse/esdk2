@@ -1,4 +1,4 @@
-package name.martingeisse.esdk.core.rtl.subdesign;
+package name.martingeisse.esdk.core.rtl.simulation;
 
 import name.martingeisse.esdk.core.rtl.RtlDesign;
 import name.martingeisse.esdk.core.rtl.RtlItem;

@@ -5,8 +5,8 @@
 package name.martingeisse.esdk.core.rtl.block;
 
 import name.martingeisse.esdk.core.rtl.RtlDesign;
-import name.martingeisse.esdk.core.rtl.statement.RtlStatementSequence;
 import name.martingeisse.esdk.core.rtl.RtlItem;
+import name.martingeisse.esdk.core.rtl.statement.RtlStatementSequence;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogWriter;
 
 import java.util.ArrayList;
@@ -51,6 +51,10 @@ public abstract class RtlBlock extends RtlItem {
 
 	public RtlProceduralVectorSignal createVector(int width) {
 		return new RtlProceduralVectorSignal(getDesign(), this, width);
+	}
+
+	public void execute() {
+		statements.execute();
 	}
 
 	public void updateProceduralSignals(List<? super RtlProceduralSignal> changeCollector) {
