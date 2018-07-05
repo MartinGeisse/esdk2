@@ -1,0 +1,39 @@
+
+Async blocks haben sich nicht als hilfreich erwiesen (-> Notizen aus dem Code).
+
+"
+Reality check:
+	//		- used for switch-expressions since there is no other way in verilog -> not needed here
+	//		- used for conditional expressions -> not needed either here or in verilog, was probably more
+	//			readable that way but we can achieve the same with a real conditional
+	//      - used for bundled switch expressions assigning many signals at once (e.g. state machines)
+	//			should be ok anyway, if not use bundled assignments and a single switch expression
+	//		- using if-else-if-chains as expression --> define a signal type for that
+	//		- nested version of the above -> no problem
+"
+
+Der echte Gewinn von Blocks ist es, nicht jedes Register laden zu müssen, also aus der Kontrollstruktur (nested ifs)
+ein implizites Clock Enable abzuleiten. Bei async blocks hat man das nicht, da sind nested ifs nur ein anderer
+Begriff für Muxe in Reihe, und if/elseif/else ist ein "priority mux".
+
+(Außer man Benutzt async blocks als high-level-modeling-werkzeug, aber async blocks funzen nicht so, und high level
+modeling macht man hier in Java).
+
+Fazit: Async Blocks bringen hier praktisch keinen Vorteil. Also sollte das Design nicht davon versaut werden. Sondern
+das Design wird ohne Async Blocks entworfen. Wenn man dann async blocks doch noch reinbekommt meinetwegen, aber
+ohne Umentscheidungen am grundlegenden Design.
+
+Konsequenz für das grundlegende Design:
+
+- Signale können rein nach dem pull/eval-Prinzip arbeiten. Push/update wird nur bei Registern verwendet, und dort
+	ist der Trigger keine Signaländerung, sondern eine Clockflanke.
+- Listener an Signalen und unnötig und unmöglich
+- Das bedeutet auch, dass ein Signal sich nicht asynchron auf ein highlevel-Modell auswirken kann (was gut ist, sonst
+	wären Glitches von Bedeutung). Der Trigger muss ein anderer sein, z.B. eine Clockflanke.
+- In der Simulation können asynchrone Glitches demnach nicht gemessen werden. Eine Sim kann Signale auch nur
+	synchron auswerten, also zwischen allen Clockflanken (diese Formulierung ist sogar bei mehreren Clocks richtig)
+- Wenn irgendwelche komplexeren asynchronen Teilmodule ihre Ausgaben cachen wollen, dann müssen sie ihre Inputs
+	auslesen und diese als Cache-Key benutzen (da sie über Änderungen nicht aktiv informiert werden). Das ist bei
+	allen einfachen Modulen langsamer, als den Wert neu zu berechnen. Denkbar wäre, für den "noch-gültig-check"
+	nur die Identität von VectorValue-Objekten zu prüfen.
+
