@@ -123,6 +123,9 @@ public final class RtlDesign extends Item {
 	// intermediate signal "expression" objects may be shared with another block. Since it's an
 	// intermediate object, that other block won't be notified!
 	//
+	// The problem here is that the whole signal concept is based on not caching the signal value,
+	// but asynchronous blocks do that anyway.
+	//
 	// solution 1: That other block must have the originally changed signal in its trigger list
 	// 		then each signal must support getting its source signals --> error-prone. If you
 	//      forget one, bugs happen.
@@ -131,12 +134,31 @@ public final class RtlDesign extends Item {
 	//		"indirect" triggers -- signals that when changed will eventually cause a change, but
 	//		will only do so "later" through a delayed event. So updating the listening signal
 	//		immediately will get the wrong value.
+	//
 	// solution 2: any intermediate signal knows its current value and supports listeners
 	// 		may be slow, but supports caching out of the box and will only trigger subsequent blocks
 	//		if a signal actually changes. This replaces "pull" signal evaluation by "push" signal
 	//		updating, like Verilog does.
 	//		Maybe this also allows custom RtlSignal implementations, which can be used to speed
 	//		up simulation.
+	//
+	// solution 3: Make asynchronous blocks not cache their value, or forget their value whenever "something
+	// 		happens" (design->clock edge; manually setting a settable signal, possibly including a changed pin
+	// 		when that is possible)
+	//
+	// solution 4: no more asynchronous blocks. How useful are they? Reality check:
+	//		- used for switch-expressions since there is no other way in verilog -> not needed here
+	//		- used for conditional expressions -> not needed either here or in verilog, was probably more
+	//			readable that way but we can achieve the same with a real conditional
+	//      - used for bundled switch expressions assigning many signals at once (e.g. state machines)
+	//			should be ok anyway, if not use bundled assignments and a single switch expression
+	//		- using if-else-if-chains as expression --> define a signal type for that
+	//		- nested version of the above -> no problem
+	//
+	// The bottom line is that asynchronous blocks aren't that useful at all since we have signal objects.
+	//
+	//
+
 	public void notifySignalChanged() {
 
 	}
