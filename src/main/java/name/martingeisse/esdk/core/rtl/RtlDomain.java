@@ -17,13 +17,13 @@ import java.util.List;
 /**
  *
  */
-public final class RtlDesign extends Item {
+public final class RtlDomain extends Item {
 
 	private final List<RtlPin> pins = new ArrayList<>();
 	private final List<RtlClockNetwork> clockNetworks = new ArrayList<>();
 	private final List<RtlClockedBlock> clockedBlocks = new ArrayList<>();
 
-	public RtlDesign(Design design) {
+	public RtlDomain(Design design) {
 		super(design);
 	}
 
@@ -76,7 +76,7 @@ public final class RtlDesign extends Item {
 	@Override
 	protected void initializeSimulation() {
 		if (!pins.isEmpty()) {
-			throw new IllegalStateException("cannot use an RtlDesign with pins in simulation");
+			throw new IllegalStateException("cannot use an RtlDomain with pins in simulation");
 		}
 	}
 

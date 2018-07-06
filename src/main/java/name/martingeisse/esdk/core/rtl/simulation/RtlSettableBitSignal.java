@@ -1,6 +1,6 @@
 package name.martingeisse.esdk.core.rtl.simulation;
 
-import name.martingeisse.esdk.core.rtl.RtlDesign;
+import name.martingeisse.esdk.core.rtl.RtlDomain;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 
 /**
@@ -10,7 +10,7 @@ public final class RtlSettableBitSignal extends RtlSettableSignal implements Rtl
 
 	private boolean value;
 
-	public RtlSettableBitSignal(RtlDesign design) {
+	public RtlSettableBitSignal(RtlDomain design) {
 		super(design);
 	}
 

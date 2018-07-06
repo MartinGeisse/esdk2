@@ -4,7 +4,7 @@
  */
 package name.martingeisse.esdk.core.rtl.signal;
 
-import name.martingeisse.esdk.core.rtl.RtlDesign;
+import name.martingeisse.esdk.core.rtl.RtlDomain;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
 
@@ -15,7 +15,7 @@ public final class RtlBitConstant extends RtlItem implements RtlBitSignal {
 
 	private final boolean value;
 
-	public RtlBitConstant(RtlDesign design, boolean value) {
+	public RtlBitConstant(RtlDomain design, boolean value) {
 		super(design);
 		this.value = value;
 	}

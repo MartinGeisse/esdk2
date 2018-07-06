@@ -4,7 +4,7 @@
  */
 package name.martingeisse.esdk.core.rtl.signal;
 
-import name.martingeisse.esdk.core.rtl.RtlDesign;
+import name.martingeisse.esdk.core.rtl.RtlDomain;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 
 /**
@@ -15,7 +15,7 @@ public final class RtlConditionalVectorOperation extends RtlConditionalOperation
 	private final RtlVectorSignal onTrue;
 	private final RtlVectorSignal onFalse;
 
-	public RtlConditionalVectorOperation(RtlDesign design, RtlBitSignal condition, RtlVectorSignal onTrue, RtlVectorSignal onFalse) {
+	public RtlConditionalVectorOperation(RtlDomain design, RtlBitSignal condition, RtlVectorSignal onTrue, RtlVectorSignal onFalse) {
 		super(design, condition);
 		if (onTrue.getWidth() != onFalse.getWidth()) {
 			throw new IllegalArgumentException("onTrue has width " + onTrue.getWidth() + " but onFalse has width " + onFalse.getWidth());

@@ -5,7 +5,7 @@
 package name.martingeisse.esdk.core.rtl.block;
 
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
-import name.martingeisse.esdk.core.rtl.RtlDesign;
+import name.martingeisse.esdk.core.rtl.RtlDomain;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.statement.RtlStatementSequence;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogWriter;
@@ -27,7 +27,7 @@ public final class RtlClockedBlock extends RtlItem {
 	private final RtlStatementSequence initializerStatements;
 	private final RtlStatementSequence statements;
 
-	public RtlClockedBlock(RtlDesign design, RtlClockNetwork clockNetwork) {
+	public RtlClockedBlock(RtlDomain design, RtlClockNetwork clockNetwork) {
 		super(design);
 		checkSameDesign(clockNetwork);
 
@@ -94,7 +94,7 @@ public final class RtlClockedBlock extends RtlItem {
 	}
 
 	/**
-	 * This class is used to ensure that {@link RtlDesign#registerBlock(DesignRegistrationKey, RtlClockedBlock)} isn't called except through the
+	 * This class is used to ensure that {@link RtlDomain#registerBlock(DesignRegistrationKey, RtlClockedBlock)} isn't called except through the
 	 * {@link RtlClockedBlock} constructor.
 	 */
 	public static final class DesignRegistrationKey {

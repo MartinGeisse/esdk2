@@ -9,13 +9,13 @@ package name.martingeisse.esdk.core.rtl;
  */
 public abstract class RtlItem implements RtlItemOwned {
 
-	private final RtlDesign design;
+	private final RtlDomain design;
 
-	public RtlItem(RtlDesign design) {
+	public RtlItem(RtlDomain design) {
 		this.design = design;
 	}
 
-	public final RtlDesign getDesign() {
+	public final RtlDomain getDesign() {
 		return design;
 	}
 

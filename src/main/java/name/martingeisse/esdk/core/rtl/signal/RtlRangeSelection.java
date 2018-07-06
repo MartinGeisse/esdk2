@@ -4,7 +4,7 @@
  */
 package name.martingeisse.esdk.core.rtl.signal;
 
-import name.martingeisse.esdk.core.rtl.RtlDesign;
+import name.martingeisse.esdk.core.rtl.RtlDomain;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogDesignGenerator;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
@@ -19,7 +19,7 @@ public class RtlRangeSelection extends RtlItem implements RtlVectorSignal {
 	private final int from;
 	private final int to;
 
-	public RtlRangeSelection(RtlDesign design, RtlVectorSignal containerSignal, int from, int to) {
+	public RtlRangeSelection(RtlDomain design, RtlVectorSignal containerSignal, int from, int to) {
 		super(design);
 		checkSameDesign(containerSignal);
 		if (from < 0 || to < 0 || from >= containerSignal.getWidth() || to >= containerSignal.getWidth() || from < to) {

@@ -2,7 +2,7 @@ package name.martingeisse.esdk.examples;
 
 import name.martingeisse.esdk.core.model.Design;
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
-import name.martingeisse.esdk.core.rtl.RtlDesign;
+import name.martingeisse.esdk.core.rtl.RtlDomain;
 import name.martingeisse.esdk.core.rtl.block.RtlClockedBlock;
 import name.martingeisse.esdk.core.rtl.block.RtlProceduralVectorSignal;
 import name.martingeisse.esdk.core.rtl.pin.RtlInputPin;
@@ -23,7 +23,7 @@ public class MovingLightMain {
 	public static void main(String[] args) throws Exception {
 
 		Design mainDesign = new Design();
-		RtlDesign design = new RtlDesign(mainDesign);
+		RtlDomain design = new RtlDomain(mainDesign);
 		RtlClockNetwork clk = design.createClockNetwork(clockPin(design));
 
 		RtlClockedBlock block = clk.createBlock();
@@ -52,13 +52,13 @@ public class MovingLightMain {
 		new ProjectGenerator(design, "MovingLight", new File("ise/moving_light"), "XC3S500E-FG320-4").generate();
 	}
 
-	private static RtlOutputPin ledPin(RtlDesign design, String id, RtlBitSignal outputSignal) {
+	private static RtlOutputPin ledPin(RtlDomain design, String id, RtlBitSignal outputSignal) {
 		RtlOutputPin pin = ledPin(design, id);
 		pin.setOutputSignal(outputSignal);
 		return pin;
 	}
 
-	private static RtlOutputPin ledPin(RtlDesign design, String id) {
+	private static RtlOutputPin ledPin(RtlDomain design, String id) {
 		XilinxPinConfiguration configuration = new XilinxPinConfiguration();
 		configuration.setIostandard("LVTTL");
 		configuration.setSlew(XilinxPinConfiguration.Slew.SLOW);
@@ -69,7 +69,7 @@ public class MovingLightMain {
 		return pin;
 	}
 
-	private static RtlInputPin clockPin(RtlDesign design) {
+	private static RtlInputPin clockPin(RtlDomain design) {
 		XilinxPinConfiguration configuration = new XilinxPinConfiguration();
 		configuration.setIostandard("LVCMOS33");
 		RtlInputPin pin = new RtlInputPin(design);

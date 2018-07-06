@@ -4,7 +4,7 @@
  */
 package name.martingeisse.esdk.core.rtl.signal;
 
-import name.martingeisse.esdk.core.rtl.RtlDesign;
+import name.martingeisse.esdk.core.rtl.RtlDomain;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogDesignGenerator;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
@@ -18,7 +18,7 @@ public final class RtlBitOperation extends RtlItem implements RtlBitSignal {
 	private final RtlBitSignal leftOperand;
 	private final RtlBitSignal rightOperand;
 
-	public RtlBitOperation(RtlDesign design, Operator operator, RtlBitSignal leftOperand, RtlBitSignal rightOperand) {
+	public RtlBitOperation(RtlDomain design, Operator operator, RtlBitSignal leftOperand, RtlBitSignal rightOperand) {
 		super(design);
 		this.operator = operator;
 		this.leftOperand = leftOperand;

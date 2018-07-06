@@ -4,7 +4,7 @@
  */
 package name.martingeisse.esdk.core.rtl.statement;
 
-import name.martingeisse.esdk.core.rtl.RtlDesign;
+import name.martingeisse.esdk.core.rtl.RtlDomain;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 
 /**
@@ -15,7 +15,7 @@ public final class RtlVectorAssignment extends RtlAssignment {
 	private final RtlVectorAssignmentTarget destination;
 	private final RtlVectorSignal source;
 
-	public RtlVectorAssignment(RtlDesign design, RtlVectorAssignmentTarget destination, RtlVectorSignal source) {
+	public RtlVectorAssignment(RtlDomain design, RtlVectorAssignmentTarget destination, RtlVectorSignal source) {
 		super(design);
 		checkSameDesign(destination);
 		checkSameDesign(source);

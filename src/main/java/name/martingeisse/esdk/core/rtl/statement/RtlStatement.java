@@ -4,7 +4,7 @@
  */
 package name.martingeisse.esdk.core.rtl.statement;
 
-import name.martingeisse.esdk.core.rtl.RtlDesign;
+import name.martingeisse.esdk.core.rtl.RtlDomain;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogWriter;
@@ -14,7 +14,7 @@ import name.martingeisse.esdk.core.rtl.verilog.VerilogWriter;
  */
 public abstract class RtlStatement extends RtlItem {
 
-	public RtlStatement(RtlDesign design) {
+	public RtlStatement(RtlDomain design) {
 		super(design);
 	}
 

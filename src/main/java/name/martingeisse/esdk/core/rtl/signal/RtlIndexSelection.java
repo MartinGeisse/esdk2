@@ -4,7 +4,7 @@
  */
 package name.martingeisse.esdk.core.rtl.signal;
 
-import name.martingeisse.esdk.core.rtl.RtlDesign;
+import name.martingeisse.esdk.core.rtl.RtlDomain;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogDesignGenerator;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
@@ -17,7 +17,7 @@ public final class RtlIndexSelection extends RtlItem implements RtlBitSignal {
 	private final RtlVectorSignal containerSignal;
 	private final RtlVectorSignal indexSignal;
 
-	public RtlIndexSelection(RtlDesign design, RtlVectorSignal containerSignal, RtlVectorSignal indexSignal) {
+	public RtlIndexSelection(RtlDomain design, RtlVectorSignal containerSignal, RtlVectorSignal indexSignal) {
 		super(design);
 		checkSameDesign(containerSignal);
 		checkSameDesign(indexSignal);

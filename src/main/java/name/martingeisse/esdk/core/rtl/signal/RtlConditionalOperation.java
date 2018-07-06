@@ -4,7 +4,7 @@
  */
 package name.martingeisse.esdk.core.rtl.signal;
 
-import name.martingeisse.esdk.core.rtl.RtlDesign;
+import name.martingeisse.esdk.core.rtl.RtlDomain;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogDesignGenerator;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
@@ -16,7 +16,7 @@ public abstract class RtlConditionalOperation extends RtlItem implements RtlSign
 
 	private final RtlBitSignal condition;
 
-	public RtlConditionalOperation(RtlDesign design, RtlBitSignal condition) {
+	public RtlConditionalOperation(RtlDomain design, RtlBitSignal condition) {
 		super(design);
 		this.condition = condition;
 	}

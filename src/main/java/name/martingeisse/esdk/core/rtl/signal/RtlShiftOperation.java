@@ -4,7 +4,7 @@
  */
 package name.martingeisse.esdk.core.rtl.signal;
 
-import name.martingeisse.esdk.core.rtl.RtlDesign;
+import name.martingeisse.esdk.core.rtl.RtlDomain;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogDesignGenerator;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
@@ -34,7 +34,7 @@ public final class RtlShiftOperation extends RtlItem implements RtlVectorSignal 
 	private final RtlVectorSignal leftOperand;
 	private final RtlVectorSignal rightOperand;
 
-	public RtlShiftOperation(RtlDesign design, Direction direction, RtlVectorSignal leftOperand, RtlVectorSignal rightOperand) {
+	public RtlShiftOperation(RtlDomain design, Direction direction, RtlVectorSignal leftOperand, RtlVectorSignal rightOperand) {
 		super(design);
 		if (leftOperand.getWidth() < (1 << rightOperand.getWidth())) {
 			throw new IllegalArgumentException("left shift operand too small: " + leftOperand.getWidth() + " for right operand width " + rightOperand.getWidth());

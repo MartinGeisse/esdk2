@@ -4,7 +4,7 @@
  */
 package name.martingeisse.esdk.core.rtl.xilinx;
 
-import name.martingeisse.esdk.core.rtl.RtlDesign;
+import name.martingeisse.esdk.core.rtl.RtlDomain;
 import name.martingeisse.esdk.core.rtl.pin.RtlPin;
 import name.martingeisse.esdk.core.rtl.pin.RtlPinConfiguration;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogDesignGenerator;
@@ -20,13 +20,13 @@ import java.util.function.Consumer;
  */
 public class ProjectGenerator {
 
-	private final RtlDesign design;
+	private final RtlDomain design;
 	private final String name;
 	private final File outputFolder;
 	private final String fpgaPartId;
 	private final List<String> additionalUcfLines = new ArrayList<>();
 
-	public ProjectGenerator(RtlDesign design, String name, File outputFolder, String fpgaPartId) {
+	public ProjectGenerator(RtlDomain design, String name, File outputFolder, String fpgaPartId) {
 		this.design = design;
 		this.name = name;
 		this.outputFolder = outputFolder;

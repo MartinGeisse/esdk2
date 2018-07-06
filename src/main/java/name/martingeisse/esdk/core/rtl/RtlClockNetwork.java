@@ -15,7 +15,7 @@ public final class RtlClockNetwork extends RtlItem {
 
 	private final RtlBitSignal clockSignal;
 
-	public RtlClockNetwork(RtlDesign design, RtlBitSignal clockSignal) {
+	public RtlClockNetwork(RtlDomain design, RtlBitSignal clockSignal) {
 		super(design);
 		checkSameDesign(clockSignal);
 		this.clockSignal = clockSignal;
@@ -34,7 +34,7 @@ public final class RtlClockNetwork extends RtlItem {
 	}
 
 	/**
-	 * This class is used to ensure that {@link RtlDesign#registerPin(RtlPin.DesignRegistrationKey, RtlPin)} isn't called except through the
+	 * This class is used to ensure that {@link RtlDomain#registerPin(RtlPin.DesignRegistrationKey, RtlPin)} isn't called except through the
 	 * {@link RtlPin} constructor.
 	 */
 	public static final class DesignRegistrationKey {

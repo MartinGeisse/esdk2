@@ -4,7 +4,7 @@
  */
 package name.martingeisse.esdk.core.rtl.statement;
 
-import name.martingeisse.esdk.core.rtl.RtlDesign;
+import name.martingeisse.esdk.core.rtl.RtlDomain;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorConstant;
@@ -22,7 +22,7 @@ public class RtlStatementSequence extends RtlStatement {
 
 	private final List<RtlStatement> statements = new ArrayList<>();
 
-	public RtlStatementSequence(RtlDesign design) {
+	public RtlStatementSequence(RtlDomain design) {
 		super(design);
 	}
 

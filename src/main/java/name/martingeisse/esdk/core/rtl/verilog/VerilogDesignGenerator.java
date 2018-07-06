@@ -4,7 +4,7 @@
  */
 package name.martingeisse.esdk.core.rtl.verilog;
 
-import name.martingeisse.esdk.core.rtl.RtlDesign;
+import name.martingeisse.esdk.core.rtl.RtlDomain;
 import name.martingeisse.esdk.core.rtl.block.RtlClockedBlock;
 import name.martingeisse.esdk.core.rtl.block.RtlProceduralSignal;
 import name.martingeisse.esdk.core.rtl.pin.RtlBidirectionalPin;
@@ -27,7 +27,7 @@ import java.util.Set;
 public class VerilogDesignGenerator {
 
 	private final VerilogWriter out;
-	private final RtlDesign design;
+	private final RtlDomain design;
 	private final String name;
 
 	private Set<RtlSignal> allSignals;
@@ -35,7 +35,7 @@ public class VerilogDesignGenerator {
 	private VerilogExpressionWriter dryRunExpressionWriter;
 
 
-	public VerilogDesignGenerator(PrintWriter out, RtlDesign design, String name) {
+	public VerilogDesignGenerator(PrintWriter out, RtlDomain design, String name) {
 		this.out = new VerilogWriter(out);
 		this.design = design;
 		this.name = name;

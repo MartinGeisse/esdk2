@@ -5,7 +5,7 @@
 package name.martingeisse.esdk.core.rtl.pin;
 
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
-import name.martingeisse.esdk.core.rtl.RtlDesign;
+import name.martingeisse.esdk.core.rtl.RtlDomain;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogWriter;
 
@@ -17,7 +17,7 @@ public abstract class RtlPin extends RtlItem {
 	private String id;
 	private RtlPinConfiguration configuration;
 
-	public RtlPin(RtlDesign design) {
+	public RtlPin(RtlDomain design) {
 		super(design);
 
 		DesignRegistrationKey key = new DesignRegistrationKey();
@@ -53,7 +53,7 @@ public abstract class RtlPin extends RtlItem {
 
 	/**
 	 * This class is used to ensure that
-	 * {@link RtlDesign#registerClockNetwork(RtlClockNetwork.DesignRegistrationKey, RtlClockNetwork)} isn't called
+	 * {@link RtlDomain#registerClockNetwork(RtlClockNetwork.DesignRegistrationKey, RtlClockNetwork)} isn't called
 	 * except through the {@link RtlClockNetwork} constructor.
 	 */
 	public static final class DesignRegistrationKey {
