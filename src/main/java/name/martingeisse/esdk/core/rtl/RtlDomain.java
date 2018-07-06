@@ -30,7 +30,7 @@ public final class RtlDomain extends Item {
 	/**
 	 * Non-public API. Do not call. Only marked public because Java forces us to if we want to use packages.
 	 */
-	public void registerPin(RtlPin.DesignRegistrationKey key, RtlPin pin) {
+	public void registerPin(RtlPin.DomainRegistrationKey key, RtlPin pin) {
 		if (!key.isValid()) {
 			throw new IllegalArgumentException("invalid registration key");
 		}

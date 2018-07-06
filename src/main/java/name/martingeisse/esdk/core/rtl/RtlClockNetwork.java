@@ -34,7 +34,7 @@ public final class RtlClockNetwork extends RtlItem {
 	}
 
 	/**
-	 * This class is used to ensure that {@link RtlDomain#registerPin(RtlPin.DesignRegistrationKey, RtlPin)} isn't called except through the
+	 * This class is used to ensure that {@link RtlDomain#registerPin(RtlPin.DomainRegistrationKey, RtlPin)} isn't called except through the
 	 * {@link RtlPin} constructor.
 	 */
 	public static final class DomainRegistrationKey {

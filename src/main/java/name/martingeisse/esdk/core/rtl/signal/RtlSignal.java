@@ -5,7 +5,7 @@
 package name.martingeisse.esdk.core.rtl.signal;
 
 import name.martingeisse.esdk.core.rtl.RtlItemOwned;
-import name.martingeisse.esdk.core.rtl.verilog.VerilogDesignGenerator;
+import name.martingeisse.esdk.core.rtl.verilog.VerilogGenerator;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
 
 /**
@@ -21,8 +21,8 @@ public interface RtlSignal extends RtlItemOwned {
 	 * The default implementation only complies with ALL nesting. This is correct in all cases but may extract an
 	 * expression to a helper signal unnecessarily.
 	 */
-	default boolean compliesWith(VerilogDesignGenerator.VerilogExpressionNesting nesting) {
-		return nesting == VerilogDesignGenerator.VerilogExpressionNesting.ALL;
+	default boolean compliesWith(VerilogGenerator.VerilogExpressionNesting nesting) {
+		return nesting == VerilogGenerator.VerilogExpressionNesting.ALL;
 	}
 
 	/**

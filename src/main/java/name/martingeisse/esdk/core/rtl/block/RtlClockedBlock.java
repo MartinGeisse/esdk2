@@ -27,17 +27,17 @@ public final class RtlClockedBlock extends RtlItem {
 	private final RtlStatementSequence initializerStatements;
 	private final RtlStatementSequence statements;
 
-	public RtlClockedBlock(RtlDomain design, RtlClockNetwork clockNetwork) {
-		super(design);
+	public RtlClockedBlock(RtlDomain domain, RtlClockNetwork clockNetwork) {
+		super(domain);
 		checkSameDomain(clockNetwork);
 
 		this.clockNetwork = clockNetwork;
 		this.proceduralSignals = new ArrayList<>();
-		this.initializerStatements = new RtlStatementSequence(design);
-		this.statements = new RtlStatementSequence(design);
+		this.initializerStatements = new RtlStatementSequence(domain);
+		this.statements = new RtlStatementSequence(domain);
 
 		DomainRegistrationKey key = new DomainRegistrationKey();
-		design.registerBlock(key, this);
+		domain.registerBlock(key, this);
 		key.valid = false;
 	}
 

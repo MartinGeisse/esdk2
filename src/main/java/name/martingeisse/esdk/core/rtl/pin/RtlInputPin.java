@@ -13,8 +13,8 @@ import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
  */
 public final class RtlInputPin extends RtlPin implements RtlBitSignal {
 
-	public RtlInputPin(RtlDomain design) {
-		super(design);
+	public RtlInputPin(RtlDomain domain) {
+		super(domain);
 	}
 
 	@Override

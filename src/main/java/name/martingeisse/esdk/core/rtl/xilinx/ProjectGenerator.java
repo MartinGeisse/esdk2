@@ -7,7 +7,7 @@ package name.martingeisse.esdk.core.rtl.xilinx;
 import name.martingeisse.esdk.core.rtl.RtlDomain;
 import name.martingeisse.esdk.core.rtl.pin.RtlPin;
 import name.martingeisse.esdk.core.rtl.pin.RtlPinConfiguration;
-import name.martingeisse.esdk.core.rtl.verilog.VerilogDesignGenerator;
+import name.martingeisse.esdk.core.rtl.verilog.VerilogGenerator;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -41,7 +41,7 @@ public class ProjectGenerator {
 		outputFolder.mkdirs();
 
 		generateFile(name + ".v", out -> {
-			new VerilogDesignGenerator(out, design, name).generate();
+			new VerilogGenerator(out, design, name).generate();
 		});
 
 		generateFile("environment.sh", out -> {

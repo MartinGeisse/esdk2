@@ -6,7 +6,7 @@ package name.martingeisse.esdk.core.rtl.signal;
 
 import name.martingeisse.esdk.core.rtl.RtlDomain;
 import name.martingeisse.esdk.core.rtl.RtlItem;
-import name.martingeisse.esdk.core.rtl.verilog.VerilogDesignGenerator;
+import name.martingeisse.esdk.core.rtl.verilog.VerilogGenerator;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 
@@ -37,7 +37,7 @@ public final class RtlVectorConstant extends RtlItem implements RtlVectorSignal 
 	}
 
 	@Override
-	public boolean compliesWith(VerilogDesignGenerator.VerilogExpressionNesting nesting) {
+	public boolean compliesWith(VerilogGenerator.VerilogExpressionNesting nesting) {
 		return true;
 	}
 

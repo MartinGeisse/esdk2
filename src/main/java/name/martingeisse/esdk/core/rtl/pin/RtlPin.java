@@ -20,7 +20,7 @@ public abstract class RtlPin extends RtlItem {
 	public RtlPin(RtlDomain design) {
 		super(design);
 
-		DesignRegistrationKey key = new DesignRegistrationKey();
+		DomainRegistrationKey key = new DomainRegistrationKey();
 		design.registerPin(key, this);
 		key.valid = false;
 	}
@@ -56,11 +56,11 @@ public abstract class RtlPin extends RtlItem {
 	 * {@link RtlDomain#registerClockNetwork(RtlClockNetwork.DomainRegistrationKey, RtlClockNetwork)} isn't called
 	 * except through the {@link RtlClockNetwork} constructor.
 	 */
-	public static final class DesignRegistrationKey {
+	public static final class DomainRegistrationKey {
 
 		private boolean valid = true;
 
-		private DesignRegistrationKey() {
+		private DomainRegistrationKey() {
 		}
 
 		public boolean isValid() {

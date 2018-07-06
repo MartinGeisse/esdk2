@@ -24,7 +24,7 @@ import java.util.Set;
 /**
  *
  */
-public class VerilogDesignGenerator {
+public class VerilogGenerator {
 
 	private final VerilogWriter out;
 	private final RtlDomain design;
@@ -35,7 +35,7 @@ public class VerilogDesignGenerator {
 	private VerilogExpressionWriter dryRunExpressionWriter;
 
 
-	public VerilogDesignGenerator(PrintWriter out, RtlDomain design, String name) {
+	public VerilogGenerator(PrintWriter out, RtlDomain design, String name) {
 		this.out = new VerilogWriter(out);
 		this.design = design;
 		this.name = name;

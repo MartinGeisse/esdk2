@@ -7,7 +7,7 @@ package name.martingeisse.esdk.core.rtl.signal;
 import com.google.common.collect.ImmutableList;
 import name.martingeisse.esdk.core.rtl.RtlDomain;
 import name.martingeisse.esdk.core.rtl.RtlItem;
-import name.martingeisse.esdk.core.rtl.verilog.VerilogDesignGenerator;
+import name.martingeisse.esdk.core.rtl.verilog.VerilogGenerator;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 
@@ -70,7 +70,7 @@ public final class RtlConcatenation extends RtlItem implements RtlVectorSignal {
 			} else {
 				out.print(", ");
 			}
-			out.print(signal, VerilogDesignGenerator.VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
+			out.print(signal, VerilogGenerator.VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
 		}
 		out.print('}');
 	}

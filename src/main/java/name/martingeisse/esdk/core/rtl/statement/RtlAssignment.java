@@ -6,7 +6,7 @@ package name.martingeisse.esdk.core.rtl.statement;
 
 import name.martingeisse.esdk.core.rtl.RtlDomain;
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
-import name.martingeisse.esdk.core.rtl.verilog.VerilogDesignGenerator;
+import name.martingeisse.esdk.core.rtl.verilog.VerilogGenerator;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogWriter;
 
@@ -24,7 +24,7 @@ public abstract class RtlAssignment extends RtlStatement {
 
 	@Override
 	public void printExpressionsDryRun(VerilogExpressionWriter expressionWriter) {
-		expressionWriter.print(getSource(), VerilogDesignGenerator.VerilogExpressionNesting.ALL);
+		expressionWriter.print(getSource(), VerilogGenerator.VerilogExpressionNesting.ALL);
 	}
 
 	@Override

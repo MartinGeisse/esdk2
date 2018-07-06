@@ -164,7 +164,7 @@ public class VerilogWriter {
 			}
 
 			@Override
-			public VerilogExpressionWriter print(RtlSignal signal, VerilogDesignGenerator.VerilogExpressionNesting nesting) {
+			public VerilogExpressionWriter print(RtlSignal signal, VerilogGenerator.VerilogExpressionNesting nesting) {
 				String name = declaredSignals.get(signal);
 				if (name == null) {
 					printExpression(signal);

@@ -15,8 +15,8 @@ public final class RtlBitConstant extends RtlItem implements RtlBitSignal {
 
 	private final boolean value;
 
-	public RtlBitConstant(RtlDomain design, boolean value) {
-		super(design);
+	public RtlBitConstant(RtlDomain domain, boolean value) {
+		super(domain);
 		this.value = value;
 	}
 

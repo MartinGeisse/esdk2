@@ -16,8 +16,8 @@ public final class RtlBidirectionalPin extends RtlPin implements RtlSignal {
 	private RtlSignal outputSignal;
 	private RtlSignal outputEnableSignal;
 
-	public RtlBidirectionalPin(RtlDomain design) {
-		super(design);
+	public RtlBidirectionalPin(RtlDomain domain) {
+		super(domain);
 	}
 
 	public RtlSignal getOutputSignal() {

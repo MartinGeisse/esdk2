@@ -13,7 +13,7 @@ import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
  *   nesting (generating helper wires to resolve forbidden nesting, [1])
  * - the second call actually writes the expression.
  *
- * Signal classes should use {@link #print(RtlSignal, VerilogDesignGenerator.VerilogExpressionNesting)} to print
+ * Signal classes should use {@link #print(RtlSignal, VerilogGenerator.VerilogExpressionNesting)} to print
  * sub-expressions. Directly calling {@link RtlSignal#printVerilogExpression(VerilogExpressionWriter)} will prevent the
  * sub-expression from being extracted for shared signals or invalid nesting. In some cases, this can even generate
  * Verilog with wrong semantics.
@@ -24,7 +24,7 @@ public interface VerilogExpressionWriter {
 	VerilogExpressionWriter print(int i);
 	VerilogExpressionWriter print(char c);
 
-	VerilogExpressionWriter print(RtlSignal signal, VerilogDesignGenerator.VerilogExpressionNesting nesting);
+	VerilogExpressionWriter print(RtlSignal signal, VerilogGenerator.VerilogExpressionNesting nesting);
 
 	VerilogExpressionWriter printProceduralSignalName(RtlProceduralSignal signal);
 

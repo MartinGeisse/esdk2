@@ -14,8 +14,8 @@ public final class RtlOutputPin extends RtlPin {
 
 	private RtlSignal outputSignal;
 
-	public RtlOutputPin(RtlDomain design) {
-		super(design);
+	public RtlOutputPin(RtlDomain domain) {
+		super(domain);
 	}
 
 	public RtlSignal getOutputSignal() {

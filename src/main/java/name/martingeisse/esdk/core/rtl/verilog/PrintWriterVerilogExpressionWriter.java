@@ -39,7 +39,7 @@ public final class PrintWriterVerilogExpressionWriter implements VerilogExpressi
 	}
 
 	@Override
-	public VerilogExpressionWriter print(RtlSignal signal, VerilogDesignGenerator.VerilogExpressionNesting nesting) {
+	public VerilogExpressionWriter print(RtlSignal signal, VerilogGenerator.VerilogExpressionNesting nesting) {
 		throw new UnsupportedOperationException();
 	}
 
