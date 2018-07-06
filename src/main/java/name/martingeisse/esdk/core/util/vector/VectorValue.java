@@ -4,6 +4,11 @@
  */
 package name.martingeisse.esdk.core.util.vector;
 
+import name.martingeisse.esdk.core.rtl.verilog.PrintWriterVerilogExpressionWriter;
+import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
+
+import java.io.PrintWriter;
+
 /**
  * Represents a bit vector with a specific width.
  * <p>
@@ -163,5 +168,16 @@ public abstract class VectorValue {
 	 * have the same width as this vector.
 	 */
 	public abstract int compareUnsigned(VectorValue other);
+
+	public void printVerilogExpression(PrintWriter out) {
+		printVerilogExpression(new PrintWriterVerilogExpressionWriter(out));
+	}
+
+	public void printVerilogExpression(VerilogExpressionWriter out) {
+		out.print(width);
+		out.print("'h");
+	}
+
+	protected abstract void printDigits(VerilogExpressionWriter out);
 
 }

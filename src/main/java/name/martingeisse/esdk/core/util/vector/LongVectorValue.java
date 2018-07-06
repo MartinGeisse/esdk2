@@ -4,6 +4,8 @@
  */
 package name.martingeisse.esdk.core.util.vector;
 
+import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
@@ -30,7 +32,7 @@ public final class LongVectorValue extends VectorValue {
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof LongVectorValue) {
-			LongVectorValue other = (LongVectorValue)obj;
+			LongVectorValue other = (LongVectorValue) obj;
 			return getWidth() == other.getWidth() && value == other.value;
 		}
 		return false;
@@ -187,6 +189,13 @@ public final class LongVectorValue extends VectorValue {
 	@Override
 	public int compareUnsigned(VectorValue other) {
 		return Long.compareUnsigned(value, expectSameWidth(other));
+	}
+
+	protected void printDigits(VerilogExpressionWriter out) {
+		int width = getWidth();
+		String zeros = StringUtils.repeat('0', width);
+		String digits = Long.toString(value, 16);
+		out.print((zeros + digits).substring(0, width));
 	}
 
 }

@@ -11,8 +11,6 @@ import name.martingeisse.esdk.core.rtl.verilog.VerilogDesignGenerator;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 
-import java.util.BitSet;
-
 /**
  * Note: Unlike other object fields, the list of signals must be determined in advance. This is to ensure that the
  * result width doesn't change.
@@ -79,25 +77,17 @@ public final class RtlConcatenation extends RtlItem implements RtlVectorSignal {
 
 	@Override
 	public VectorValue getValue() {
-		BitSet result = new BitSet();
-		int previousWidth = 0;
-		for (int signalIndex = signals.size() - 1; signalIndex >= 0; signalIndex--) {
-			RtlSignal elementSignal = signals.get(signalIndex);
+		VectorValue result = VectorValue.ofUnsigned(0, 0);
+		for (RtlSignal elementSignal : signals) {
 			if (elementSignal instanceof RtlBitSignal) {
-				result.set(previousWidth, ((RtlBitSignal) elementSignal).getValue());
-				previousWidth++;
+				result = result.concat(((RtlBitSignal) elementSignal).getValue());
 			} else if (elementSignal instanceof RtlVectorSignal) {
-				VectorValue elementValue = ((RtlVectorSignal) elementSignal).getValue();
-				BitSet elementBits = elementValue.getBitsShared();
-				for (int i = 0; i < elementValue.getWidth(); i++) {
-					result.set(previousWidth + i, elementBits.get(i));
-				}
-				previousWidth += elementValue.getWidth();
+				result = result.concat(((RtlVectorSignal) elementSignal).getValue());
 			} else {
 				throw new RuntimeException("invalid signal: " + elementSignal);
 			}
 		}
-		return new VectorValue(previousWidth, result, false);
+		return result;
 	}
 
 }

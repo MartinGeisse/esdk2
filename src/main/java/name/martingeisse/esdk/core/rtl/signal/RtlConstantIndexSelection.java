@@ -52,7 +52,7 @@ public final class RtlConstantIndexSelection extends RtlItem implements RtlBitSi
 
 	@Override
 	public boolean getValue() {
-		return containerSignal.getValue().getBit(index);
+		return containerSignal.getValue().select(index);
 	}
 
 }
