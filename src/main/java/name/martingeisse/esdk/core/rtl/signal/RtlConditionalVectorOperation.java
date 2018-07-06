@@ -15,8 +15,8 @@ public final class RtlConditionalVectorOperation extends RtlConditionalOperation
 	private final RtlVectorSignal onTrue;
 	private final RtlVectorSignal onFalse;
 
-	public RtlConditionalVectorOperation(RtlDomain design, RtlBitSignal condition, RtlVectorSignal onTrue, RtlVectorSignal onFalse) {
-		super(design, condition);
+	public RtlConditionalVectorOperation(RtlDomain domain, RtlBitSignal condition, RtlVectorSignal onTrue, RtlVectorSignal onFalse) {
+		super(domain, condition);
 		if (onTrue.getWidth() != onFalse.getWidth()) {
 			throw new IllegalArgumentException("onTrue has width " + onTrue.getWidth() + " but onFalse has width " + onFalse.getWidth());
 		}

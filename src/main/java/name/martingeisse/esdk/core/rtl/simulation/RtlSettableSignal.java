@@ -17,8 +17,8 @@ import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
  */
 public abstract class RtlSettableSignal extends RtlItem implements RtlSignal {
 
-	RtlSettableSignal(RtlDomain design) {
-		super(design);
+	RtlSettableSignal(RtlDomain domain) {
+		super(domain);
 	}
 
 	@Override

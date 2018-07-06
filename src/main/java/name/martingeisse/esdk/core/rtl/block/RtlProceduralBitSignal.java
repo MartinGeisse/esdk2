@@ -16,8 +16,8 @@ public final class RtlProceduralBitSignal extends RtlProceduralSignal implements
 	private boolean value;
 	private boolean nextValue;
 
-	public RtlProceduralBitSignal(RtlDomain design, RtlClockedBlock block) {
-		super(design, block);
+	public RtlProceduralBitSignal(RtlDomain domain, RtlClockedBlock block) {
+		super(domain, block);
 	}
 
 	@Override

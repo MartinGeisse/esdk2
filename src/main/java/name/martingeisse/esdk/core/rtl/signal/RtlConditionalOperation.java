@@ -16,8 +16,8 @@ public abstract class RtlConditionalOperation extends RtlItem implements RtlSign
 
 	private final RtlBitSignal condition;
 
-	public RtlConditionalOperation(RtlDomain design, RtlBitSignal condition) {
-		super(design);
+	public RtlConditionalOperation(RtlDomain domain, RtlBitSignal condition) {
+		super(domain);
 		this.condition = condition;
 	}
 

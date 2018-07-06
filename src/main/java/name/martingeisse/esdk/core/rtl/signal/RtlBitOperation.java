@@ -18,8 +18,8 @@ public final class RtlBitOperation extends RtlItem implements RtlBitSignal {
 	private final RtlBitSignal leftOperand;
 	private final RtlBitSignal rightOperand;
 
-	public RtlBitOperation(RtlDomain design, Operator operator, RtlBitSignal leftOperand, RtlBitSignal rightOperand) {
-		super(design);
+	public RtlBitOperation(RtlDomain domain, Operator operator, RtlBitSignal leftOperand, RtlBitSignal rightOperand) {
+		super(domain);
 		this.operator = operator;
 		this.leftOperand = leftOperand;
 		this.rightOperand = rightOperand;

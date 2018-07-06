@@ -18,8 +18,8 @@ public abstract class RtlProceduralSignal extends RtlItem implements RtlSignal, 
 
 	private final RtlClockedBlock block;
 
-	public RtlProceduralSignal(RtlDomain design, RtlClockedBlock block) {
-		super(design);
+	public RtlProceduralSignal(RtlDomain domain, RtlClockedBlock block) {
+		super(domain);
 		checkSameDomain(block);
 		this.block = block;
 		block.registerProceduralSignal(this);

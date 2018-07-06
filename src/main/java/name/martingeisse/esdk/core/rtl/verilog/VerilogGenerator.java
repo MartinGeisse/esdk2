@@ -27,7 +27,7 @@ import java.util.Set;
 public class VerilogGenerator {
 
 	private final VerilogWriter out;
-	private final RtlDomain design;
+	private final RtlDomain domain;
 	private final String name;
 
 	private Set<RtlSignal> allSignals;
@@ -35,16 +35,16 @@ public class VerilogGenerator {
 	private VerilogExpressionWriter dryRunExpressionWriter;
 
 
-	public VerilogGenerator(PrintWriter out, RtlDomain design, String name) {
+	public VerilogGenerator(PrintWriter out, RtlDomain domain, String name) {
 		this.out = new VerilogWriter(out);
-		this.design = design;
+		this.domain = domain;
 		this.name = name;
 	}
 
 	public void generate() {
 		analyzeSignals();
 		out.prepare(new HashMap<>(), declaredSignals);
-		out.printIntro(name, design.getPins());
+		out.printIntro(name, domain.getPins());
 		printSignalDeclarations();
 		out.getOut().println();
 		printBlocks();
@@ -90,14 +90,14 @@ public class VerilogGenerator {
 		};
 
 		// pins are implicitly declared
-		for (RtlPin pin : design.getPins()) {
+		for (RtlPin pin : domain.getPins()) {
 			if (pin instanceof RtlInputPin) {
 				declaredSignals.put((RtlInputPin)pin, pin.getNetName());
 			}
 		}
 
 		// procedural signals must be declared
-		for (RtlClockedBlock block : design.getClockedBlocks()) {
+		for (RtlClockedBlock block : domain.getClockedBlocks()) {
 			for (RtlProceduralSignal signal : block.getProceduralSignals()) {
 				allSignals.add(signal);
 				declareSignal(signal);
@@ -105,7 +105,7 @@ public class VerilogGenerator {
 		}
 
 		// analyze output and output-enable signals for signals to extract
-		for (RtlPin pin : design.getPins()) {
+		for (RtlPin pin : domain.getPins()) {
 			if (pin instanceof RtlOutputPin) {
 				RtlOutputPin outputPin = (RtlOutputPin)pin;
 				analyzeSignal(outputPin.getOutputSignal(), VerilogExpressionNesting.ALL);
@@ -117,7 +117,7 @@ public class VerilogGenerator {
 		}
 
 		// analyze signal "expressions" in blocks for signals to extract
-		for (RtlClockedBlock block : design.getClockedBlocks()) {
+		for (RtlClockedBlock block : domain.getClockedBlocks()) {
 			block.getInitializerStatements().printExpressionsDryRun(dryRunExpressionWriter);
 			block.getStatements().printExpressionsDryRun(dryRunExpressionWriter);
 		}
@@ -188,7 +188,7 @@ public class VerilogGenerator {
 	}
 
 	private void printBlocks() {
-		for (RtlClockedBlock block : design.getClockedBlocks()) {
+		for (RtlClockedBlock block : domain.getClockedBlocks()) {
 			block.printVerilogBlocks(out);
 		}
 	}

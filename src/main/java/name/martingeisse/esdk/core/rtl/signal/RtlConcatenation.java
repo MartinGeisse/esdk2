@@ -20,12 +20,12 @@ public final class RtlConcatenation extends RtlItem implements RtlVectorSignal {
 	private final ImmutableList<RtlSignal> signals;
 	private final int width;
 
-	public RtlConcatenation(RtlDomain design, RtlSignal... signals) {
-		this(design, ImmutableList.copyOf(signals));
+	public RtlConcatenation(RtlDomain domain, RtlSignal... signals) {
+		this(domain, ImmutableList.copyOf(signals));
 	}
 
-	public RtlConcatenation(RtlDomain design, ImmutableList<RtlSignal> signals) {
-		super(design);
+	public RtlConcatenation(RtlDomain domain, ImmutableList<RtlSignal> signals) {
+		super(domain);
 
 		// store signals
 		for (RtlSignal signal : signals) {

@@ -14,8 +14,8 @@ public final class RtlConditionalBitOperation extends RtlConditionalOperation im
 	private final RtlBitSignal onTrue;
 	private final RtlBitSignal onFalse;
 
-	public RtlConditionalBitOperation(RtlDomain design, RtlBitSignal condition, RtlBitSignal onTrue, RtlBitSignal onFalse) {
-		super(design, condition);
+	public RtlConditionalBitOperation(RtlDomain domain, RtlBitSignal condition, RtlBitSignal onTrue, RtlBitSignal onFalse) {
+		super(domain, condition);
 		this.onTrue = onTrue;
 		this.onFalse = onFalse;
 	}

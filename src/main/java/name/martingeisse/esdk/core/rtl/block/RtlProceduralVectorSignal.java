@@ -18,8 +18,8 @@ public final class RtlProceduralVectorSignal extends RtlProceduralSignal impleme
 	private VectorValue value;
 	private VectorValue nextValue;
 
-	public RtlProceduralVectorSignal(RtlDomain design, RtlClockedBlock block, int width) {
-		super(design, block);
+	public RtlProceduralVectorSignal(RtlDomain domain, RtlClockedBlock block, int width) {
+		super(domain, block);
 		this.width = width;
 		this.value = VectorValue.ofUnsigned(width, 0);
 		this.nextValue = value;

@@ -12,8 +12,8 @@ public final class RtlSettableVectorSignal extends RtlSettableSignal implements 
 	private final int width;
 	private VectorValue value;
 
-	public RtlSettableVectorSignal(RtlDomain design, int width) {
-		super(design);
+	public RtlSettableVectorSignal(RtlDomain domain, int width) {
+		super(domain);
 		this.width = width;
 		this.value = VectorValue.ofUnsigned(width, 0);
 	}

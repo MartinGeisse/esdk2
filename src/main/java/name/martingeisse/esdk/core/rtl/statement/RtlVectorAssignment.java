@@ -15,8 +15,8 @@ public final class RtlVectorAssignment extends RtlAssignment {
 	private final RtlVectorAssignmentTarget destination;
 	private final RtlVectorSignal source;
 
-	public RtlVectorAssignment(RtlDomain design, RtlVectorAssignmentTarget destination, RtlVectorSignal source) {
-		super(design);
+	public RtlVectorAssignment(RtlDomain domain, RtlVectorAssignmentTarget destination, RtlVectorSignal source) {
+		super(domain);
 		checkSameDomain(destination);
 		checkSameDomain(source);
 		if (destination.getWidth() != source.getWidth()) {

@@ -22,8 +22,8 @@ public class RtlStatementSequence extends RtlStatement {
 
 	private final List<RtlStatement> statements = new ArrayList<>();
 
-	public RtlStatementSequence(RtlDomain design) {
-		super(design);
+	public RtlStatementSequence(RtlDomain domain) {
+		super(domain);
 	}
 
 	public boolean isEmpty() {

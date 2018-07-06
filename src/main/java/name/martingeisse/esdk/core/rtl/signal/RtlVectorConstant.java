@@ -17,13 +17,13 @@ public final class RtlVectorConstant extends RtlItem implements RtlVectorSignal 
 
 	private final VectorValue value;
 
-	public RtlVectorConstant(RtlDomain design, VectorValue value) {
-		super(design);
+	public RtlVectorConstant(RtlDomain domain, VectorValue value) {
+		super(domain);
 		this.value = value;
 	}
 
-	public static RtlVectorConstant ofUnsigned(RtlDomain design, int width, int value) {
-		return new RtlVectorConstant(design, VectorValue.ofUnsigned(width, value));
+	public static RtlVectorConstant ofUnsigned(RtlDomain domain, int width, int value) {
+		return new RtlVectorConstant(domain, VectorValue.ofUnsigned(width, value));
 	}
 
 	@Override

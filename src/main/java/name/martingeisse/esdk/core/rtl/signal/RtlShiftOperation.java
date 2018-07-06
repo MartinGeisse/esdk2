@@ -34,8 +34,8 @@ public final class RtlShiftOperation extends RtlItem implements RtlVectorSignal 
 	private final RtlVectorSignal leftOperand;
 	private final RtlVectorSignal rightOperand;
 
-	public RtlShiftOperation(RtlDomain design, Direction direction, RtlVectorSignal leftOperand, RtlVectorSignal rightOperand) {
-		super(design);
+	public RtlShiftOperation(RtlDomain domain, Direction direction, RtlVectorSignal leftOperand, RtlVectorSignal rightOperand) {
+		super(domain);
 		if (leftOperand.getWidth() < (1 << rightOperand.getWidth())) {
 			throw new IllegalArgumentException("left shift operand too small: " + leftOperand.getWidth() + " for right operand width " + rightOperand.getWidth());
 		}

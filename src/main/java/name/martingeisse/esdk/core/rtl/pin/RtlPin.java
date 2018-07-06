@@ -17,11 +17,11 @@ public abstract class RtlPin extends RtlItem {
 	private String id;
 	private RtlPinConfiguration configuration;
 
-	public RtlPin(RtlDomain design) {
-		super(design);
+	public RtlPin(RtlDomain domain) {
+		super(domain);
 
 		DomainRegistrationKey key = new DomainRegistrationKey();
-		design.registerPin(key, this);
+		domain.registerPin(key, this);
 		key.valid = false;
 	}
 

@@ -10,8 +10,8 @@ public final class RtlSettableBitSignal extends RtlSettableSignal implements Rtl
 
 	private boolean value;
 
-	public RtlSettableBitSignal(RtlDomain design) {
-		super(design);
+	public RtlSettableBitSignal(RtlDomain domain) {
+		super(domain);
 	}
 
 	@Override

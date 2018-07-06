@@ -14,8 +14,8 @@ import name.martingeisse.esdk.core.rtl.verilog.VerilogWriter;
  */
 public abstract class RtlStatement extends RtlItem {
 
-	public RtlStatement(RtlDomain design) {
-		super(design);
+	public RtlStatement(RtlDomain domain) {
+		super(domain);
 	}
 
 	public abstract void printExpressionsDryRun(VerilogExpressionWriter expressionWriter);

@@ -15,8 +15,8 @@ import name.martingeisse.esdk.core.rtl.verilog.VerilogWriter;
  */
 public abstract class RtlAssignment extends RtlStatement {
 
-	public RtlAssignment(RtlDomain design) {
-		super(design);
+	public RtlAssignment(RtlDomain domain) {
+		super(domain);
 	}
 
 	public abstract RtlAssignmentTarget getDestination();

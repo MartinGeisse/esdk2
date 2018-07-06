@@ -19,8 +19,8 @@ public final class RtlVectorComparison extends RtlItem implements RtlBitSignal {
 	private final RtlVectorSignal leftOperand;
 	private final RtlVectorSignal rightOperand;
 
-	public RtlVectorComparison(RtlDomain design, Operator operator, RtlVectorSignal leftOperand, RtlVectorSignal rightOperand) {
-		super(design);
+	public RtlVectorComparison(RtlDomain domain, Operator operator, RtlVectorSignal leftOperand, RtlVectorSignal rightOperand) {
+		super(domain);
 		if (leftOperand.getWidth() != rightOperand.getWidth()) {
 			throw new IllegalArgumentException("operand width mismatch: " + leftOperand.getWidth() + " vs. " + rightOperand.getWidth());
 		}

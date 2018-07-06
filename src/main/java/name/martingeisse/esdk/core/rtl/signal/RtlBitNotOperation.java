@@ -16,8 +16,8 @@ public final class RtlBitNotOperation extends RtlItem implements RtlBitSignal {
 
 	private final RtlBitSignal operand;
 
-	public RtlBitNotOperation(RtlDomain design, RtlBitSignal operand) {
-		super(design);
+	public RtlBitNotOperation(RtlDomain domain, RtlBitSignal operand) {
+		super(domain);
 		this.operand = operand;
 	}
 

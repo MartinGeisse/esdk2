@@ -17,8 +17,8 @@ public final class RtlIndexSelection extends RtlItem implements RtlBitSignal {
 	private final RtlVectorSignal containerSignal;
 	private final RtlVectorSignal indexSignal;
 
-	public RtlIndexSelection(RtlDomain design, RtlVectorSignal containerSignal, RtlVectorSignal indexSignal) {
-		super(design);
+	public RtlIndexSelection(RtlDomain domain, RtlVectorSignal containerSignal, RtlVectorSignal indexSignal) {
+		super(domain);
 		checkSameDomain(containerSignal);
 		checkSameDomain(indexSignal);
 		if (containerSignal.getWidth() < (1 << indexSignal.getWidth())) {

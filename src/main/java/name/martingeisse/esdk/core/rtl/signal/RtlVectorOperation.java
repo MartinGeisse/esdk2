@@ -20,8 +20,8 @@ public final class RtlVectorOperation extends RtlItem implements RtlVectorSignal
 	private final RtlVectorSignal leftOperand;
 	private final RtlVectorSignal rightOperand;
 
-	public RtlVectorOperation(RtlDomain design, Operator operator, RtlVectorSignal leftOperand, RtlVectorSignal rightOperand) {
-		super(design);
+	public RtlVectorOperation(RtlDomain domain, Operator operator, RtlVectorSignal leftOperand, RtlVectorSignal rightOperand) {
+		super(domain);
 		if (leftOperand.getWidth() != rightOperand.getWidth()) {
 			throw new IllegalArgumentException("operand width mismatch: " + leftOperand.getWidth() + " vs. " + rightOperand.getWidth());
 		}

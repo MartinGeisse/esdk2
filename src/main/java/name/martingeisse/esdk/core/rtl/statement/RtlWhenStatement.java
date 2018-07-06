@@ -19,11 +19,11 @@ public final class RtlWhenStatement extends RtlStatement {
 	private final RtlStatementSequence thenBranch;
 	private final RtlStatementSequence otherwiseBranch;
 
-	public RtlWhenStatement(RtlDomain design, RtlBitSignal condition) {
-		super(design);
+	public RtlWhenStatement(RtlDomain domain, RtlBitSignal condition) {
+		super(domain);
 		this.condition = condition;
-		this.thenBranch = new RtlStatementSequence(design);
-		this.otherwiseBranch = new RtlStatementSequence(design);
+		this.thenBranch = new RtlStatementSequence(domain);
+		this.otherwiseBranch = new RtlStatementSequence(domain);
 	}
 
 	public RtlStatementSequence getThenBranch() {
