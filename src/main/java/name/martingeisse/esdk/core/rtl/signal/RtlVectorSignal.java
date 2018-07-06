@@ -20,15 +20,15 @@ public interface RtlVectorSignal extends RtlSignal {
 	//
 
 	default RtlBitSignal select(RtlVectorSignal index) {
-		return new RtlIndexSelection(getRtlItem().getDesign(), this, index);
+		return new RtlIndexSelection(getRtlItem().getDomain(), this, index);
 	}
 
 	default RtlBitSignal select(int index) {
-		return new RtlConstantIndexSelection(getRtlItem().getDesign(), this, index);
+		return new RtlConstantIndexSelection(getRtlItem().getDomain(), this, index);
 	}
 
 	default RtlVectorSignal select(int from, int to) {
-		return new RtlRangeSelection(getRtlItem().getDesign(), this, from, to);
+		return new RtlRangeSelection(getRtlItem().getDomain(), this, from, to);
 	}
 
 	//
@@ -36,11 +36,11 @@ public interface RtlVectorSignal extends RtlSignal {
 	//
 
 	default RtlVectorSignal operation(RtlVectorOperation.Operator operator, RtlVectorSignal rightOperand) {
-		return new RtlVectorOperation(getRtlItem().getDesign(), operator, this, rightOperand);
+		return new RtlVectorOperation(getRtlItem().getDomain(), operator, this, rightOperand);
 	}
 
 	default RtlVectorSignal operation(RtlVectorOperation.Operator operator, int rightOperand) {
-		return operation(operator, RtlVectorConstant.ofUnsigned(getRtlItem().getDesign(), getWidth(), rightOperand));
+		return operation(operator, RtlVectorConstant.ofUnsigned(getRtlItem().getDomain(), getWidth(), rightOperand));
 	}
 
 	default RtlVectorSignal add(RtlVectorSignal rightOperand) {
@@ -96,11 +96,11 @@ public interface RtlVectorSignal extends RtlSignal {
 	//
 
 	default RtlBitSignal comparison(RtlVectorComparison.Operator operator, RtlVectorSignal rightOperand) {
-		return new RtlVectorComparison(getRtlItem().getDesign(), operator, this, rightOperand);
+		return new RtlVectorComparison(getRtlItem().getDomain(), operator, this, rightOperand);
 	}
 
 	default RtlBitSignal comparison(RtlVectorComparison.Operator operator, int rightOperand) {
-		return comparison(operator, RtlVectorConstant.ofUnsigned(getRtlItem().getDesign(), getWidth(), rightOperand));
+		return comparison(operator, RtlVectorConstant.ofUnsigned(getRtlItem().getDomain(), getWidth(), rightOperand));
 	}
 
 	default RtlBitSignal compareEqual(RtlVectorSignal rightOperand) {

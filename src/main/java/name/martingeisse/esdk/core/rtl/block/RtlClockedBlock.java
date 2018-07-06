@@ -74,11 +74,11 @@ public final class RtlClockedBlock extends RtlItem {
 	}
 
 	public RtlProceduralBitSignal createBit() {
-		return new RtlProceduralBitSignal(getDesign(), this);
+		return new RtlProceduralBitSignal(getDomain(), this);
 	}
 
 	public RtlProceduralVectorSignal createVector(int width) {
-		return new RtlProceduralVectorSignal(getDesign(), this, width);
+		return new RtlProceduralVectorSignal(getDomain(), this, width);
 	}
 
 	public void execute() {

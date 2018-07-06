@@ -36,20 +36,20 @@ public class RtlStatementSequence extends RtlStatement {
 	}
 
 	public final RtlBitAssignment assign(RtlBitAssignmentTarget destination, RtlBitSignal source) {
-		RtlBitAssignment assignment = new RtlBitAssignment(getDesign(), destination, source);
+		RtlBitAssignment assignment = new RtlBitAssignment(getDomain(), destination, source);
 		addStatement(assignment);
 		return assignment;
 	}
 
 	public final RtlBitAssignment assignBit(RtlBitAssignmentTarget destination, boolean value) {
-		RtlBitConstant constant = new RtlBitConstant(getDesign(), value);
-		RtlBitAssignment assignment = new RtlBitAssignment(getDesign(), destination, constant);
+		RtlBitConstant constant = new RtlBitConstant(getDomain(), value);
+		RtlBitAssignment assignment = new RtlBitAssignment(getDomain(), destination, constant);
 		addStatement(assignment);
 		return assignment;
 	}
 
 	public final RtlVectorAssignment assign(RtlVectorAssignmentTarget destination, RtlVectorSignal source) {
-		RtlVectorAssignment assignment = new RtlVectorAssignment(getDesign(), destination, source);
+		RtlVectorAssignment assignment = new RtlVectorAssignment(getDomain(), destination, source);
 		addStatement(assignment);
 		return assignment;
 	}
@@ -58,14 +58,14 @@ public class RtlStatementSequence extends RtlStatement {
 		if (value < 0) {
 			throw new IllegalArgumentException("assignUnsigned called with negative value: " + value);
 		}
-		RtlVectorConstant constant = RtlVectorConstant.ofUnsigned(getDesign(), destination.getWidth(), value);
-		RtlVectorAssignment assignment = new RtlVectorAssignment(getDesign(), destination, constant);
+		RtlVectorConstant constant = RtlVectorConstant.ofUnsigned(getDomain(), destination.getWidth(), value);
+		RtlVectorAssignment assignment = new RtlVectorAssignment(getDomain(), destination, constant);
 		addStatement(assignment);
 		return assignment;
 	}
 
 	public final RtlWhenStatement when(RtlBitSignal condition) {
-		RtlWhenStatement whenStatement = new RtlWhenStatement(getDesign(), condition);
+		RtlWhenStatement whenStatement = new RtlWhenStatement(getDomain(), condition);
 		addStatement(whenStatement);
 		return whenStatement;
 	}

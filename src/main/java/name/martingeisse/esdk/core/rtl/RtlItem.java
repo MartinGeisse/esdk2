@@ -9,22 +9,22 @@ package name.martingeisse.esdk.core.rtl;
  */
 public abstract class RtlItem implements RtlItemOwned {
 
-	private final RtlDomain design;
+	private final RtlDomain domain;
 
-	public RtlItem(RtlDomain design) {
-		this.design = design;
+	public RtlItem(RtlDomain domain) {
+		this.domain = domain;
 	}
 
-	public final RtlDomain getDesign() {
-		return design;
+	public final RtlDomain getDomain() {
+		return domain;
 	}
 
 	protected final void checkSameDesign(RtlItemOwned itemOwned) {
 		RtlItem item = itemOwned.getRtlItem();
-		if (item.getDesign() != design) {
+		if (item.getDomain() != domain) {
 			String argumentDescription = (item == itemOwned) ?
 				("item (" + item + ")") : ("object (" + itemOwned + " from item " + item + ")");
-			throw new IllegalArgumentException("the specified " + argumentDescription + " is not part of the same design as this item (" + this + ")");
+			throw new IllegalArgumentException("the specified " + argumentDescription + " is not part of the same domain as this item (" + this + ")");
 		}
 	}
 

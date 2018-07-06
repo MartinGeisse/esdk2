@@ -15,13 +15,13 @@ public final class RtlClockNetwork extends RtlItem {
 
 	private final RtlBitSignal clockSignal;
 
-	public RtlClockNetwork(RtlDomain design, RtlBitSignal clockSignal) {
-		super(design);
+	public RtlClockNetwork(RtlDomain domain, RtlBitSignal clockSignal) {
+		super(domain);
 		checkSameDesign(clockSignal);
 		this.clockSignal = clockSignal;
 
 		DesignRegistrationKey key = new DesignRegistrationKey();
-		design.registerClockNetwork(key, this);
+		domain.registerClockNetwork(key, this);
 		key.valid = false;
 	}
 
@@ -30,7 +30,7 @@ public final class RtlClockNetwork extends RtlItem {
 	}
 
 	public RtlClockedBlock createBlock() {
-		return new RtlClockedBlock(getDesign(), this);
+		return new RtlClockedBlock(getDomain(), this);
 	}
 
 	/**
