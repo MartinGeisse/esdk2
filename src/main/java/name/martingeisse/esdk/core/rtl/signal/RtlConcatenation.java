@@ -5,7 +5,7 @@
 package name.martingeisse.esdk.core.rtl.signal;
 
 import com.google.common.collect.ImmutableList;
-import name.martingeisse.esdk.core.rtl.RtlDomain;
+import name.martingeisse.esdk.core.rtl.RtlRegion;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogGenerator;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
@@ -20,16 +20,16 @@ public final class RtlConcatenation extends RtlItem implements RtlVectorSignal {
 	private final ImmutableList<RtlSignal> signals;
 	private final int width;
 
-	public RtlConcatenation(RtlDomain domain, RtlSignal... signals) {
-		this(domain, ImmutableList.copyOf(signals));
+	public RtlConcatenation(RtlRegion region, RtlSignal... signals) {
+		this(region, ImmutableList.copyOf(signals));
 	}
 
-	public RtlConcatenation(RtlDomain domain, ImmutableList<RtlSignal> signals) {
-		super(domain);
+	public RtlConcatenation(RtlRegion region, ImmutableList<RtlSignal> signals) {
+		super(region);
 
 		// store signals
 		for (RtlSignal signal : signals) {
-			checkSameDomain(signal);
+			checkSameRegion(signal);
 		}
 		this.signals = signals;
 

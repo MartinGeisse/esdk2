@@ -4,7 +4,7 @@
  */
 package name.martingeisse.esdk.core.rtl.verilog;
 
-import name.martingeisse.esdk.core.rtl.RtlDomain;
+import name.martingeisse.esdk.core.rtl.RtlRegion;
 import name.martingeisse.esdk.core.rtl.block.RtlClockedBlock;
 import name.martingeisse.esdk.core.rtl.block.RtlProceduralSignal;
 import name.martingeisse.esdk.core.rtl.pin.RtlBidirectionalPin;
@@ -27,7 +27,7 @@ import java.util.Set;
 public class VerilogGenerator {
 
 	private final VerilogWriter out;
-	private final RtlDomain domain;
+	private final RtlRegion region;
 	private final String name;
 
 	private Set<RtlSignal> allSignals;
@@ -35,16 +35,16 @@ public class VerilogGenerator {
 	private VerilogExpressionWriter dryRunExpressionWriter;
 
 
-	public VerilogGenerator(PrintWriter out, RtlDomain domain, String name) {
+	public VerilogGenerator(PrintWriter out, RtlRegion region, String name) {
 		this.out = new VerilogWriter(out);
-		this.domain = domain;
+		this.region = region;
 		this.name = name;
 	}
 
 	public void generate() {
 		analyzeSignals();
 		out.prepare(new HashMap<>(), declaredSignals);
-		out.printIntro(name, domain.getPins());
+		out.printIntro(name, region.getPins());
 		printSignalDeclarations();
 		out.getOut().println();
 		printBlocks();
@@ -90,14 +90,14 @@ public class VerilogGenerator {
 		};
 
 		// pins are implicitly declared
-		for (RtlPin pin : domain.getPins()) {
+		for (RtlPin pin : region.getPins()) {
 			if (pin instanceof RtlInputPin) {
 				declaredSignals.put((RtlInputPin)pin, pin.getNetName());
 			}
 		}
 
 		// procedural signals must be declared
-		for (RtlClockedBlock block : domain.getClockedBlocks()) {
+		for (RtlClockedBlock block : region.getClockedBlocks()) {
 			for (RtlProceduralSignal signal : block.getProceduralSignals()) {
 				allSignals.add(signal);
 				declareSignal(signal);
@@ -105,7 +105,7 @@ public class VerilogGenerator {
 		}
 
 		// analyze output and output-enable signals for signals to extract
-		for (RtlPin pin : domain.getPins()) {
+		for (RtlPin pin : region.getPins()) {
 			if (pin instanceof RtlOutputPin) {
 				RtlOutputPin outputPin = (RtlOutputPin)pin;
 				analyzeSignal(outputPin.getOutputSignal(), VerilogExpressionNesting.ALL);
@@ -117,7 +117,7 @@ public class VerilogGenerator {
 		}
 
 		// analyze signal "expressions" in blocks for signals to extract
-		for (RtlClockedBlock block : domain.getClockedBlocks()) {
+		for (RtlClockedBlock block : region.getClockedBlocks()) {
 			block.getInitializerStatements().printExpressionsDryRun(dryRunExpressionWriter);
 			block.getStatements().printExpressionsDryRun(dryRunExpressionWriter);
 		}
@@ -188,7 +188,7 @@ public class VerilogGenerator {
 	}
 
 	private void printBlocks() {
-		for (RtlClockedBlock block : domain.getClockedBlocks()) {
+		for (RtlClockedBlock block : region.getClockedBlocks()) {
 			block.printVerilogBlocks(out);
 		}
 	}

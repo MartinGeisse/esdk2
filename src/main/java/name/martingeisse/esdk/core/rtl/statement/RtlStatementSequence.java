@@ -4,7 +4,7 @@
  */
 package name.martingeisse.esdk.core.rtl.statement;
 
-import name.martingeisse.esdk.core.rtl.RtlDomain;
+import name.martingeisse.esdk.core.rtl.RtlRegion;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorConstant;
@@ -22,8 +22,8 @@ public class RtlStatementSequence extends RtlStatement {
 
 	private final List<RtlStatement> statements = new ArrayList<>();
 
-	public RtlStatementSequence(RtlDomain domain) {
-		super(domain);
+	public RtlStatementSequence(RtlRegion region) {
+		super(region);
 	}
 
 	public boolean isEmpty() {
@@ -31,25 +31,25 @@ public class RtlStatementSequence extends RtlStatement {
 	}
 
 	public final void addStatement(RtlStatement statement) {
-		checkSameDomain(statement);
+		checkSameRegion(statement);
 		statements.add(statement);
 	}
 
 	public final RtlBitAssignment assign(RtlBitAssignmentTarget destination, RtlBitSignal source) {
-		RtlBitAssignment assignment = new RtlBitAssignment(getDomain(), destination, source);
+		RtlBitAssignment assignment = new RtlBitAssignment(getRegion(), destination, source);
 		addStatement(assignment);
 		return assignment;
 	}
 
 	public final RtlBitAssignment assignBit(RtlBitAssignmentTarget destination, boolean value) {
-		RtlBitConstant constant = new RtlBitConstant(getDomain(), value);
-		RtlBitAssignment assignment = new RtlBitAssignment(getDomain(), destination, constant);
+		RtlBitConstant constant = new RtlBitConstant(getRegion(), value);
+		RtlBitAssignment assignment = new RtlBitAssignment(getRegion(), destination, constant);
 		addStatement(assignment);
 		return assignment;
 	}
 
 	public final RtlVectorAssignment assign(RtlVectorAssignmentTarget destination, RtlVectorSignal source) {
-		RtlVectorAssignment assignment = new RtlVectorAssignment(getDomain(), destination, source);
+		RtlVectorAssignment assignment = new RtlVectorAssignment(getRegion(), destination, source);
 		addStatement(assignment);
 		return assignment;
 	}
@@ -58,14 +58,14 @@ public class RtlStatementSequence extends RtlStatement {
 		if (value < 0) {
 			throw new IllegalArgumentException("assignUnsigned called with negative value: " + value);
 		}
-		RtlVectorConstant constant = RtlVectorConstant.ofUnsigned(getDomain(), destination.getWidth(), value);
-		RtlVectorAssignment assignment = new RtlVectorAssignment(getDomain(), destination, constant);
+		RtlVectorConstant constant = RtlVectorConstant.ofUnsigned(getRegion(), destination.getWidth(), value);
+		RtlVectorAssignment assignment = new RtlVectorAssignment(getRegion(), destination, constant);
 		addStatement(assignment);
 		return assignment;
 	}
 
 	public final RtlWhenStatement when(RtlBitSignal condition) {
-		RtlWhenStatement whenStatement = new RtlWhenStatement(getDomain(), condition);
+		RtlWhenStatement whenStatement = new RtlWhenStatement(getRegion(), condition);
 		addStatement(whenStatement);
 		return whenStatement;
 	}

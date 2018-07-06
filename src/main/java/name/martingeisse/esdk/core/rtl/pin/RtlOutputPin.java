@@ -4,7 +4,7 @@
  */
 package name.martingeisse.esdk.core.rtl.pin;
 
-import name.martingeisse.esdk.core.rtl.RtlDomain;
+import name.martingeisse.esdk.core.rtl.RtlRegion;
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
 
 /**
@@ -14,8 +14,8 @@ public final class RtlOutputPin extends RtlPin {
 
 	private RtlSignal outputSignal;
 
-	public RtlOutputPin(RtlDomain domain) {
-		super(domain);
+	public RtlOutputPin(RtlRegion region) {
+		super(region);
 	}
 
 	public RtlSignal getOutputSignal() {

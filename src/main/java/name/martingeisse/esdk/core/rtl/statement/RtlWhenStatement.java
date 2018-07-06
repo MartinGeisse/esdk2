@@ -4,7 +4,7 @@
  */
 package name.martingeisse.esdk.core.rtl.statement;
 
-import name.martingeisse.esdk.core.rtl.RtlDomain;
+import name.martingeisse.esdk.core.rtl.RtlRegion;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogGenerator;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
@@ -19,11 +19,11 @@ public final class RtlWhenStatement extends RtlStatement {
 	private final RtlStatementSequence thenBranch;
 	private final RtlStatementSequence otherwiseBranch;
 
-	public RtlWhenStatement(RtlDomain domain, RtlBitSignal condition) {
-		super(domain);
+	public RtlWhenStatement(RtlRegion region, RtlBitSignal condition) {
+		super(region);
 		this.condition = condition;
-		this.thenBranch = new RtlStatementSequence(domain);
-		this.otherwiseBranch = new RtlStatementSequence(domain);
+		this.thenBranch = new RtlStatementSequence(region);
+		this.otherwiseBranch = new RtlStatementSequence(region);
 	}
 
 	public RtlStatementSequence getThenBranch() {

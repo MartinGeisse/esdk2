@@ -4,7 +4,7 @@
  */
 package name.martingeisse.esdk.core.rtl.statement;
 
-import name.martingeisse.esdk.core.rtl.RtlDomain;
+import name.martingeisse.esdk.core.rtl.RtlRegion;
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogGenerator;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
@@ -15,8 +15,8 @@ import name.martingeisse.esdk.core.rtl.verilog.VerilogWriter;
  */
 public abstract class RtlAssignment extends RtlStatement {
 
-	public RtlAssignment(RtlDomain domain) {
-		super(domain);
+	public RtlAssignment(RtlRegion region) {
+		super(region);
 	}
 
 	public abstract RtlAssignmentTarget getDestination();

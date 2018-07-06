@@ -4,7 +4,7 @@
  */
 package name.martingeisse.esdk.core.rtl.signal;
 
-import name.martingeisse.esdk.core.rtl.RtlDomain;
+import name.martingeisse.esdk.core.rtl.RtlRegion;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogGenerator;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
@@ -20,8 +20,8 @@ public final class RtlVectorOperation extends RtlItem implements RtlVectorSignal
 	private final RtlVectorSignal leftOperand;
 	private final RtlVectorSignal rightOperand;
 
-	public RtlVectorOperation(RtlDomain domain, Operator operator, RtlVectorSignal leftOperand, RtlVectorSignal rightOperand) {
-		super(domain);
+	public RtlVectorOperation(RtlRegion region, Operator operator, RtlVectorSignal leftOperand, RtlVectorSignal rightOperand) {
+		super(region);
 		if (leftOperand.getWidth() != rightOperand.getWidth()) {
 			throw new IllegalArgumentException("operand width mismatch: " + leftOperand.getWidth() + " vs. " + rightOperand.getWidth());
 		}

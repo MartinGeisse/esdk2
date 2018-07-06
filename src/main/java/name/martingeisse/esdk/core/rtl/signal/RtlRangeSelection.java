@@ -4,7 +4,7 @@
  */
 package name.martingeisse.esdk.core.rtl.signal;
 
-import name.martingeisse.esdk.core.rtl.RtlDomain;
+import name.martingeisse.esdk.core.rtl.RtlRegion;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogGenerator;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
@@ -19,9 +19,9 @@ public class RtlRangeSelection extends RtlItem implements RtlVectorSignal {
 	private final int from;
 	private final int to;
 
-	public RtlRangeSelection(RtlDomain domain, RtlVectorSignal containerSignal, int from, int to) {
-		super(domain);
-		checkSameDomain(containerSignal);
+	public RtlRangeSelection(RtlRegion region, RtlVectorSignal containerSignal, int from, int to) {
+		super(region);
+		checkSameRegion(containerSignal);
 		if (from < 0 || to < 0 || from >= containerSignal.getWidth() || to >= containerSignal.getWidth() || from < to) {
 			throw new IllegalArgumentException("invalid from/to indices for container width " +
 				containerSignal.getWidth() + ": from = " + from + ", to = " + to);

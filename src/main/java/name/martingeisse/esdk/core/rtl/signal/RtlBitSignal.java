@@ -12,31 +12,31 @@ public interface RtlBitSignal extends RtlSignal {
 	boolean getValue();
 
 	default RtlBitNotOperation not() {
-		return new RtlBitNotOperation(getRtlItem().getDomain(), this);
+		return new RtlBitNotOperation(getRtlItem().getRegion(), this);
 	}
 
 	default RtlBitOperation and(RtlBitSignal other) {
-		return new RtlBitOperation(getRtlItem().getDomain(), RtlBitOperation.Operator.AND, this, other);
+		return new RtlBitOperation(getRtlItem().getRegion(), RtlBitOperation.Operator.AND, this, other);
 	}
 
 	default RtlBitOperation or(RtlBitSignal other) {
-		return new RtlBitOperation(getRtlItem().getDomain(), RtlBitOperation.Operator.OR, this, other);
+		return new RtlBitOperation(getRtlItem().getRegion(), RtlBitOperation.Operator.OR, this, other);
 	}
 
 	default RtlBitOperation xor(RtlBitSignal other) {
-		return new RtlBitOperation(getRtlItem().getDomain(), RtlBitOperation.Operator.XOR, this, other);
+		return new RtlBitOperation(getRtlItem().getRegion(), RtlBitOperation.Operator.XOR, this, other);
 	}
 
 	default RtlBitOperation xnor(RtlBitSignal other) {
-		return new RtlBitOperation(getRtlItem().getDomain(), RtlBitOperation.Operator.XNOR, this, other);
+		return new RtlBitOperation(getRtlItem().getRegion(), RtlBitOperation.Operator.XNOR, this, other);
 	}
 
 	default RtlConditionalBitOperation conditional(RtlBitSignal onTrue, RtlBitSignal onFalse) {
-		return new RtlConditionalBitOperation(getRtlItem().getDomain(), this, onTrue, onFalse);
+		return new RtlConditionalBitOperation(getRtlItem().getRegion(), this, onTrue, onFalse);
 	}
 
 	default RtlConditionalVectorOperation conditional(RtlVectorSignal onTrue, RtlVectorSignal onFalse) {
-		return new RtlConditionalVectorOperation(getRtlItem().getDomain(), this, onTrue, onFalse);
+		return new RtlConditionalVectorOperation(getRtlItem().getRegion(), this, onTrue, onFalse);
 	}
 
 }

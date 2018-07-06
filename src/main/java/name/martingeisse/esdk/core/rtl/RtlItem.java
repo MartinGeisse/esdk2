@@ -9,22 +9,22 @@ package name.martingeisse.esdk.core.rtl;
  */
 public abstract class RtlItem implements RtlItemOwned {
 
-	private final RtlDomain domain;
+	private final RtlRegion region;
 
-	public RtlItem(RtlDomain domain) {
-		this.domain = domain;
+	public RtlItem(RtlRegion region) {
+		this.region = region;
 	}
 
-	public final RtlDomain getDomain() {
-		return domain;
+	public final RtlRegion getRegion() {
+		return region;
 	}
 
-	protected final void checkSameDomain(RtlItemOwned itemOwned) {
+	protected final void checkSameRegion(RtlItemOwned itemOwned) {
 		RtlItem item = itemOwned.getRtlItem();
-		if (item.getDomain() != domain) {
+		if (item.getRegion() != region) {
 			String argumentDescription = (item == itemOwned) ?
 				("item (" + item + ")") : ("object (" + itemOwned + " from item " + item + ")");
-			throw new IllegalArgumentException("the specified " + argumentDescription + " is not part of the same domain as this item (" + this + ")");
+			throw new IllegalArgumentException("the specified " + argumentDescription + " is not part of the same region as this item (" + this + ")");
 		}
 	}
 

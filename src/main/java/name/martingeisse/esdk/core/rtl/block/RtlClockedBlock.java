@@ -5,7 +5,7 @@
 package name.martingeisse.esdk.core.rtl.block;
 
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
-import name.martingeisse.esdk.core.rtl.RtlDomain;
+import name.martingeisse.esdk.core.rtl.RtlRegion;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.statement.RtlStatementSequence;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogWriter;
@@ -27,17 +27,17 @@ public final class RtlClockedBlock extends RtlItem {
 	private final RtlStatementSequence initializerStatements;
 	private final RtlStatementSequence statements;
 
-	public RtlClockedBlock(RtlDomain domain, RtlClockNetwork clockNetwork) {
-		super(domain);
-		checkSameDomain(clockNetwork);
+	public RtlClockedBlock(RtlRegion region, RtlClockNetwork clockNetwork) {
+		super(region);
+		checkSameRegion(clockNetwork);
 
 		this.clockNetwork = clockNetwork;
 		this.proceduralSignals = new ArrayList<>();
-		this.initializerStatements = new RtlStatementSequence(domain);
-		this.statements = new RtlStatementSequence(domain);
+		this.initializerStatements = new RtlStatementSequence(region);
+		this.statements = new RtlStatementSequence(region);
 
-		DomainRegistrationKey key = new DomainRegistrationKey();
-		domain.registerBlock(key, this);
+		RegionRegistrationKey key = new RegionRegistrationKey();
+		region.registerBlock(key, this);
 		key.valid = false;
 	}
 
@@ -74,11 +74,11 @@ public final class RtlClockedBlock extends RtlItem {
 	}
 
 	public RtlProceduralBitSignal createBit() {
-		return new RtlProceduralBitSignal(getDomain(), this);
+		return new RtlProceduralBitSignal(getRegion(), this);
 	}
 
 	public RtlProceduralVectorSignal createVector(int width) {
-		return new RtlProceduralVectorSignal(getDomain(), this, width);
+		return new RtlProceduralVectorSignal(getRegion(), this, width);
 	}
 
 	public void execute() {
@@ -94,14 +94,14 @@ public final class RtlClockedBlock extends RtlItem {
 	}
 
 	/**
-	 * This class is used to ensure that {@link RtlDomain#registerBlock(DomainRegistrationKey, RtlClockedBlock)} isn't called except through the
+	 * This class is used to ensure that {@link RtlRegion#registerBlock(RegionRegistrationKey, RtlClockedBlock)} isn't called except through the
 	 * {@link RtlClockedBlock} constructor.
 	 */
-	public static final class DomainRegistrationKey {
+	public static final class RegionRegistrationKey {
 
 		private boolean valid = true;
 
-		private DomainRegistrationKey() {
+		private RegionRegistrationKey() {
 		}
 
 		public boolean isValid() {

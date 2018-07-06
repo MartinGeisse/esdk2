@@ -4,7 +4,7 @@
  */
 package name.martingeisse.esdk.core.rtl.block;
 
-import name.martingeisse.esdk.core.rtl.RtlDomain;
+import name.martingeisse.esdk.core.rtl.RtlRegion;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.statement.RtlBitAssignmentTarget;
 
@@ -16,8 +16,8 @@ public final class RtlProceduralBitSignal extends RtlProceduralSignal implements
 	private boolean value;
 	private boolean nextValue;
 
-	public RtlProceduralBitSignal(RtlDomain domain, RtlClockedBlock block) {
-		super(domain, block);
+	public RtlProceduralBitSignal(RtlRegion region, RtlClockedBlock block) {
+		super(region, block);
 	}
 
 	@Override

@@ -4,7 +4,7 @@
  */
 package name.martingeisse.esdk.core.rtl.block;
 
-import name.martingeisse.esdk.core.rtl.RtlDomain;
+import name.martingeisse.esdk.core.rtl.RtlRegion;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.statement.RtlVectorAssignmentTarget;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
@@ -18,8 +18,8 @@ public final class RtlProceduralVectorSignal extends RtlProceduralSignal impleme
 	private VectorValue value;
 	private VectorValue nextValue;
 
-	public RtlProceduralVectorSignal(RtlDomain domain, RtlClockedBlock block, int width) {
-		super(domain, block);
+	public RtlProceduralVectorSignal(RtlRegion region, RtlClockedBlock block, int width) {
+		super(region, block);
 		this.width = width;
 		this.value = VectorValue.ofUnsigned(width, 0);
 		this.nextValue = value;

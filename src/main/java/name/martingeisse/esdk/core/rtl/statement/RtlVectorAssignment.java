@@ -4,7 +4,7 @@
  */
 package name.martingeisse.esdk.core.rtl.statement;
 
-import name.martingeisse.esdk.core.rtl.RtlDomain;
+import name.martingeisse.esdk.core.rtl.RtlRegion;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 
 /**
@@ -15,10 +15,10 @@ public final class RtlVectorAssignment extends RtlAssignment {
 	private final RtlVectorAssignmentTarget destination;
 	private final RtlVectorSignal source;
 
-	public RtlVectorAssignment(RtlDomain domain, RtlVectorAssignmentTarget destination, RtlVectorSignal source) {
-		super(domain);
-		checkSameDomain(destination);
-		checkSameDomain(source);
+	public RtlVectorAssignment(RtlRegion region, RtlVectorAssignmentTarget destination, RtlVectorSignal source) {
+		super(region);
+		checkSameRegion(destination);
+		checkSameRegion(source);
 		if (destination.getWidth() != source.getWidth()) {
 			throw new IllegalArgumentException("destination width (" + destination.getWidth() + ") and source width (" + source.getWidth() + ") differ");
 		}

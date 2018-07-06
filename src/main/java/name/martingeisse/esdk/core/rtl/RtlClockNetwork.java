@@ -15,13 +15,13 @@ public final class RtlClockNetwork extends RtlItem {
 
 	private final RtlBitSignal clockSignal;
 
-	public RtlClockNetwork(RtlDomain domain, RtlBitSignal clockSignal) {
-		super(domain);
-		checkSameDomain(clockSignal);
+	public RtlClockNetwork(RtlRegion region, RtlBitSignal clockSignal) {
+		super(region);
+		checkSameRegion(clockSignal);
 		this.clockSignal = clockSignal;
 
-		DomainRegistrationKey key = new DomainRegistrationKey();
-		domain.registerClockNetwork(key, this);
+		RegionRegistrationKey key = new RegionRegistrationKey();
+		region.registerClockNetwork(key, this);
 		key.valid = false;
 	}
 
@@ -30,18 +30,18 @@ public final class RtlClockNetwork extends RtlItem {
 	}
 
 	public RtlClockedBlock createBlock() {
-		return new RtlClockedBlock(getDomain(), this);
+		return new RtlClockedBlock(getRegion(), this);
 	}
 
 	/**
-	 * This class is used to ensure that {@link RtlDomain#registerPin(RtlPin.DomainRegistrationKey, RtlPin)} isn't called except through the
+	 * This class is used to ensure that {@link RtlRegion#registerPin(RtlPin.RegionRegistrationKey, RtlPin)} isn't called except through the
 	 * {@link RtlPin} constructor.
 	 */
-	public static final class DomainRegistrationKey {
+	public static final class RegionRegistrationKey {
 
 		private boolean valid = true;
 
-		private DomainRegistrationKey() {
+		private RegionRegistrationKey() {
 		}
 
 		public boolean isValid() {

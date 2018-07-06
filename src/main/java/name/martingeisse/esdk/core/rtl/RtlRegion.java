@@ -17,20 +17,20 @@ import java.util.List;
 /**
  *
  */
-public final class RtlDomain extends Item {
+public final class RtlRegion extends Item {
 
 	private final List<RtlPin> pins = new ArrayList<>();
 	private final List<RtlClockNetwork> clockNetworks = new ArrayList<>();
 	private final List<RtlClockedBlock> clockedBlocks = new ArrayList<>();
 
-	public RtlDomain(Design design) {
+	public RtlRegion(Design design) {
 		super(design);
 	}
 
 	/**
 	 * Non-public API. Do not call. Only marked public because Java forces us to if we want to use packages.
 	 */
-	public void registerPin(RtlPin.DomainRegistrationKey key, RtlPin pin) {
+	public void registerPin(RtlPin.RegionRegistrationKey key, RtlPin pin) {
 		if (!key.isValid()) {
 			throw new IllegalArgumentException("invalid registration key");
 		}
@@ -40,7 +40,7 @@ public final class RtlDomain extends Item {
 	/**
 	 * Non-public API. Do not call. Only marked public because Java forces us to if we want to use packages.
 	 */
-	public void registerClockNetwork(RtlClockNetwork.DomainRegistrationKey key, RtlClockNetwork clockNetwork) {
+	public void registerClockNetwork(RtlClockNetwork.RegionRegistrationKey key, RtlClockNetwork clockNetwork) {
 		if (!key.isValid()) {
 			throw new IllegalArgumentException("invalid registration key");
 		}
@@ -50,7 +50,7 @@ public final class RtlDomain extends Item {
 	/**
 	 * Non-public API. Do not call. Only marked public because Java forces us to if we want to use packages.
 	 */
-	public void registerBlock(RtlClockedBlock.DomainRegistrationKey key, RtlClockedBlock block) {
+	public void registerBlock(RtlClockedBlock.RegionRegistrationKey key, RtlClockedBlock block) {
 		if (!key.isValid()) {
 			throw new IllegalArgumentException("invalid registration key");
 		}
@@ -76,7 +76,7 @@ public final class RtlDomain extends Item {
 	@Override
 	protected void initializeSimulation() {
 		if (!pins.isEmpty()) {
-			throw new IllegalStateException("cannot use an RtlDomain with pins in simulation");
+			throw new IllegalStateException("cannot use an RtlRegion with pins in simulation");
 		}
 	}
 

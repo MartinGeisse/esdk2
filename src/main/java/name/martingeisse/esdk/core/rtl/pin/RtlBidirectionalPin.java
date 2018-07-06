@@ -4,7 +4,7 @@
  */
 package name.martingeisse.esdk.core.rtl.pin;
 
-import name.martingeisse.esdk.core.rtl.RtlDomain;
+import name.martingeisse.esdk.core.rtl.RtlRegion;
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
 
@@ -16,8 +16,8 @@ public final class RtlBidirectionalPin extends RtlPin implements RtlSignal {
 	private RtlSignal outputSignal;
 	private RtlSignal outputEnableSignal;
 
-	public RtlBidirectionalPin(RtlDomain domain) {
-		super(domain);
+	public RtlBidirectionalPin(RtlRegion region) {
+		super(region);
 	}
 
 	public RtlSignal getOutputSignal() {

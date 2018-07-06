@@ -4,7 +4,7 @@
  */
 package name.martingeisse.esdk.core.rtl.pin;
 
-import name.martingeisse.esdk.core.rtl.RtlDomain;
+import name.martingeisse.esdk.core.rtl.RtlRegion;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
 
@@ -13,8 +13,8 @@ import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
  */
 public final class RtlInputPin extends RtlPin implements RtlBitSignal {
 
-	public RtlInputPin(RtlDomain domain) {
-		super(domain);
+	public RtlInputPin(RtlRegion region) {
+		super(region);
 	}
 
 	@Override
