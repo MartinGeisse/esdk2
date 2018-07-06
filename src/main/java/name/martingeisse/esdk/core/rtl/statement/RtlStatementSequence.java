@@ -31,7 +31,7 @@ public class RtlStatementSequence extends RtlStatement {
 	}
 
 	public final void addStatement(RtlStatement statement) {
-		checkSameDesign(statement);
+		checkSameDomain(statement);
 		statements.add(statement);
 	}
 

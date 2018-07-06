@@ -21,7 +21,7 @@ public class RtlRangeSelection extends RtlItem implements RtlVectorSignal {
 
 	public RtlRangeSelection(RtlDomain design, RtlVectorSignal containerSignal, int from, int to) {
 		super(design);
-		checkSameDesign(containerSignal);
+		checkSameDomain(containerSignal);
 		if (from < 0 || to < 0 || from >= containerSignal.getWidth() || to >= containerSignal.getWidth() || from < to) {
 			throw new IllegalArgumentException("invalid from/to indices for container width " +
 				containerSignal.getWidth() + ": from = " + from + ", to = " + to);

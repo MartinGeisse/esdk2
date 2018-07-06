@@ -29,14 +29,14 @@ public final class RtlClockedBlock extends RtlItem {
 
 	public RtlClockedBlock(RtlDomain design, RtlClockNetwork clockNetwork) {
 		super(design);
-		checkSameDesign(clockNetwork);
+		checkSameDomain(clockNetwork);
 
 		this.clockNetwork = clockNetwork;
 		this.proceduralSignals = new ArrayList<>();
 		this.initializerStatements = new RtlStatementSequence(design);
 		this.statements = new RtlStatementSequence(design);
 
-		DesignRegistrationKey key = new DesignRegistrationKey();
+		DomainRegistrationKey key = new DomainRegistrationKey();
 		design.registerBlock(key, this);
 		key.valid = false;
 	}
@@ -94,14 +94,14 @@ public final class RtlClockedBlock extends RtlItem {
 	}
 
 	/**
-	 * This class is used to ensure that {@link RtlDomain#registerBlock(DesignRegistrationKey, RtlClockedBlock)} isn't called except through the
+	 * This class is used to ensure that {@link RtlDomain#registerBlock(DomainRegistrationKey, RtlClockedBlock)} isn't called except through the
 	 * {@link RtlClockedBlock} constructor.
 	 */
-	public static final class DesignRegistrationKey {
+	public static final class DomainRegistrationKey {
 
 		private boolean valid = true;
 
-		private DesignRegistrationKey() {
+		private DomainRegistrationKey() {
 		}
 
 		public boolean isValid() {

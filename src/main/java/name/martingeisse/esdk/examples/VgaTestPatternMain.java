@@ -13,9 +13,9 @@ public class VgaTestPatternMain {
 
 	public static void main(String[] args) throws Exception {
 		// TODO
-		Design mainDesign = new Design();
-		RtlDomain design = new RtlDomain(mainDesign);
-		new ProjectGenerator(design, "EsdkTestbild", new File("ise"), "XC3S500E-FG320-4").generate();
+		Design design = new Design();
+		RtlDomain domain = new RtlDomain(design);
+		new ProjectGenerator(domain, "EsdkTestbild", new File("ise"), "XC3S500E-FG320-4").generate();
 	}
 
 }

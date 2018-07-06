@@ -40,7 +40,7 @@ public final class RtlDomain extends Item {
 	/**
 	 * Non-public API. Do not call. Only marked public because Java forces us to if we want to use packages.
 	 */
-	public void registerClockNetwork(RtlClockNetwork.DesignRegistrationKey key, RtlClockNetwork clockNetwork) {
+	public void registerClockNetwork(RtlClockNetwork.DomainRegistrationKey key, RtlClockNetwork clockNetwork) {
 		if (!key.isValid()) {
 			throw new IllegalArgumentException("invalid registration key");
 		}
@@ -50,7 +50,7 @@ public final class RtlDomain extends Item {
 	/**
 	 * Non-public API. Do not call. Only marked public because Java forces us to if we want to use packages.
 	 */
-	public void registerBlock(RtlClockedBlock.DesignRegistrationKey key, RtlClockedBlock block) {
+	public void registerBlock(RtlClockedBlock.DomainRegistrationKey key, RtlClockedBlock block) {
 		if (!key.isValid()) {
 			throw new IllegalArgumentException("invalid registration key");
 		}

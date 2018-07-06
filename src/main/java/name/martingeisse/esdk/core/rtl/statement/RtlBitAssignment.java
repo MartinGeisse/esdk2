@@ -17,8 +17,8 @@ public final class RtlBitAssignment extends RtlAssignment {
 
 	public RtlBitAssignment(RtlDomain design, RtlBitAssignmentTarget destination, RtlBitSignal source) {
 		super(design);
-		checkSameDesign(destination);
-		checkSameDesign(source);
+		checkSameDomain(destination);
+		checkSameDomain(source);
 		this.destination = destination;
 		this.source = source;
 	}

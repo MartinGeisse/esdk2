@@ -17,10 +17,10 @@ public final class RtlClockNetwork extends RtlItem {
 
 	public RtlClockNetwork(RtlDomain domain, RtlBitSignal clockSignal) {
 		super(domain);
-		checkSameDesign(clockSignal);
+		checkSameDomain(clockSignal);
 		this.clockSignal = clockSignal;
 
-		DesignRegistrationKey key = new DesignRegistrationKey();
+		DomainRegistrationKey key = new DomainRegistrationKey();
 		domain.registerClockNetwork(key, this);
 		key.valid = false;
 	}
@@ -37,11 +37,11 @@ public final class RtlClockNetwork extends RtlItem {
 	 * This class is used to ensure that {@link RtlDomain#registerPin(RtlPin.DesignRegistrationKey, RtlPin)} isn't called except through the
 	 * {@link RtlPin} constructor.
 	 */
-	public static final class DesignRegistrationKey {
+	public static final class DomainRegistrationKey {
 
 		private boolean valid = true;
 
-		private DesignRegistrationKey() {
+		private DomainRegistrationKey() {
 		}
 
 		public boolean isValid() {

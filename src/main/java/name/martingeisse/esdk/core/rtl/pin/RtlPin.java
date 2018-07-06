@@ -53,7 +53,7 @@ public abstract class RtlPin extends RtlItem {
 
 	/**
 	 * This class is used to ensure that
-	 * {@link RtlDomain#registerClockNetwork(RtlClockNetwork.DesignRegistrationKey, RtlClockNetwork)} isn't called
+	 * {@link RtlDomain#registerClockNetwork(RtlClockNetwork.DomainRegistrationKey, RtlClockNetwork)} isn't called
 	 * except through the {@link RtlClockNetwork} constructor.
 	 */
 	public static final class DesignRegistrationKey {

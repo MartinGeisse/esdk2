@@ -19,7 +19,7 @@ public abstract class RtlItem implements RtlItemOwned {
 		return domain;
 	}
 
-	protected final void checkSameDesign(RtlItemOwned itemOwned) {
+	protected final void checkSameDomain(RtlItemOwned itemOwned) {
 		RtlItem item = itemOwned.getRtlItem();
 		if (item.getDomain() != domain) {
 			String argumentDescription = (item == itemOwned) ?

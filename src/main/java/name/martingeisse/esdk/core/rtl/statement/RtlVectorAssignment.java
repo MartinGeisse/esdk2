@@ -17,8 +17,8 @@ public final class RtlVectorAssignment extends RtlAssignment {
 
 	public RtlVectorAssignment(RtlDomain design, RtlVectorAssignmentTarget destination, RtlVectorSignal source) {
 		super(design);
-		checkSameDesign(destination);
-		checkSameDesign(source);
+		checkSameDomain(destination);
+		checkSameDomain(source);
 		if (destination.getWidth() != source.getWidth()) {
 			throw new IllegalArgumentException("destination width (" + destination.getWidth() + ") and source width (" + source.getWidth() + ") differ");
 		}

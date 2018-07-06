@@ -29,7 +29,7 @@ public final class RtlConcatenation extends RtlItem implements RtlVectorSignal {
 
 		// store signals
 		for (RtlSignal signal : signals) {
-			checkSameDesign(signal);
+			checkSameDomain(signal);
 		}
 		this.signals = signals;
 

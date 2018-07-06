@@ -22,9 +22,9 @@ public class MovingLightMain {
 
 	public static void main(String[] args) throws Exception {
 
-		Design mainDesign = new Design();
-		RtlDomain design = new RtlDomain(mainDesign);
-		RtlClockNetwork clk = design.createClockNetwork(clockPin(design));
+		Design design = new Design();
+		RtlDomain domain = new RtlDomain(design);
+		RtlClockNetwork clk = domain.createClockNetwork(clockPin(domain));
 
 		RtlClockedBlock block = clk.createBlock();
 
@@ -35,44 +35,44 @@ public class MovingLightMain {
 		RtlProceduralVectorSignal leds = block.createVector(8);
 		block.getInitializerStatements().assignUnsigned(leds, 1);
 		RtlWhenStatement whenPrescalerZero = block.getStatements().when(prescaler.compareEqual(0));
-		whenPrescalerZero.getThenBranch().assign(leds, new RtlConcatenation(design,
+		whenPrescalerZero.getThenBranch().assign(leds, new RtlConcatenation(domain,
 			leds.select(0),
 			leds.select(7, 1)
 		));
 
-		ledPin(design, "F12", leds.select(0));
-		ledPin(design, "E12", leds.select(1));
-		ledPin(design, "E11", leds.select(2));
-		ledPin(design, "F11", leds.select(3));
-		ledPin(design, "C11", leds.select(4));
-		ledPin(design, "D11", leds.select(5));
-		ledPin(design, "E9", leds.select(6));
-		ledPin(design, "F9", leds.select(7));
+		ledPin(domain, "F12", leds.select(0));
+		ledPin(domain, "E12", leds.select(1));
+		ledPin(domain, "E11", leds.select(2));
+		ledPin(domain, "F11", leds.select(3));
+		ledPin(domain, "C11", leds.select(4));
+		ledPin(domain, "D11", leds.select(5));
+		ledPin(domain, "E9", leds.select(6));
+		ledPin(domain, "F9", leds.select(7));
 
-		new ProjectGenerator(design, "MovingLight", new File("ise/moving_light"), "XC3S500E-FG320-4").generate();
+		new ProjectGenerator(domain, "MovingLight", new File("ise/moving_light"), "XC3S500E-FG320-4").generate();
 	}
 
-	private static RtlOutputPin ledPin(RtlDomain design, String id, RtlBitSignal outputSignal) {
-		RtlOutputPin pin = ledPin(design, id);
+	private static RtlOutputPin ledPin(RtlDomain domain, String id, RtlBitSignal outputSignal) {
+		RtlOutputPin pin = ledPin(domain, id);
 		pin.setOutputSignal(outputSignal);
 		return pin;
 	}
 
-	private static RtlOutputPin ledPin(RtlDomain design, String id) {
+	private static RtlOutputPin ledPin(RtlDomain domain, String id) {
 		XilinxPinConfiguration configuration = new XilinxPinConfiguration();
 		configuration.setIostandard("LVTTL");
 		configuration.setSlew(XilinxPinConfiguration.Slew.SLOW);
 		configuration.setDrive(8);
-		RtlOutputPin pin = new RtlOutputPin(design);
+		RtlOutputPin pin = new RtlOutputPin(domain);
 		pin.setId(id);
 		pin.setConfiguration(new XilinxPinConfiguration());
 		return pin;
 	}
 
-	private static RtlInputPin clockPin(RtlDomain design) {
+	private static RtlInputPin clockPin(RtlDomain domain) {
 		XilinxPinConfiguration configuration = new XilinxPinConfiguration();
 		configuration.setIostandard("LVCMOS33");
-		RtlInputPin pin = new RtlInputPin(design);
+		RtlInputPin pin = new RtlInputPin(domain);
 		pin.setId("C9");
 		pin.setConfiguration(new XilinxPinConfiguration());
 		return pin;

@@ -19,8 +19,8 @@ public final class RtlIndexSelection extends RtlItem implements RtlBitSignal {
 
 	public RtlIndexSelection(RtlDomain design, RtlVectorSignal containerSignal, RtlVectorSignal indexSignal) {
 		super(design);
-		checkSameDesign(containerSignal);
-		checkSameDesign(indexSignal);
+		checkSameDomain(containerSignal);
+		checkSameDomain(indexSignal);
 		if (containerSignal.getWidth() < (1 << indexSignal.getWidth())) {
 			throw new IllegalArgumentException("container of width " + containerSignal.getWidth() + " is too small for index of width " + indexSignal.getWidth());
 		}
