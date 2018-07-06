@@ -5,11 +5,11 @@
 package name.martingeisse.esdk.core.rtl.statement;
 
 import name.martingeisse.esdk.core.rtl.RtlDesign;
+import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorConstant;
-import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
-import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
+import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogWriter;
 
 import java.util.ArrayList;
@@ -58,7 +58,7 @@ public class RtlStatementSequence extends RtlStatement {
 		if (value < 0) {
 			throw new IllegalArgumentException("assignUnsigned called with negative value: " + value);
 		}
-		RtlVectorConstant constant = RtlVectorConstant.from(getDesign(), destination.getWidth(), value);
+		RtlVectorConstant constant = RtlVectorConstant.ofUnsigned(getDesign(), destination.getWidth(), value);
 		RtlVectorAssignment assignment = new RtlVectorAssignment(getDesign(), destination, constant);
 		addStatement(assignment);
 		return assignment;

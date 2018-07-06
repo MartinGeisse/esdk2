@@ -1,5 +1,6 @@
 package name.martingeisse.esdk.examples;
 
+import name.martingeisse.esdk.core.model.Design;
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlDesign;
 import name.martingeisse.esdk.core.rtl.block.RtlClockedBlock;
@@ -7,10 +8,10 @@ import name.martingeisse.esdk.core.rtl.block.RtlProceduralVectorSignal;
 import name.martingeisse.esdk.core.rtl.pin.RtlInputPin;
 import name.martingeisse.esdk.core.rtl.pin.RtlOutputPin;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
-import name.martingeisse.esdk.core.rtl.statement.RtlWhenStatement;
-import name.martingeisse.esdk.core.rtl.xilinx.XilinxPinConfiguration;
 import name.martingeisse.esdk.core.rtl.signal.RtlConcatenation;
+import name.martingeisse.esdk.core.rtl.statement.RtlWhenStatement;
 import name.martingeisse.esdk.core.rtl.xilinx.ProjectGenerator;
+import name.martingeisse.esdk.core.rtl.xilinx.XilinxPinConfiguration;
 
 import java.io.File;
 
@@ -21,7 +22,8 @@ public class MovingLightMain {
 
 	public static void main(String[] args) throws Exception {
 
-		RtlDesign design = new RtlDesign();
+		Design mainDesign = new Design();
+		RtlDesign design = new RtlDesign(mainDesign);
 		RtlClockNetwork clk = design.createClockNetwork(clockPin(design));
 
 		RtlClockedBlock block = clk.createBlock();

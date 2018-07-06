@@ -2,7 +2,7 @@ package name.martingeisse.esdk.core.rtl.simulation;
 
 import name.martingeisse.esdk.core.rtl.RtlDesign;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
-import name.martingeisse.esdk.core.rtl.signal.RtlVectorValue;
+import name.martingeisse.esdk.core.util.vector.VectorValue;
 
 /**
  * Vector version of {@link RtlSettableSignal}.
@@ -10,12 +10,12 @@ import name.martingeisse.esdk.core.rtl.signal.RtlVectorValue;
 public final class RtlSettableVectorSignal extends RtlSettableSignal implements RtlVectorSignal {
 
 	private final int width;
-	private RtlVectorValue value;
+	private VectorValue value;
 
 	public RtlSettableVectorSignal(RtlDesign design, int width) {
 		super(design);
 		this.width = width;
-		this.value = RtlVectorValue.zeroes(width);
+		this.value = VectorValue.ofUnsigned(width, 0);
 	}
 
 	@Override
@@ -24,11 +24,11 @@ public final class RtlSettableVectorSignal extends RtlSettableSignal implements 
 	}
 
 	@Override
-	public RtlVectorValue getValue() {
+	public VectorValue getValue() {
 		return value;
 	}
 
-	public void setValue(RtlVectorValue value) {
+	public void setValue(VectorValue value) {
 		this.value = value;
 		// TODO notify RTL simulation core
 	}

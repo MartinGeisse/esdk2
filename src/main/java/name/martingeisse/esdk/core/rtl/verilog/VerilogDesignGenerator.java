@@ -4,16 +4,15 @@
  */
 package name.martingeisse.esdk.core.rtl.verilog;
 
+import name.martingeisse.esdk.core.rtl.RtlDesign;
 import name.martingeisse.esdk.core.rtl.block.RtlClockedBlock;
+import name.martingeisse.esdk.core.rtl.block.RtlProceduralSignal;
 import name.martingeisse.esdk.core.rtl.pin.RtlBidirectionalPin;
 import name.martingeisse.esdk.core.rtl.pin.RtlInputPin;
 import name.martingeisse.esdk.core.rtl.pin.RtlOutputPin;
+import name.martingeisse.esdk.core.rtl.pin.RtlPin;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
-import name.martingeisse.esdk.core.rtl.RtlDesign;
-import name.martingeisse.esdk.core.rtl.block.RtlBlock;
-import name.martingeisse.esdk.core.rtl.block.RtlProceduralSignal;
-import name.martingeisse.esdk.core.rtl.pin.RtlPin;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 
 import java.io.PrintWriter;
@@ -98,7 +97,7 @@ public class VerilogDesignGenerator {
 		}
 
 		// procedural signals must be declared
-		for (RtlBlock block : design.getBlocks()) {
+		for (RtlClockedBlock block : design.getClockedBlocks()) {
 			for (RtlProceduralSignal signal : block.getProceduralSignals()) {
 				allSignals.add(signal);
 				declareSignal(signal);
@@ -118,11 +117,9 @@ public class VerilogDesignGenerator {
 		}
 
 		// analyze signal "expressions" in blocks for signals to extract
-		for (RtlBlock block : design.getBlocks()) {
+		for (RtlClockedBlock block : design.getClockedBlocks()) {
+			block.getInitializerStatements().printExpressionsDryRun(dryRunExpressionWriter);
 			block.getStatements().printExpressionsDryRun(dryRunExpressionWriter);
-			if (block instanceof RtlClockedBlock) {
-				((RtlClockedBlock) block).getInitializerStatements().printExpressionsDryRun(dryRunExpressionWriter);
-			}
 		}
 
 	}
@@ -191,8 +188,9 @@ public class VerilogDesignGenerator {
 	}
 
 	private void printBlocks() {
-		for (RtlBlock block : design.getBlocks()) {
+		for (RtlClockedBlock block : design.getClockedBlocks()) {
 			block.printVerilogBlocks(out);
 		}
 	}
+
 }

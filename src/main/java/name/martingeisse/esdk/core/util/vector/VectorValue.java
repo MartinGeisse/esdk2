@@ -157,4 +157,11 @@ public abstract class VectorValue {
 	 */
 	public abstract VectorValue shiftRight(int amount);
 
+	/**
+	 * Numerically compares the unsigned meaning of this vector and the specified other vector. Returns -1, 0 or 1
+	 * if this vector is less than, equal to, or greater than the argument vector, respectively. The argument must
+	 * have the same width as this vector.
+	 */
+	public abstract int compareUnsigned(VectorValue other);
+
 }

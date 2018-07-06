@@ -5,9 +5,9 @@
 package name.martingeisse.esdk.core.rtl.signal;
 
 import name.martingeisse.esdk.core.rtl.RtlDesign;
+import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogDesignGenerator;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
-import name.martingeisse.esdk.core.rtl.RtlItem;
 
 /**
  *

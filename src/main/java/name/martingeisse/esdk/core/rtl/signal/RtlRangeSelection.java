@@ -8,6 +8,7 @@ import name.martingeisse.esdk.core.rtl.RtlDesign;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogDesignGenerator;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
+import name.martingeisse.esdk.core.util.vector.VectorValue;
 
 /**
  *
@@ -63,8 +64,8 @@ public class RtlRangeSelection extends RtlItem implements RtlVectorSignal {
 	}
 
 	@Override
-	public RtlVectorValue getValue() {
-		return containerSignal.getValue().getRange(from, to);
+	public VectorValue getValue() {
+		return containerSignal.getValue().select(from, to);
 	}
 
 }

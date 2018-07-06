@@ -4,6 +4,8 @@
  */
 package name.martingeisse.esdk.core.rtl.signal;
 
+import name.martingeisse.esdk.core.util.vector.VectorValue;
+
 /**
  *
  */
@@ -11,7 +13,7 @@ public interface RtlVectorSignal extends RtlSignal {
 
 	int getWidth();
 
-	RtlVectorValue getValue();
+	VectorValue getValue();
 
 	//
 	// selection
@@ -38,7 +40,7 @@ public interface RtlVectorSignal extends RtlSignal {
 	}
 
 	default RtlVectorSignal operation(RtlVectorOperation.Operator operator, int rightOperand) {
-		return operation(operator, RtlVectorConstant.from(getRtlItem().getDesign(), getWidth(), rightOperand));
+		return operation(operator, RtlVectorConstant.ofUnsigned(getRtlItem().getDesign(), getWidth(), rightOperand));
 	}
 
 	default RtlVectorSignal add(RtlVectorSignal rightOperand) {
@@ -98,7 +100,7 @@ public interface RtlVectorSignal extends RtlSignal {
 	}
 
 	default RtlBitSignal comparison(RtlVectorComparison.Operator operator, int rightOperand) {
-		return comparison(operator, RtlVectorConstant.from(getRtlItem().getDesign(), getWidth(), rightOperand));
+		return comparison(operator, RtlVectorConstant.ofUnsigned(getRtlItem().getDesign(), getWidth(), rightOperand));
 	}
 
 	default RtlBitSignal compareEqual(RtlVectorSignal rightOperand) {

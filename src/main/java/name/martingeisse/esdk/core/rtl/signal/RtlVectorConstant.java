@@ -8,21 +8,22 @@ import name.martingeisse.esdk.core.rtl.RtlDesign;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogDesignGenerator;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
+import name.martingeisse.esdk.core.util.vector.VectorValue;
 
 /**
  *
  */
 public final class RtlVectorConstant extends RtlItem implements RtlVectorSignal {
 
-	private final RtlVectorValue value;
+	private final VectorValue value;
 
-	public RtlVectorConstant(RtlDesign design, RtlVectorValue value) {
+	public RtlVectorConstant(RtlDesign design, VectorValue value) {
 		super(design);
 		this.value = value;
 	}
 
-	public static RtlVectorConstant from(RtlDesign design, int width, int value) {
-		return new RtlVectorConstant(design, RtlVectorValue.from(width, value));
+	public static RtlVectorConstant ofUnsigned(RtlDesign design, int width, int value) {
+		return new RtlVectorConstant(design, VectorValue.ofUnsigned(width, value));
 	}
 
 	@Override
@@ -31,7 +32,7 @@ public final class RtlVectorConstant extends RtlItem implements RtlVectorSignal 
 	}
 
 	@Override
-	public RtlVectorValue getValue() {
+	public VectorValue getValue() {
 		return value;
 	}
 

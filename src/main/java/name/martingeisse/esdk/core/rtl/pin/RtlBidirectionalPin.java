@@ -5,8 +5,8 @@
 package name.martingeisse.esdk.core.rtl.pin;
 
 import name.martingeisse.esdk.core.rtl.RtlDesign;
-import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
+import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
 
 /**
  * TODO generate tri-state assignment

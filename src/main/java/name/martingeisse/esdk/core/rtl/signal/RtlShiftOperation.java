@@ -4,10 +4,11 @@
  */
 package name.martingeisse.esdk.core.rtl.signal;
 
-import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
 import name.martingeisse.esdk.core.rtl.RtlDesign;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogDesignGenerator;
+import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
+import name.martingeisse.esdk.core.util.vector.VectorValue;
 
 /**
  * This class implements shift operators. It is separate from {@link RtlVectorOperation} because it has different
@@ -70,14 +71,14 @@ public final class RtlShiftOperation extends RtlItem implements RtlVectorSignal 
 	}
 
 	@Override
-	public RtlVectorValue getValue() {
+	public VectorValue getValue() {
 		switch (direction) {
 
 			case LEFT:
-				return leftOperand.getValue().shiftLeft(rightOperand.getValue().convertUnsignedToSmallInteger());
+				return leftOperand.getValue().shiftLeft(rightOperand.getValue().getAsUnsignedInt());
 
 			case RIGHT:
-				return leftOperand.getValue().shiftRight(rightOperand.getValue().convertUnsignedToSmallInteger());
+				return leftOperand.getValue().shiftRight(rightOperand.getValue().getAsUnsignedInt());
 
 			default:
 				throw new UnsupportedOperationException();

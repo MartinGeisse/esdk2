@@ -4,8 +4,8 @@
  */
 package name.martingeisse.esdk.core.rtl.verilog;
 
-import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
 import name.martingeisse.esdk.core.rtl.block.RtlProceduralSignal;
+import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
 
 /**
  * Helper class to turn signals into expressions. Signal classes should expect to be called twice:

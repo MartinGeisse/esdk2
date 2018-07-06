@@ -4,8 +4,8 @@
  */
 package name.martingeisse.esdk.core.rtl.xilinx;
 
-import name.martingeisse.esdk.core.rtl.pin.RtlPinConfiguration;
 import name.martingeisse.esdk.core.rtl.pin.RtlPin;
+import name.martingeisse.esdk.core.rtl.pin.RtlPinConfiguration;
 
 import java.io.PrintWriter;
 

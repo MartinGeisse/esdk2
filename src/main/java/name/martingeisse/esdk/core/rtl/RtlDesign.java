@@ -6,8 +6,6 @@ package name.martingeisse.esdk.core.rtl;
 
 import name.martingeisse.esdk.core.model.Design;
 import name.martingeisse.esdk.core.model.Item;
-import name.martingeisse.esdk.core.rtl.block.RtlAsynchronousBlock;
-import name.martingeisse.esdk.core.rtl.block.RtlBlock;
 import name.martingeisse.esdk.core.rtl.block.RtlClockedBlock;
 import name.martingeisse.esdk.core.rtl.block.RtlProceduralSignal;
 import name.martingeisse.esdk.core.rtl.pin.RtlPin;
@@ -17,21 +15,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * TODO: asynchronous blocks cache their results implicitly, inside their RtlProceduralSignal objects.
- * They have to be updated immediately when their inputs change (Verilog: always @(*) does that).
- * But we can't right now. Solutions:
- * - allow to register listeners to RtlSignal. Cumbersome for custom signal writers and we have to
- * implement some kind of "grouping" to avoid registering lots of event callbacks
- * - don't allow custom RtlSignal implementations. Other models must set the value explicitly, and this
- * calls listeners / block execution.
- * - additionally allow custom RtlSignal implementations that must support listeners. No advantages over
- * calling a setter -- code is still as complex and it's even more error-prone.
+ *
  */
 public final class RtlDesign extends Item {
 
 	private final List<RtlPin> pins = new ArrayList<>();
 	private final List<RtlClockNetwork> clockNetworks = new ArrayList<>();
-	private final List<RtlBlock> blocks = new ArrayList<>();
+	private final List<RtlClockedBlock> clockedBlocks = new ArrayList<>();
 
 	public RtlDesign(Design design) {
 		super(design);
@@ -60,11 +50,11 @@ public final class RtlDesign extends Item {
 	/**
 	 * Non-public API. Do not call. Only marked public because Java forces us to if we want to use packages.
 	 */
-	public void registerBlock(RtlBlock.DesignRegistrationKey key, RtlBlock block) {
+	public void registerBlock(RtlClockedBlock.DesignRegistrationKey key, RtlClockedBlock block) {
 		if (!key.isValid()) {
 			throw new IllegalArgumentException("invalid registration key");
 		}
-		blocks.add(block);
+		clockedBlocks.add(block);
 	}
 
 	public Iterable<RtlPin> getPins() {
@@ -75,16 +65,12 @@ public final class RtlDesign extends Item {
 		return clockNetworks;
 	}
 
-	public Iterable<RtlBlock> getBlocks() {
-		return blocks;
+	public Iterable<RtlClockedBlock> getClockedBlocks() {
+		return clockedBlocks;
 	}
 
 	public RtlClockNetwork createClockNetwork(RtlBitSignal clockSignal) {
 		return new RtlClockNetwork(this, clockSignal);
-	}
-
-	public RtlAsynchronousBlock createAsynchronousBlock() {
-		return new RtlAsynchronousBlock(this);
 	}
 
 	@Override
@@ -99,68 +85,17 @@ public final class RtlDesign extends Item {
 	}
 
 	private void onClockEdge(RtlClockNetwork clockNetwork) {
-		for (RtlBlock block : blocks) {
-			if (block instanceof RtlClockedBlock) {
-				RtlClockedBlock clockedBlock = (RtlClockedBlock) block;
-				if (clockedBlock.getClockNetwork() == clockNetwork) {
-					clockedBlock.execute();
-				}
+		for (RtlClockedBlock block : clockedBlocks) {
+			if (block.getClockNetwork() == clockNetwork) {
+				block.execute();
 			}
 		}
 		List<RtlProceduralSignal> changedSignals = new ArrayList<>();
-		for (RtlBlock block : blocks) {
-			if (block instanceof RtlClockedBlock) {
-				RtlClockedBlock clockedBlock = (RtlClockedBlock) block;
-				if (clockedBlock.getClockNetwork() == clockNetwork) {
-					clockedBlock.updateProceduralSignals(changedSignals);
-				}
+		for (RtlClockedBlock block : clockedBlocks) {
+			if (block.getClockNetwork() == clockNetwork) {
+				block.updateProceduralSignals(changedSignals);
 			}
 		}
-		// TODO run triggered asynchronous blocks
-	}
-
-	// TODO: A changed signal may result in execution of an asynchronous block, but one of the
-	// intermediate signal "expression" objects may be shared with another block. Since it's an
-	// intermediate object, that other block won't be notified!
-	//
-	// The problem here is that the whole signal concept is based on not caching the signal value,
-	// but asynchronous blocks do that anyway.
-	//
-	// solution 1: That other block must have the originally changed signal in its trigger list
-	// 		then each signal must support getting its source signals --> error-prone. If you
-	//      forget one, bugs happen.
-	//		On the other hand, the set of signal classes is meant to be bounded anyway.
-	//		Also, the trigger list must include all "direct" triggers but must not include any
-	//		"indirect" triggers -- signals that when changed will eventually cause a change, but
-	//		will only do so "later" through a delayed event. So updating the listening signal
-	//		immediately will get the wrong value.
-	//
-	// solution 2: any intermediate signal knows its current value and supports listeners
-	// 		may be slow, but supports caching out of the box and will only trigger subsequent blocks
-	//		if a signal actually changes. This replaces "pull" signal evaluation by "push" signal
-	//		updating, like Verilog does.
-	//		Maybe this also allows custom RtlSignal implementations, which can be used to speed
-	//		up simulation.
-	//
-	// solution 3: Make asynchronous blocks not cache their value, or forget their value whenever "something
-	// 		happens" (design->clock edge; manually setting a settable signal, possibly including a changed pin
-	// 		when that is possible)
-	//
-	// solution 4: no more asynchronous blocks. How useful are they? Reality check:
-	//		- used for switch-expressions since there is no other way in verilog -> not needed here
-	//		- used for conditional expressions -> not needed either here or in verilog, was probably more
-	//			readable that way but we can achieve the same with a real conditional
-	//      - used for bundled switch expressions assigning many signals at once (e.g. state machines)
-	//			should be ok anyway, if not use bundled assignments and a single switch expression
-	//		- using if-else-if-chains as expression --> define a signal type for that
-	//		- nested version of the above -> no problem
-	//
-	// The bottom line is that asynchronous blocks aren't that useful at all since we have signal objects.
-	//
-	//
-
-	public void notifySignalChanged() {
-
 	}
 
 }

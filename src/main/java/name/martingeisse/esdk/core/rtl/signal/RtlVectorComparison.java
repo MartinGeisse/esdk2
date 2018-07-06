@@ -8,6 +8,7 @@ import name.martingeisse.esdk.core.rtl.RtlDesign;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogDesignGenerator;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
+import name.martingeisse.esdk.core.util.vector.VectorValue;
 
 /**
  *
@@ -72,7 +73,7 @@ public final class RtlVectorComparison extends RtlItem implements RtlBitSignal {
 			return symbol;
 		}
 
-		public boolean evaluate(RtlVectorValue leftOperand, RtlVectorValue rightOperand) {
+		public boolean evaluate(VectorValue leftOperand, VectorValue rightOperand) {
 			switch (this) {
 
 				case EQUAL:
@@ -82,6 +83,7 @@ public final class RtlVectorComparison extends RtlItem implements RtlBitSignal {
 					return !leftOperand.equals(rightOperand);
 
 				case UNSIGNED_LESS_THAN:
+
 					return compare(leftOperand, rightOperand, true, false);
 
 				case UNSIGNED_LESS_THAN_OR_EQUAL:
@@ -99,8 +101,8 @@ public final class RtlVectorComparison extends RtlItem implements RtlBitSignal {
 			}
 		}
 
-		private boolean compare(RtlVectorValue leftOperand, RtlVectorValue rightOperand, boolean less, boolean equal) {
-			int raw = leftOperand.convertUnsignedToBigInteger().compareTo(rightOperand.convertUnsignedToBigInteger());
+		private boolean compare(VectorValue leftOperand, VectorValue rightOperand, boolean less, boolean equal) {
+			int raw = leftOperand.compareUnsigned(rightOperand);
 			return raw == 0 ? equal : (raw < 0) == less;
 		}
 

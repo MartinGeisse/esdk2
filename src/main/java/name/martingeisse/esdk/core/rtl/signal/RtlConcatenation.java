@@ -9,6 +9,7 @@ import name.martingeisse.esdk.core.rtl.RtlDesign;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogDesignGenerator;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
+import name.martingeisse.esdk.core.util.vector.VectorValue;
 
 import java.util.BitSet;
 
@@ -77,7 +78,7 @@ public final class RtlConcatenation extends RtlItem implements RtlVectorSignal {
 	}
 
 	@Override
-	public RtlVectorValue getValue() {
+	public VectorValue getValue() {
 		BitSet result = new BitSet();
 		int previousWidth = 0;
 		for (int signalIndex = signals.size() - 1; signalIndex >= 0; signalIndex--) {
@@ -86,7 +87,7 @@ public final class RtlConcatenation extends RtlItem implements RtlVectorSignal {
 				result.set(previousWidth, ((RtlBitSignal) elementSignal).getValue());
 				previousWidth++;
 			} else if (elementSignal instanceof RtlVectorSignal) {
-				RtlVectorValue elementValue = ((RtlVectorSignal) elementSignal).getValue();
+				VectorValue elementValue = ((RtlVectorSignal) elementSignal).getValue();
 				BitSet elementBits = elementValue.getBitsShared();
 				for (int i = 0; i < elementValue.getWidth(); i++) {
 					result.set(previousWidth + i, elementBits.get(i));
@@ -96,7 +97,7 @@ public final class RtlConcatenation extends RtlItem implements RtlVectorSignal {
 				throw new RuntimeException("invalid signal: " + elementSignal);
 			}
 		}
-		return new RtlVectorValue(previousWidth, result, false);
+		return new VectorValue(previousWidth, result, false);
 	}
 
 }

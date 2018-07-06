@@ -6,8 +6,8 @@ package name.martingeisse.esdk.core.rtl.block;
 
 import name.martingeisse.esdk.core.rtl.RtlDesign;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
-import name.martingeisse.esdk.core.rtl.signal.RtlVectorValue;
 import name.martingeisse.esdk.core.rtl.statement.RtlVectorAssignmentTarget;
+import name.martingeisse.esdk.core.util.vector.VectorValue;
 
 /**
  *
@@ -15,13 +15,13 @@ import name.martingeisse.esdk.core.rtl.statement.RtlVectorAssignmentTarget;
 public final class RtlProceduralVectorSignal extends RtlProceduralSignal implements RtlVectorSignal, RtlVectorAssignmentTarget {
 
 	private final int width;
-	private RtlVectorValue value;
-	private RtlVectorValue nextValue;
+	private VectorValue value;
+	private VectorValue nextValue;
 
-	public RtlProceduralVectorSignal(RtlDesign design, RtlBlock block, int width) {
+	public RtlProceduralVectorSignal(RtlDesign design, RtlClockedBlock block, int width) {
 		super(design, block);
 		this.width = width;
-		this.value = RtlVectorValue.zeroes(width);
+		this.value = VectorValue.ofUnsigned(width, 0);
 		this.nextValue = value;
 	}
 
@@ -31,11 +31,11 @@ public final class RtlProceduralVectorSignal extends RtlProceduralSignal impleme
 	}
 
 	@Override
-	public RtlVectorValue getValue() {
+	public VectorValue getValue() {
 		return value;
 	}
 
-	public void setNextValue(RtlVectorValue nextValue) {
+	public void setNextValue(VectorValue nextValue) {
 		if (nextValue == null) {
 			throw new IllegalArgumentException("value cannot be null");
 		}

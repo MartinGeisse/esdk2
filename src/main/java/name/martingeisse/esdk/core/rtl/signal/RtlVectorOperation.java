@@ -8,8 +8,7 @@ import name.martingeisse.esdk.core.rtl.RtlDesign;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogDesignGenerator;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
-
-import java.math.BigInteger;
+import name.martingeisse.esdk.core.util.vector.VectorValue;
 
 /**
  * See {@link RtlShiftOperation} for shifting. That class is separate because it has different width constraints on
@@ -58,7 +57,7 @@ public final class RtlVectorOperation extends RtlItem implements RtlVectorSignal
 	}
 
 	@Override
-	public RtlVectorValue getValue() {
+	public VectorValue getValue() {
 		return operator.evaluate(leftOperand.getValue(), rightOperand.getValue());
 	}
 
@@ -80,41 +79,31 @@ public final class RtlVectorOperation extends RtlItem implements RtlVectorSignal
 			return symbol;
 		}
 
-		public RtlVectorValue evaluate(RtlVectorValue leftOperand, RtlVectorValue rightOperand) {
-			BigInteger left = leftOperand.convertUnsignedToBigInteger();
-			BigInteger right = rightOperand.convertUnsignedToBigInteger();
-			BigInteger result;
+		public VectorValue evaluate(VectorValue leftOperand, VectorValue rightOperand) {
 			switch (this) {
 
 				case ADD:
-					result = left.add(right);
-					break;
+					return leftOperand.add(rightOperand);
 
 				case SUBTRACT:
-					result = left.subtract(right);
-					break;
+					return leftOperand.subtract(rightOperand);
 
 				case MULTIPLY:
-					result = left.multiply(right);
-					break;
+					return leftOperand.multiply(rightOperand);
 
 				case AND:
-					result = left.and(right);
-					break;
+					return leftOperand.and(rightOperand);
 
 				case OR:
-					result = left.or(right);
-					break;
+					return leftOperand.or(rightOperand);
 
 				case XOR:
-					result = left.xor(right);
-					break;
+					return leftOperand.xor(rightOperand);
 
 				default:
 					throw new UnsupportedOperationException();
 
 			}
-			return RtlVectorValue.from(leftOperand.getWidth(), result);
 		}
 	}
 

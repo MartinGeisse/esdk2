@@ -184,4 +184,9 @@ public final class LongVectorValue extends VectorValue {
 		return new LongVectorValue(getWidth(), value >>> amount);
 	}
 
+	@Override
+	public int compareUnsigned(VectorValue other) {
+		return Long.compareUnsigned(value, expectSameWidth(other));
+	}
+
 }

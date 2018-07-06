@@ -4,7 +4,7 @@
  */
 package name.martingeisse.esdk.core.rtl.statement;
 
-import name.martingeisse.esdk.core.rtl.signal.RtlVectorValue;
+import name.martingeisse.esdk.core.util.vector.VectorValue;
 
 /**
  *
@@ -13,6 +13,6 @@ public interface RtlVectorAssignmentTarget extends RtlAssignmentTarget {
 
 	int getWidth();
 
-	void setNextValue(RtlVectorValue nextValue);
+	void setNextValue(VectorValue nextValue);
 
 }

@@ -5,6 +5,7 @@
 package name.martingeisse.esdk.core.rtl.signal;
 
 import name.martingeisse.esdk.core.rtl.RtlDesign;
+import name.martingeisse.esdk.core.util.vector.VectorValue;
 
 /**
  *
@@ -37,7 +38,7 @@ public final class RtlConditionalVectorOperation extends RtlConditionalOperation
 	}
 
 	@Override
-	public RtlVectorValue getValue() {
+	public VectorValue getValue() {
 		return getCondition().getValue() ? onTrue.getValue() : onFalse.getValue();
 	}
 
