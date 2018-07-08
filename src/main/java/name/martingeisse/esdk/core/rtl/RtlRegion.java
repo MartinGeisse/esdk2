@@ -75,9 +75,6 @@ public final class RtlRegion extends Item {
 
 	@Override
 	protected void initializeSimulation() {
-		if (!pins.isEmpty()) {
-			throw new IllegalStateException("cannot use an RtlRegion with pins in simulation");
-		}
 	}
 
 	public void fireClockEdge(RtlClockNetwork clockNetwork) {
