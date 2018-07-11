@@ -5,8 +5,8 @@
 package name.martingeisse.esdk.core.rtl.block;
 
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
-import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.RtlItem;
+import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.statement.RtlStatementSequence;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogWriter;
 
@@ -41,6 +41,23 @@ public final class RtlClockedBlock extends RtlItem {
 		key.valid = false;
 	}
 
+	/**
+	 * This class is used to ensure that {@link RtlRealm#registerBlock(RealmRegistrationKey, RtlClockedBlock)} isn't called except through the
+	 * {@link RtlClockedBlock} constructor.
+	 */
+	public static final class RealmRegistrationKey {
+
+		private boolean valid = true;
+
+		private RealmRegistrationKey() {
+		}
+
+		public boolean isValid() {
+			return valid;
+		}
+
+	}
+
 	void registerProceduralSignal(RtlProceduralSignal proceduralSignal) {
 		proceduralSignals.add(proceduralSignal);
 	}
@@ -61,17 +78,9 @@ public final class RtlClockedBlock extends RtlItem {
 		return statements;
 	}
 
-	public void printVerilogBlocks(VerilogWriter out) {
-
-		out.startProceduralInitialBlock();
-		initializerStatements.printVerilogStatements(out);
-		out.endProceduralAlwaysBlock();
-
-		out.startProceduralAlwaysBlock("posedge " + out.getSignalName(clockNetwork.getClockSignal()));
-		getStatements().printVerilogStatements(out);
-		out.endProceduralAlwaysBlock();
-
-	}
+	// ----------------------------------------------------------------------------------------------------------------
+	// factory methods
+	// ----------------------------------------------------------------------------------------------------------------
 
 	public RtlProceduralBitSignal createBit() {
 		return new RtlProceduralBitSignal(getRealm(), this);
@@ -80,6 +89,10 @@ public final class RtlClockedBlock extends RtlItem {
 	public RtlProceduralVectorSignal createVector(int width) {
 		return new RtlProceduralVectorSignal(getRealm(), this, width);
 	}
+
+	// ----------------------------------------------------------------------------------------------------------------
+	// simulation
+	// ----------------------------------------------------------------------------------------------------------------
 
 	public void execute() {
 		statements.execute();
@@ -93,20 +106,19 @@ public final class RtlClockedBlock extends RtlItem {
 		}
 	}
 
-	/**
-	 * This class is used to ensure that {@link RtlRealm#registerBlock(RealmRegistrationKey, RtlClockedBlock)} isn't called except through the
-	 * {@link RtlClockedBlock} constructor.
-	 */
-	public static final class RealmRegistrationKey {
+	// ----------------------------------------------------------------------------------------------------------------
+	// Verilog generation
+	// ----------------------------------------------------------------------------------------------------------------
 
-		private boolean valid = true;
+	public void printVerilogBlocks(VerilogWriter out) {
 
-		private RealmRegistrationKey() {
-		}
+		out.startProceduralInitialBlock();
+		initializerStatements.printVerilogStatements(out);
+		out.endProceduralAlwaysBlock();
 
-		public boolean isValid() {
-			return valid;
-		}
+		out.startProceduralAlwaysBlock("posedge " + out.getSignalName(clockNetwork.getClockSignal()));
+		getStatements().printVerilogStatements(out);
+		out.endProceduralAlwaysBlock();
 
 	}
 

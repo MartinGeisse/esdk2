@@ -15,6 +15,10 @@ import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
  */
 public interface RtlSignal extends RtlItemOwned {
 
+	// ----------------------------------------------------------------------------------------------------------------
+	// Verilog generation
+	// ----------------------------------------------------------------------------------------------------------------
+
 	/**
 	 * Returns true iff the expression for this signal can be generated with the specified nesting.
 	 *

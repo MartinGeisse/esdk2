@@ -25,6 +25,19 @@ public final class RtlInputPin extends RtlPin implements RtlBitSignal {
 		return settableBitSignal;
 	}
 
+	// ----------------------------------------------------------------------------------------------------------------
+	// simulation
+	// ----------------------------------------------------------------------------------------------------------------
+
+	@Override
+	public boolean getValue() {
+		return settableBitSignal.getValue();
+	}
+
+	// ----------------------------------------------------------------------------------------------------------------
+	// Verilog generation
+	// ----------------------------------------------------------------------------------------------------------------
+
 	@Override
 	public void printVerilogExpression(VerilogExpressionWriter out) {
 		out.print(getNetName());
@@ -33,11 +46,6 @@ public final class RtlInputPin extends RtlPin implements RtlBitSignal {
 	@Override
 	public String getVerilogDirectionKeyword() {
 		return "input";
-	}
-
-	@Override
-	public boolean getValue() {
-		return settableBitSignal.getValue();
 	}
 
 }

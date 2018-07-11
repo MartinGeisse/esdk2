@@ -43,6 +43,19 @@ public final class RtlBidirectionalPin extends RtlPin implements RtlBitSignal {
 		this.outputEnableSignal = outputEnableSignal;
 	}
 
+	// ----------------------------------------------------------------------------------------------------------------
+	// simulation
+	// ----------------------------------------------------------------------------------------------------------------
+
+	@Override
+	public boolean getValue() {
+		return outputEnableSignal.getValue() ? outputSignal.getValue() : settableInputBitSignal.getValue();
+	}
+
+	// ----------------------------------------------------------------------------------------------------------------
+	// Verilog generation
+	// ----------------------------------------------------------------------------------------------------------------
+
 	@Override
 	public void printVerilogExpression(VerilogExpressionWriter out) {
 		out.print(getNetName());
@@ -51,11 +64,6 @@ public final class RtlBidirectionalPin extends RtlPin implements RtlBitSignal {
 	@Override
 	public String getVerilogDirectionKeyword() {
 		return "inout";
-	}
-
-	@Override
-	public boolean getValue() {
-		return outputEnableSignal.getValue() ? outputSignal.getValue() : settableInputBitSignal.getValue();
 	}
 
 }

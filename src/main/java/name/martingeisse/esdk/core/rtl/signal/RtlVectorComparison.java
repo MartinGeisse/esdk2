@@ -42,15 +42,6 @@ public final class RtlVectorComparison extends RtlItem implements RtlBitSignal {
 	}
 
 	@Override
-	public void printVerilogExpression(VerilogExpressionWriter out) {
-		out.print(leftOperand, VerilogGenerator.VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
-		out.print(' ');
-		out.print(operator.getSymbol());
-		out.print(' ');
-		out.print(rightOperand, VerilogGenerator.VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
-	}
-
-	@Override
 	public boolean getValue() {
 		return operator.evaluate(leftOperand.getValue(), rightOperand.getValue());
 	}
@@ -106,6 +97,19 @@ public final class RtlVectorComparison extends RtlItem implements RtlBitSignal {
 			return raw == 0 ? equal : (raw < 0) == less;
 		}
 
+	}
+
+	// ----------------------------------------------------------------------------------------------------------------
+	// Verilog generation
+	// ----------------------------------------------------------------------------------------------------------------
+
+	@Override
+	public void printVerilogExpression(VerilogExpressionWriter out) {
+		out.print(leftOperand, VerilogGenerator.VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
+		out.print(' ');
+		out.print(operator.getSymbol());
+		out.print(' ');
+		out.print(rightOperand, VerilogGenerator.VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
 	}
 
 }

@@ -58,6 +58,25 @@ public final class RtlConcatenation extends RtlItem implements RtlVectorSignal {
 	}
 
 	@Override
+	public VectorValue getValue() {
+		VectorValue result = VectorValue.ofUnsigned(0, 0);
+		for (RtlSignal elementSignal : signals) {
+			if (elementSignal instanceof RtlBitSignal) {
+				result = result.concat(((RtlBitSignal) elementSignal).getValue());
+			} else if (elementSignal instanceof RtlVectorSignal) {
+				result = result.concat(((RtlVectorSignal) elementSignal).getValue());
+			} else {
+				throw new RuntimeException("invalid signal: " + elementSignal);
+			}
+		}
+		return result;
+	}
+
+	// ----------------------------------------------------------------------------------------------------------------
+	// Verilog generation
+	// ----------------------------------------------------------------------------------------------------------------
+
+	@Override
 	public void printVerilogExpression(VerilogExpressionWriter out) {
 		if (width == 0) {
 			throw new RuntimeException("cannot print zero-width concatenation");
@@ -73,21 +92,6 @@ public final class RtlConcatenation extends RtlItem implements RtlVectorSignal {
 			out.print(signal, VerilogGenerator.VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
 		}
 		out.print('}');
-	}
-
-	@Override
-	public VectorValue getValue() {
-		VectorValue result = VectorValue.ofUnsigned(0, 0);
-		for (RtlSignal elementSignal : signals) {
-			if (elementSignal instanceof RtlBitSignal) {
-				result = result.concat(((RtlBitSignal) elementSignal).getValue());
-			} else if (elementSignal instanceof RtlVectorSignal) {
-				result = result.concat(((RtlVectorSignal) elementSignal).getValue());
-			} else {
-				throw new RuntimeException("invalid signal: " + elementSignal);
-			}
-		}
-		return result;
 	}
 
 }

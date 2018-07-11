@@ -29,6 +29,10 @@ public abstract class RtlConditionalOperation extends RtlItem implements RtlSign
 
 	public abstract RtlSignal getOnFalse();
 
+	// ----------------------------------------------------------------------------------------------------------------
+	// Verilog generation
+	// ----------------------------------------------------------------------------------------------------------------
+
 	@Override
 	public void printVerilogExpression(VerilogExpressionWriter out) {
 		out.print(condition, VerilogGenerator.VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);

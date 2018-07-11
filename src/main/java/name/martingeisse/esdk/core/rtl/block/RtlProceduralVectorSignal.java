@@ -30,6 +30,10 @@ public final class RtlProceduralVectorSignal extends RtlProceduralSignal impleme
 		return width;
 	}
 
+	// ----------------------------------------------------------------------------------------------------------------
+	// simulation
+	// ----------------------------------------------------------------------------------------------------------------
+
 	@Override
 	public VectorValue getValue() {
 		return value;

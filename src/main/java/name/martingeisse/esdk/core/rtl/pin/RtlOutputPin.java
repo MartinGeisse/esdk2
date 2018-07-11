@@ -26,6 +26,10 @@ public final class RtlOutputPin extends RtlPin {
 		this.outputSignal = outputSignal;
 	}
 
+	// ----------------------------------------------------------------------------------------------------------------
+	// Verilog generation
+	// ----------------------------------------------------------------------------------------------------------------
+
 	@Override
 	public String getVerilogDirectionKeyword() {
 		return "output";

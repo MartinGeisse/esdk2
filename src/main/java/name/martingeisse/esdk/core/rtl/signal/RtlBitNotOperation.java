@@ -25,15 +25,23 @@ public final class RtlBitNotOperation extends RtlItem implements RtlBitSignal {
 		return operand;
 	}
 
-	@Override
-	public void printVerilogExpression(VerilogExpressionWriter out) {
-		out.print('~');
-		out.print(operand, VerilogGenerator.VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
-	}
+	// ----------------------------------------------------------------------------------------------------------------
+	// simulation
+	// ----------------------------------------------------------------------------------------------------------------
 
 	@Override
 	public boolean getValue() {
 		return !operand.getValue();
+	}
+
+	// ----------------------------------------------------------------------------------------------------------------
+	// Verilog generation
+	// ----------------------------------------------------------------------------------------------------------------
+
+	@Override
+	public void printVerilogExpression(VerilogExpressionWriter out) {
+		out.print('~');
+		out.print(operand, VerilogGenerator.VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
 	}
 
 }

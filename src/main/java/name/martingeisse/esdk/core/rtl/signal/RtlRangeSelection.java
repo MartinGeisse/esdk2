@@ -49,6 +49,15 @@ public class RtlRangeSelection extends RtlItem implements RtlVectorSignal {
 	}
 
 	@Override
+	public VectorValue getValue() {
+		return containerSignal.getValue().select(from, to);
+	}
+
+	// ----------------------------------------------------------------------------------------------------------------
+	// Verilog generation
+	// ----------------------------------------------------------------------------------------------------------------
+
+	@Override
 	public boolean compliesWith(VerilogGenerator.VerilogExpressionNesting nesting) {
 		return nesting != VerilogGenerator.VerilogExpressionNesting.SIGNALS_AND_CONSTANTS;
 	}
@@ -61,11 +70,6 @@ public class RtlRangeSelection extends RtlItem implements RtlVectorSignal {
 		out.print(':');
 		out.print(to);
 		out.print(']');
-	}
-
-	@Override
-	public VectorValue getValue() {
-		return containerSignal.getValue().select(from, to);
 	}
 
 }

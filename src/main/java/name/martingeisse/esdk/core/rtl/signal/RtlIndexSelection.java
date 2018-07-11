@@ -37,6 +37,15 @@ public final class RtlIndexSelection extends RtlItem implements RtlBitSignal {
 	}
 
 	@Override
+	public boolean getValue() {
+		return containerSignal.getValue().select(indexSignal.getValue().getAsUnsignedInt());
+	}
+
+	// ----------------------------------------------------------------------------------------------------------------
+	// Verilog generation
+	// ----------------------------------------------------------------------------------------------------------------
+
+	@Override
 	public boolean compliesWith(VerilogGenerator.VerilogExpressionNesting nesting) {
 		return nesting != VerilogGenerator.VerilogExpressionNesting.SIGNALS_AND_CONSTANTS;
 	}
@@ -47,11 +56,6 @@ public final class RtlIndexSelection extends RtlItem implements RtlBitSignal {
 		out.print('[');
 		out.print(indexSignal, VerilogGenerator.VerilogExpressionNesting.SIGNALS_AND_CONSTANTS);
 		out.print(']');
-	}
-
-	@Override
-	public boolean getValue() {
-		return containerSignal.getValue().select(indexSignal.getValue().getAsUnsignedInt());
 	}
 
 }

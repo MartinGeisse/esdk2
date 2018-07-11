@@ -62,15 +62,6 @@ public final class RtlShiftOperation extends RtlItem implements RtlVectorSignal 
 	}
 
 	@Override
-	public void printVerilogExpression(VerilogExpressionWriter out) {
-		out.print(leftOperand, VerilogGenerator.VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
-		out.print(' ');
-		out.print(direction.getSymbol());
-		out.print(' ');
-		out.print(rightOperand, VerilogGenerator.VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
-	}
-
-	@Override
 	public VectorValue getValue() {
 		switch (direction) {
 
@@ -99,6 +90,19 @@ public final class RtlShiftOperation extends RtlItem implements RtlVectorSignal 
 			return symbol;
 		}
 
+	}
+
+	// ----------------------------------------------------------------------------------------------------------------
+	// Verilog generation
+	// ----------------------------------------------------------------------------------------------------------------
+
+	@Override
+	public void printVerilogExpression(VerilogExpressionWriter out) {
+		out.print(leftOperand, VerilogGenerator.VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
+		out.print(' ');
+		out.print(direction.getSymbol());
+		out.print(' ');
+		out.print(rightOperand, VerilogGenerator.VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
 	}
 
 }

@@ -38,6 +38,15 @@ public final class RtlConstantIndexSelection extends RtlItem implements RtlBitSi
 	}
 
 	@Override
+	public boolean getValue() {
+		return containerSignal.getValue().select(index);
+	}
+
+	// ----------------------------------------------------------------------------------------------------------------
+	// Verilog generation
+	// ----------------------------------------------------------------------------------------------------------------
+
+	@Override
 	public boolean compliesWith(VerilogGenerator.VerilogExpressionNesting nesting) {
 		return nesting != VerilogGenerator.VerilogExpressionNesting.SIGNALS_AND_CONSTANTS;
 	}
@@ -48,11 +57,6 @@ public final class RtlConstantIndexSelection extends RtlItem implements RtlBitSi
 		out.print('[');
 		out.print(index);
 		out.print(']');
-	}
-
-	@Override
-	public boolean getValue() {
-		return containerSignal.getValue().select(index);
 	}
 
 }

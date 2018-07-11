@@ -29,6 +29,19 @@ public abstract class RtlProceduralSignal extends RtlItem implements RtlSignal, 
 		return block;
 	}
 
+	// ----------------------------------------------------------------------------------------------------------------
+	// simulation
+	// ----------------------------------------------------------------------------------------------------------------
+
+	/**
+	 * Updates the value from the stored next value. Returns true if the value actually changed.
+	 */
+	public abstract boolean updateValue();
+
+	// ----------------------------------------------------------------------------------------------------------------
+	// Verilog generation
+	// ----------------------------------------------------------------------------------------------------------------
+
 	@Override
 	public final void printVerilogAssignmentTarget(VerilogWriter out) {
 		out.printProceduralSignalName(this);
@@ -38,10 +51,5 @@ public abstract class RtlProceduralSignal extends RtlItem implements RtlSignal, 
 	public final void printVerilogExpression(VerilogExpressionWriter out) {
 		out.printProceduralSignalName(this);
 	}
-
-	/**
-	 * Updates the value from the stored next value. Returns true if the value actually changed.
-	 */
-	public abstract boolean updateValue();
 
 }

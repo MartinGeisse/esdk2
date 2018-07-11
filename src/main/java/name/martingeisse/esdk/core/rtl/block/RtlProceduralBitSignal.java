@@ -20,6 +20,10 @@ public final class RtlProceduralBitSignal extends RtlProceduralSignal implements
 		super(realm, block);
 	}
 
+	// ----------------------------------------------------------------------------------------------------------------
+	// simulation
+	// ----------------------------------------------------------------------------------------------------------------
+
 	@Override
 	public boolean getValue() {
 		return value;

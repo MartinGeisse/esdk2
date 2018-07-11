@@ -37,14 +37,6 @@ public final class RtlBitOperation extends RtlItem implements RtlBitSignal {
 		return rightOperand;
 	}
 
-	@Override
-	public void printVerilogExpression(VerilogExpressionWriter out) {
-		out.print(leftOperand, VerilogGenerator.VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
-		out.print(' ');
-		out.print(operator.getSymbol());
-		out.print(' ');
-		out.print(rightOperand, VerilogGenerator.VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
-	}
 
 	@Override
 	public boolean getValue() {
@@ -88,6 +80,19 @@ public final class RtlBitOperation extends RtlItem implements RtlBitSignal {
 			}
 		}
 
+	}
+
+	// ----------------------------------------------------------------------------------------------------------------
+	// Verilog generation
+	// ----------------------------------------------------------------------------------------------------------------
+
+	@Override
+	public void printVerilogExpression(VerilogExpressionWriter out) {
+		out.print(leftOperand, VerilogGenerator.VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
+		out.print(' ');
+		out.print(operator.getSymbol());
+		out.print(' ');
+		out.print(rightOperand, VerilogGenerator.VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
 	}
 
 }

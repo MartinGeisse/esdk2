@@ -25,6 +25,24 @@ public abstract class RtlPin extends RtlItem {
 		key.valid = false;
 	}
 
+	/**
+	 * This class is used to ensure that
+	 * {@link RtlRealm#registerClockNetwork(RtlClockNetwork.RealmRegistrationKey, RtlClockNetwork)} isn't called
+	 * except through the {@link RtlClockNetwork} constructor.
+	 */
+	public static final class RealmRegistrationKey {
+
+		private boolean valid = true;
+
+		private RealmRegistrationKey() {
+		}
+
+		public boolean isValid() {
+			return valid;
+		}
+
+	}
+
 	public String getId() {
 		return id;
 	}
@@ -45,28 +63,14 @@ public abstract class RtlPin extends RtlItem {
 		return "pin" + id;
 	}
 
+	// ----------------------------------------------------------------------------------------------------------------
+	// Verilog generation
+	// ----------------------------------------------------------------------------------------------------------------
+
 	public abstract String getVerilogDirectionKeyword();
 
 	public void writeModuleLocalDeclarations(VerilogWriter out) {
 		// TODO
-	}
-
-	/**
-	 * This class is used to ensure that
-	 * {@link RtlRealm#registerClockNetwork(RtlClockNetwork.RealmRegistrationKey, RtlClockNetwork)} isn't called
-	 * except through the {@link RtlClockNetwork} constructor.
-	 */
-	public static final class RealmRegistrationKey {
-
-		private boolean valid = true;
-
-		private RealmRegistrationKey() {
-		}
-
-		public boolean isValid() {
-			return valid;
-		}
-
 	}
 
 }

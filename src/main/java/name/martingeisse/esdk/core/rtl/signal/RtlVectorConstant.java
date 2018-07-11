@@ -36,6 +36,10 @@ public final class RtlVectorConstant extends RtlItem implements RtlVectorSignal 
 		return value;
 	}
 
+	// ----------------------------------------------------------------------------------------------------------------
+	// Verilog generation
+	// ----------------------------------------------------------------------------------------------------------------
+
 	@Override
 	public boolean compliesWith(VerilogGenerator.VerilogExpressionNesting nesting) {
 		return true;
