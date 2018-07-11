@@ -9,6 +9,10 @@ package name.martingeisse.esdk.core.rtl.statement;
  */
 public interface RtlBitAssignmentTarget extends RtlAssignmentTarget {
 
+	// ----------------------------------------------------------------------------------------------------------------
+	// simulation
+	// ----------------------------------------------------------------------------------------------------------------
+
 	void setNextValue(boolean nextValue);
 
 }

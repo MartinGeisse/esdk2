@@ -18,10 +18,19 @@ public abstract class RtlStatement extends RtlItem {
 		super(realm);
 	}
 
+	// ----------------------------------------------------------------------------------------------------------------
+	// simulation
+	// ----------------------------------------------------------------------------------------------------------------
+
+	public abstract void execute();
+
+	// ----------------------------------------------------------------------------------------------------------------
+	// Verilog generation
+	// ----------------------------------------------------------------------------------------------------------------
+
 	public abstract void printExpressionsDryRun(VerilogExpressionWriter expressionWriter);
 
 	public abstract void printVerilogStatements(VerilogWriter out);
 
-	public abstract void execute();
 
 }

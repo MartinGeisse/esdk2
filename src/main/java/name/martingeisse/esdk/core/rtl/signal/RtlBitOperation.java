@@ -4,10 +4,10 @@
  */
 package name.martingeisse.esdk.core.rtl.signal;
 
-import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.RtlItem;
-import name.martingeisse.esdk.core.rtl.verilog.VerilogGenerator;
+import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
+import name.martingeisse.esdk.core.rtl.verilog.VerilogGenerator;
 
 /**
  *
@@ -37,12 +37,6 @@ public final class RtlBitOperation extends RtlItem implements RtlBitSignal {
 		return rightOperand;
 	}
 
-
-	@Override
-	public boolean getValue() {
-		return operator.evaluate(leftOperand.getValue(), rightOperand.getValue());
-	}
-
 	public enum Operator {
 		AND("&"),
 		OR("|"),
@@ -58,6 +52,10 @@ public final class RtlBitOperation extends RtlItem implements RtlBitSignal {
 		public String getSymbol() {
 			return symbol;
 		}
+
+		// ------------------------------------------------------------------------------------------------------------
+		// simulation
+		// ------------------------------------------------------------------------------------------------------------
 
 		public boolean evaluate(boolean leftOperand, boolean rightOperand) {
 			switch (this) {
@@ -80,6 +78,15 @@ public final class RtlBitOperation extends RtlItem implements RtlBitSignal {
 			}
 		}
 
+	}
+
+	// ----------------------------------------------------------------------------------------------------------------
+	// simulation
+	// ----------------------------------------------------------------------------------------------------------------
+
+	@Override
+	public boolean getValue() {
+		return operator.evaluate(leftOperand.getValue(), rightOperand.getValue());
 	}
 
 	// ----------------------------------------------------------------------------------------------------------------

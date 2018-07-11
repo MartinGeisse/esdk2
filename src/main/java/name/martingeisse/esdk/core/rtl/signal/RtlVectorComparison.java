@@ -4,10 +4,10 @@
  */
 package name.martingeisse.esdk.core.rtl.signal;
 
-import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.RtlItem;
-import name.martingeisse.esdk.core.rtl.verilog.VerilogGenerator;
+import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
+import name.martingeisse.esdk.core.rtl.verilog.VerilogGenerator;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 
 /**
@@ -41,11 +41,6 @@ public final class RtlVectorComparison extends RtlItem implements RtlBitSignal {
 		return rightOperand;
 	}
 
-	@Override
-	public boolean getValue() {
-		return operator.evaluate(leftOperand.getValue(), rightOperand.getValue());
-	}
-
 	public enum Operator {
 		EQUAL("=="),
 		NOT_EQUAL("!="),
@@ -63,6 +58,10 @@ public final class RtlVectorComparison extends RtlItem implements RtlBitSignal {
 		public String getSymbol() {
 			return symbol;
 		}
+
+		// ------------------------------------------------------------------------------------------------------------
+		// simulation
+		// ------------------------------------------------------------------------------------------------------------
 
 		public boolean evaluate(VectorValue leftOperand, VectorValue rightOperand) {
 			switch (this) {
@@ -97,6 +96,15 @@ public final class RtlVectorComparison extends RtlItem implements RtlBitSignal {
 			return raw == 0 ? equal : (raw < 0) == less;
 		}
 
+	}
+
+	// ----------------------------------------------------------------------------------------------------------------
+	// simulation
+	// ----------------------------------------------------------------------------------------------------------------
+
+	@Override
+	public boolean getValue() {
+		return operator.evaluate(leftOperand.getValue(), rightOperand.getValue());
 	}
 
 	// ----------------------------------------------------------------------------------------------------------------

@@ -4,10 +4,10 @@
  */
 package name.martingeisse.esdk.core.rtl.signal;
 
-import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.RtlItem;
-import name.martingeisse.esdk.core.rtl.verilog.VerilogGenerator;
+import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
+import name.martingeisse.esdk.core.rtl.verilog.VerilogGenerator;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 
 /**
@@ -47,11 +47,6 @@ public final class RtlVectorOperation extends RtlItem implements RtlVectorSignal
 		return leftOperand.getWidth();
 	}
 
-	@Override
-	public VectorValue getValue() {
-		return operator.evaluate(leftOperand.getValue(), rightOperand.getValue());
-	}
-
 	public enum Operator {
 		ADD("+"),
 		SUBTRACT("-"),
@@ -69,6 +64,10 @@ public final class RtlVectorOperation extends RtlItem implements RtlVectorSignal
 		public String getSymbol() {
 			return symbol;
 		}
+
+		// ------------------------------------------------------------------------------------------------------------
+		// simulation
+		// ------------------------------------------------------------------------------------------------------------
 
 		public VectorValue evaluate(VectorValue leftOperand, VectorValue rightOperand) {
 			switch (this) {
@@ -96,6 +95,15 @@ public final class RtlVectorOperation extends RtlItem implements RtlVectorSignal
 
 			}
 		}
+	}
+
+	// ----------------------------------------------------------------------------------------------------------------
+	// simulation
+	// ----------------------------------------------------------------------------------------------------------------
+
+	@Override
+	public VectorValue getValue() {
+		return operator.evaluate(leftOperand.getValue(), rightOperand.getValue());
 	}
 
 	// ----------------------------------------------------------------------------------------------------------------

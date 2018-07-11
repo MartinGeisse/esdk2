@@ -71,9 +71,17 @@ public final class RtlRealm extends Item {
 		return clockedBlocks;
 	}
 
+	// ----------------------------------------------------------------------------------------------------------------
+	// factory methods
+	// ----------------------------------------------------------------------------------------------------------------
+
 	public RtlClockNetwork createClockNetwork(RtlBitSignal clockSignal) {
 		return new RtlClockNetwork(this, clockSignal);
 	}
+
+	// ----------------------------------------------------------------------------------------------------------------
+	// simulation
+	// ----------------------------------------------------------------------------------------------------------------
 
 	@Override
 	protected void initializeSimulation() {

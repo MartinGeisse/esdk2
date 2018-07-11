@@ -14,6 +14,10 @@ public final class RtlSettableBitSignal extends RtlSettableSignal implements Rtl
 		super(realm);
 	}
 
+	// ----------------------------------------------------------------------------------------------------------------
+	// simulation
+	// ----------------------------------------------------------------------------------------------------------------
+
 	@Override
 	public boolean getValue() {
 		return value;

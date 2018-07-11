@@ -33,6 +33,10 @@ public final class RtlBitAssignment extends RtlAssignment {
 		return source;
 	}
 
+	// ----------------------------------------------------------------------------------------------------------------
+	// simulation
+	// ----------------------------------------------------------------------------------------------------------------
+
 	@Override
 	public void execute() {
 		destination.setNextValue(source.getValue());

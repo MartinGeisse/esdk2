@@ -13,6 +13,10 @@ public interface RtlVectorAssignmentTarget extends RtlAssignmentTarget {
 
 	int getWidth();
 
+	// ----------------------------------------------------------------------------------------------------------------
+	// simulation
+	// ----------------------------------------------------------------------------------------------------------------
+
 	void setNextValue(VectorValue nextValue);
 
 }

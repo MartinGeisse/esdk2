@@ -36,6 +36,10 @@ public final class RtlIndexSelection extends RtlItem implements RtlBitSignal {
 		return indexSignal;
 	}
 
+	// ----------------------------------------------------------------------------------------------------------------
+	// simulation
+	// ----------------------------------------------------------------------------------------------------------------
+
 	@Override
 	public boolean getValue() {
 		return containerSignal.getValue().select(indexSignal.getValue().getAsUnsignedInt());

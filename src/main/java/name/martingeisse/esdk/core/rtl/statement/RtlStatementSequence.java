@@ -35,6 +35,10 @@ public class RtlStatementSequence extends RtlStatement {
 		statements.add(statement);
 	}
 
+	// ----------------------------------------------------------------------------------------------------------------
+	// factory methods
+	// ----------------------------------------------------------------------------------------------------------------
+
 	public final RtlBitAssignment assign(RtlBitAssignmentTarget destination, RtlBitSignal source) {
 		RtlBitAssignment assignment = new RtlBitAssignment(getRealm(), destination, source);
 		addStatement(assignment);
@@ -70,6 +74,21 @@ public class RtlStatementSequence extends RtlStatement {
 		return whenStatement;
 	}
 
+	// ----------------------------------------------------------------------------------------------------------------
+	// simulation
+	// ----------------------------------------------------------------------------------------------------------------
+
+	@Override
+	public void execute() {
+		for (RtlStatement statement : statements) {
+			statement.execute();
+		}
+	}
+
+	// ----------------------------------------------------------------------------------------------------------------
+	// Verilog generation
+	// ----------------------------------------------------------------------------------------------------------------
+
 	@Override
 	public void printExpressionsDryRun(VerilogExpressionWriter expressionWriter) {
 		for (RtlStatement statement : statements) {
@@ -81,13 +100,6 @@ public class RtlStatementSequence extends RtlStatement {
 	public void printVerilogStatements(VerilogWriter out) {
 		for (RtlStatement statement : statements) {
 			statement.printVerilogStatements(out);
-		}
-	}
-
-	@Override
-	public void execute() {
-		for (RtlStatement statement : statements) {
-			statement.execute();
 		}
 	}
 

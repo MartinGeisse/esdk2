@@ -5,10 +5,10 @@
 package name.martingeisse.esdk.core.rtl.signal;
 
 import com.google.common.collect.ImmutableList;
-import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.RtlItem;
-import name.martingeisse.esdk.core.rtl.verilog.VerilogGenerator;
+import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
+import name.martingeisse.esdk.core.rtl.verilog.VerilogGenerator;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 
 /**
@@ -56,6 +56,10 @@ public final class RtlConcatenation extends RtlItem implements RtlVectorSignal {
 	public int getWidth() {
 		return width;
 	}
+
+	// ----------------------------------------------------------------------------------------------------------------
+	// simulation
+	// ----------------------------------------------------------------------------------------------------------------
 
 	@Override
 	public VectorValue getValue() {

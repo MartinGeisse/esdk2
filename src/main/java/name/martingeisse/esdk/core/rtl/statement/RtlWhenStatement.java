@@ -6,8 +6,8 @@ package name.martingeisse.esdk.core.rtl.statement;
 
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
-import name.martingeisse.esdk.core.rtl.verilog.VerilogGenerator;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
+import name.martingeisse.esdk.core.rtl.verilog.VerilogGenerator;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogWriter;
 
 /**
@@ -34,6 +34,23 @@ public final class RtlWhenStatement extends RtlStatement {
 		return otherwiseBranch;
 	}
 
+	// ----------------------------------------------------------------------------------------------------------------
+	// simulation
+	// ----------------------------------------------------------------------------------------------------------------
+
+	@Override
+	public void execute() {
+		if (condition.getValue()) {
+			thenBranch.execute();
+		} else {
+			otherwiseBranch.execute();
+		}
+	}
+
+	// ----------------------------------------------------------------------------------------------------------------
+	// Verilog generation
+	// ----------------------------------------------------------------------------------------------------------------
+
 	@Override
 	public void printExpressionsDryRun(VerilogExpressionWriter expressionWriter) {
 		expressionWriter.print(condition, VerilogGenerator.VerilogExpressionNesting.ALL);
@@ -59,15 +76,6 @@ public final class RtlWhenStatement extends RtlStatement {
 		out.endIndentation();
 		out.indent();
 		out.getOut().println("end");
-	}
-
-	@Override
-	public void execute() {
-		if (condition.getValue()) {
-			thenBranch.execute();
-		} else {
-			otherwiseBranch.execute();
-		}
 	}
 
 }

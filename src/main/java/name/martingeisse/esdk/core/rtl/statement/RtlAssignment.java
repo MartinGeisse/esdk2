@@ -22,6 +22,10 @@ public abstract class RtlAssignment extends RtlStatement {
 	public abstract RtlAssignmentTarget getDestination();
 	public abstract RtlSignal getSource();
 
+	// ----------------------------------------------------------------------------------------------------------------
+	// Verilog generation
+	// ----------------------------------------------------------------------------------------------------------------
+
 	@Override
 	public void printExpressionsDryRun(VerilogExpressionWriter expressionWriter) {
 		expressionWriter.print(getSource(), VerilogGenerator.VerilogExpressionNesting.ALL);

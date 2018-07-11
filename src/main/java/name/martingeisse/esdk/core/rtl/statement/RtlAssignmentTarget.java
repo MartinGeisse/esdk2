@@ -12,6 +12,10 @@ import name.martingeisse.esdk.core.rtl.verilog.VerilogWriter;
  */
 public interface RtlAssignmentTarget extends RtlItemOwned {
 
+	// ----------------------------------------------------------------------------------------------------------------
+	// Verilog generation
+	// ----------------------------------------------------------------------------------------------------------------
+
 	/**
 	 * Writes a Verilog assignment target for this assignment target.
 	 */

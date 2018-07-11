@@ -4,24 +4,24 @@
  */
 package name.martingeisse.esdk.core.rtl.signal;
 
-import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.RtlItem;
-import name.martingeisse.esdk.core.rtl.verilog.VerilogGenerator;
+import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
+import name.martingeisse.esdk.core.rtl.verilog.VerilogGenerator;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 
 /**
  * This class implements shift operators. It is separate from {@link RtlVectorOperation} because it has different
  * width constraints on the right operand.
- *
+ * <p>
  * Shifts the left operand right or left by the number of bits indicated by the right operand. The left operand is
  * interpreted as a bit pattern and therefore has no notion of signedness. The right operand is always unsigned,
  * so a "right shift" never shifts left due to a negative shift amount.
- *
+ * <p>
  * Shifted-in bits are 0 in all cases. To shift in ones, double the width of the left operand and fill the new bits with
  * 1. To implement the typical "signed right shift" case, double the width of the left operand and fill the new bits
  * with the previous most significant bit (a.k.a. sign extension).
- *
+ * <p>
  * The result width is equal to the width of the left operand. The width of the right operand must ensure that the
  * left operand cannot be fully shifted-out. Formally, if the width of the right operand is R, then the width of the
  * left operand must be at least 2^R. This sidesteps the question of whether a large shift amount is truncated to a
@@ -61,21 +61,6 @@ public final class RtlShiftOperation extends RtlItem implements RtlVectorSignal 
 		return leftOperand.getWidth();
 	}
 
-	@Override
-	public VectorValue getValue() {
-		switch (direction) {
-
-			case LEFT:
-				return leftOperand.getValue().shiftLeft(rightOperand.getValue().getAsUnsignedInt());
-
-			case RIGHT:
-				return leftOperand.getValue().shiftRight(rightOperand.getValue().getAsUnsignedInt());
-
-			default:
-				throw new UnsupportedOperationException();
-		}
-	}
-
 	public enum Direction {
 		LEFT("<<"),
 		RIGHT(">>");
@@ -90,6 +75,25 @@ public final class RtlShiftOperation extends RtlItem implements RtlVectorSignal 
 			return symbol;
 		}
 
+	}
+
+	// ----------------------------------------------------------------------------------------------------------------
+	// simulation
+	// ----------------------------------------------------------------------------------------------------------------
+
+	@Override
+	public VectorValue getValue() {
+		switch (direction) {
+
+			case LEFT:
+				return leftOperand.getValue().shiftLeft(rightOperand.getValue().getAsUnsignedInt());
+
+			case RIGHT:
+				return leftOperand.getValue().shiftRight(rightOperand.getValue().getAsUnsignedInt());
+
+			default:
+				throw new UnsupportedOperationException();
+		}
 	}
 
 	// ----------------------------------------------------------------------------------------------------------------

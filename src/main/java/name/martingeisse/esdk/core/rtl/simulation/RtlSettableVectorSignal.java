@@ -23,6 +23,10 @@ public final class RtlSettableVectorSignal extends RtlSettableSignal implements 
 		return width;
 	}
 
+	// ----------------------------------------------------------------------------------------------------------------
+	// simulation
+	// ----------------------------------------------------------------------------------------------------------------
+
 	@Override
 	public VectorValue getValue() {
 		return value;
@@ -32,4 +36,5 @@ public final class RtlSettableVectorSignal extends RtlSettableSignal implements 
 		this.value = value;
 		// TODO notify RTL simulation core
 	}
+
 }
