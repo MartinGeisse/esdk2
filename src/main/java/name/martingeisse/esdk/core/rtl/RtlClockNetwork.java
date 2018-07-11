@@ -15,13 +15,13 @@ public final class RtlClockNetwork extends RtlItem {
 
 	private final RtlBitSignal clockSignal;
 
-	public RtlClockNetwork(RtlRegion region, RtlBitSignal clockSignal) {
-		super(region);
-		checkSameRegion(clockSignal);
+	public RtlClockNetwork(RtlRealm realm, RtlBitSignal clockSignal) {
+		super(realm);
+		checkSameRealm(clockSignal);
 		this.clockSignal = clockSignal;
 
-		RegionRegistrationKey key = new RegionRegistrationKey();
-		region.registerClockNetwork(key, this);
+		RealmRegistrationKey key = new RealmRegistrationKey();
+		realm.registerClockNetwork(key, this);
 		key.valid = false;
 	}
 
@@ -30,18 +30,18 @@ public final class RtlClockNetwork extends RtlItem {
 	}
 
 	public RtlClockedBlock createBlock() {
-		return new RtlClockedBlock(getRegion(), this);
+		return new RtlClockedBlock(getRealm(), this);
 	}
 
 	/**
-	 * This class is used to ensure that {@link RtlRegion#registerPin(RtlPin.RegionRegistrationKey, RtlPin)} isn't called except through the
+	 * This class is used to ensure that {@link RtlRealm#registerPin(RtlPin.RealmRegistrationKey, RtlPin)} isn't called except through the
 	 * {@link RtlPin} constructor.
 	 */
-	public static final class RegionRegistrationKey {
+	public static final class RealmRegistrationKey {
 
 		private boolean valid = true;
 
-		private RegionRegistrationKey() {
+		private RealmRegistrationKey() {
 		}
 
 		public boolean isValid() {

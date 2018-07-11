@@ -4,7 +4,7 @@
  */
 package name.martingeisse.esdk.core.rtl.statement;
 
-import name.martingeisse.esdk.core.rtl.RtlRegion;
+import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 
 /**
@@ -15,10 +15,10 @@ public final class RtlBitAssignment extends RtlAssignment {
 	private final RtlBitAssignmentTarget destination;
 	private final RtlBitSignal source;
 
-	public RtlBitAssignment(RtlRegion region, RtlBitAssignmentTarget destination, RtlBitSignal source) {
-		super(region);
-		checkSameRegion(destination);
-		checkSameRegion(source);
+	public RtlBitAssignment(RtlRealm realm, RtlBitAssignmentTarget destination, RtlBitSignal source) {
+		super(realm);
+		checkSameRealm(destination);
+		checkSameRealm(source);
 		this.destination = destination;
 		this.source = source;
 	}

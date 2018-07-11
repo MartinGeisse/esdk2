@@ -4,7 +4,7 @@
  */
 package name.martingeisse.esdk.core.rtl.signal;
 
-import name.martingeisse.esdk.core.rtl.RtlRegion;
+import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogGenerator;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
@@ -17,10 +17,10 @@ public final class RtlIndexSelection extends RtlItem implements RtlBitSignal {
 	private final RtlVectorSignal containerSignal;
 	private final RtlVectorSignal indexSignal;
 
-	public RtlIndexSelection(RtlRegion region, RtlVectorSignal containerSignal, RtlVectorSignal indexSignal) {
-		super(region);
-		checkSameRegion(containerSignal);
-		checkSameRegion(indexSignal);
+	public RtlIndexSelection(RtlRealm realm, RtlVectorSignal containerSignal, RtlVectorSignal indexSignal) {
+		super(realm);
+		checkSameRealm(containerSignal);
+		checkSameRealm(indexSignal);
 		if (containerSignal.getWidth() < (1 << indexSignal.getWidth())) {
 			throw new IllegalArgumentException("container of width " + containerSignal.getWidth() + " is too small for index of width " + indexSignal.getWidth());
 		}

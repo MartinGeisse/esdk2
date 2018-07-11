@@ -4,9 +4,8 @@
  */
 package name.martingeisse.esdk.core.rtl.pin;
 
-import name.martingeisse.esdk.core.rtl.RtlRegion;
+import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
-import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
 import name.martingeisse.esdk.core.rtl.simulation.RtlSettableBitSignal;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
 
@@ -19,9 +18,9 @@ public final class RtlBidirectionalPin extends RtlPin implements RtlBitSignal {
 	private RtlBitSignal outputSignal;
 	private RtlBitSignal outputEnableSignal;
 
-	public RtlBidirectionalPin(RtlRegion region) {
-		super(region);
-		this.settableInputBitSignal = new RtlSettableBitSignal(region);
+	public RtlBidirectionalPin(RtlRealm realm) {
+		super(realm);
+		this.settableInputBitSignal = new RtlSettableBitSignal(realm);
 	}
 
 	public RtlSettableBitSignal getSettableInputBitSignal() {

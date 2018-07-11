@@ -5,7 +5,7 @@
 package name.martingeisse.esdk.core.rtl.pin;
 
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
-import name.martingeisse.esdk.core.rtl.RtlRegion;
+import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogWriter;
 
@@ -17,11 +17,11 @@ public abstract class RtlPin extends RtlItem {
 	private String id;
 	private RtlPinConfiguration configuration;
 
-	public RtlPin(RtlRegion region) {
-		super(region);
+	public RtlPin(RtlRealm realm) {
+		super(realm);
 
-		RegionRegistrationKey key = new RegionRegistrationKey();
-		region.registerPin(key, this);
+		RealmRegistrationKey key = new RealmRegistrationKey();
+		realm.registerPin(key, this);
 		key.valid = false;
 	}
 
@@ -53,14 +53,14 @@ public abstract class RtlPin extends RtlItem {
 
 	/**
 	 * This class is used to ensure that
-	 * {@link RtlRegion#registerClockNetwork(RtlClockNetwork.RegionRegistrationKey, RtlClockNetwork)} isn't called
+	 * {@link RtlRealm#registerClockNetwork(RtlClockNetwork.RealmRegistrationKey, RtlClockNetwork)} isn't called
 	 * except through the {@link RtlClockNetwork} constructor.
 	 */
-	public static final class RegionRegistrationKey {
+	public static final class RealmRegistrationKey {
 
 		private boolean valid = true;
 
-		private RegionRegistrationKey() {
+		private RealmRegistrationKey() {
 		}
 
 		public boolean isValid() {

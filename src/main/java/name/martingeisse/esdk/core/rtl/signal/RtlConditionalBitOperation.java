@@ -4,7 +4,7 @@
  */
 package name.martingeisse.esdk.core.rtl.signal;
 
-import name.martingeisse.esdk.core.rtl.RtlRegion;
+import name.martingeisse.esdk.core.rtl.RtlRealm;
 
 /**
  *
@@ -14,8 +14,8 @@ public final class RtlConditionalBitOperation extends RtlConditionalOperation im
 	private final RtlBitSignal onTrue;
 	private final RtlBitSignal onFalse;
 
-	public RtlConditionalBitOperation(RtlRegion region, RtlBitSignal condition, RtlBitSignal onTrue, RtlBitSignal onFalse) {
-		super(region, condition);
+	public RtlConditionalBitOperation(RtlRealm realm, RtlBitSignal condition, RtlBitSignal onTrue, RtlBitSignal onFalse) {
+		super(realm, condition);
 		this.onTrue = onTrue;
 		this.onFalse = onFalse;
 	}

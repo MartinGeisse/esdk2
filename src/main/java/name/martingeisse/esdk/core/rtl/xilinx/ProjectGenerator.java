@@ -4,7 +4,7 @@
  */
 package name.martingeisse.esdk.core.rtl.xilinx;
 
-import name.martingeisse.esdk.core.rtl.RtlRegion;
+import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.pin.RtlPin;
 import name.martingeisse.esdk.core.rtl.pin.RtlPinConfiguration;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogGenerator;
@@ -20,14 +20,14 @@ import java.util.function.Consumer;
  */
 public class ProjectGenerator {
 
-	private final RtlRegion region;
+	private final RtlRealm realm;
 	private final String name;
 	private final File outputFolder;
 	private final String fpgaPartId;
 	private final List<String> additionalUcfLines = new ArrayList<>();
 
-	public ProjectGenerator(RtlRegion region, String name, File outputFolder, String fpgaPartId) {
-		this.region = region;
+	public ProjectGenerator(RtlRealm realm, String name, File outputFolder, String fpgaPartId) {
+		this.realm = realm;
 		this.name = name;
 		this.outputFolder = outputFolder;
 		this.fpgaPartId = fpgaPartId;
@@ -41,7 +41,7 @@ public class ProjectGenerator {
 		outputFolder.mkdirs();
 
 		generateFile(name + ".v", out -> {
-			new VerilogGenerator(out, region, name).generate();
+			new VerilogGenerator(out, realm, name).generate();
 		});
 
 		generateFile("environment.sh", out -> {
@@ -76,7 +76,7 @@ public class ProjectGenerator {
 		});
 
 		generateFile("build.ucf", out -> {
-			for (RtlPin pin : region.getPins()) {
+			for (RtlPin pin : realm.getPins()) {
 				RtlPinConfiguration pinConfiguration = pin.getConfiguration();
 				if (!(pinConfiguration instanceof XilinxPinConfiguration)) {
 					throw new RuntimeException("cannot process pin configuration (not a XilinxPinConfiguration): " + pinConfiguration);

@@ -9,22 +9,22 @@ package name.martingeisse.esdk.core.rtl;
  */
 public abstract class RtlItem implements RtlItemOwned {
 
-	private final RtlRegion region;
+	private final RtlRealm realm;
 
-	public RtlItem(RtlRegion region) {
-		this.region = region;
+	public RtlItem(RtlRealm realm) {
+		this.realm = realm;
 	}
 
-	public final RtlRegion getRegion() {
-		return region;
+	public final RtlRealm getRealm() {
+		return realm;
 	}
 
-	protected final void checkSameRegion(RtlItemOwned itemOwned) {
+	protected final void checkSameRealm(RtlItemOwned itemOwned) {
 		RtlItem item = itemOwned.getRtlItem();
-		if (item.getRegion() != region) {
+		if (item.getRealm() != realm) {
 			String argumentDescription = (item == itemOwned) ?
 				("item (" + item + ")") : ("object (" + itemOwned + " from item " + item + ")");
-			throw new IllegalArgumentException("the specified " + argumentDescription + " is not part of the same region as this item (" + this + ")");
+			throw new IllegalArgumentException("the specified " + argumentDescription + " is not part of the same realm as this item (" + this + ")");
 		}
 	}
 

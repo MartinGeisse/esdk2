@@ -4,7 +4,7 @@
  */
 package name.martingeisse.esdk.core.rtl.signal;
 
-import name.martingeisse.esdk.core.rtl.RtlRegion;
+import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogGenerator;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
@@ -19,8 +19,8 @@ public final class RtlVectorComparison extends RtlItem implements RtlBitSignal {
 	private final RtlVectorSignal leftOperand;
 	private final RtlVectorSignal rightOperand;
 
-	public RtlVectorComparison(RtlRegion region, Operator operator, RtlVectorSignal leftOperand, RtlVectorSignal rightOperand) {
-		super(region);
+	public RtlVectorComparison(RtlRealm realm, Operator operator, RtlVectorSignal leftOperand, RtlVectorSignal rightOperand) {
+		super(realm);
 		if (leftOperand.getWidth() != rightOperand.getWidth()) {
 			throw new IllegalArgumentException("operand width mismatch: " + leftOperand.getWidth() + " vs. " + rightOperand.getWidth());
 		}

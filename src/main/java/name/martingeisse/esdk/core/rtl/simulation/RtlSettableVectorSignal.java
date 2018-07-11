@@ -1,6 +1,6 @@
 package name.martingeisse.esdk.core.rtl.simulation;
 
-import name.martingeisse.esdk.core.rtl.RtlRegion;
+import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 
@@ -12,8 +12,8 @@ public final class RtlSettableVectorSignal extends RtlSettableSignal implements 
 	private final int width;
 	private VectorValue value;
 
-	public RtlSettableVectorSignal(RtlRegion region, int width) {
-		super(region);
+	public RtlSettableVectorSignal(RtlRealm realm, int width) {
+		super(realm);
 		this.width = width;
 		this.value = VectorValue.ofUnsigned(width, 0);
 	}

@@ -4,7 +4,7 @@
  */
 package name.martingeisse.esdk.core.rtl.block;
 
-import name.martingeisse.esdk.core.rtl.RtlRegion;
+import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
 import name.martingeisse.esdk.core.rtl.statement.RtlAssignmentTarget;
@@ -18,9 +18,9 @@ public abstract class RtlProceduralSignal extends RtlItem implements RtlSignal, 
 
 	private final RtlClockedBlock block;
 
-	public RtlProceduralSignal(RtlRegion region, RtlClockedBlock block) {
-		super(region);
-		checkSameRegion(block);
+	public RtlProceduralSignal(RtlRealm realm, RtlClockedBlock block) {
+		super(realm);
+		checkSameRealm(block);
 		this.block = block;
 		block.registerProceduralSignal(this);
 	}

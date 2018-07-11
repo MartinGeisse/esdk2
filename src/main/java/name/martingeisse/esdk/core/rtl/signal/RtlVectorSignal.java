@@ -20,15 +20,15 @@ public interface RtlVectorSignal extends RtlSignal {
 	//
 
 	default RtlBitSignal select(RtlVectorSignal index) {
-		return new RtlIndexSelection(getRtlItem().getRegion(), this, index);
+		return new RtlIndexSelection(getRtlItem().getRealm(), this, index);
 	}
 
 	default RtlBitSignal select(int index) {
-		return new RtlConstantIndexSelection(getRtlItem().getRegion(), this, index);
+		return new RtlConstantIndexSelection(getRtlItem().getRealm(), this, index);
 	}
 
 	default RtlVectorSignal select(int from, int to) {
-		return new RtlRangeSelection(getRtlItem().getRegion(), this, from, to);
+		return new RtlRangeSelection(getRtlItem().getRealm(), this, from, to);
 	}
 
 	//
@@ -36,11 +36,11 @@ public interface RtlVectorSignal extends RtlSignal {
 	//
 
 	default RtlVectorSignal operation(RtlVectorOperation.Operator operator, RtlVectorSignal rightOperand) {
-		return new RtlVectorOperation(getRtlItem().getRegion(), operator, this, rightOperand);
+		return new RtlVectorOperation(getRtlItem().getRealm(), operator, this, rightOperand);
 	}
 
 	default RtlVectorSignal operation(RtlVectorOperation.Operator operator, int rightOperand) {
-		return operation(operator, RtlVectorConstant.ofUnsigned(getRtlItem().getRegion(), getWidth(), rightOperand));
+		return operation(operator, RtlVectorConstant.ofUnsigned(getRtlItem().getRealm(), getWidth(), rightOperand));
 	}
 
 	default RtlVectorSignal add(RtlVectorSignal rightOperand) {
@@ -96,11 +96,11 @@ public interface RtlVectorSignal extends RtlSignal {
 	//
 
 	default RtlBitSignal comparison(RtlVectorComparison.Operator operator, RtlVectorSignal rightOperand) {
-		return new RtlVectorComparison(getRtlItem().getRegion(), operator, this, rightOperand);
+		return new RtlVectorComparison(getRtlItem().getRealm(), operator, this, rightOperand);
 	}
 
 	default RtlBitSignal comparison(RtlVectorComparison.Operator operator, int rightOperand) {
-		return comparison(operator, RtlVectorConstant.ofUnsigned(getRtlItem().getRegion(), getWidth(), rightOperand));
+		return comparison(operator, RtlVectorConstant.ofUnsigned(getRtlItem().getRealm(), getWidth(), rightOperand));
 	}
 
 	default RtlBitSignal compareEqual(RtlVectorSignal rightOperand) {

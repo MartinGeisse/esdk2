@@ -4,7 +4,7 @@
  */
 package name.martingeisse.esdk.core.rtl.signal;
 
-import name.martingeisse.esdk.core.rtl.RtlRegion;
+import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogGenerator;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
@@ -17,13 +17,13 @@ public final class RtlVectorConstant extends RtlItem implements RtlVectorSignal 
 
 	private final VectorValue value;
 
-	public RtlVectorConstant(RtlRegion region, VectorValue value) {
-		super(region);
+	public RtlVectorConstant(RtlRealm realm, VectorValue value) {
+		super(realm);
 		this.value = value;
 	}
 
-	public static RtlVectorConstant ofUnsigned(RtlRegion region, int width, int value) {
-		return new RtlVectorConstant(region, VectorValue.ofUnsigned(width, value));
+	public static RtlVectorConstant ofUnsigned(RtlRealm realm, int width, int value) {
+		return new RtlVectorConstant(realm, VectorValue.ofUnsigned(width, value));
 	}
 
 	@Override

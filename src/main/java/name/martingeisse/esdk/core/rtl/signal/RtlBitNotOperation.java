@@ -4,7 +4,7 @@
  */
 package name.martingeisse.esdk.core.rtl.signal;
 
-import name.martingeisse.esdk.core.rtl.RtlRegion;
+import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogGenerator;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
@@ -16,8 +16,8 @@ public final class RtlBitNotOperation extends RtlItem implements RtlBitSignal {
 
 	private final RtlBitSignal operand;
 
-	public RtlBitNotOperation(RtlRegion region, RtlBitSignal operand) {
-		super(region);
+	public RtlBitNotOperation(RtlRealm realm, RtlBitSignal operand) {
+		super(realm);
 		this.operand = operand;
 	}
 
