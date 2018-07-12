@@ -20,8 +20,7 @@ public abstract class RtlProceduralSignal extends RtlItem implements RtlSignal, 
 
 	public RtlProceduralSignal(RtlRealm realm, RtlClockedBlock block) {
 		super(realm);
-		checkSameRealm(block);
-		this.block = block;
+		this.block = checkSameRealm(block);
 		block.registerProceduralSignal(this);
 	}
 

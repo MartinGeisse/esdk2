@@ -19,13 +19,14 @@ public abstract class RtlItem implements RtlItemOwned {
 		return realm;
 	}
 
-	protected final void checkSameRealm(RtlItemOwned itemOwned) {
+	protected final <T extends RtlItemOwned> T checkSameRealm(T itemOwned) {
 		RtlItem item = itemOwned.getRtlItem();
 		if (item.getRealm() != realm) {
 			String argumentDescription = (item == itemOwned) ?
 				("item (" + item + ")") : ("object (" + itemOwned + " from item " + item + ")");
 			throw new IllegalArgumentException("the specified " + argumentDescription + " is not part of the same realm as this item (" + this + ")");
 		}
+		return itemOwned;
 	}
 
 	@Override

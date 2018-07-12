@@ -29,9 +29,8 @@ public final class RtlClockedBlock extends RtlItem {
 
 	public RtlClockedBlock(RtlRealm realm, RtlClockNetwork clockNetwork) {
 		super(realm);
-		checkSameRealm(clockNetwork);
 
-		this.clockNetwork = clockNetwork;
+		this.clockNetwork = checkSameRealm(clockNetwork);
 		this.proceduralSignals = new ArrayList<>();
 		this.initializerStatements = new RtlStatementSequence(realm);
 		this.statements = new RtlStatementSequence(realm);

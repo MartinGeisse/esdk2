@@ -40,8 +40,8 @@ public final class RtlShiftOperation extends RtlItem implements RtlVectorSignal 
 			throw new IllegalArgumentException("left shift operand too small: " + leftOperand.getWidth() + " for right operand width " + rightOperand.getWidth());
 		}
 		this.direction = direction;
-		this.leftOperand = leftOperand;
-		this.rightOperand = rightOperand;
+		this.leftOperand = checkSameRealm(leftOperand);
+		this.rightOperand = checkSameRealm(rightOperand);
 	}
 
 	public Direction getDirection() {

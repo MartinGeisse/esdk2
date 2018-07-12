@@ -18,7 +18,7 @@ public abstract class RtlConditionalOperation extends RtlItem implements RtlSign
 
 	public RtlConditionalOperation(RtlRealm realm, RtlBitSignal condition) {
 		super(realm);
-		this.condition = condition;
+		this.condition = checkSameRealm(condition);
 	}
 
 	public final RtlBitSignal getCondition() {

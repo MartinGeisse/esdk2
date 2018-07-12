@@ -20,8 +20,8 @@ public final class RtlConditionalVectorOperation extends RtlConditionalOperation
 		if (onTrue.getWidth() != onFalse.getWidth()) {
 			throw new IllegalArgumentException("onTrue has width " + onTrue.getWidth() + " but onFalse has width " + onFalse.getWidth());
 		}
-		this.onTrue = onTrue;
-		this.onFalse = onFalse;
+		this.onTrue = checkSameRealm(onTrue);
+		this.onFalse = checkSameRealm(onFalse);
 	}
 
 	public RtlVectorSignal getOnTrue() {

@@ -21,8 +21,8 @@ public final class RtlBitOperation extends RtlItem implements RtlBitSignal {
 	public RtlBitOperation(RtlRealm realm, Operator operator, RtlBitSignal leftOperand, RtlBitSignal rightOperand) {
 		super(realm);
 		this.operator = operator;
-		this.leftOperand = leftOperand;
-		this.rightOperand = rightOperand;
+		this.leftOperand = checkSameRealm(leftOperand);
+		this.rightOperand = checkSameRealm(rightOperand);
 	}
 
 	public Operator getOperator() {

@@ -17,13 +17,11 @@ public final class RtlVectorAssignment extends RtlAssignment {
 
 	public RtlVectorAssignment(RtlRealm realm, RtlVectorAssignmentTarget destination, RtlVectorSignal source) {
 		super(realm);
-		checkSameRealm(destination);
-		checkSameRealm(source);
 		if (destination.getWidth() != source.getWidth()) {
 			throw new IllegalArgumentException("destination width (" + destination.getWidth() + ") and source width (" + source.getWidth() + ") differ");
 		}
-		this.destination = destination;
-		this.source = source;
+		this.destination = checkSameRealm(destination);
+		this.source = checkSameRealm(source);
 	}
 
 	@Override

@@ -25,8 +25,8 @@ public final class RtlVectorComparison extends RtlItem implements RtlBitSignal {
 			throw new IllegalArgumentException("operand width mismatch: " + leftOperand.getWidth() + " vs. " + rightOperand.getWidth());
 		}
 		this.operator = operator;
-		this.leftOperand = leftOperand;
-		this.rightOperand = rightOperand;
+		this.leftOperand = checkSameRealm(leftOperand);
+		this.rightOperand = checkSameRealm(rightOperand);
 	}
 
 	public Operator getOperator() {

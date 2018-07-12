@@ -19,13 +19,11 @@ public final class RtlIndexSelection extends RtlItem implements RtlBitSignal {
 
 	public RtlIndexSelection(RtlRealm realm, RtlVectorSignal containerSignal, RtlVectorSignal indexSignal) {
 		super(realm);
-		checkSameRealm(containerSignal);
-		checkSameRealm(indexSignal);
 		if (containerSignal.getWidth() < (1 << indexSignal.getWidth())) {
 			throw new IllegalArgumentException("container of width " + containerSignal.getWidth() + " is too small for index of width " + indexSignal.getWidth());
 		}
-		this.containerSignal = containerSignal;
-		this.indexSignal = indexSignal;
+		this.containerSignal = checkSameRealm(containerSignal);
+		this.indexSignal = checkSameRealm(indexSignal);
 	}
 
 	public RtlVectorSignal getContainerSignal() {

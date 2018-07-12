@@ -17,10 +17,8 @@ public final class RtlBitAssignment extends RtlAssignment {
 
 	public RtlBitAssignment(RtlRealm realm, RtlBitAssignmentTarget destination, RtlBitSignal source) {
 		super(realm);
-		checkSameRealm(destination);
-		checkSameRealm(source);
-		this.destination = destination;
-		this.source = source;
+		this.destination = checkSameRealm(destination);
+		this.source = checkSameRealm(source);
 	}
 
 	@Override

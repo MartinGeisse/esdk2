@@ -17,8 +17,7 @@ public final class RtlClockNetwork extends RtlItem {
 
 	public RtlClockNetwork(RtlRealm realm, RtlBitSignal clockSignal) {
 		super(realm);
-		checkSameRealm(clockSignal);
-		this.clockSignal = clockSignal;
+		this.clockSignal = checkSameRealm(clockSignal);
 
 		RealmRegistrationKey key = new RealmRegistrationKey();
 		realm.registerClockNetwork(key, this);

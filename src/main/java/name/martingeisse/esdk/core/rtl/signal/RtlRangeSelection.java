@@ -21,12 +21,11 @@ public class RtlRangeSelection extends RtlItem implements RtlVectorSignal {
 
 	public RtlRangeSelection(RtlRealm realm, RtlVectorSignal containerSignal, int from, int to) {
 		super(realm);
-		checkSameRealm(containerSignal);
 		if (from < 0 || to < 0 || from >= containerSignal.getWidth() || to >= containerSignal.getWidth() || from < to) {
 			throw new IllegalArgumentException("invalid from/to indices for container width " +
 				containerSignal.getWidth() + ": from = " + from + ", to = " + to);
 		}
-		this.containerSignal = containerSignal;
+		this.containerSignal = checkSameRealm(containerSignal);
 		this.from = from;
 		this.to = to;
 	}

@@ -18,7 +18,7 @@ public final class RtlBitNotOperation extends RtlItem implements RtlBitSignal {
 
 	public RtlBitNotOperation(RtlRealm realm, RtlBitSignal operand) {
 		super(realm);
-		this.operand = operand;
+		this.operand = checkSameRealm(operand);
 	}
 
 	public RtlBitSignal getOperand() {

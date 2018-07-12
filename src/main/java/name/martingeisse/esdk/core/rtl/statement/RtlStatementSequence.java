@@ -31,8 +31,7 @@ public class RtlStatementSequence extends RtlStatement {
 	}
 
 	public final void addStatement(RtlStatement statement) {
-		checkSameRealm(statement);
-		statements.add(statement);
+		statements.add(checkSameRealm(statement));
 	}
 
 	// ----------------------------------------------------------------------------------------------------------------
