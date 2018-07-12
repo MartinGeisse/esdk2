@@ -23,7 +23,7 @@ public final class RtlOutputPin extends RtlPin {
 	}
 
 	public void setOutputSignal(RtlSignal outputSignal) {
-		this.outputSignal = outputSignal;
+		this.outputSignal = checkSameRealm(outputSignal);
 	}
 
 	// ----------------------------------------------------------------------------------------------------------------

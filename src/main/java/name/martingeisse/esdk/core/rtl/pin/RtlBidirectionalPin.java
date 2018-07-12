@@ -32,7 +32,7 @@ public final class RtlBidirectionalPin extends RtlPin implements RtlBitSignal {
 	}
 
 	public void setOutputSignal(RtlBitSignal outputSignal) {
-		this.outputSignal = outputSignal;
+		this.outputSignal = checkSameRealm(outputSignal);
 	}
 
 	public RtlBitSignal getOutputEnableSignal() {
@@ -40,7 +40,7 @@ public final class RtlBidirectionalPin extends RtlPin implements RtlBitSignal {
 	}
 
 	public void setOutputEnableSignal(RtlBitSignal outputEnableSignal) {
-		this.outputEnableSignal = outputEnableSignal;
+		this.outputEnableSignal = checkSameRealm(outputEnableSignal);
 	}
 
 	// ----------------------------------------------------------------------------------------------------------------
