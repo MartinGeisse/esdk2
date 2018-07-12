@@ -87,20 +87,15 @@ public final class RtlRealm extends Item {
 	protected void initializeSimulation() {
 	}
 
-	public void fireClockEdge(RtlClockNetwork clockNetwork) {
-		fire(() -> onClockEdge(clockNetwork), 0);
-	}
-
-	private void onClockEdge(RtlClockNetwork clockNetwork) {
+	void onClockEdge(RtlClockNetwork clockNetwork) {
 		for (RtlClockedBlock block : clockedBlocks) {
 			if (block.getClockNetwork() == clockNetwork) {
 				block.execute();
 			}
 		}
-		List<RtlProceduralSignal> changedSignals = new ArrayList<>();
 		for (RtlClockedBlock block : clockedBlocks) {
 			if (block.getClockNetwork() == clockNetwork) {
-				block.updateProceduralSignals(changedSignals);
+				block.updateProceduralSignals();
 			}
 		}
 	}

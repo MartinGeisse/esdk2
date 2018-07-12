@@ -7,7 +7,7 @@ package name.martingeisse.esdk.core.rtl.block;
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
-import name.martingeisse.esdk.core.rtl.statement.RtlStatementSequence;
+import name.martingeisse.esdk.core.rtl.block.statement.RtlStatementSequence;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogWriter;
 
 import java.util.ArrayList;
@@ -97,11 +97,9 @@ public final class RtlClockedBlock extends RtlItem {
 		statements.execute();
 	}
 
-	public void updateProceduralSignals(List<? super RtlProceduralSignal> changeCollector) {
+	public void updateProceduralSignals() {
 		for (RtlProceduralSignal signal : proceduralSignals) {
-			if (signal.updateValue()) {
-				changeCollector.add(signal);
-			}
+			signal.updateValue();
 		}
 	}
 

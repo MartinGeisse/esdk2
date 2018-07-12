@@ -7,7 +7,7 @@ package name.martingeisse.esdk.core.rtl.block;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
-import name.martingeisse.esdk.core.rtl.statement.RtlAssignmentTarget;
+import name.martingeisse.esdk.core.rtl.block.statement.RtlAssignmentTarget;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogWriter;
 
@@ -33,9 +33,9 @@ public abstract class RtlProceduralSignal extends RtlItem implements RtlSignal, 
 	// ----------------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Updates the value from the stored next value. Returns true if the value actually changed.
+	 * Updates the value from the stored next value.
 	 */
-	public abstract boolean updateValue();
+	abstract void updateValue();
 
 	// ----------------------------------------------------------------------------------------------------------------
 	// Verilog generation

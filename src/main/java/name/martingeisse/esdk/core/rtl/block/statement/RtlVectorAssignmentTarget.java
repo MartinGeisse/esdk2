@@ -2,17 +2,21 @@
  * Copyright (c) 2018 Martin Geisse
  * This file is distributed under the terms of the MIT license.
  */
-package name.martingeisse.esdk.core.rtl.statement;
+package name.martingeisse.esdk.core.rtl.block.statement;
+
+import name.martingeisse.esdk.core.util.vector.VectorValue;
 
 /**
  *
  */
-public interface RtlBitAssignmentTarget extends RtlAssignmentTarget {
+public interface RtlVectorAssignmentTarget extends RtlAssignmentTarget {
+
+	int getWidth();
 
 	// ----------------------------------------------------------------------------------------------------------------
 	// simulation
 	// ----------------------------------------------------------------------------------------------------------------
 
-	void setNextValue(boolean nextValue);
+	void setNextValue(VectorValue nextValue);
 
 }

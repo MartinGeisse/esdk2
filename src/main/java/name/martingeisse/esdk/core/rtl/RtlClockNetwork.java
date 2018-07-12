@@ -53,4 +53,14 @@ public final class RtlClockNetwork extends RtlItem {
 		return new RtlClockedBlock(getRealm(), this);
 	}
 
+	// ----------------------------------------------------------------------------------------------------------------
+	// simulation
+	// ----------------------------------------------------------------------------------------------------------------
+
+	public void fireClockEdge() {
+		fire(() -> {
+			getRealm().onClockEdge(this);
+		}, 0);
+	}
+
 }

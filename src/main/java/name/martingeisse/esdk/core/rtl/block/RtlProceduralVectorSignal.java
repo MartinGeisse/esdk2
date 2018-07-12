@@ -6,7 +6,7 @@ package name.martingeisse.esdk.core.rtl.block;
 
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
-import name.martingeisse.esdk.core.rtl.statement.RtlVectorAssignmentTarget;
+import name.martingeisse.esdk.core.rtl.block.statement.RtlVectorAssignmentTarget;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 
 /**
@@ -50,10 +50,8 @@ public final class RtlProceduralVectorSignal extends RtlProceduralSignal impleme
 	}
 
 	@Override
-	public boolean updateValue() {
-		boolean changed = !value.equals(nextValue);
+	void updateValue() {
 		value = nextValue;
-		return changed;
 	}
 
 }

@@ -4,7 +4,7 @@ import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.block.RtlProceduralSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
-import name.martingeisse.esdk.core.rtl.statement.RtlStatement;
+import name.martingeisse.esdk.core.rtl.block.statement.RtlStatement;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
 
 /**

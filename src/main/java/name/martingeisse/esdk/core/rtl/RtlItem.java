@@ -4,14 +4,17 @@
  */
 package name.martingeisse.esdk.core.rtl;
 
+import name.martingeisse.esdk.core.model.Item;
+
 /**
  *
  */
-public abstract class RtlItem implements RtlItemOwned {
+public abstract class RtlItem extends Item implements RtlItemOwned {
 
 	private final RtlRealm realm;
 
 	public RtlItem(RtlRealm realm) {
+		super(realm.getDesign());
 		this.realm = realm;
 	}
 

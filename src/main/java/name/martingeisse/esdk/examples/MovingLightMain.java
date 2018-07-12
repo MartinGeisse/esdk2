@@ -9,7 +9,7 @@ import name.martingeisse.esdk.core.rtl.pin.RtlInputPin;
 import name.martingeisse.esdk.core.rtl.pin.RtlOutputPin;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlConcatenation;
-import name.martingeisse.esdk.core.rtl.statement.RtlWhenStatement;
+import name.martingeisse.esdk.core.rtl.block.statement.RtlWhenStatement;
 import name.martingeisse.esdk.core.rtl.xilinx.ProjectGenerator;
 import name.martingeisse.esdk.core.rtl.xilinx.XilinxPinConfiguration;
 
