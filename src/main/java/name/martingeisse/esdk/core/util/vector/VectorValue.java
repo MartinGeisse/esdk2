@@ -8,6 +8,7 @@ import name.martingeisse.esdk.core.rtl.verilog.PrintWriterVerilogExpressionWrite
 import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
 
 import java.io.PrintWriter;
+import java.io.StringWriter;
 
 /**
  * Represents a bit vector with a specific width.
@@ -176,8 +177,18 @@ public abstract class VectorValue {
 	public void printVerilogExpression(VerilogExpressionWriter out) {
 		out.print(width);
 		out.print("'h");
+		printDigits(out);
 	}
 
 	protected abstract void printDigits(VerilogExpressionWriter out);
+
+	@Override
+	public String toString() {
+		StringWriter stringWriter = new StringWriter();
+		PrintWriter printWriter = new PrintWriter(stringWriter);
+		printVerilogExpression(printWriter);
+		printWriter.flush();
+		return stringWriter.toString();
+	}
 
 }

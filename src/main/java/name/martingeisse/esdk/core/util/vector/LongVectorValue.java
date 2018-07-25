@@ -127,7 +127,7 @@ public final class LongVectorValue extends VectorValue {
 
 	@Override
 	public VectorValue select(int from, int to) {
-		if (to < 0 || from < to || from <= getWidth()) {
+		if (to < 0 || from < to || from >= getWidth()) {
 			throw new IllegalArgumentException("invalid range [" + from + " .. " + to + "] for width " + getWidth());
 		}
 		int selectedWidth = from - to + 1;

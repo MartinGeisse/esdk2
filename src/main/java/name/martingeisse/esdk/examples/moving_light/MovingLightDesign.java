@@ -14,6 +14,7 @@ import name.martingeisse.esdk.core.rtl.pin.RtlInputPin;
 import name.martingeisse.esdk.core.rtl.pin.RtlOutputPin;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlConcatenation;
+import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.xilinx.XilinxPinConfiguration;
 
 /**
@@ -22,18 +23,23 @@ import name.martingeisse.esdk.core.rtl.xilinx.XilinxPinConfiguration;
 public class MovingLightDesign extends Design {
 
 	private final RtlRealm realm;
+	private final RtlClockNetwork clk;
+	private final RtlVectorSignal leds;
 
 	public MovingLightDesign() {
 		realm = new RtlRealm(this);
-		RtlClockNetwork clk = realm.createClockNetwork(clockPin(realm));
+		clk = realm.createClockNetwork(clockPin(realm));
 
 		RtlClockedBlock block = clk.createBlock();
+
+		TODO does not execute initializer statements
 
 		RtlProceduralVectorSignal prescaler = block.createVector(24);
 		block.getInitializerStatements().assignUnsigned(prescaler, 0);
 		block.getStatements().assign(prescaler, prescaler.add(1));
 
 		RtlProceduralVectorSignal leds = block.createVector(8);
+		this.leds = leds;
 		block.getInitializerStatements().assignUnsigned(leds, 1);
 		RtlWhenStatement whenPrescalerZero = block.getStatements().when(prescaler.compareEqual(0));
 		whenPrescalerZero.getThenBranch().assign(leds, new RtlConcatenation(realm,
@@ -53,6 +59,14 @@ public class MovingLightDesign extends Design {
 
 	public RtlRealm getRealm() {
 		return realm;
+	}
+
+	public RtlClockNetwork getClk() {
+		return clk;
+	}
+
+	public RtlVectorSignal getLeds() {
+		return leds;
 	}
 
 	private static RtlOutputPin ledPin(RtlRealm realm, String id, RtlBitSignal outputSignal) {

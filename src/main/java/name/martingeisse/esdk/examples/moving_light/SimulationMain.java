@@ -1,6 +1,5 @@
 package name.martingeisse.esdk.examples.moving_light;
 
-import name.martingeisse.esdk.core.model.Design;
 import name.martingeisse.esdk.core.model.Item;
 
 /**
@@ -16,10 +15,12 @@ public class SimulationMain {
 
 	private static class SimulationController extends Item {
 
+		private final MovingLightDesign design;
 		private int counter = 0;
 
-		public SimulationController(Design design) {
+		public SimulationController(MovingLightDesign design) {
 			super(design);
+			this.design = design;
 		}
 
 		@Override
@@ -28,7 +29,8 @@ public class SimulationMain {
 		}
 
 		private void callback() {
-			System.out.println("counter: " + counter);
+			design.getClk().fireClockEdge();
+			System.out.println(counter + ": " + design.getLeds().getValue());
 			counter++;
 			if (counter == 5) {
 				getDesign().stopSimulation();
