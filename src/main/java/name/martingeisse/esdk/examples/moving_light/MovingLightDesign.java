@@ -1,29 +1,30 @@
-package name.martingeisse.esdk.examples;
+/*
+ * Copyright (c) 2018 Martin Geisse
+ * This file is distributed under the terms of the MIT license.
+ */
+package name.martingeisse.esdk.examples.moving_light;
 
 import name.martingeisse.esdk.core.model.Design;
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.block.RtlClockedBlock;
 import name.martingeisse.esdk.core.rtl.block.RtlProceduralVectorSignal;
+import name.martingeisse.esdk.core.rtl.block.statement.RtlWhenStatement;
 import name.martingeisse.esdk.core.rtl.pin.RtlInputPin;
 import name.martingeisse.esdk.core.rtl.pin.RtlOutputPin;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlConcatenation;
-import name.martingeisse.esdk.core.rtl.block.statement.RtlWhenStatement;
-import name.martingeisse.esdk.core.rtl.xilinx.ProjectGenerator;
 import name.martingeisse.esdk.core.rtl.xilinx.XilinxPinConfiguration;
-
-import java.io.File;
 
 /**
  *
  */
-public class MovingLightMain {
+public class MovingLightDesign extends Design {
 
-	public static void main(String[] args) throws Exception {
+	private final RtlRealm realm;
 
-		Design design = new Design();
-		RtlRealm realm = new RtlRealm(design);
+	public MovingLightDesign() {
+		realm = new RtlRealm(this);
 		RtlClockNetwork clk = realm.createClockNetwork(clockPin(realm));
 
 		RtlClockedBlock block = clk.createBlock();
@@ -48,8 +49,10 @@ public class MovingLightMain {
 		ledPin(realm, "D11", leds.select(5));
 		ledPin(realm, "E9", leds.select(6));
 		ledPin(realm, "F9", leds.select(7));
+	}
 
-		new ProjectGenerator(realm, "MovingLight", new File("ise/moving_light"), "XC3S500E-FG320-4").generate();
+	public RtlRealm getRealm() {
+		return realm;
 	}
 
 	private static RtlOutputPin ledPin(RtlRealm realm, String id, RtlBitSignal outputSignal) {

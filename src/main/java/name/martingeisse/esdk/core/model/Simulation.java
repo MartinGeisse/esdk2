@@ -40,7 +40,7 @@ final class Simulation {
 		while (!stopped && !eventQueue.isEmpty()) {
 			now = eventQueue.peek().when;
 			batch.clear();
-			while (eventQueue.peek().when == now) {
+			while (!eventQueue.isEmpty() && eventQueue.peek().when == now) {
 				batch.add(eventQueue.remove());
 			}
 			for (ScheduledEvent event : batch) {
