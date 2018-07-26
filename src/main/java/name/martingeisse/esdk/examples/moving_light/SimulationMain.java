@@ -31,12 +31,14 @@ public class SimulationMain {
 
 		private void callback() {
 			design.getClk().fireClockEdge();
-			System.out.println(counter + ": " + design.getLeds().getValue());
+			if (counter % (2 * 1024 * 1024) == 0) {
+				System.out.println(counter + ": " + design.getLeds().getValue());
+			}
 			counter++;
-			if (counter == 5) {
+			if (counter == 1000 * 1024 * 1024) {
 				getDesign().stopSimulation();
 			} else {
-				fire(this::callback, 1000);
+				fire(this::callback, 10);
 			}
 		}
 
