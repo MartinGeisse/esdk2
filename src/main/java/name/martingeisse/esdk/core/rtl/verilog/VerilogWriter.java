@@ -106,7 +106,7 @@ public class VerilogWriter {
 	}
 
 	public void printOutro() {
-		out.println("endmodule;");
+		out.println("endmodule");
 		out.println();
 	}
 

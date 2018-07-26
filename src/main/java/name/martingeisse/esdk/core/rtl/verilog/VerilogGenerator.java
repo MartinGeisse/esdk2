@@ -49,6 +49,8 @@ public class VerilogGenerator {
 		out.getOut().println();
 		printBlocks();
 		out.getOut().println();
+		printPinAssignments();
+		out.getOut().println();
 		out.printOutro();
 	}
 
