@@ -85,6 +85,12 @@ public final class RtlRealm extends Item {
 
 	@Override
 	protected void initializeSimulation() {
+		for (RtlClockedBlock block : clockedBlocks) {
+			block.executeInitializer();
+		}
+		for (RtlClockedBlock block : clockedBlocks) {
+			block.updateProceduralSignals();
+		}
 	}
 
 	void onClockEdge(RtlClockNetwork clockNetwork) {

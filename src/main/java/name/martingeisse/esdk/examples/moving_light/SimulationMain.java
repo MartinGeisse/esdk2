@@ -1,6 +1,7 @@
 package name.martingeisse.esdk.examples.moving_light;
 
 import name.martingeisse.esdk.core.model.Item;
+import name.martingeisse.esdk.core.util.vector.VectorValue;
 
 /**
  *

@@ -193,9 +193,11 @@ public final class LongVectorValue extends VectorValue {
 
 	protected void printDigits(VerilogExpressionWriter out) {
 		int width = getWidth();
-		String zeros = StringUtils.repeat('0', width);
+		int printWidth = (width + 3) / 4;
+		String zeros = StringUtils.repeat('0', printWidth);
 		String digits = Long.toString(value, 16);
-		out.print((zeros + digits).substring(0, width));
+		String combined = zeros + digits;
+		out.print(combined.substring(combined.length() - printWidth));
 	}
 
 }

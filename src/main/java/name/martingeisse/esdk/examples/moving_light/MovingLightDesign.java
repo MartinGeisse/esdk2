@@ -32,8 +32,6 @@ public class MovingLightDesign extends Design {
 
 		RtlClockedBlock block = clk.createBlock();
 
-		TODO does not execute initializer statements
-
 		RtlProceduralVectorSignal prescaler = block.createVector(24);
 		block.getInitializerStatements().assignUnsigned(prescaler, 0);
 		block.getStatements().assign(prescaler, prescaler.add(1));
