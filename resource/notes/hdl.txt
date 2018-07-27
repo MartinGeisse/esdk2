@@ -13,6 +13,16 @@ This HDL would have to interact properly with
 - high-level objects
 - IntelliJ
 
-pro/con arguments:
-- non-HDL RTL code isn't that hard to write, but very hard to read (and code is written once, read many times)
-
+pro/con arguments w/r/t HDL:
+(+) non-HDL RTL code isn't that hard to write, but very hard to read (and code is written once,
+    read many times)
+(-) Java code can better handle a situation where a submodule has different implementations which
+    use the same interface
+    ... in general (HDL "interfaces" would have to be defined first)
+    ... when the implementations use different sets of ports *other* than the common interface
+        (e.g. RAMDAC: a real implementation would have RGB output, a simulated implementation
+        could drive a GUI window on the simulator machine and therefore not have RGB ports)
+(-) HDL would also have to accept interfaces for components that are not written in HDL (already
+    intended using the "native" keyword in MaHDL). Especially cumbersome when part of that is
+    parameterized and has to be "instantiated" through code generation for a particular set of
+    parameter values.
