@@ -18,6 +18,7 @@ public class SimulationMain {
 
 		private final MovingLightDesign design;
 		private int counter = 0;
+		private boolean slideSwitch = false;
 
 		public SimulationController(MovingLightDesign design) {
 			super(design);
@@ -35,6 +36,10 @@ public class SimulationMain {
 				System.out.println(counter + ": " + design.getLeds().getValue());
 			}
 			counter++;
+			if (counter == 150_000_000) {
+				slideSwitch = !slideSwitch;
+				design.getSlideSwitch().getSettableBitSignal().setValue(slideSwitch);
+			}
 			if (counter == 1000 * 1024 * 1024) {
 				getDesign().stopSimulation();
 			} else {

@@ -17,6 +17,7 @@ public final class XilinxPinConfiguration extends RtlPinConfiguration {
 	private String iostandard;
 	private Integer drive;
 	private Slew slew;
+	private String[] additionalInfo;
 
 	public String getIostandard() {
 		return iostandard;
@@ -42,6 +43,14 @@ public final class XilinxPinConfiguration extends RtlPinConfiguration {
 		this.slew = slew;
 	}
 
+	public String[] getAdditionalInfo() {
+		return additionalInfo;
+	}
+
+	public void setAdditionalInfo(String... additionalInfo) {
+		this.additionalInfo = additionalInfo;
+	}
+
 	public void writeUcf(RtlPin pin, PrintWriter out) {
 		out.print("NET \"");
 		out.print(pin.getNetName());
@@ -62,6 +71,11 @@ public final class XilinxPinConfiguration extends RtlPinConfiguration {
 			out.print("| SLEW = ");
 			out.print(slew);
 			out.print(" ");
+		}
+		for (String s : additionalInfo) {
+			out.print("| ");
+			out.print(s);
+			out.print(' ');
 		}
 		out.println(";");
 	}

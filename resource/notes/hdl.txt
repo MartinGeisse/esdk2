@@ -1,0 +1,18 @@
+
+Big question: Use an HDL or not?
+
+In any case, the RTL classes are useful -- even with a good RTL HDL -- and should be defined independent of the HDL
+except to properly support the HDL language constructs. These classes are especially important for mixed-level
+simulation.
+
+The big question is whether to define an HDL on top of them.
+
+This HDL would have to interact properly with
+- other RTL objects (those not defined through the HDL)
+- independently written HDL chunks
+- high-level objects
+- IntelliJ
+
+pro/con arguments:
+- non-HDL RTL code isn't that hard to write, but very hard to read (and code is written once, read many times)
+

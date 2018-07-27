@@ -195,4 +195,14 @@ public class VerilogGenerator {
 		}
 	}
 
+	private void printPinAssignments() {
+		for (RtlPin pin : realm.getPins()) {
+			if (pin instanceof RtlOutputPin) {
+				out.getOut().print("assign " + pin.getNetName() + " = ");
+				out.printExpression(((RtlOutputPin) pin).getOutputSignal());
+				out.getOut().println(";");
+			}
+		}
+	}
+
 }

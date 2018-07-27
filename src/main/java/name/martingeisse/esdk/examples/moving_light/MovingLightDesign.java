@@ -14,6 +14,7 @@ import name.martingeisse.esdk.core.rtl.pin.RtlInputPin;
 import name.martingeisse.esdk.core.rtl.pin.RtlOutputPin;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlConcatenation;
+import name.martingeisse.esdk.core.rtl.signal.RtlConditionalVectorOperation;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.xilinx.XilinxPinConfiguration;
 
@@ -25,10 +26,12 @@ public class MovingLightDesign extends Design {
 	private final RtlRealm realm;
 	private final RtlClockNetwork clk;
 	private final RtlVectorSignal leds;
+	private final RtlInputPin slideSwitch;
 
 	public MovingLightDesign() {
 		realm = new RtlRealm(this);
 		clk = realm.createClockNetwork(clockPin(realm));
+		slideSwitch = slideSwitchPin(realm, "L13");
 
 		RtlClockedBlock block = clk.createBlock();
 
@@ -40,10 +43,12 @@ public class MovingLightDesign extends Design {
 		this.leds = leds;
 		block.getInitializerStatements().assignUnsigned(leds, 1);
 		RtlWhenStatement whenPrescalerZero = block.getStatements().when(prescaler.compareEqual(0));
-		whenPrescalerZero.getThenBranch().assign(leds, new RtlConcatenation(realm,
-			leds.select(0),
-			leds.select(7, 1)
-		));
+		whenPrescalerZero.getThenBranch().assign(leds,
+			new RtlConditionalVectorOperation(realm, slideSwitch,
+				new RtlConcatenation(realm, leds.select(0), leds.select(7, 1)),
+				new RtlConcatenation(realm, leds.select(6, 0), leds.select(7))
+			)
+		);
 
 		ledPin(realm, "F12", leds.select(0));
 		ledPin(realm, "E12", leds.select(1));
@@ -65,6 +70,10 @@ public class MovingLightDesign extends Design {
 
 	public RtlVectorSignal getLeds() {
 		return leds;
+	}
+
+	public RtlInputPin getSlideSwitch() {
+		return slideSwitch;
 	}
 
 	private static RtlOutputPin ledPin(RtlRealm realm, String id, RtlBitSignal outputSignal) {
@@ -89,6 +98,16 @@ public class MovingLightDesign extends Design {
 		configuration.setIostandard("LVCMOS33");
 		RtlInputPin pin = new RtlInputPin(realm);
 		pin.setId("C9");
+		pin.setConfiguration(new XilinxPinConfiguration());
+		return pin;
+	}
+
+	private static RtlInputPin slideSwitchPin(RtlRealm realm, String id) {
+		XilinxPinConfiguration configuration = new XilinxPinConfiguration();
+		configuration.setIostandard("LVTTL");
+		configuration.setAdditionalInfo("PULLUP");
+		RtlInputPin pin = new RtlInputPin(realm);
+		pin.setId(id);
 		pin.setConfiguration(new XilinxPinConfiguration());
 		return pin;
 	}
