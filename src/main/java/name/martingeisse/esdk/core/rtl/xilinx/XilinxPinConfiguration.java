@@ -72,10 +72,12 @@ public final class XilinxPinConfiguration extends RtlPinConfiguration {
 			out.print(slew);
 			out.print(" ");
 		}
-		for (String s : additionalInfo) {
-			out.print("| ");
-			out.print(s);
-			out.print(' ');
+		if (additionalInfo != null) {
+			for (String s : additionalInfo) {
+				out.print("| ");
+				out.print(s);
+				out.print(' ');
+			}
 		}
 		out.println(";");
 	}

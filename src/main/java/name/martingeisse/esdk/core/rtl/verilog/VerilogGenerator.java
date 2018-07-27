@@ -47,6 +47,8 @@ public class VerilogGenerator {
 		out.printIntro(name, realm.getPins());
 		printSignalDeclarations();
 		out.getOut().println();
+		printSignalAssignments();
+		out.getOut().println();
 		printBlocks();
 		out.getOut().println();
 		printPinAssignments();
@@ -186,6 +188,19 @@ public class VerilogGenerator {
 			}
 			out.getOut().print(signalName);
 			out.getOut().println(';');
+		}
+	}
+
+	private void printSignalAssignments() {
+		for (Map.Entry<RtlSignal, String> signalEntry : declaredSignals.entrySet()) {
+			RtlSignal signal = signalEntry.getKey();
+			String signalName = signalEntry.getValue();
+			if (signal instanceof RtlPin || signal instanceof RtlProceduralSignal) {
+				continue;
+			}
+			out.getOut().print("assign " + signalName + " = ");
+			out.printExpression(TODO);
+			out.getOut().println(";");
 		}
 	}
 

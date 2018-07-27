@@ -142,6 +142,7 @@ public class VerilogWriter {
 	// expressions and assignment targets
 	//
 
+	TODO for declared signals, it is unclear at this point whether the name or definition should be printed!
 	public void printExpression(RtlSignal signal) {
 		signal.printVerilogExpression(new VerilogExpressionWriter() {
 
