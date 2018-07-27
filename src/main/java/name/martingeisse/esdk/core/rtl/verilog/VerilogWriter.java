@@ -142,8 +142,24 @@ public class VerilogWriter {
 	// expressions and assignment targets
 	//
 
-	TODO for declared signals, it is unclear at this point whether the name or definition should be printed!
+	/**
+	 * Prints the expression to use for a signal at a point where the signal gets used.
+	 */
 	public void printExpression(RtlSignal signal) {
+		String name = declaredSignals.get(signal);
+		if (name == null) {
+			printDefiningExpression(signal);
+		} else {
+			out.print(name);
+		}
+	}
+
+	/**
+	 * This method should normally not be called directly since {@link #printExpression(RtlSignal)}
+	 * is usually the right method to use. This method works similarly, but for declared signals,
+	 * it prints the defining expression, not the declared name.
+	 */
+	public void printDefiningExpression(RtlSignal signal) {
 		signal.printVerilogExpression(new VerilogExpressionWriter() {
 
 			@Override
@@ -166,12 +182,7 @@ public class VerilogWriter {
 
 			@Override
 			public VerilogExpressionWriter print(RtlSignal signal, VerilogGenerator.VerilogExpressionNesting nesting) {
-				String name = declaredSignals.get(signal);
-				if (name == null) {
-					printExpression(signal);
-				} else {
-					out.print(name);
-				}
+				printExpression(signal);
 				return this;
 			}
 

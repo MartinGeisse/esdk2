@@ -35,12 +35,22 @@ public class MovingLightDesign extends Design {
 
 		RtlClockedBlock block = clk.createBlock();
 
+		// register vector[24] prescaler = 0;
+		// do (clk) {
+		//   prescaler = prescaler + 1;
+		// }
 		RtlProceduralVectorSignal prescaler = block.createVector(24);
 		block.getInitializerStatements().assignUnsigned(prescaler, 0);
 		block.getStatements().assign(prescaler, prescaler.add(1));
 
+		// register vector[8] leds = 1;
+		// do (clk) {
+		//   if (prescaler == 0) {
+		//     leds = (slideSwitch ? leds[0] _ leds[7:1] : leds[6:0] _ leds[7]);
+		//   }
+		// }
+		//
 		RtlProceduralVectorSignal leds = block.createVector(8);
-		this.leds = leds;
 		block.getInitializerStatements().assignUnsigned(leds, 1);
 		RtlWhenStatement whenPrescalerZero = block.getStatements().when(prescaler.compareEqual(0));
 		whenPrescalerZero.getThenBranch().assign(leds,
@@ -49,6 +59,7 @@ public class MovingLightDesign extends Design {
 				new RtlConcatenation(realm, leds.select(6, 0), leds.select(7))
 			)
 		);
+		this.leds = leds;
 
 		ledPin(realm, "F12", leds.select(0));
 		ledPin(realm, "E12", leds.select(1));

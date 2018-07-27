@@ -199,7 +199,7 @@ public class VerilogGenerator {
 				continue;
 			}
 			out.getOut().print("assign " + signalName + " = ");
-			out.printExpression(TODO);
+			out.printDefiningExpression(signal);
 			out.getOut().println(";");
 		}
 	}
