@@ -5,8 +5,8 @@
 package name.martingeisse.esdk.core.rtl.signal;
 
 import name.martingeisse.esdk.core.rtl.RtlItemOwned;
-import name.martingeisse.esdk.core.rtl.verilog.VerilogGenerator;
 import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
+import name.martingeisse.esdk.core.rtl.verilog.VerilogGenerator;
 
 /**
  * Note: If an implementation redefines equals() / hashCode(), then "equal" signals must be exchangeable without
