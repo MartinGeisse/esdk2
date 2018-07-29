@@ -4,11 +4,8 @@
  */
 package name.martingeisse.esdk.core.rtl.signal;
 
-import name.martingeisse.esdk.core.rtl.verilog.PrintWriterVerilogExpressionWriter;
-import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.util.BitSet;
 
