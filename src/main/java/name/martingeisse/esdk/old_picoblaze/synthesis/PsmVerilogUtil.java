@@ -4,7 +4,7 @@
  * This file is distributed under the terms of the MIT license.
  */
 
-package name.martingeisse.esdk.old_picoblaze;
+package name.martingeisse.esdk.old_picoblaze.synthesis;
 
 import java.io.IOException;
 

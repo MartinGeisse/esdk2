@@ -1,0 +1,24 @@
+
+Picoblaze in ESDK:
+
+- simulation driver: could be an RtlClockNetwork or high-level events. With high-level events, no RTL signal
+    interfaces can be simulated but simulation may be faster (but I don't know how much faster -- should test that
+    first). The high-level driver may be unnecessary if the speedup is less than 2x. I don't think there are other
+    advantages to a high-level driver. RtlClockNetwork driver is needed in any case, so build that first.
+
+- reset:
+    - high level reset interface: is a method that can be called
+    - RTL reset interface: is a separate RTL object that calls that method.
+    --> no simulation cycles wasted if reset is irrelevant during run-time
+
+- interrupt
+    - like reset
+
+- instruction memory interface:
+    - RTL interface using signals; provides getter for the address signal and setter for the instruction signal
+    - high level interface; does not provide ahead-of-time address; works using a callback
+
+- I/O interface:
+    - RTL interface using signals; provides getters for output signals and setters for input signals.
+    - high level interface; does not provide ahead-of-time I/O addresses like the RTL interface does; allows to
+        set read/write callbacks.

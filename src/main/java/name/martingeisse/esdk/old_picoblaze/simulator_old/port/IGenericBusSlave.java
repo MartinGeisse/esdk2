@@ -4,7 +4,7 @@
  * This file is distributed under the terms of the MIT license.
  */
 
-package name.martingeisse.esdk.old_picoblaze.simulator.port;
+package name.martingeisse.esdk.old_picoblaze.simulator_old.port;
 
 /**
  * This interface abstracts the generic behavior of bus slave

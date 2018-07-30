@@ -4,7 +4,7 @@
  * This file is distributed under the terms of the MIT license.
  */
 
-package name.martingeisse.esdk.old_picoblaze.simulator;
+package name.martingeisse.esdk.old_picoblaze.simulator_old;
 
 /**
  * This enum type defines the various conditions that can be used in

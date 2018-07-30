@@ -4,7 +4,7 @@
  * This file is distributed under the terms of the MIT license.
  */
 
-package name.martingeisse.esdk.old_picoblaze.simulator;
+package name.martingeisse.esdk.old_picoblaze.simulator_old;
 
 /**
  * An abstraction level-neutral representation of the internal state of a PicoBlaze

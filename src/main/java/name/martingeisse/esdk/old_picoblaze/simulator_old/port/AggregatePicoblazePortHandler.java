@@ -4,9 +4,9 @@
  * This file is distributed under the terms of the MIT license.
  */
 
-package name.martingeisse.esdk.old_picoblaze.simulator.port;
+package name.martingeisse.esdk.old_picoblaze.simulator_old.port;
 
-import name.martingeisse.esdk.old_picoblaze.simulator.IPicoblazePortHandler;
+import name.martingeisse.esdk.old_picoblaze.simulator_old.IPicoblazePortHandler;
 
 import java.util.ArrayList;
 import java.util.List;

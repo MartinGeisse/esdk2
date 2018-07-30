@@ -4,11 +4,11 @@
  * This file is distributed under the terms of the MIT license.
  */
 
-package name.martingeisse.esdk.old_picoblaze.simulator.instruction;
+package name.martingeisse.esdk.old_picoblaze.simulator_old.instruction;
 
-import name.martingeisse.esdk.old_picoblaze.simulator.IPicoblazePortHandler;
-import name.martingeisse.esdk.old_picoblaze.simulator.PicoblazeSimulatorException;
-import name.martingeisse.esdk.old_picoblaze.simulator.PicoblazeState;
+import name.martingeisse.esdk.old_picoblaze.simulator_old.IPicoblazePortHandler;
+import name.martingeisse.esdk.old_picoblaze.simulator_old.PicoblazeSimulatorException;
+import name.martingeisse.esdk.old_picoblaze.simulator_old.PicoblazeState;
 
 import java.io.File;
 import java.io.IOException;
