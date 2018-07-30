@@ -6,9 +6,9 @@
 
 package name.martingeisse.esdk.old_picoblaze.simulator.instruction;
 
-import name.martingeisse.old.esdk.model.picoblaze.simulator.IPicoblazePortHandler;
-import name.martingeisse.old.esdk.model.picoblaze.simulator.PicoblazeSimulatorException;
-import name.martingeisse.old.esdk.model.picoblaze.simulator.PicoblazeState;
+import name.martingeisse.esdk.old_picoblaze.simulator.IPicoblazePortHandler;
+import name.martingeisse.esdk.old_picoblaze.simulator.PicoblazeSimulatorException;
+import name.martingeisse.esdk.old_picoblaze.simulator.PicoblazeState;
 
 import java.io.File;
 import java.io.IOException;

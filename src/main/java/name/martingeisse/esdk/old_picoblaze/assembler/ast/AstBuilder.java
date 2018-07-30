@@ -5,11 +5,11 @@
  */
 package name.martingeisse.esdk.old_picoblaze.assembler.ast;
 
-import name.martingeisse.old.esdk.model.picoblaze.assembler.IPicoblazeAssemblerErrorHandler;
-import name.martingeisse.old.esdk.model.picoblaze.assembler.Range;
-import name.martingeisse.old.esdk.model.picoblaze.assembler.parser.IParserClient;
-import name.martingeisse.old.esdk.model.picoblaze.assembler.parser.Parser;
-import name.martingeisse.old.esdk.model.picoblaze.assembler.parser.Tokenizer;
+import name.martingeisse.esdk.old_picoblaze.assembler.IPicoblazeAssemblerErrorHandler;
+import name.martingeisse.esdk.old_picoblaze.assembler.Range;
+import name.martingeisse.esdk.old_picoblaze.assembler.parser.IParserClient;
+import name.martingeisse.esdk.old_picoblaze.assembler.parser.Parser;
+import name.martingeisse.esdk.old_picoblaze.assembler.parser.Tokenizer;
 
 import java.io.IOException;
 import java.io.Reader;

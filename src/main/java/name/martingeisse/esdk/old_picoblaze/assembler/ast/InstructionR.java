@@ -5,8 +5,8 @@
  */
 package name.martingeisse.esdk.old_picoblaze.assembler.ast;
 
-import name.martingeisse.old.esdk.model.picoblaze.assembler.IPicoblazeAssemblerErrorHandler;
-import name.martingeisse.old.esdk.model.picoblaze.assembler.Range;
+import name.martingeisse.esdk.old_picoblaze.assembler.IPicoblazeAssemblerErrorHandler;
+import name.martingeisse.esdk.old_picoblaze.assembler.Range;
 
 /**
  * An instruction that uses a single register operand at the

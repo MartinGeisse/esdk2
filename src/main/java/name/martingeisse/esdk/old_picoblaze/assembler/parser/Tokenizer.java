@@ -1,6 +1,6 @@
 package name.martingeisse.esdk.old_picoblaze.assembler.parser;
 
-import name.martingeisse.old.esdk.model.picoblaze.assembler.IPicoblazeAssemblerErrorHandler;
+import name.martingeisse.esdk.old_picoblaze.assembler.IPicoblazeAssemblerErrorHandler;
 
 import java.io.IOException;
 import java.io.Reader;

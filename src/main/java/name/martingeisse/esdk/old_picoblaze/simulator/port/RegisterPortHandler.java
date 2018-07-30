@@ -6,7 +6,7 @@
 
 package name.martingeisse.esdk.old_picoblaze.simulator.port;
 
-import name.martingeisse.old.esdk.model.picoblaze.simulator.IPicoblazePortHandler;
+import name.martingeisse.esdk.old_picoblaze.simulator.IPicoblazePortHandler;
 
 /**
  * Represents a single register that reacts to all I/O operations.

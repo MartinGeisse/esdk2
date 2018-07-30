@@ -5,7 +5,7 @@
  */
 package name.martingeisse.esdk.old_picoblaze.assembler.ast;
 
-import name.martingeisse.old.esdk.model.picoblaze.assembler.Range;
+import name.martingeisse.esdk.old_picoblaze.assembler.Range;
 
 /**
  * A PSM element that represents a constant definition. The value should

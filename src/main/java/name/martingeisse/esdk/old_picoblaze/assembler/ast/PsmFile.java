@@ -1,6 +1,6 @@
 package name.martingeisse.esdk.old_picoblaze.assembler.ast;
 
-import name.martingeisse.old.esdk.model.picoblaze.assembler.IPicoblazeAssemblerErrorHandler;
+import name.martingeisse.esdk.old_picoblaze.assembler.IPicoblazeAssemblerErrorHandler;
 
 import java.util.ArrayList;
 import java.util.List;

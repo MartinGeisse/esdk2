@@ -6,11 +6,11 @@
 
 package name.martingeisse.esdk.old_picoblaze;
 
-import name.martingeisse.old.esdk.model.picoblaze.assembler.IPicoblazeAssemblerErrorHandler;
-import name.martingeisse.old.esdk.model.picoblaze.assembler.Range;
-import name.martingeisse.old.esdk.model.picoblaze.assembler.ast.AstBuilder;
-import name.martingeisse.old.esdk.model.picoblaze.assembler.ast.Context;
-import name.martingeisse.old.esdk.model.picoblaze.assembler.ast.PsmFile;
+import name.martingeisse.esdk.old_picoblaze.assembler.IPicoblazeAssemblerErrorHandler;
+import name.martingeisse.esdk.old_picoblaze.assembler.Range;
+import name.martingeisse.esdk.old_picoblaze.assembler.ast.AstBuilder;
+import name.martingeisse.esdk.old_picoblaze.assembler.ast.Context;
+import name.martingeisse.esdk.old_picoblaze.assembler.ast.PsmFile;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;

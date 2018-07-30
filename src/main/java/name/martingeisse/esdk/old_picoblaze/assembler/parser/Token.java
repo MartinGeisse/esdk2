@@ -1,6 +1,6 @@
 package name.martingeisse.esdk.old_picoblaze.assembler.parser;
 
-import name.martingeisse.old.esdk.model.picoblaze.assembler.Range;
+import name.martingeisse.esdk.old_picoblaze.assembler.Range;
 
 /**
  * A token from the .psm input file. All indices (offset, line, column)

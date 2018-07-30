@@ -6,7 +6,7 @@
 
 package name.martingeisse.esdk.old_picoblaze.simulator.instruction;
 
-import name.martingeisse.old.esdk.model.picoblaze.simulator.PicoblazeSimulatorException;
+import name.martingeisse.esdk.old_picoblaze.simulator.PicoblazeSimulatorException;
 
 /**
  * A model for the instruction memory used by the PicoBlaze.

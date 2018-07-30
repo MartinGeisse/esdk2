@@ -1,6 +1,6 @@
 package name.martingeisse.esdk.old_picoblaze.assembler.parser;
 
-import name.martingeisse.old.esdk.model.picoblaze.assembler.PicoblazeAssemblerOpcodes;
+import name.martingeisse.esdk.old_picoblaze.assembler.PicoblazeAssemblerOpcodes;
 
 import java.util.HashMap;
 import java.util.Map;

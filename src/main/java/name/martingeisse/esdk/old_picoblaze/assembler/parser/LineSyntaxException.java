@@ -6,7 +6,7 @@
 
 package name.martingeisse.esdk.old_picoblaze.assembler.parser;
 
-import name.martingeisse.old.esdk.model.picoblaze.assembler.IPicoblazeAssemblerErrorHandler;
+import name.martingeisse.esdk.old_picoblaze.assembler.IPicoblazeAssemblerErrorHandler;
 
 /**
  * Indicates a syntax error whose immediate effect is constrained

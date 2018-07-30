@@ -6,8 +6,8 @@
 
 package name.martingeisse.esdk.old_picoblaze.simulator.instruction;
 
-import name.martingeisse.old.esdk.model.picoblaze.PsmBinUtil;
-import name.martingeisse.old.esdk.model.picoblaze.simulator.PicoblazeSimulatorException;
+import name.martingeisse.esdk.old_picoblaze.PsmBinUtil;
+import name.martingeisse.esdk.old_picoblaze.simulator.PicoblazeSimulatorException;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
