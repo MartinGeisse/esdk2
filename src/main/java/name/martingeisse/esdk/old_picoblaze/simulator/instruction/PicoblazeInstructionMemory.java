@@ -6,12 +6,11 @@
 
 package name.martingeisse.esdk.old_picoblaze.simulator.instruction;
 
-import name.martingeisse.esdk.old_picoblaze.PsmBinUtil;
 import name.martingeisse.esdk.old_picoblaze.simulator.PicoblazeSimulatorException;
-import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 /**
  * Default implementation of {@link IPicoblazeInstructionMemory} that
@@ -78,9 +77,11 @@ public class PicoblazeInstructionMemory implements IPicoblazeInstructionMemory {
 	 * @throws IOException on I/O errors
 	 */
 	public static PicoblazeInstructionMemory createFromPsmBinFile(final File file) throws IOException {
-		final byte[] encodedInstructions = FileUtils.readFileToByteArray(file);
-		final int[] instructions = PsmBinUtil.decodePsmBin(encodedInstructions);
-		return new PicoblazeInstructionMemory(instructions);
+//		final byte[] encodedInstructions = FileUtils.readFileToByteArray(file);
+//		final int[] instructions = PsmBinUtil.decodePsmBin(encodedInstructions);
+//		return new PicoblazeInstructionMemory(instructions);
+		// TODO MIF support
+		throw new UnsupportedEncodingException();
 	}
 
 }

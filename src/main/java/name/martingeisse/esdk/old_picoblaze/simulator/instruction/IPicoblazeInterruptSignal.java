@@ -15,6 +15,6 @@ public interface IPicoblazeInterruptSignal {
 	 * Returns true if the interrupt signal is active, false if not.
 	 * @return whether the interrupt signal is active.
 	 */
-	public boolean isActive();
+	boolean isActive();
 
 }

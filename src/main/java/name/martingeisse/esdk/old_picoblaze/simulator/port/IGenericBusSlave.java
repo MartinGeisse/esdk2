@@ -35,7 +35,7 @@ public interface IGenericBusSlave {
 	 *
 	 * @return the number of address bits.
 	 */
-	public int getLocalAddressBitCount();
+	int getLocalAddressBitCount();
 
 	/**
 	 * Reads a value from the specified local address.
@@ -43,7 +43,7 @@ public interface IGenericBusSlave {
 	 * @param localAddress the device-local address to read from
 	 * @return the value read
 	 */
-	public int read(int localAddress);
+	int read(int localAddress);
 
 	/**
 	 * Writes a value to the specified local address.
@@ -51,6 +51,6 @@ public interface IGenericBusSlave {
 	 * @param localAddress the device-local address to write to
 	 * @param value the value to write
 	 */
-	public void write(int localAddress, int value);
+	void write(int localAddress, int value);
 
 }

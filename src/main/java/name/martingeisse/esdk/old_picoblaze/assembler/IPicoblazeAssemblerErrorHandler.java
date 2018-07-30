@@ -17,13 +17,13 @@ public interface IPicoblazeAssemblerErrorHandler {
 	 * @param range the syntactic range of the error
 	 * @param message the error message
 	 */
-	public void handleError(Range range, String message);
+	void handleError(Range range, String message);
 
 	/**
 	 * Handles a warning.
 	 * @param range the syntactic range of the warning
 	 * @param message the warning message
 	 */
-	public void handleWarning(Range range, String message);
+	void handleWarning(Range range, String message);
 
 }

@@ -18,7 +18,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
 /**
- *
+ * TODO remove. This file was left as a code example for running the assembler.
  */
 public class AssemblerMain {
 

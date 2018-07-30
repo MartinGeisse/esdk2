@@ -20,6 +20,6 @@ public interface IPicoblazeInstructionMemory {
 	 * @return the instruction
 	 * @throws PicoblazeSimulatorException if this model fails
 	 */
-	public int getInstruction(int address) throws PicoblazeSimulatorException;
+	int getInstruction(int address) throws PicoblazeSimulatorException;
 
 }
