@@ -8,7 +8,7 @@ package name.martingeisse.esdk.old_picoblaze.simulator_old;
 
 /**
  * Strategy that defines how the environment reacts to INPUT and OUTPUT
- * instructions executed by a PicoBlaze.
+ * instructions executed by a PicoBlaze. TODO useless. This interface needs to handle ahead-of-time I/O addresses.
  */
 public interface IPicoblazePortHandler {
 

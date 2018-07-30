@@ -22,3 +22,14 @@ Picoblaze in ESDK:
     - RTL interface using signals; provides getters for output signals and setters for input signals.
     - high level interface; does not provide ahead-of-time I/O addresses like the RTL interface does; allows to
         set read/write callbacks.
+
+---------------------------------------------------------------------------------------------------
+
+Instruction interface, I/O interface: probably two different handlers aren't needed. If the simulation simulates
+the two-clocks-per-instruction anyway, then the ahead-of-time signals cannot be handled by a handler anway; they
+have to be available as RtlSignals right after loading the instruction. Since RtlSignals are just getters at the
+Java level, this means they are getters that read certain bits from the instruction register, which is possible at
+no extra cost. So just provide these signals -- the user can ignore them if not needed. Any external action at RTL
+level in reaction to INPUT/OUTPUT is triggered by the clock signal, not the Picoblaze. Only high-level actions
+are triggered by the Picoblaze. So provide a way to set a high-level callback, and do nothing if none is set.
+
