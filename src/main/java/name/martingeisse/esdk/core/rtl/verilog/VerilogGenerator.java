@@ -51,7 +51,7 @@ public class VerilogGenerator {
 		out.getOut().println();
 		printBlocks();
 		out.getOut().println();
-		printPinAssignments();
+		printOutputPinAssignments();
 		out.getOut().println();
 		out.printOutro();
 	}
@@ -210,12 +210,19 @@ public class VerilogGenerator {
 		}
 	}
 
-	private void printPinAssignments() {
+	private void printOutputPinAssignments() {
 		for (RtlPin pin : realm.getPins()) {
 			if (pin instanceof RtlOutputPin) {
 				out.getOut().print("assign " + pin.getNetName() + " = ");
 				out.printExpression(((RtlOutputPin) pin).getOutputSignal());
 				out.getOut().println(";");
+			} else if (pin instanceof RtlBidirectionalPin) {
+				RtlBidirectionalPin bidirectionalPin = (RtlBidirectionalPin)pin;
+				out.getOut().print("assign " + pin.getNetName() + " = ");
+				out.printExpression(bidirectionalPin.getOutputEnableSignal());
+				out.getOut().println(" ? ");
+				out.printExpression(bidirectionalPin.getOutputSignal());
+				out.getOut().println(" : 1'bz;");
 			}
 		}
 	}

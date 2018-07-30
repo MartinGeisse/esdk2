@@ -5,8 +5,8 @@
 package name.martingeisse.esdk.core.rtl.block;
 
 import name.martingeisse.esdk.core.rtl.RtlRealm;
-import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.block.statement.RtlBitAssignmentTarget;
+import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 
 /**
  *
