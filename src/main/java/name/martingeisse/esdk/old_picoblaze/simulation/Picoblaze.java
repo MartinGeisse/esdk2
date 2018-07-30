@@ -1,75 +1,39 @@
 /**
  * Copyright (c) 2015 Martin Geisse
- *
+ * <p>
  * This file is distributed under the terms of the MIT license.
  */
 
-package name.martingeisse.esdk.old_picoblaze.simulator_old;
+package name.martingeisse.esdk.old_picoblaze.simulation;
+
+import name.martingeisse.esdk.old_picoblaze.simulation.port.PicoblazePortHandler;
 
 /**
  * An abstraction level-neutral representation of the internal state of a PicoBlaze
  * instance. This state model can be used both for simulating a PB program within
  * an instruction-level simulator and simulating the PB in a hardware system at
  * register transfer level.
- *
+ * <p>
  * Note that the instruction store is *NOT* part of this model.
  */
-public final class PicoblazeState {
+public final class Picoblaze {
 
-	/**
-	 * the registers
-	 */
 	private final byte[] registers;
-
-	/**
-	 * the zero
-	 */
 	private boolean zero;
-
-	/**
-	 * the carry
-	 */
 	private boolean carry;
-
-	/**
-	 * the ram
-	 */
 	private final byte[] ram;
-
-	/**
-	 * the stack
-	 */
 	private final int[] returnStack;
-
-	/**
-	 * the returnStackPointer
-	 */
 	private int returnStackPointer;
-
-	/**
-	 * the interruptEnable
-	 */
 	private boolean interruptEnable;
-
-	/**
-	 * the preservedZero
-	 */
 	private boolean preservedZero;
-
-	/**
-	 * the preservedCarry
-	 */
 	private boolean preservedCarry;
-
-	/**
-	 * the portHandler
-	 */
-	private IPicoblazePortHandler portHandler;
+	private PicoblazePortHandler portHandler;
+	private boolean secondCycle;
 
 	/**
 	 * Constructor.
 	 */
-	public PicoblazeState() {
+	public Picoblaze() {
 		this.registers = new byte[16];
 		this.ram = new byte[64];
 		this.returnStack = new int[32];
@@ -84,10 +48,12 @@ public final class PicoblazeState {
 		setInterruptEnable(false);
 		setZero(false);
 		setCarry(false);
+		secondCycle = false;
 	}
 
 	/**
 	 * Getter method for the pc.
+	 *
 	 * @return the pc
 	 */
 	public int getPc() {
@@ -96,6 +62,7 @@ public final class PicoblazeState {
 
 	/**
 	 * Setter method for the pc.
+	 *
 	 * @param pc the pc to set
 	 */
 	public void setPc(final int pc) {
@@ -104,6 +71,7 @@ public final class PicoblazeState {
 
 	/**
 	 * Getter method for the zero.
+	 *
 	 * @return the zero
 	 */
 	public boolean isZero() {
@@ -112,6 +80,7 @@ public final class PicoblazeState {
 
 	/**
 	 * Setter method for the zero.
+	 *
 	 * @param zero the zero to set
 	 */
 	public void setZero(final boolean zero) {
@@ -120,6 +89,7 @@ public final class PicoblazeState {
 
 	/**
 	 * Getter method for the carry.
+	 *
 	 * @return the carry
 	 */
 	public boolean isCarry() {
@@ -128,6 +98,7 @@ public final class PicoblazeState {
 
 	/**
 	 * Setter method for the carry.
+	 *
 	 * @param carry the carry to set
 	 */
 	public void setCarry(final boolean carry) {
@@ -136,6 +107,7 @@ public final class PicoblazeState {
 
 	/**
 	 * Getter method for the returnStackPointer.
+	 *
 	 * @return the returnStackPointer
 	 */
 	public int getReturnStackPointer() {
@@ -144,6 +116,7 @@ public final class PicoblazeState {
 
 	/**
 	 * Setter method for the returnStackPointer.
+	 *
 	 * @param returnStackPointer the returnStackPointer to set
 	 */
 	public void setReturnStackPointer(final int returnStackPointer) {
@@ -152,6 +125,7 @@ public final class PicoblazeState {
 
 	/**
 	 * Getter method for the registers.
+	 *
 	 * @return the registers
 	 */
 	public byte[] getRegisters() {
@@ -160,6 +134,7 @@ public final class PicoblazeState {
 
 	/**
 	 * Getter method for the ram.
+	 *
 	 * @return the ram
 	 */
 	public byte[] getRam() {
@@ -168,6 +143,7 @@ public final class PicoblazeState {
 
 	/**
 	 * Getter method for the returnStack.
+	 *
 	 * @return the returnStack
 	 */
 	public int[] getReturnStack() {
@@ -176,6 +152,7 @@ public final class PicoblazeState {
 
 	/**
 	 * Getter method for the interruptEnable.
+	 *
 	 * @return the interruptEnable
 	 */
 	public boolean isInterruptEnable() {
@@ -184,6 +161,7 @@ public final class PicoblazeState {
 
 	/**
 	 * Setter method for the interruptEnable.
+	 *
 	 * @param interruptEnable the interruptEnable to set
 	 */
 	public void setInterruptEnable(final boolean interruptEnable) {
@@ -192,6 +170,7 @@ public final class PicoblazeState {
 
 	/**
 	 * Getter method for the preservedZero.
+	 *
 	 * @return the preservedZero
 	 */
 	public boolean isPreservedZero() {
@@ -200,6 +179,7 @@ public final class PicoblazeState {
 
 	/**
 	 * Setter method for the preservedZero.
+	 *
 	 * @param preservedZero the preservedZero to set
 	 */
 	public void setPreservedZero(final boolean preservedZero) {
@@ -208,6 +188,7 @@ public final class PicoblazeState {
 
 	/**
 	 * Getter method for the preservedCarry.
+	 *
 	 * @return the preservedCarry
 	 */
 	public boolean isPreservedCarry() {
@@ -216,6 +197,7 @@ public final class PicoblazeState {
 
 	/**
 	 * Setter method for the preservedCarry.
+	 *
 	 * @param preservedCarry the preservedCarry to set
 	 */
 	public void setPreservedCarry(final boolean preservedCarry) {
@@ -224,22 +206,25 @@ public final class PicoblazeState {
 
 	/**
 	 * Getter method for the portHandler.
+	 *
 	 * @return the portHandler
 	 */
-	public IPicoblazePortHandler getPortHandler() {
+	public PicoblazePortHandler getPortHandler() {
 		return portHandler;
 	}
 
 	/**
 	 * Setter method for the portHandler.
+	 *
 	 * @param portHandler the portHandler to set
 	 */
-	public void setPortHandler(final IPicoblazePortHandler portHandler) {
+	public void setPortHandler(final PicoblazePortHandler portHandler) {
 		this.portHandler = portHandler;
 	}
 
 	/**
 	 * Returns the value of the specified register
+	 *
 	 * @param registerNumber the register number (only the lowest four bits are considered)
 	 * @return the value of the register, in the range 0-255
 	 */
@@ -249,15 +234,17 @@ public final class PicoblazeState {
 
 	/**
 	 * Sets the value of the specified register
+	 *
 	 * @param registerNumber the register number (only the lowest four bits are considered)
-	 * @param value the value to set (only the lowest eight bits are considered)
+	 * @param value          the value to set (only the lowest eight bits are considered)
 	 */
 	public void setRegisterValue(final int registerNumber, final int value) {
-		registers[registerNumber & 15] = (byte)value;
+		registers[registerNumber & 15] = (byte) value;
 	}
 
 	/**
 	 * Returns the value of the specified RAM cell
+	 *
 	 * @param address the RAM address (only the lowest six bits are considered)
 	 * @return the value of the RAM cell, in the range 0-255
 	 */
@@ -267,62 +254,39 @@ public final class PicoblazeState {
 
 	/**
 	 * Sets the value of the RAM cell.
+	 *
 	 * @param address the RAM address (only the lowest six bits are considered)
-	 * @param value the value to set (only the lowest eight bits are considered)
+	 * @param value   the value to set (only the lowest eight bits are considered)
 	 */
 	public void setRamValue(final int address, final int value) {
-		ram[address & 63] = (byte)value;
-	}
-
-	/**
-	 * Inputs a value from the specified port.
-	 * @param port the port to input from (only the lowest eight bits are considered)
-	 * @return the value taken from the port, in the range 0-255
-	 * @throws PicoblazeSimulatorException when this model fails
-	 */
-	public int input(final int port) throws PicoblazeSimulatorException {
-		if (portHandler == null) {
-			throw new PicoblazeSimulatorException("no port handler");
-		}
-		return (portHandler.handleInput(port & 0xff) & 0xff);
-	}
-
-	/**
-	 * Outputs a value to the specified port.
-	 * @param port the port to output to (only the lowest eight bits are considered)
-	 * @param value the value to output (only the lowest eight bits are considered)
-	 * @throws PicoblazeSimulatorException when this model fails
-	 */
-	public void output(final int port, final int value) throws PicoblazeSimulatorException {
-		if (portHandler == null) {
-			throw new PicoblazeSimulatorException("no port handler");
-		}
-		portHandler.handleOutput(port & 0xff, value & 0xff);
+		ram[address & 63] = (byte) value;
 	}
 
 	/**
 	 * Returns the byte value (0-255) of either a register or the specified value.
-	 * @param x the register number or immediate value
+	 *
+	 * @param x         the register number or immediate value
 	 * @param immediate whether the value is immediate
 	 * @return the byte value
 	 */
-	int getRegisterOrImmediate(final int x, final boolean immediate) {
+	private int getRegisterOrImmediate(final int x, final boolean immediate) {
 		return (immediate ? (x & 0xff) : getRegisterValue(x));
 	}
 
 	/**
 	 * Increments the PC register by 1.
 	 */
-	void incrementPc() {
+	private void incrementPc() {
 		setPc(getPc() + 1);
 	}
 
 	/**
 	 * Performs an ADD operation
-	 * @param leftOperand the left operand register number
-	 * @param rightOperand the right operand register number or immediate value
+	 *
+	 * @param leftOperand             the left operand register number
+	 * @param rightOperand            the right operand register number or immediate value
 	 * @param rightOperandIsImmediate whether the right operand is specified as an immediate value (true)
-	 * or as a register number (false)
+	 *                                or as a register number (false)
 	 */
 	public void performAdd(final int leftOperand, final int rightOperand, final boolean rightOperandIsImmediate) {
 		final int result = (getRegisterValue(leftOperand) + getRegisterOrImmediate(rightOperand, rightOperandIsImmediate));
@@ -334,10 +298,11 @@ public final class PicoblazeState {
 
 	/**
 	 * Performs an ADDCY operation
-	 * @param leftOperand the left operand register number
-	 * @param rightOperand the right operand register number or immediate value
+	 *
+	 * @param leftOperand             the left operand register number
+	 * @param rightOperand            the right operand register number or immediate value
 	 * @param rightOperandIsImmediate whether the right operand is specified as an immediate value (true)
-	 * or as a register number (false)
+	 *                                or as a register number (false)
 	 */
 	public void performAddWithCarry(final int leftOperand, final int rightOperand, final boolean rightOperandIsImmediate) {
 		final int result = (getRegisterValue(leftOperand) + getRegisterOrImmediate(rightOperand, rightOperandIsImmediate) + (carry ? 1 : 0));
@@ -349,10 +314,11 @@ public final class PicoblazeState {
 
 	/**
 	 * Performs a SUB operation
-	 * @param leftOperand the left operand register number
-	 * @param rightOperand the right operand register number or immediate value
+	 *
+	 * @param leftOperand             the left operand register number
+	 * @param rightOperand            the right operand register number or immediate value
 	 * @param rightOperandIsImmediate whether the right operand is specified as an immediate value (true)
-	 * or as a register number (false)
+	 *                                or as a register number (false)
 	 */
 	public void performSub(final int leftOperand, final int rightOperand, final boolean rightOperandIsImmediate) {
 		final int result = (getRegisterValue(leftOperand) - getRegisterOrImmediate(rightOperand, rightOperandIsImmediate));
@@ -364,10 +330,11 @@ public final class PicoblazeState {
 
 	/**
 	 * Performs a SUBCY operation
-	 * @param leftOperand the left operand register number
-	 * @param rightOperand the right operand register number or immediate value
+	 *
+	 * @param leftOperand             the left operand register number
+	 * @param rightOperand            the right operand register number or immediate value
 	 * @param rightOperandIsImmediate whether the right operand is specified as an immediate value (true)
-	 * or as a register number (false)
+	 *                                or as a register number (false)
 	 */
 	public void performSubWithCarry(final int leftOperand, final int rightOperand, final boolean rightOperandIsImmediate) {
 		final int result = (getRegisterValue(leftOperand) - getRegisterOrImmediate(rightOperand, rightOperandIsImmediate) - (carry ? 1 : 0));
@@ -379,10 +346,11 @@ public final class PicoblazeState {
 
 	/**
 	 * Performs an AND operation
-	 * @param leftOperand the left operand register number
-	 * @param rightOperand the right operand register number or immediate value
+	 *
+	 * @param leftOperand             the left operand register number
+	 * @param rightOperand            the right operand register number or immediate value
 	 * @param rightOperandIsImmediate whether the right operand is specified as an immediate value (true)
-	 * or as a register number (false)
+	 *                                or as a register number (false)
 	 */
 	public void performAnd(final int leftOperand, final int rightOperand, final boolean rightOperandIsImmediate) {
 		final int result = (getRegisterValue(leftOperand) & getRegisterOrImmediate(rightOperand, rightOperandIsImmediate));
@@ -394,10 +362,11 @@ public final class PicoblazeState {
 
 	/**
 	 * Performs an OR operation
-	 * @param leftOperand the left operand register number
-	 * @param rightOperand the right operand register number or immediate value
+	 *
+	 * @param leftOperand             the left operand register number
+	 * @param rightOperand            the right operand register number or immediate value
 	 * @param rightOperandIsImmediate whether the right operand is specified as an immediate value (true)
-	 * or as a register number (false)
+	 *                                or as a register number (false)
 	 */
 	public void performOr(final int leftOperand, final int rightOperand, final boolean rightOperandIsImmediate) {
 		final int result = (getRegisterValue(leftOperand) | getRegisterOrImmediate(rightOperand, rightOperandIsImmediate));
@@ -409,10 +378,11 @@ public final class PicoblazeState {
 
 	/**
 	 * Performs an XOR operation
-	 * @param leftOperand the left operand register number
-	 * @param rightOperand the right operand register number or immediate value
+	 *
+	 * @param leftOperand             the left operand register number
+	 * @param rightOperand            the right operand register number or immediate value
 	 * @param rightOperandIsImmediate whether the right operand is specified as an immediate value (true)
-	 * or as a register number (false)
+	 *                                or as a register number (false)
 	 */
 	public void performXor(final int leftOperand, final int rightOperand, final boolean rightOperandIsImmediate) {
 		final int result = (getRegisterValue(leftOperand) ^ getRegisterOrImmediate(rightOperand, rightOperandIsImmediate));
@@ -425,6 +395,7 @@ public final class PicoblazeState {
 	/**
 	 * Returns the XOR of the lowest eight bits of the specified value as
 	 * a boolean value
+	 *
 	 * @param value the value containing the bits
 	 * @return true if the XOR result is 1, false if it is 0
 	 */
@@ -437,10 +408,11 @@ public final class PicoblazeState {
 
 	/**
 	 * Performs a TEST operation
-	 * @param leftOperand the left operand register number
-	 * @param rightOperand the right operand register number or immediate value
+	 *
+	 * @param leftOperand             the left operand register number
+	 * @param rightOperand            the right operand register number or immediate value
 	 * @param rightOperandIsImmediate whether the right operand is specified as an immediate value (true)
-	 * or as a register number (false)
+	 *                                or as a register number (false)
 	 */
 	public void performTest(final int leftOperand, final int rightOperand, final boolean rightOperandIsImmediate) {
 		final int temp = (getRegisterValue(leftOperand) & getRegisterOrImmediate(rightOperand, rightOperandIsImmediate));
@@ -451,10 +423,11 @@ public final class PicoblazeState {
 
 	/**
 	 * Performs a COMPARE operation
-	 * @param leftOperand the left operand register number
-	 * @param rightOperand the right operand register number or immediate value
+	 *
+	 * @param leftOperand             the left operand register number
+	 * @param rightOperand            the right operand register number or immediate value
 	 * @param rightOperandIsImmediate whether the right operand is specified as an immediate value (true)
-	 * or as a register number (false)
+	 *                                or as a register number (false)
 	 */
 	public void performCompare(final int leftOperand, final int rightOperand, final boolean rightOperandIsImmediate) {
 		final int temp = (getRegisterValue(leftOperand) - getRegisterOrImmediate(rightOperand, rightOperandIsImmediate));
@@ -464,7 +437,7 @@ public final class PicoblazeState {
 	}
 
 	/**
-	 * @param operand the operand register number
+	 * @param operand      the operand register number
 	 * @param shiftInValue true to shift in a 1 bit, false to shift in a 0 bit
 	 */
 	private void performShiftLeft(final int operand, final boolean shiftInValue) {
@@ -478,6 +451,7 @@ public final class PicoblazeState {
 
 	/**
 	 * Performs a SL0 (shift left and fill with 0) operation
+	 *
 	 * @param operand the operand register number
 	 */
 	public void performShiftLeftZero(final int operand) {
@@ -486,6 +460,7 @@ public final class PicoblazeState {
 
 	/**
 	 * Performs a SL1 (shift left and fill with 1) operation
+	 *
 	 * @param operand the operand register number
 	 */
 	public void performShiftLeftOne(final int operand) {
@@ -494,6 +469,7 @@ public final class PicoblazeState {
 
 	/**
 	 * Performs a SLX (shift left and replicate bit 0) operation
+	 *
 	 * @param operand the operand register number
 	 */
 	public void performShiftLeftReplicate(final int operand) {
@@ -502,6 +478,7 @@ public final class PicoblazeState {
 
 	/**
 	 * Performs a SLA (shift left through all bits including CARRY) operation
+	 *
 	 * @param operand the operand register number
 	 */
 	public void performShiftLeftAll(final int operand) {
@@ -510,6 +487,7 @@ public final class PicoblazeState {
 
 	/**
 	 * Performs a RL (rotate left) operation
+	 *
 	 * @param operand the operand register number
 	 */
 	public void performRotateLeft(final int operand) {
@@ -517,7 +495,7 @@ public final class PicoblazeState {
 	}
 
 	/**
-	 * @param operand the operand register number
+	 * @param operand      the operand register number
 	 * @param shiftInValue true to shift in a 1 bit, false to shift in a 0 bit
 	 */
 	private void performShiftRight(final int operand, final boolean shiftInValue) {
@@ -531,6 +509,7 @@ public final class PicoblazeState {
 
 	/**
 	 * Performs a SL0 (shift right and fill with 0) operation
+	 *
 	 * @param operand the operand register number
 	 */
 	public void performShiftRightZero(final int operand) {
@@ -539,6 +518,7 @@ public final class PicoblazeState {
 
 	/**
 	 * Performs a SL1 (shift right and fill with 1) operation
+	 *
 	 * @param operand the operand register number
 	 */
 	public void performShiftRightOne(final int operand) {
@@ -547,6 +527,7 @@ public final class PicoblazeState {
 
 	/**
 	 * Performs a SLX (shift right and replicate bit 0) operation
+	 *
 	 * @param operand the operand register number
 	 */
 	public void performShiftRightReplicate(final int operand) {
@@ -555,6 +536,7 @@ public final class PicoblazeState {
 
 	/**
 	 * Performs a SLA (shift right through all bits including CARRY) operation
+	 *
 	 * @param operand the operand register number
 	 */
 	public void performShiftRightAll(final int operand) {
@@ -563,6 +545,7 @@ public final class PicoblazeState {
 
 	/**
 	 * Performs a RL (rotate right) operation
+	 *
 	 * @param operand the operand register number
 	 */
 	public void performRotateRight(final int operand) {
@@ -571,10 +554,11 @@ public final class PicoblazeState {
 
 	/**
 	 * Performs a LOAD operation
-	 * @param leftOperand the left operand register number
-	 * @param rightOperand the right operand register number or immediate value
+	 *
+	 * @param leftOperand             the left operand register number
+	 * @param rightOperand            the right operand register number or immediate value
 	 * @param rightOperandIsImmediate whether the right operand is specified as an immediate value (true)
-	 * or as a register number (false)
+	 *                                or as a register number (false)
 	 */
 	public void performLoad(final int leftOperand, final int rightOperand, final boolean rightOperandIsImmediate) {
 		setRegisterValue(leftOperand, getRegisterOrImmediate(rightOperand, rightOperandIsImmediate));
@@ -583,10 +567,11 @@ public final class PicoblazeState {
 
 	/**
 	 * Performs a FETCH operation
-	 * @param leftOperand the left operand register number
-	 * @param rightOperand the right operand register number or immediate value
+	 *
+	 * @param leftOperand             the left operand register number
+	 * @param rightOperand            the right operand register number or immediate value
 	 * @param rightOperandIsImmediate whether the right operand is specified as an immediate value (true)
-	 * or as a register number (false)
+	 *                                or as a register number (false)
 	 */
 	public void performFetch(final int leftOperand, final int rightOperand, final boolean rightOperandIsImmediate) {
 		setRegisterValue(leftOperand, getRamValue(getRegisterOrImmediate(rightOperand, rightOperandIsImmediate)));
@@ -595,10 +580,11 @@ public final class PicoblazeState {
 
 	/**
 	 * Performs a STORE operation
-	 * @param leftOperand the left operand register number
-	 * @param rightOperand the right operand register number or immediate value
+	 *
+	 * @param leftOperand             the left operand register number
+	 * @param rightOperand            the right operand register number or immediate value
 	 * @param rightOperandIsImmediate whether the right operand is specified as an immediate value (true)
-	 * or as a register number (false)
+	 *                                or as a register number (false)
 	 */
 	public void performStore(final int leftOperand, final int rightOperand, final boolean rightOperandIsImmediate) {
 		setRamValue(getRegisterOrImmediate(rightOperand, rightOperandIsImmediate), getRegisterValue(leftOperand));
@@ -607,33 +593,46 @@ public final class PicoblazeState {
 
 	/**
 	 * Performs a INPUT operation
-	 * @param leftOperand the left operand register number
-	 * @param rightOperand the right operand register number or immediate value
+	 *
+	 * @param leftOperand             the left operand register number
+	 * @param rightOperand            the right operand register number or immediate value
 	 * @param rightOperandIsImmediate whether the right operand is specified as an immediate value (true)
-	 * or as a register number (false)
+	 *                                or as a register number (false)
 	 * @throws PicoblazeSimulatorException when this model fails
 	 */
 	public void performInput(final int leftOperand, final int rightOperand, final boolean rightOperandIsImmediate) throws PicoblazeSimulatorException {
-		setRegisterValue(leftOperand, input(getRegisterOrImmediate(rightOperand, rightOperandIsImmediate)));
+		if (portHandler == null) {
+			throw new PicoblazeSimulatorException("no port handler");
+		}
+		int port = getRegisterOrImmediate(rightOperand, rightOperandIsImmediate);
+		int value = portHandler.handleInput(port & 0xff) & 0xff;
+		setRegisterValue(leftOperand, value);
 		incrementPc();
 	}
 
 	/**
 	 * Performs a OUTPUT operation
-	 * @param leftOperand the left operand register number
-	 * @param rightOperand the right operand register number or immediate value
+	 *
+	 * @param leftOperand             the left operand register number
+	 * @param rightOperand            the right operand register number or immediate value
 	 * @param rightOperandIsImmediate whether the right operand is specified as an immediate value (true)
-	 * or as a register number (false)
+	 *                                or as a register number (false)
 	 * @throws PicoblazeSimulatorException when this model fails
 	 */
 	public void performOutput(final int leftOperand, final int rightOperand, final boolean rightOperandIsImmediate) throws PicoblazeSimulatorException {
-		output(getRegisterOrImmediate(rightOperand, rightOperandIsImmediate), getRegisterValue(leftOperand));
+		if (portHandler == null) {
+			throw new PicoblazeSimulatorException("no port handler");
+		}
+		int port = getRegisterOrImmediate(rightOperand, rightOperandIsImmediate);
+		int value = getRegisterValue(leftOperand);
+		portHandler.handleOutput(port & 0xff, value & 0xff);
 		incrementPc();
 	}
 
 	/**
 	 * Performs a JUMP, JUMP Z, JUMP NZ, JUMP C or JUMP NC instruction, depending on the specified condition.
-	 * @param condition the condition that determines whether to jump
+	 *
+	 * @param condition     the condition that determines whether to jump
 	 * @param targetAddress the target address to jump to if the condition is met
 	 */
 	public void performJump(final PicoblazeJumpCondition condition, final int targetAddress) {
@@ -646,7 +645,8 @@ public final class PicoblazeState {
 
 	/**
 	 * Performs a CALL, CALL Z, CALL NZ, CALL C or CALL NC instruction, depending on the specified condition.
-	 * @param condition the condition that determines whether to call
+	 *
+	 * @param condition     the condition that determines whether to call
 	 * @param targetAddress the target address to call to if the condition is met
 	 */
 	public void performCall(final PicoblazeJumpCondition condition, final int targetAddress) {
@@ -660,6 +660,7 @@ public final class PicoblazeState {
 
 	/**
 	 * Performs a RETURN, RETURN Z, RETURN NZ, RETURN C or RETURN NC instruction, depending on the specified condition.
+	 *
 	 * @param condition the condition that determines whether to return
 	 */
 	public void performReturn(final PicoblazeJumpCondition condition) {
@@ -684,6 +685,7 @@ public final class PicoblazeState {
 
 	/**
 	 * Performs a RETURNI ENABLE or RETURNI DISABLE instruction, depending on the specified enable flag.
+	 *
 	 * @param enable whether to enable or disable interrupts after returning
 	 */
 	public void performReturnInterrupt(final boolean enable) {
@@ -696,6 +698,7 @@ public final class PicoblazeState {
 	/**
 	 * Performs a DISABLE INTERRUPT or ENABLE INTERRUPT instruction, depending on the specified
 	 * enable flag.
+	 *
 	 * @param enable whether to enable or disable interrupts
 	 */
 	public void performSetInterruptEnable(final boolean enable) {
@@ -706,9 +709,10 @@ public final class PicoblazeState {
 	/**
 	 * Performs a shift or rotate instruction. This method is used for
 	 * all types of shift and rotate, left and right.
+	 *
 	 * @param encodedInstruction the encoded instruction
-	 * @param operand the (left) operand register number. This could actually be
-	 * obtained from the encoded instruction, but isn't for performance reasons.
+	 * @param operand            the (left) operand register number. This could actually be
+	 *                           obtained from the encoded instruction, but isn't for performance reasons.
 	 */
 	private void performShiftOrRotateInstruction(final int encodedInstruction, final int operand) throws PicoblazeSimulatorException {
 		final int subOpcode = encodedInstruction & 15;
@@ -765,6 +769,7 @@ public final class PicoblazeState {
 	 * Performs the specified instruction. The instruction is assumed to be an encoded value
 	 * as taken from the instruction memory. Only the lowest 18 bits are respected. The
 	 * highest-order bits of those 18 bits are assumed to contain the opcode, and so on.
+	 *
 	 * @param encodedInstruction the encoded instruction, as taken from the instruction memory
 	 * @throws PicoblazeSimulatorException when this model fails
 	 */

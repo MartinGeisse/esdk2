@@ -6,9 +6,9 @@
 
 package name.martingeisse.esdk.old_picoblaze.simulator_old.instruction;
 
-import name.martingeisse.esdk.old_picoblaze.simulator_old.IPicoblazePortHandler;
-import name.martingeisse.esdk.old_picoblaze.simulator_old.PicoblazeSimulatorException;
-import name.martingeisse.esdk.old_picoblaze.simulator_old.PicoblazeState;
+import name.martingeisse.esdk.old_picoblaze.simulation.port.PicoblazePortHandler;
+import name.martingeisse.esdk.old_picoblaze.simulation.PicoblazeSimulatorException;
+import name.martingeisse.esdk.old_picoblaze.simulation.Picoblaze;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,13 +31,13 @@ public final class InstructionLevelPicoblazeSimulator {
 	/**
 	 * the state
 	 */
-	private PicoblazeState state;
+	private Picoblaze state;
 
 	/**
 	 * Constructor.
 	 */
 	public InstructionLevelPicoblazeSimulator() {
-		this.state = new PicoblazeState();
+		this.state = new Picoblaze();
 	}
 
 	/**
@@ -86,7 +86,7 @@ public final class InstructionLevelPicoblazeSimulator {
 	 * Getter method for the state.
 	 * @return the state
 	 */
-	public PicoblazeState getState() {
+	public Picoblaze getState() {
 		return state;
 	}
 
@@ -94,7 +94,7 @@ public final class InstructionLevelPicoblazeSimulator {
 	 * Setter method for the state.
 	 * @param state the state to set
 	 */
-	public void setState(final PicoblazeState state) {
+	public void setState(final Picoblaze state) {
 		if (state == null) {
 			throw new IllegalArgumentException("cannot set the state to null");
 		}
@@ -105,7 +105,7 @@ public final class InstructionLevelPicoblazeSimulator {
 	 * Convenience getter method for the portHandler of the state.
 	 * @return the portHandler
 	 */
-	public IPicoblazePortHandler getPortHandler() {
+	public PicoblazePortHandler getPortHandler() {
 		return state.getPortHandler();
 	}
 
@@ -113,7 +113,7 @@ public final class InstructionLevelPicoblazeSimulator {
 	 * Convenience setter method for the portHandler of the state.
 	 * @param portHandler the portHandler to set
 	 */
-	public void setPortHandler(final IPicoblazePortHandler portHandler) {
+	public void setPortHandler(final PicoblazePortHandler portHandler) {
 		state.setPortHandler(portHandler);
 	}
 

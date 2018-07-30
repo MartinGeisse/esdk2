@@ -4,10 +4,10 @@
  * This file is distributed under the terms of the MIT license.
  */
 
-package name.martingeisse.esdk.old_picoblaze.simulator_old;
+package name.martingeisse.esdk.old_picoblaze.simulation;
 
 /**
- * This exception is thrown by {@link PicoblazeState} when
+ * This exception is thrown by {@link Picoblaze} when
  * trying to execute an encoded instruction whose code does
  * not correspond to any real instruction.
  */

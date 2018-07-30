@@ -6,7 +6,7 @@
 
 package name.martingeisse.esdk.old_picoblaze.simulator_old.instruction;
 
-import name.martingeisse.esdk.old_picoblaze.simulator_old.PicoblazeSimulatorException;
+import name.martingeisse.esdk.old_picoblaze.simulation.PicoblazeSimulatorException;
 
 import java.io.File;
 import java.io.IOException;

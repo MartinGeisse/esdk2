@@ -4,13 +4,13 @@
  * This file is distributed under the terms of the MIT license.
  */
 
-package name.martingeisse.esdk.old_picoblaze.simulator_old;
+package name.martingeisse.esdk.old_picoblaze.simulation;
 
 /**
  * This enum type defines the various conditions that can be used in
  * JUMP, CALL and RETURN instructions. The main purpose of this enum
  * is to reduce the number of different methods in
- * {@link PicoblazeState} (because without this enum, there'd be
+ * {@link Picoblaze} (because without this enum, there'd be
  * 15 jump methods!)
  */
 public enum PicoblazeJumpCondition {
