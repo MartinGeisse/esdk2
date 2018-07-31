@@ -22,7 +22,7 @@ public final class RtlRealm extends Item {
 
 	private final List<RtlPin> pins = new ArrayList<>();
 	private final List<RtlClockNetwork> clockNetworks = new ArrayList<>();
-	private final List<RtlClockedBlock> clockedBlocks = new ArrayList<>();
+	private final List<RtlClockedItem> clockedItems = new ArrayList<>();
 
 	public RtlRealm(Design design) {
 		super(design);
@@ -51,11 +51,11 @@ public final class RtlRealm extends Item {
 	/**
 	 * Non-public API. Do not call. Only marked public because Java forces us to if we want to use packages.
 	 */
-	public void registerBlock(RtlClockedBlock.RealmRegistrationKey key, RtlClockedBlock block) {
+	public void registerClockedItem(RtlClockedItem.RealmRegistrationKey key, RtlClockedItem item) {
 		if (!key.isValid()) {
 			throw new IllegalArgumentException("invalid registration key");
 		}
-		clockedBlocks.add(block);
+		clockedItems.add(item);
 	}
 
 	public Iterable<RtlPin> getPins() {
@@ -66,8 +66,8 @@ public final class RtlRealm extends Item {
 		return clockNetworks;
 	}
 
-	public Iterable<RtlClockedBlock> getClockedBlocks() {
-		return clockedBlocks;
+	public Iterable<RtlClockedItem> getClockedItems() {
+		return clockedItems;
 	}
 
 	// ----------------------------------------------------------------------------------------------------------------
@@ -84,23 +84,23 @@ public final class RtlRealm extends Item {
 
 	@Override
 	protected void initializeSimulation() {
-		for (RtlClockedBlock block : clockedBlocks) {
-			block.executeInitializer();
+		for (RtlClockedItem item : clockedItems) {
+			item.executeInitializer();
 		}
-		for (RtlClockedBlock block : clockedBlocks) {
-			block.updateProceduralSignals();
+		for (RtlClockedItem item : clockedItems) {
+			item.updateState();
 		}
 	}
 
 	void onClockEdge(RtlClockNetwork clockNetwork) {
-		for (RtlClockedBlock block : clockedBlocks) {
-			if (block.getClockNetwork() == clockNetwork) {
-				block.execute();
+		for (RtlClockedItem item : clockedItems) {
+			if (item.getClockNetwork() == clockNetwork) {
+				item.execute();
 			}
 		}
-		for (RtlClockedBlock block : clockedBlocks) {
-			if (block.getClockNetwork() == clockNetwork) {
-				block.updateProceduralSignals();
+		for (RtlClockedItem item : clockedItems) {
+			if (item.getClockNetwork() == clockNetwork) {
+				item.updateState();
 			}
 		}
 	}

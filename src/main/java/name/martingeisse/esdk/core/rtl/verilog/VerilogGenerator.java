@@ -4,6 +4,7 @@
  */
 package name.martingeisse.esdk.core.rtl.verilog;
 
+import name.martingeisse.esdk.core.rtl.RtlClockedItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.block.RtlClockedBlock;
 import name.martingeisse.esdk.core.rtl.block.RtlProceduralSignal;
@@ -16,10 +17,7 @@ import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 
 import java.io.PrintWriter;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  *
@@ -30,6 +28,7 @@ public class VerilogGenerator {
 	private final RtlRealm realm;
 	private final String name;
 
+	private List<RtlClockedBlock> clockedBlocks;
 	private Set<RtlSignal> allSignals;
 	private Map<RtlSignal, String> declaredSignals;
 	private VerilogExpressionWriter dryRunExpressionWriter;
@@ -42,6 +41,7 @@ public class VerilogGenerator {
 	}
 
 	public void generate() {
+		copyBlocks();
 		analyzeSignals();
 		out.prepare(new HashMap<>(), declaredSignals);
 		out.printIntro(name, realm.getPins());
@@ -54,6 +54,22 @@ public class VerilogGenerator {
 		printOutputPinAssignments();
 		out.getOut().println();
 		out.printOutro();
+	}
+
+	//
+	// preparation
+	//
+
+	private void copyBlocks() {
+		clockedBlocks = new ArrayList<>();
+		for (RtlClockedItem item : realm.getClockedItems()) {
+			if (item instanceof RtlClockedBlock) {
+				clockedBlocks.add((RtlClockedBlock)item);
+			} else {
+				throw new RuntimeException("cannot synthesize RtlClockedItems except RtlClockedBlock");
+			}
+		}
+
 	}
 
 	//
@@ -101,7 +117,7 @@ public class VerilogGenerator {
 		}
 
 		// procedural signals must be declared
-		for (RtlClockedBlock block : realm.getClockedBlocks()) {
+		for (RtlClockedBlock block : clockedBlocks) {
 			for (RtlProceduralSignal signal : block.getProceduralSignals()) {
 				allSignals.add(signal);
 				declareSignal(signal);
@@ -121,7 +137,7 @@ public class VerilogGenerator {
 		}
 
 		// analyze signal "expressions" in blocks for signals to extract
-		for (RtlClockedBlock block : realm.getClockedBlocks()) {
+		for (RtlClockedBlock block : clockedBlocks) {
 			block.getInitializerStatements().printExpressionsDryRun(dryRunExpressionWriter);
 			block.getStatements().printExpressionsDryRun(dryRunExpressionWriter);
 		}
@@ -205,7 +221,7 @@ public class VerilogGenerator {
 	}
 
 	private void printBlocks() {
-		for (RtlClockedBlock block : realm.getClockedBlocks()) {
+		for (RtlClockedBlock block : clockedBlocks) {
 			block.printVerilogBlocks(out);
 		}
 	}

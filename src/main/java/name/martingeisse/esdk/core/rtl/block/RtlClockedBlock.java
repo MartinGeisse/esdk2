@@ -5,6 +5,7 @@
 package name.martingeisse.esdk.core.rtl.block;
 
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
+import name.martingeisse.esdk.core.rtl.RtlClockedItem;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.block.statement.RtlStatementSequence;
@@ -20,49 +21,23 @@ import java.util.List;
  * For a sequence of statements grouped as a single statement, commonly referred to as a "block"
  * inside compilers, see {@link RtlStatementSequence}.
  */
-public final class RtlClockedBlock extends RtlItem {
+public final class RtlClockedBlock extends RtlClockedItem {
 
-	private final RtlClockNetwork clockNetwork;
 	private final List<RtlProceduralSignal> proceduralSignals;
 	private final RtlStatementSequence initializerStatements;
 	private final RtlStatementSequence statements;
 
 	public RtlClockedBlock(RtlRealm realm, RtlClockNetwork clockNetwork) {
-		super(realm);
+		super(realm, clockNetwork);
 
-		this.clockNetwork = checkSameRealm(clockNetwork);
 		this.proceduralSignals = new ArrayList<>();
 		this.initializerStatements = new RtlStatementSequence(realm);
 		this.statements = new RtlStatementSequence(realm);
-
-		RealmRegistrationKey key = new RealmRegistrationKey();
-		realm.registerBlock(key, this);
-		key.valid = false;
 	}
 
-	/**
-	 * This class is used to ensure that {@link RtlRealm#registerBlock(RealmRegistrationKey, RtlClockedBlock)} isn't called except through the
-	 * {@link RtlClockedBlock} constructor.
-	 */
-	public static final class RealmRegistrationKey {
-
-		private boolean valid = true;
-
-		private RealmRegistrationKey() {
-		}
-
-		public boolean isValid() {
-			return valid;
-		}
-
-	}
 
 	void registerProceduralSignal(RtlProceduralSignal proceduralSignal) {
 		proceduralSignals.add(proceduralSignal);
-	}
-
-	public RtlClockNetwork getClockNetwork() {
-		return clockNetwork;
 	}
 
 	public Iterable<RtlProceduralSignal> getProceduralSignals() {
@@ -101,7 +76,7 @@ public final class RtlClockedBlock extends RtlItem {
 		statements.execute();
 	}
 
-	public void updateProceduralSignals() {
+	public void updateState() {
 		for (RtlProceduralSignal signal : proceduralSignals) {
 			signal.updateValue();
 		}
@@ -117,7 +92,7 @@ public final class RtlClockedBlock extends RtlItem {
 		initializerStatements.printVerilogStatements(out);
 		out.endProceduralAlwaysBlock();
 
-		out.startProceduralAlwaysBlock("posedge " + out.getSignalName(clockNetwork.getClockSignal()));
+		out.startProceduralAlwaysBlock("posedge " + out.getSignalName(getClockNetwork().getClockSignal()));
 		getStatements().printVerilogStatements(out);
 		out.endProceduralAlwaysBlock();
 

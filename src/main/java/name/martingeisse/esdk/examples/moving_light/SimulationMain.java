@@ -30,7 +30,7 @@ public class SimulationMain {
 		}
 
 		private void callback() {
-			design.getClk().fireClockEdge();
+			design.getClk().simulateClockEdge();
 			if (counter % (2 * 1024 * 1024) == 0) {
 				System.out.println(counter + ": " + design.getLeds().getValue());
 			}

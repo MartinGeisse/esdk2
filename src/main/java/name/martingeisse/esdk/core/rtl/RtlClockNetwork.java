@@ -61,10 +61,8 @@ public final class RtlClockNetwork extends RtlItem {
 	// simulation
 	// ----------------------------------------------------------------------------------------------------------------
 
-	public void fireClockEdge() {
-		fire(() -> {
-			getRealm().onClockEdge(this);
-		}, 0);
+	public void simulateClockEdge() {
+		getRealm().onClockEdge(this);
 	}
 
 }
