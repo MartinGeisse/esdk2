@@ -47,10 +47,28 @@ public abstract class RtlClockedItem extends RtlItem {
 	// simulation
 	// ----------------------------------------------------------------------------------------------------------------
 
-	public abstract void executeInitializer();
+	/**
+	 * Initializes the simulation run-time state of this item. This method must not access the state of other items
+	 * since the order in which items are initialized is undefined.
+	 */
+	public abstract void initializeSimulation();
 
-	public abstract void execute();
+	/**
+	 * This method computes the next state of this item based on its current state and the signals provided by other
+	 * items. It must not cause changes to any signals.
+	 * <p>
+	 * In RTL terms, this method runs between active clock edges and causes the register input signals to stabilize
+	 * to their final values.
+	 */
+	public abstract void computeNextState();
 
+	/**
+	 * Updates the current state of this item based on the next state computed by {@link #computeNextState()}. This
+	 * method causes signals to change values. It must not obtain the values of any signals since those may or may not
+	 * have changed their value already.
+	 * <p>
+	 * In RTL terms, this method runs at an active clock edge and causes all registers to load a new value.
+	 */
 	public abstract void updateState();
 
 }

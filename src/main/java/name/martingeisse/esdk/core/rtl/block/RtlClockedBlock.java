@@ -68,11 +68,12 @@ public final class RtlClockedBlock extends RtlClockedItem {
 	// simulation
 	// ----------------------------------------------------------------------------------------------------------------
 
-	public void executeInitializer() {
+	public void initializeSimulation() {
 		initializerStatements.execute();
+		updateState();
 	}
 
-	public void execute() {
+	public void computeNextState() {
 		statements.execute();
 	}
 

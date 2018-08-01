@@ -6,7 +6,6 @@ package name.martingeisse.esdk.core.rtl;
 
 import name.martingeisse.esdk.core.model.Design;
 import name.martingeisse.esdk.core.model.Item;
-import name.martingeisse.esdk.core.rtl.block.RtlClockedBlock;
 import name.martingeisse.esdk.core.rtl.pin.RtlPin;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 
@@ -85,17 +84,14 @@ public final class RtlRealm extends Item {
 	@Override
 	protected void initializeSimulation() {
 		for (RtlClockedItem item : clockedItems) {
-			item.executeInitializer();
-		}
-		for (RtlClockedItem item : clockedItems) {
-			item.updateState();
+			item.initializeSimulation();
 		}
 	}
 
 	void onClockEdge(RtlClockNetwork clockNetwork) {
 		for (RtlClockedItem item : clockedItems) {
 			if (item.getClockNetwork() == clockNetwork) {
-				item.execute();
+				item.computeNextState();
 			}
 		}
 		for (RtlClockedItem item : clockedItems) {
