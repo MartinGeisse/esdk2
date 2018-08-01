@@ -6,9 +6,9 @@
 
 package name.martingeisse.esdk.old_picoblaze.simulator_old.instruction;
 
-import name.martingeisse.esdk.old_picoblaze.simulation.port.PicoblazePortHandler;
 import name.martingeisse.esdk.old_picoblaze.simulation.PicoblazeSimulatorException;
-import name.martingeisse.esdk.old_picoblaze.simulation.Picoblaze;
+import name.martingeisse.esdk.old_picoblaze.simulation.PicoblazeState;
+import name.martingeisse.esdk.old_picoblaze.simulation.port.PicoblazePortHandler;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,13 +31,13 @@ public final class InstructionLevelPicoblazeSimulator {
 	/**
 	 * the state
 	 */
-	private Picoblaze state;
+	private PicoblazeState state;
 
 	/**
 	 * Constructor.
 	 */
 	public InstructionLevelPicoblazeSimulator() {
-		this.state = new Picoblaze();
+		this.state = new PicoblazeState();
 	}
 
 	/**
@@ -86,7 +86,7 @@ public final class InstructionLevelPicoblazeSimulator {
 	 * Getter method for the state.
 	 * @return the state
 	 */
-	public Picoblaze getState() {
+	public PicoblazeState getState() {
 		return state;
 	}
 
@@ -94,7 +94,7 @@ public final class InstructionLevelPicoblazeSimulator {
 	 * Setter method for the state.
 	 * @param state the state to set
 	 */
-	public void setState(final Picoblaze state) {
+	public void setState(final PicoblazeState state) {
 		if (state == null) {
 			throw new IllegalArgumentException("cannot set the state to null");
 		}

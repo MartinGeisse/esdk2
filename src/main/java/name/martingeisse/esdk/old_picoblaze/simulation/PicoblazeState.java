@@ -16,8 +16,12 @@ import name.martingeisse.esdk.old_picoblaze.simulation.port.PicoblazePortHandler
  * <p>
  * Note that the instruction store is *NOT* part of this model.
  */
-public final class Picoblaze {
+public final class PicoblazeState {
 
+	// configuration
+	private PicoblazePortHandler portHandler;
+
+	// ISA-visible state
 	private final byte[] registers;
 	private boolean zero;
 	private boolean carry;
@@ -27,16 +31,15 @@ public final class Picoblaze {
 	private boolean interruptEnable;
 	private boolean preservedZero;
 	private boolean preservedCarry;
-	private PicoblazePortHandler portHandler;
-	private boolean secondCycle;
 
 	/**
 	 * Constructor.
 	 */
-	public Picoblaze() {
+	public PicoblazeState() {
 		this.registers = new byte[16];
 		this.ram = new byte[64];
 		this.returnStack = new int[32];
+		reset();
 	}
 
 	/**
@@ -48,7 +51,24 @@ public final class Picoblaze {
 		setInterruptEnable(false);
 		setZero(false);
 		setCarry(false);
-		secondCycle = false;
+	}
+
+	/**
+	 * Getter method for the portHandler.
+	 *
+	 * @return the portHandler
+	 */
+	public PicoblazePortHandler getPortHandler() {
+		return portHandler;
+	}
+
+	/**
+	 * Setter method for the portHandler.
+	 *
+	 * @param portHandler the portHandler to set
+	 */
+	public void setPortHandler(final PicoblazePortHandler portHandler) {
+		this.portHandler = portHandler;
 	}
 
 	/**
@@ -202,24 +222,6 @@ public final class Picoblaze {
 	 */
 	public void setPreservedCarry(final boolean preservedCarry) {
 		this.preservedCarry = preservedCarry;
-	}
-
-	/**
-	 * Getter method for the portHandler.
-	 *
-	 * @return the portHandler
-	 */
-	public PicoblazePortHandler getPortHandler() {
-		return portHandler;
-	}
-
-	/**
-	 * Setter method for the portHandler.
-	 *
-	 * @param portHandler the portHandler to set
-	 */
-	public void setPortHandler(final PicoblazePortHandler portHandler) {
-		this.portHandler = portHandler;
 	}
 
 	/**

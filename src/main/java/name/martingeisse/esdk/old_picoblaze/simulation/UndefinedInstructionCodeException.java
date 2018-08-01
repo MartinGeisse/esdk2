@@ -7,7 +7,7 @@
 package name.martingeisse.esdk.old_picoblaze.simulation;
 
 /**
- * This exception is thrown by {@link Picoblaze} when
+ * This exception is thrown by {@link PicoblazeState} when
  * trying to execute an encoded instruction whose code does
  * not correspond to any real instruction.
  */

@@ -6,13 +6,11 @@
 
 package name.martingeisse.esdk.old_picoblaze.simulation.program;
 
-import name.martingeisse.esdk.old_picoblaze.simulation.Picoblaze;
-
 /**
  * Strategy that defines how instructions are loaded.
  * <p>
  * This interface is meant to define port behavior at a high level. To interact at RTL level, use the
- * corresponding address signal from the {@link Picoblaze} and install an {@link PicoblazeProgramHandlerRtl}
+ * corresponding address signal and install an {@link PicoblazeProgramHandlerRtl}
  * implementation of this interface to define the source for input data.
  */
 public interface PicoblazeProgramHandler {

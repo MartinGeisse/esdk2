@@ -6,13 +6,11 @@
 
 package name.martingeisse.esdk.old_picoblaze.simulation.port;
 
-import name.martingeisse.esdk.old_picoblaze.simulation.Picoblaze;
-
 /**
  * Strategy that defines how the environment reacts to INPUT and OUTPUT instructions executed by a PicoBlaze.
  * <p>
  * This interface is meant to define port behavior at a high level. To interact with ports at RTL level, use the
- * corresponding address and read/write strobe signals from the {@link Picoblaze} and install an {@link PicoblazePortHandlerRtl}
+ * corresponding address and read/write strobe signals and install an {@link PicoblazePortHandlerRtl}
  * implementation of this interface to define the source for input data.
  */
 public interface PicoblazePortHandler {
