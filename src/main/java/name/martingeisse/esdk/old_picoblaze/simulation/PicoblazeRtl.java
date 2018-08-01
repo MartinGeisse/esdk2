@@ -29,6 +29,9 @@ import name.martingeisse.esdk.old_picoblaze.simulation.program.PicoblazeProgramH
 public class PicoblazeRtl extends RtlClockedItem {
 
 	private final PicoblazeState state;
+	// TODO these probably have to go back into the PicoblazeState to avoid duplicate logic. We did I remove them?
+	// this had to do with reset() vs. the RTL interface. So move the instruction execution state there but leave all
+	// RTL logic here.
 	private boolean secondCycle;
 	private int instruction;
 

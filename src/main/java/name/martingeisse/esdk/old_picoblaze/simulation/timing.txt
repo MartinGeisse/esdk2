@@ -1,0 +1,11 @@
+
+
+Normal instructions: The PC gets incremented in the cycle the instruction register DOESN'T get loaded.
+
+The I/O address is stable for two cycles; the strobe is active for only one cycle.
+
+The output data is stable for two cycles, like the I/O address.
+
+With a jump, call or return, obviously the new address must be ready at the end of the second cycle, so the
+next instruction gets loaded properly. Since even the incremented PC is not ready before that, the loaded PC probably
+isn't either.

@@ -37,3 +37,17 @@ clock edges.
 
 What is *not* allowed is to drive output-changing methods and clock edges in different events scheduled at the same
 time, because then the order in which these events are processed is undefined.
+
+# Other Notes
+
+Building such an interface is hard. So we need a set of standard classes to handle it properly.
+These should correspond to standard synthesizable interfaces to avoid special coding just
+for simulation. An obvious example is bus masters and slaves, e.g. standard implementations to
+connect a high-level model to an RTL model of a CPU on a Wishbone bus; connecting a
+high-level CPU model (or even threaded item) to an RTL model of a bus slave device, with or
+without a bus model in between; connecting and RTL (highlevel) producer to a highlevel (RTL)
+consumer via a FIFO queue, and so on.
+
+The Picoblaze gets special treatment here because it is very popular and uses its own custom
+bus specification. So we provide an implementation for this RTL-to-highlevel interface even
+though it is very specialized.
