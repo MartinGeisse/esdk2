@@ -32,6 +32,10 @@ public final class PicoblazeState {
 	private boolean preservedZero;
 	private boolean preservedCarry;
 
+	// instruction execution state
+	private boolean secondCycle;
+	private int instruction;
+
 	/**
 	 * Constructor.
 	 */
@@ -51,7 +55,14 @@ public final class PicoblazeState {
 		setInterruptEnable(false);
 		setZero(false);
 		setCarry(false);
+
+		// Initialize the instruction to a NOP and jump right to execution (second cycle). This will have no effect
+		// other than immediately loading the first instruction.
+		this.secondCycle = true;
+		this.instruction = 0x01000; // LOAD s0, s0
 	}
+
+//region accessors
 
 	/**
 	 * Getter method for the portHandler.
@@ -275,322 +286,99 @@ public final class PicoblazeState {
 		return (immediate ? (x & 0xff) : getRegisterValue(x));
 	}
 
+//endregion
+
+//region instruction decoding
+
 	/**
-	 * Increments the PC register by 1.
+	 * Returns the primary opcode, which is the highest 5 bits of the instruction.
 	 */
-	private void incrementPc() {
-		setPc(getPc() + 1);
+	public int getPrimaryOpcode() {
+		return ((instruction >> 13) & 31);
 	}
 
 	/**
-	 * Performs an ADD operation
-	 *
-	 * @param leftOperand             the left operand register number
-	 * @param rightOperand            the right operand register number or immediate value
-	 * @param rightOperandIsImmediate whether the right operand is specified as an immediate value (true)
-	 *                                or as a register number (false)
+	 * Gets the left operand value in the range 0..255
 	 */
-	public void performAdd(final int leftOperand, final int rightOperand, final boolean rightOperandIsImmediate) {
-		final int result = (getRegisterValue(leftOperand) + getRegisterOrImmediate(rightOperand, rightOperandIsImmediate));
-		setRegisterValue(leftOperand, result);
-		setZero((result & 0xff) == 0);
-		setCarry(result > 255);
-		incrementPc();
+	public int getLeftOperand() {
+		return getRegisterValue((instruction >> 8) & 15);
 	}
 
 	/**
-	 * Performs an ADDCY operation
-	 *
-	 * @param leftOperand             the left operand register number
-	 * @param rightOperand            the right operand register number or immediate value
-	 * @param rightOperandIsImmediate whether the right operand is specified as an immediate value (true)
-	 *                                or as a register number (false)
+	 * Sets the left operand value. Only the low 8 bits are stored.
 	 */
-	public void performAddWithCarry(final int leftOperand, final int rightOperand, final boolean rightOperandIsImmediate) {
-		final int result = (getRegisterValue(leftOperand) + getRegisterOrImmediate(rightOperand, rightOperandIsImmediate) + (carry ? 1 : 0));
-		setRegisterValue(leftOperand, result);
-		setZero((result & 0xff) == 0);
-		setCarry(result > 255);
-		incrementPc();
+	public void setLeftOperand(int value) {
+		setRegisterValue((instruction >> 8) & 15, value);
 	}
 
 	/**
-	 * Performs a SUB operation
-	 *
-	 * @param leftOperand             the left operand register number
-	 * @param rightOperand            the right operand register number or immediate value
-	 * @param rightOperandIsImmediate whether the right operand is specified as an immediate value (true)
-	 *                                or as a register number (false)
+	 * Gets the right operand value in the range 0..255
 	 */
-	public void performSub(final int leftOperand, final int rightOperand, final boolean rightOperandIsImmediate) {
-		final int result = (getRegisterValue(leftOperand) - getRegisterOrImmediate(rightOperand, rightOperandIsImmediate));
-		setRegisterValue(leftOperand, result);
-		setZero((result & 0xff) == 0);
-		setCarry(result < 0);
-		incrementPc();
+	public int getRightOperand() {
+		if (((instruction >> 12) & 1) == 0) {
+			// immediate
+			return (instruction & 255);
+		} else {
+			// register
+			return getRegisterValue((getRightOperand() >> 4) & 15);
+		}
 	}
 
 	/**
-	 * Performs a SUBCY operation
-	 *
-	 * @param leftOperand             the left operand register number
-	 * @param rightOperand            the right operand register number or immediate value
-	 * @param rightOperandIsImmediate whether the right operand is specified as an immediate value (true)
-	 *                                or as a register number (false)
+	 * Decodes the jump/return condition from the instruction and tests it against the current flag state.
 	 */
-	public void performSubWithCarry(final int leftOperand, final int rightOperand, final boolean rightOperandIsImmediate) {
-		final int result = (getRegisterValue(leftOperand) - getRegisterOrImmediate(rightOperand, rightOperandIsImmediate) - (carry ? 1 : 0));
-		setRegisterValue(leftOperand, result);
-		setZero((result & 0xff) == 0);
-		setCarry(result < 0);
-		incrementPc();
+	public boolean testCondition() {
+		return PicoblazeJumpCondition.fromEncodedInstruction(instruction).test(zero, carry);
 	}
 
-	/**
-	 * Performs an AND operation
-	 *
-	 * @param leftOperand             the left operand register number
-	 * @param rightOperand            the right operand register number or immediate value
-	 * @param rightOperandIsImmediate whether the right operand is specified as an immediate value (true)
-	 *                                or as a register number (false)
-	 */
-	public void performAnd(final int leftOperand, final int rightOperand, final boolean rightOperandIsImmediate) {
-		final int result = (getRegisterValue(leftOperand) & getRegisterOrImmediate(rightOperand, rightOperandIsImmediate));
-		setRegisterValue(leftOperand, result);
-		setZero((result & 0xff) == 0);
-		setCarry(false);
-		incrementPc();
+//endregion
+
+//region RTL signal support
+
+	public int getPortOutputData() {
+		return getLeftOperand();
 	}
 
-	/**
-	 * Performs an OR operation
-	 *
-	 * @param leftOperand             the left operand register number
-	 * @param rightOperand            the right operand register number or immediate value
-	 * @param rightOperandIsImmediate whether the right operand is specified as an immediate value (true)
-	 *                                or as a register number (false)
-	 */
-	public void performOr(final int leftOperand, final int rightOperand, final boolean rightOperandIsImmediate) {
-		final int result = (getRegisterValue(leftOperand) | getRegisterOrImmediate(rightOperand, rightOperandIsImmediate));
-		setRegisterValue(leftOperand, result);
-		setZero((result & 0xff) == 0);
-		setCarry(false);
-		incrementPc();
+	public int getPortAddress() {
+		return getRightOperand();
 	}
 
-	/**
-	 * Performs an XOR operation
-	 *
-	 * @param leftOperand             the left operand register number
-	 * @param rightOperand            the right operand register number or immediate value
-	 * @param rightOperandIsImmediate whether the right operand is specified as an immediate value (true)
-	 *                                or as a register number (false)
-	 */
-	public void performXor(final int leftOperand, final int rightOperand, final boolean rightOperandIsImmediate) {
-		final int result = (getRegisterValue(leftOperand) ^ getRegisterOrImmediate(rightOperand, rightOperandIsImmediate));
-		setRegisterValue(leftOperand, result);
-		setZero((result & 0xff) == 0);
-		setCarry(false);
-		incrementPc();
+	public boolean getReadStrobe() {
+		return secondCycle && (getPrimaryOpcode() == 2);
 	}
 
-	/**
-	 * Returns the XOR of the lowest eight bits of the specified value as
-	 * a boolean value
-	 *
-	 * @param value the value containing the bits
-	 * @return true if the XOR result is 1, false if it is 0
-	 */
-	private boolean computeByteXor(int value) {
-		value ^= (value >> 4);
-		value ^= (value >> 2);
-		value ^= (value >> 1);
-		return ((value & 1) != 0);
+	public boolean getWriteStrobe() {
+		return secondCycle && (getPrimaryOpcode() == 22);
 	}
 
-	/**
-	 * Performs a TEST operation
-	 *
-	 * @param leftOperand             the left operand register number
-	 * @param rightOperand            the right operand register number or immediate value
-	 * @param rightOperandIsImmediate whether the right operand is specified as an immediate value (true)
-	 *                                or as a register number (false)
-	 */
-	public void performTest(final int leftOperand, final int rightOperand, final boolean rightOperandIsImmediate) {
-		final int temp = (getRegisterValue(leftOperand) & getRegisterOrImmediate(rightOperand, rightOperandIsImmediate));
-		setZero((temp & 0xff) == 0);
-		setCarry(computeByteXor(temp));
-		incrementPc();
-	}
+//endregion
+
+//region instruction execution
+
+	// ----------------------------------------------------------------------------------------------------------------
+	// instruction execution
+	// ----------------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Performs a COMPARE operation
-	 *
-	 * @param leftOperand             the left operand register number
-	 * @param rightOperand            the right operand register number or immediate value
-	 * @param rightOperandIsImmediate whether the right operand is specified as an immediate value (true)
-	 *                                or as a register number (false)
-	 */
-	public void performCompare(final int leftOperand, final int rightOperand, final boolean rightOperandIsImmediate) {
-		final int temp = (getRegisterValue(leftOperand) - getRegisterOrImmediate(rightOperand, rightOperandIsImmediate));
-		setZero(temp == 0);
-		setCarry(temp < 0);
-		incrementPc();
-	}
-
-	/**
-	 * @param operand      the operand register number
 	 * @param shiftInValue true to shift in a 1 bit, false to shift in a 0 bit
 	 */
-	private void performShiftLeft(final int operand, final boolean shiftInValue) {
-		int x = getRegisterValue(operand);
+	private void performShiftLeft(final boolean shiftInValue) {
+		int x = getLeftOperand();
 		setCarry((x & 128) != 0);
 		x = ((x << 1) | (shiftInValue ? 1 : 0));
-		setRegisterValue(operand, x);
+		setLeftOperand(x);
 		setZero((x & 0xff) == 0);
-		incrementPc();
 	}
 
 	/**
-	 * Performs a SL0 (shift left and fill with 0) operation
-	 *
-	 * @param operand the operand register number
-	 */
-	public void performShiftLeftZero(final int operand) {
-		performShiftLeft(operand, false);
-	}
-
-	/**
-	 * Performs a SL1 (shift left and fill with 1) operation
-	 *
-	 * @param operand the operand register number
-	 */
-	public void performShiftLeftOne(final int operand) {
-		performShiftLeft(operand, true);
-	}
-
-	/**
-	 * Performs a SLX (shift left and replicate bit 0) operation
-	 *
-	 * @param operand the operand register number
-	 */
-	public void performShiftLeftReplicate(final int operand) {
-		performShiftLeft(operand, (getRegisterValue(operand) & 1) != 0);
-	}
-
-	/**
-	 * Performs a SLA (shift left through all bits including CARRY) operation
-	 *
-	 * @param operand the operand register number
-	 */
-	public void performShiftLeftAll(final int operand) {
-		performShiftLeft(operand, carry);
-	}
-
-	/**
-	 * Performs a RL (rotate left) operation
-	 *
-	 * @param operand the operand register number
-	 */
-	public void performRotateLeft(final int operand) {
-		performShiftLeft(operand, (getRegisterValue(operand) & 128) != 0);
-	}
-
-	/**
-	 * @param operand      the operand register number
 	 * @param shiftInValue true to shift in a 1 bit, false to shift in a 0 bit
 	 */
-	private void performShiftRight(final int operand, final boolean shiftInValue) {
-		int x = getRegisterValue(operand);
+	private void performShiftRight(final boolean shiftInValue) {
+		int x = getLeftOperand();
 		setCarry((x & 1) != 0);
 		x = ((x >> 1) | (shiftInValue ? 128 : 0));
-		setRegisterValue(operand, x);
+		setLeftOperand(x);
 		setZero((x & 0xff) == 0);
-		incrementPc();
-	}
-
-	/**
-	 * Performs a SL0 (shift right and fill with 0) operation
-	 *
-	 * @param operand the operand register number
-	 */
-	public void performShiftRightZero(final int operand) {
-		performShiftRight(operand, false);
-	}
-
-	/**
-	 * Performs a SL1 (shift right and fill with 1) operation
-	 *
-	 * @param operand the operand register number
-	 */
-	public void performShiftRightOne(final int operand) {
-		performShiftRight(operand, true);
-	}
-
-	/**
-	 * Performs a SLX (shift right and replicate bit 0) operation
-	 *
-	 * @param operand the operand register number
-	 */
-	public void performShiftRightReplicate(final int operand) {
-		performShiftRight(operand, (getRegisterValue(operand) & 128) != 0);
-	}
-
-	/**
-	 * Performs a SLA (shift right through all bits including CARRY) operation
-	 *
-	 * @param operand the operand register number
-	 */
-	public void performShiftRightAll(final int operand) {
-		performShiftRight(operand, carry);
-	}
-
-	/**
-	 * Performs a RL (rotate right) operation
-	 *
-	 * @param operand the operand register number
-	 */
-	public void performRotateRight(final int operand) {
-		performShiftRight(operand, (getRegisterValue(operand) & 1) != 0);
-	}
-
-	/**
-	 * Performs a LOAD operation
-	 *
-	 * @param leftOperand             the left operand register number
-	 * @param rightOperand            the right operand register number or immediate value
-	 * @param rightOperandIsImmediate whether the right operand is specified as an immediate value (true)
-	 *                                or as a register number (false)
-	 */
-	public void performLoad(final int leftOperand, final int rightOperand, final boolean rightOperandIsImmediate) {
-		setRegisterValue(leftOperand, getRegisterOrImmediate(rightOperand, rightOperandIsImmediate));
-		incrementPc();
-	}
-
-	/**
-	 * Performs a FETCH operation
-	 *
-	 * @param leftOperand             the left operand register number
-	 * @param rightOperand            the right operand register number or immediate value
-	 * @param rightOperandIsImmediate whether the right operand is specified as an immediate value (true)
-	 *                                or as a register number (false)
-	 */
-	public void performFetch(final int leftOperand, final int rightOperand, final boolean rightOperandIsImmediate) {
-		setRegisterValue(leftOperand, getRamValue(getRegisterOrImmediate(rightOperand, rightOperandIsImmediate)));
-		incrementPc();
-	}
-
-	/**
-	 * Performs a STORE operation
-	 *
-	 * @param leftOperand             the left operand register number
-	 * @param rightOperand            the right operand register number or immediate value
-	 * @param rightOperandIsImmediate whether the right operand is specified as an immediate value (true)
-	 *                                or as a register number (false)
-	 */
-	public void performStore(final int leftOperand, final int rightOperand, final boolean rightOperandIsImmediate) {
-		setRamValue(getRegisterOrImmediate(rightOperand, rightOperandIsImmediate), getRegisterValue(leftOperand));
-		incrementPc();
 	}
 
 	/**
@@ -632,49 +420,6 @@ public final class PicoblazeState {
 	}
 
 	/**
-	 * Performs a JUMP, JUMP Z, JUMP NZ, JUMP C or JUMP NC instruction, depending on the specified condition.
-	 *
-	 * @param condition     the condition that determines whether to jump
-	 * @param targetAddress the target address to jump to if the condition is met
-	 */
-	public void performJump(final PicoblazeJumpCondition condition, final int targetAddress) {
-		if (condition.test(zero, carry)) {
-			setPc(targetAddress);
-		} else {
-			incrementPc();
-		}
-	}
-
-	/**
-	 * Performs a CALL, CALL Z, CALL NZ, CALL C or CALL NC instruction, depending on the specified condition.
-	 *
-	 * @param condition     the condition that determines whether to call
-	 * @param targetAddress the target address to call to if the condition is met
-	 */
-	public void performCall(final PicoblazeJumpCondition condition, final int targetAddress) {
-		if (condition.test(zero, carry)) {
-			setReturnStackPointer(getReturnStackPointer() + 1);
-			setPc(targetAddress);
-		} else {
-			incrementPc();
-		}
-	}
-
-	/**
-	 * Performs a RETURN, RETURN Z, RETURN NZ, RETURN C or RETURN NC instruction, depending on the specified condition.
-	 *
-	 * @param condition the condition that determines whether to return
-	 */
-	public void performReturn(final PicoblazeJumpCondition condition) {
-		if (condition.test(zero, carry)) {
-			setReturnStackPointer(getReturnStackPointer() - 1);
-			incrementPc();
-		} else {
-			incrementPc();
-		}
-	}
-
-	/**
 	 * This method does not correspond to an instruction, but to an asserted interrupt signal.
 	 */
 	public void performInterrupt() {
@@ -686,78 +431,50 @@ public final class PicoblazeState {
 	}
 
 	/**
-	 * Performs a RETURNI ENABLE or RETURNI DISABLE instruction, depending on the specified enable flag.
-	 *
-	 * @param enable whether to enable or disable interrupts after returning
+	 * Performs a shift or rotate instruction. This method is used for all types of shift and rotate, left and right.
 	 */
-	public void performReturnInterrupt(final boolean enable) {
-		setReturnStackPointer(getReturnStackPointer() - 1);
-		setZero(isPreservedZero());
-		setCarry(isPreservedCarry());
-		setInterruptEnable(enable);
-	}
-
-	/**
-	 * Performs a DISABLE INTERRUPT or ENABLE INTERRUPT instruction, depending on the specified
-	 * enable flag.
-	 *
-	 * @param enable whether to enable or disable interrupts
-	 */
-	public void performSetInterruptEnable(final boolean enable) {
-		setInterruptEnable(enable);
-		incrementPc();
-	}
-
-	/**
-	 * Performs a shift or rotate instruction. This method is used for
-	 * all types of shift and rotate, left and right.
-	 *
-	 * @param encodedInstruction the encoded instruction
-	 * @param operand            the (left) operand register number. This could actually be
-	 *                           obtained from the encoded instruction, but isn't for performance reasons.
-	 */
-	private void performShiftOrRotateInstruction(final int encodedInstruction, final int operand) throws PicoblazeSimulatorException {
-		final int subOpcode = encodedInstruction & 15;
+	private void performShiftOrRotateInstruction() throws PicoblazeSimulatorException {
+		final int subOpcode = instruction & 15;
 		switch (subOpcode) {
 
 			case 0:
-				performShiftLeftAll(operand);
+				performShiftLeft(carry);
 				break;
 
 			case 2:
-				performRotateLeft(operand);
+				performShiftLeft((getLeftOperand() & 128) != 0);
 				break;
 
 			case 4:
-				performShiftLeftReplicate(operand);
+				performShiftLeft((getLeftOperand() & 1) != 0);
 				break;
 
 			case 6:
-				performShiftLeftZero(operand);
+				performShiftLeft(false);
 				break;
 
 			case 7:
-				performShiftLeftOne(operand);
+				performShiftLeft(true);
 				break;
 
 			case 8:
-				performShiftRightAll(operand);
+				performShiftRight(carry);
 				break;
 
 			case 10:
-				performShiftRightReplicate(operand);
+				performShiftRight((getLeftOperand() & 128) != 0);
 				break;
 
 			case 12:
-				performRotateRight(operand);
+				performShiftRight((getLeftOperand() & 1) != 0);
 				break;
 
 			case 14:
-				performShiftRightZero(operand);
+				performShiftRight(false);
 				break;
 
 			case 15:
-				performShiftRightOne(operand);
+				performShiftRight(true);
 				break;
 
 			// undefined shift sub-opcodes: 1, 3, 5, 9, 11, 13
@@ -767,32 +484,52 @@ public final class PicoblazeState {
 		}
 	}
 
-	/**
-	 * Performs the specified instruction. The instruction is assumed to be an encoded value
-	 * as taken from the instruction memory. Only the lowest 18 bits are respected. The
-	 * highest-order bits of those 18 bits are assumed to contain the opcode, and so on.
-	 *
-	 * @param encodedInstruction the encoded instruction, as taken from the instruction memory
-	 * @throws PicoblazeSimulatorException when this model fails
-	 */
-	public void performInstruction(final int encodedInstruction) throws PicoblazeSimulatorException {
+	private void performFirstCycle() {
+		setPc(getPc() + 1);
+		switch (getPrimaryOpcode()) {
 
-		final int primaryOpcode = ((encodedInstruction >> 13) & 31);
-		final boolean rightOperandIsImmediate = (((encodedInstruction >> 12) & 1) == 0);
-		final PicoblazeJumpCondition jumpCondition = PicoblazeJumpCondition.fromEncodedInstruction(encodedInstruction);
-		final int leftOperand = ((encodedInstruction >> 8) & 15);
-		int rightOperand = (encodedInstruction & 255);
-		final int targetAddress = (encodedInstruction & 1023);
+			// RETURN*
+			case 21:
+				if (testCondition()) {
+					setReturnStackPointer(getReturnStackPointer() - 1);
+				}
+				break;
 
-		if (!rightOperandIsImmediate) {
-			rightOperand = (rightOperand >> 4);
+			// CALL*
+			// Implementation note: We store the address of the instruction *after* the call on the stack, not the
+			// address of the call as described in the docs. Since the stack cannot be accessed, this shouldn't make
+			// a difference.
+			case 24:
+				if (testCondition()) {
+					setReturnStackPointer(getReturnStackPointer() + 1);
+					setPc(instruction & 1023);
+				}
+				break;
+
+			// JUMP*
+			case 26:
+				if (testCondition()) {
+					setPc(instruction & 1023);
+				}
+				break;
+
+			// RETURNI*
+			case 28:
+				setReturnStackPointer(getReturnStackPointer() - 1);
+				setZero(isPreservedZero());
+				setCarry(isPreservedCarry());
+				setInterruptEnable((instruction & 1) != 0);
+				break;
+
 		}
+	}
 
-		switch (primaryOpcode) {
+	private void performSecondCycle() throws PicoblazeSimulatorException {
+		switch (getPrimaryOpcode()) {
 
 			// LOAD
 			case 0:
-				performLoad(leftOperand, rightOperand, rightOperandIsImmediate);
+				setLeftOperand(getRightOperand());
 				break;
 
 			// INPUT
@@ -802,62 +539,98 @@ public final class PicoblazeState {
 
 			// FETCH
 			case 3:
-				performFetch(leftOperand, rightOperand, rightOperandIsImmediate);
+				setLeftOperand(getRamValue(getRightOperand()));
 				break;
 
 			// AND
-			case 5:
-				performAnd(leftOperand, rightOperand, rightOperandIsImmediate);
+			case 5: {
+				final int result = getLeftOperand() & getRightOperand();
+				setLeftOperand(result);
+				setZero((result & 0xff) == 0);
+				setCarry(false);
 				break;
+			}
 
 			// OR
-			case 6:
-				performOr(leftOperand, rightOperand, rightOperandIsImmediate);
+			case 6: {
+				final int result = getLeftOperand() | getRightOperand();
+				setLeftOperand(result);
+				setZero((result & 0xff) == 0);
+				setCarry(false);
 				break;
+			}
 
 			// XOR
-			case 7:
-				performXor(leftOperand, rightOperand, rightOperandIsImmediate);
+			case 7: {
+				final int result = getLeftOperand() ^ getRightOperand();
+				setLeftOperand(result);
+				setZero((result & 0xff) == 0);
+				setCarry(false);
 				break;
+			}
 
 			// TEST
-			case 9:
-				performTest(leftOperand, rightOperand, rightOperandIsImmediate);
+			case 9: {
+				int temp = getLeftOperand() & getRightOperand();
+				setZero(temp == 0);
+				temp ^= (temp >> 4);
+				temp ^= (temp >> 2);
+				temp ^= (temp >> 1);
+				setCarry((temp & 1) != 0);
 				break;
+			}
 
 			// COMPARE
-			case 10:
-				performCompare(leftOperand, rightOperand, rightOperandIsImmediate);
+			case 10: {
+				final int temp = getLeftOperand() - getRightOperand();
+				setZero(temp == 0);
+				setCarry(temp < 0);
 				break;
+			}
 
 			// ADD
-			case 12:
-				performAdd(leftOperand, rightOperand, rightOperandIsImmediate);
+			case 12: {
+				final int result = getLeftOperand() + getRightOperand();
+				setLeftOperand(result);
+				setZero((result & 0xff) == 0);
+				setCarry(result > 255);
 				break;
+			}
 
 			// ADDCY
-			case 13:
-				performAddWithCarry(leftOperand, rightOperand, rightOperandIsImmediate);
+			case 13: {
+				final int result = getLeftOperand() + getRightOperand() + (carry ? 1 : 0);
+				setLeftOperand(result);
+				setZero((result & 0xff) == 0);
+				setCarry(result > 255);
 				break;
+			}
 
 			// SUB
-			case 14:
-				performSub(leftOperand, rightOperand, rightOperandIsImmediate);
+			case 14: {
+				final int result = getLeftOperand() - getRightOperand();
+				setLeftOperand(result);
+				setZero((result & 0xff) == 0);
+				setCarry(result < 0);
 				break;
+			}
 
 			// SUBCY
-			case 15:
-				performSubWithCarry(leftOperand, rightOperand, rightOperandIsImmediate);
+			case 15: {
+				final int result = getLeftOperand() - getRightOperand() - (carry ? 1 : 0);
+				setLeftOperand(result);
+				setZero((result & 0xff) == 0);
+				setCarry(result < 0);
 				break;
+			}
 
 			// all shift and rotate instructions
 			case 16:
-				performShiftOrRotateInstruction(encodedInstruction, leftOperand);
+				performShiftOrRotateInstruction();
 				break;
 
-			// RETURN*
+			// RETURN* -- already done in first cycle
 			case 21:
-				performReturn(jumpCondition);
 				break;
 
 			// OUTPUT
@@ -867,34 +640,43 @@ public final class PicoblazeState {
 
 			// STORE
 			case 23:
-				performStore(leftOperand, rightOperand, rightOperandIsImmediate);
+				setRamValue(getRightOperand(), getLeftOperand());
 				break;
 
-			// CALL*
+			// CALL* -- already done in first cycle
 			case 24:
-				performCall(jumpCondition, targetAddress);
 				break;
 
-			// JUMP*
+			// JUMP* -- already done in first cycle
 			case 26:
-				performJump(jumpCondition, targetAddress);
 				break;
 
-			// RETURNI*
+			// RETURNI* -- already done in first cycle
 			case 28:
-				performReturnInterrupt((encodedInstruction & 1) != 0);
 				break;
 
 			// ENABLE INTERRUPT, DISABLE INTERRUPT
 			case 30:
-				performSetInterruptEnable((encodedInstruction & 1) != 0);
+				setInterruptEnable((instruction & 1) != 0);
 				break;
 
 			// undefined primary opcodes: 1, 4, 8, 11, 17-20, 25, 27, 29, 31
 			default:
-				throw new UndefinedInstructionCodeException("unknown primary opcode (highest five bits): " + primaryOpcode);
+				throw new UndefinedInstructionCodeException("unknown primary opcode (highest five bits): " + getPrimaryOpcode());
 
 		}
 	}
+
+	public void performCycle() throws PicoblazeSimulatorException {
+		if (secondCycle) {
+			performSecondCycle();
+			secondCycle = false;
+		} else {
+			performFirstCycle();
+			secondCycle = true;
+		}
+	}
+
+//endregion
 
 }

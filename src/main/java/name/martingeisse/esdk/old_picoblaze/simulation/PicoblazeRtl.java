@@ -39,10 +39,6 @@ public class PicoblazeRtl extends RtlClockedItem {
 		super(realm, clockNetwork);
 		this.state = new PicoblazeState();
 
-		// Initialize the instruction to a NOP and jump right to execution (second cycle). This will have no effect
-		// other than immediately loading the first instruction.
-		this.secondCycle = true;
-		this.instruction = 0x01000; // LOAD s0, s0
 	}
 
 	public RtlVectorSignal getInstructionAddress() {
