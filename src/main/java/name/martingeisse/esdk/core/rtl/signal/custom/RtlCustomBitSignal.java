@@ -7,6 +7,9 @@ package name.martingeisse.esdk.core.rtl.signal.custom;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
+import name.martingeisse.esdk.core.util.BitProvider;
+
+import java.util.function.Predicate;
 
 /**
  * Helper class that extends both {@link RtlItem} and {@link RtlBitSignal} and the same time. An anonymous signal
@@ -16,6 +19,15 @@ public abstract class RtlCustomBitSignal extends RtlCustomSignal implements RtlB
 
 	public RtlCustomBitSignal(RtlRealm realm) {
 		super(realm);
+	}
+
+	public static RtlCustomBitSignal of(RtlRealm realm, BitProvider bitProvider) {
+		return new RtlCustomBitSignal(realm) {
+			@Override
+			public boolean getValue() {
+				return bitProvider.getValue();
+			}
+		};
 	}
 
 }

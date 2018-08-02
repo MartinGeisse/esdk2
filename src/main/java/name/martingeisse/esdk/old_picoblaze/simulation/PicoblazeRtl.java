@@ -25,92 +25,42 @@ import name.martingeisse.esdk.old_picoblaze.simulation.program.PicoblazeProgramH
  * <p>
  * Similarly, the program can be configured using a {@link PicoblazeProgramHandler}. For a pure RTL model, use
  * a {@link PicoblazeProgramHandlerRtl}.
+ * <p>
+ * This model supports resetting the Picoblaze either through an RTL signal or by calling a method. Both ways can be
+ * mixed; however, if the reset method gets called from within {@link RtlClockedItem#updateState()}, then it is
+ * undefined whether the Picoblaze executes the current cycle before or after the reset.
  */
 public class PicoblazeRtl extends RtlClockedItem {
 
 	private final PicoblazeState state;
-	// TODO these probably have to go back into the PicoblazeState to avoid duplicate logic. We did I remove them?
-	// this had to do with reset() vs. the RTL interface. So move the instruction execution state there but leave all
-	// RTL logic here.
-	private boolean secondCycle;
-	private int instruction;
 
 	public PicoblazeRtl(RtlRealm realm, RtlClockNetwork clockNetwork) {
 		super(realm, clockNetwork);
 		this.state = new PicoblazeState();
+	}
 
+	public PicoblazeState getState() {
+		return state;
 	}
 
 	public RtlVectorSignal getInstructionAddress() {
-		return new RtlCustomVectorSignal(getRealm()) {
-
-			@Override
-			public int getWidth() {
-				return 10;
-			}
-
-			@Override
-			public VectorValue getValue() {
-				// TODO does this reflect the correct value both for increments and jumps?
-				return VectorValue.ofUnsigned(10, state.getPc());
-			}
-
-		};
+		return RtlCustomVectorSignal.ofUnsigned(getRealm(), 10, state::getPc);
 	}
 
 	public RtlVectorSignal getIoAddress() {
-		return new RtlCustomVectorSignal(getRealm()) {
-
-			@Override
-			public int getWidth() {
-				return 8;
-			}
-
-			@Override
-			public VectorValue getValue() {
-				// TODO does this reflect the correct value both for immediate and register addresses?
-				return VectorValue.ofUnsigned(8, 0 /*TODO*/);
-			}
-
-		};
+		return RtlCustomVectorSignal.ofUnsigned(getRealm(), 10, state::getPortAddress);
 	}
 
 	public RtlVectorSignal getIoData() {
-		return new RtlCustomVectorSignal(getRealm()) {
-
-			@Override
-			public int getWidth() {
-				return 8;
-			}
-
-			@Override
-			public VectorValue getValue() {
-				return VectorValue.ofUnsigned(8, 0 /*TODO*/);
-			}
-
-		};
+		return RtlCustomVectorSignal.ofUnsigned(getRealm(), 10, state::getPortOutputData);
 	}
 
 	public RtlBitSignal getReadStrobe() {
-		return new RtlCustomBitSignal(getRealm()) {
-
-			@Override
-			public boolean getValue() {
-				return false; // TODO
-			}
-
-		};
+		return RtlCustomBitSignal.of(getRealm(), state::getReadStrobe);
 	}
 
 	public RtlBitSignal getWriteStrobe() {
-		return new RtlCustomBitSignal(getRealm()) {
-
-			@Override
-			public boolean getValue() {
-				return false; // TODO
-			}
-
-		};
+		return RtlCustomBitSignal.of(getRealm(), state::getWriteStrobe);
 	}
 
 	@Override
