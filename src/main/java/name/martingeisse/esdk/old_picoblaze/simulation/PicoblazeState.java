@@ -382,45 +382,9 @@ public final class PicoblazeState {
 	}
 
 	/**
-	 * Performs a INPUT operation
-	 *
-	 * @param leftOperand             the left operand register number
-	 * @param rightOperand            the right operand register number or immediate value
-	 * @param rightOperandIsImmediate whether the right operand is specified as an immediate value (true)
-	 *                                or as a register number (false)
-	 * @throws PicoblazeSimulatorException when this model fails
-	 */
-	public void performInput(final int leftOperand, final int rightOperand, final boolean rightOperandIsImmediate) throws PicoblazeSimulatorException {
-		if (portHandler == null) {
-			throw new PicoblazeSimulatorException("no port handler");
-		}
-		int port = getRegisterOrImmediate(rightOperand, rightOperandIsImmediate);
-		int value = portHandler.handleInput(port & 0xff) & 0xff;
-		setRegisterValue(leftOperand, value);
-		incrementPc();
-	}
-
-	/**
-	 * Performs a OUTPUT operation
-	 *
-	 * @param leftOperand             the left operand register number
-	 * @param rightOperand            the right operand register number or immediate value
-	 * @param rightOperandIsImmediate whether the right operand is specified as an immediate value (true)
-	 *                                or as a register number (false)
-	 * @throws PicoblazeSimulatorException when this model fails
-	 */
-	public void performOutput(final int leftOperand, final int rightOperand, final boolean rightOperandIsImmediate) throws PicoblazeSimulatorException {
-		if (portHandler == null) {
-			throw new PicoblazeSimulatorException("no port handler");
-		}
-		int port = getRegisterOrImmediate(rightOperand, rightOperandIsImmediate);
-		int value = getRegisterValue(leftOperand);
-		portHandler.handleOutput(port & 0xff, value & 0xff);
-		incrementPc();
-	}
-
-	/**
 	 * This method does not correspond to an instruction, but to an asserted interrupt signal.
+	 *
+	 * TODO how does this work together with the two-cycle instruction execution?
 	 */
 	public void performInterrupt() {
 		setReturnStackPointer(getReturnStackPointer() + 1);
@@ -534,7 +498,10 @@ public final class PicoblazeState {
 
 			// INPUT
 			case 2:
-				performInput(leftOperand, rightOperand, rightOperandIsImmediate);
+				if (portHandler == null) {
+					throw new PicoblazeSimulatorException("no port handler");
+				}
+				setLeftOperand(portHandler.handleInput(getRightOperand()));
 				break;
 
 			// FETCH
@@ -635,7 +602,10 @@ public final class PicoblazeState {
 
 			// OUTPUT
 			case 22:
-				performOutput(leftOperand, rightOperand, rightOperandIsImmediate);
+				if (portHandler == null) {
+					throw new PicoblazeSimulatorException("no port handler");
+				}
+				portHandler.handleOutput(getRightOperand(), getLeftOperand());
 				break;
 
 			// STORE
