@@ -15,7 +15,8 @@ import name.martingeisse.esdk.old_picoblaze.model.instruction.AssociatedPicoblaz
 /**
  * This is a synchronous ROM that loads and assembles a .psm from an associated resource.
  * <p>
- * Calling code must set the address signal before using this object.
+ * Calling code must set the address signal using {@link #setAddressSignal(RtlVectorSignal)} and make use of the
+ * instruction signal form {@link #getInstructionSignal()} as part of building the design
  */
 public class AssociatedPicoblazeProgramRom extends RtlItem {
 
@@ -49,4 +50,11 @@ public class AssociatedPicoblazeProgramRom extends RtlItem {
 		rom.setAddressSignal(addressSignal);
 	}
 
+	public RtlVectorSignal getInstructionSignal() {
+		return rom.getReadDataSignal();
+	}
+
+	public RtlSynchronousRom getRom() {
+		return rom;
+	}
 }
