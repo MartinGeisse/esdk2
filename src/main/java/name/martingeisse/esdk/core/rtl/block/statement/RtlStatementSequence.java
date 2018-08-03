@@ -9,8 +9,8 @@ import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorConstant;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
-import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
-import name.martingeisse.esdk.core.rtl.verilog.VerilogWriter;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
 
 import java.util.ArrayList;
 import java.util.List;

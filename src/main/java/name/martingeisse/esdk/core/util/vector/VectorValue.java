@@ -4,8 +4,8 @@
  */
 package name.martingeisse.esdk.core.util.vector;
 
-import name.martingeisse.esdk.core.rtl.verilog.PrintWriterVerilogExpressionWriter;
-import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.PrintWriterVerilogExpressionWriter;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

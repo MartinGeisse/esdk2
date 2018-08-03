@@ -6,10 +6,9 @@ package name.martingeisse.esdk.core.rtl.block;
 
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlClockedItem;
-import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.block.statement.RtlStatementSequence;
-import name.martingeisse.esdk.core.rtl.verilog.VerilogWriter;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
 
 import java.util.ArrayList;
 import java.util.List;

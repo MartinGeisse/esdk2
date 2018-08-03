@@ -2,7 +2,7 @@
  * Copyright (c) 2018 Martin Geisse
  * This file is distributed under the terms of the MIT license.
  */
-package name.martingeisse.esdk.core.rtl.verilog;
+package name.martingeisse.esdk.core.rtl.synthesis.verilog;
 
 import name.martingeisse.esdk.core.rtl.RtlClockedItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;

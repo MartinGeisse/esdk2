@@ -7,8 +7,8 @@ package name.martingeisse.esdk.core.rtl.signal.connector;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
-import name.martingeisse.esdk.core.rtl.verilog.VerilogExpressionWriter;
-import name.martingeisse.esdk.core.rtl.verilog.VerilogGenerator;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogGenerator;
 
 /**
  * This signal simply produces the same values as another signal which is settable after construction. This helps

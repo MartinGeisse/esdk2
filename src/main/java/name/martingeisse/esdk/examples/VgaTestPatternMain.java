@@ -2,7 +2,7 @@ package name.martingeisse.esdk.examples;
 
 import name.martingeisse.esdk.core.model.Design;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
-import name.martingeisse.esdk.core.rtl.xilinx.ProjectGenerator;
+import name.martingeisse.esdk.core.rtl.synthesis.xilinx.ProjectGenerator;
 
 import java.io.File;
 

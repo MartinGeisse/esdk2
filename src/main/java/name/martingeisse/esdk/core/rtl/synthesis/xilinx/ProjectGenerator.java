@@ -2,12 +2,12 @@
  * Copyright (c) 2018 Martin Geisse
  * This file is distributed under the terms of the MIT license.
  */
-package name.martingeisse.esdk.core.rtl.xilinx;
+package name.martingeisse.esdk.core.rtl.synthesis.xilinx;
 
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.pin.RtlPin;
 import name.martingeisse.esdk.core.rtl.pin.RtlPinConfiguration;
-import name.martingeisse.esdk.core.rtl.verilog.VerilogGenerator;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogGenerator;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;

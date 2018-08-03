@@ -16,7 +16,7 @@ import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlConcatenation;
 import name.martingeisse.esdk.core.rtl.signal.RtlConditionalVectorOperation;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
-import name.martingeisse.esdk.core.rtl.xilinx.XilinxPinConfiguration;
+import name.martingeisse.esdk.core.rtl.synthesis.xilinx.XilinxPinConfiguration;
 
 /**
  *

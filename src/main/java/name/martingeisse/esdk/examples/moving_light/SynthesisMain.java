@@ -1,6 +1,6 @@
 package name.martingeisse.esdk.examples.moving_light;
 
-import name.martingeisse.esdk.core.rtl.xilinx.ProjectGenerator;
+import name.martingeisse.esdk.core.rtl.synthesis.xilinx.ProjectGenerator;
 
 import java.io.File;
 
