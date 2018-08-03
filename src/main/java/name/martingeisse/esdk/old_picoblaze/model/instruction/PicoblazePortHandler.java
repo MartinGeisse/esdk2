@@ -4,7 +4,7 @@
  * This file is distributed under the terms of the MIT license.
  */
 
-package name.martingeisse.esdk.old_picoblaze.simulation.port;
+package name.martingeisse.esdk.old_picoblaze.model.instruction;
 
 /**
  * Strategy that defines how the environment reacts to INPUT and OUTPUT instructions executed by a PicoBlaze.

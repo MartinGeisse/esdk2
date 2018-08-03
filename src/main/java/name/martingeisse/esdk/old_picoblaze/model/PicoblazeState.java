@@ -4,9 +4,10 @@
  * This file is distributed under the terms of the MIT license.
  */
 
-package name.martingeisse.esdk.old_picoblaze.simulation;
+package name.martingeisse.esdk.old_picoblaze.model;
 
-import name.martingeisse.esdk.old_picoblaze.simulation.port.PicoblazePortHandler;
+import name.martingeisse.esdk.old_picoblaze.model.instruction.PicoblazePortHandler;
+import name.martingeisse.esdk.old_picoblaze.model.instruction.PicoblazeProgramHandler;
 
 /**
  * An abstraction level-neutral representation of the internal state of a PicoBlaze
@@ -17,9 +18,6 @@ import name.martingeisse.esdk.old_picoblaze.simulation.port.PicoblazePortHandler
  * Note that the instruction store is *NOT* part of this model.
  */
 public final class PicoblazeState {
-
-	// configuration
-	private PicoblazePortHandler portHandler;
 
 	// ISA-visible state
 	private final byte[] registers;
@@ -58,29 +56,12 @@ public final class PicoblazeState {
 
 		// Initialize the instruction to a NOP and jump right to execution (second cycle). This will have no effect
 		// other than immediately loading the first instruction.
+		// TODO move to RTL model; the RTL can detect reset by looking at the signal and the highlevel model doesn't need this flag
 		this.secondCycle = true;
 		this.instruction = 0x01000; // LOAD s0, s0
 	}
 
 //region accessors
-
-	/**
-	 * Getter method for the portHandler.
-	 *
-	 * @return the portHandler
-	 */
-	public PicoblazePortHandler getPortHandler() {
-		return portHandler;
-	}
-
-	/**
-	 * Setter method for the portHandler.
-	 *
-	 * @param portHandler the portHandler to set
-	 */
-	public void setPortHandler(final PicoblazePortHandler portHandler) {
-		this.portHandler = portHandler;
-	}
 
 	/**
 	 * Getter method for the pc.
@@ -286,7 +267,15 @@ public final class PicoblazeState {
 		return (immediate ? (x & 0xff) : getRegisterValue(x));
 	}
 
-//endregion
+	public int getInstruction() {
+		return instruction;
+	}
+
+	public void setInstruction(int instruction) {
+		this.instruction = instruction;
+	}
+
+	//endregion
 
 //region instruction decoding
 
@@ -343,12 +332,22 @@ public final class PicoblazeState {
 		return getRightOperand();
 	}
 
+	public boolean isInputInstruction() {
+		return getPrimaryOpcode() == 2;
+	}
+
+	// TODO move to RTL model
 	public boolean getReadStrobe() {
 		return secondCycle && (getPrimaryOpcode() == 2);
 	}
 
+	// TODO move to RTL model
 	public boolean getWriteStrobe() {
 		return secondCycle && (getPrimaryOpcode() == 22);
+	}
+
+	public boolean isOutputInstruction() {
+		return getPrimaryOpcode() == 22;
 	}
 
 //endregion
@@ -397,7 +396,7 @@ public final class PicoblazeState {
 	/**
 	 * Performs a shift or rotate instruction. This method is used for all types of shift and rotate, left and right.
 	 */
-	private void performShiftOrRotateInstruction() throws PicoblazeSimulatorException {
+	private void performShiftOrRotateInstruction() {
 		final int subOpcode = instruction & 15;
 		switch (subOpcode) {
 
@@ -448,7 +447,7 @@ public final class PicoblazeState {
 		}
 	}
 
-	private void performFirstCycle() {
+	public void performFirstCycle() {
 		setPc(getPc() + 1);
 		switch (getPrimaryOpcode()) {
 
@@ -488,7 +487,7 @@ public final class PicoblazeState {
 		}
 	}
 
-	private void performSecondCycle() throws PicoblazeSimulatorException {
+	public void performSecondCycle() {
 		switch (getPrimaryOpcode()) {
 
 			// LOAD
@@ -637,7 +636,8 @@ public final class PicoblazeState {
 		}
 	}
 
-	public void performCycle() throws PicoblazeSimulatorException {
+	// TODO move to RTL model
+	public void performCycle() {
 		if (secondCycle) {
 			performSecondCycle();
 			secondCycle = false;

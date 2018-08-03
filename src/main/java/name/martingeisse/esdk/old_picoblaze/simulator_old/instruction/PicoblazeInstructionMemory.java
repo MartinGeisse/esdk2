@@ -6,7 +6,7 @@
 
 package name.martingeisse.esdk.old_picoblaze.simulator_old.instruction;
 
-import name.martingeisse.esdk.old_picoblaze.simulation.PicoblazeSimulatorException;
+import name.martingeisse.esdk.old_picoblaze.model.PicoblazeSimulatorException;
 
 import java.io.File;
 import java.io.IOException;
@@ -60,7 +60,7 @@ public class PicoblazeInstructionMemory implements IPicoblazeInstructionMemory {
 	 * @see name.martingeisse.esdk.picoblaze.simulator.instruction.IPicoblazeInstructionMemory#getInstruction(int)
 	 */
 	@Override
-	public int getInstruction(final int address) throws PicoblazeSimulatorException {
+	public int getInstruction(final int address) {
 		if (address < 0 || address >= 1024) {
 			throw new PicoblazeSimulatorException("invalid instruction address: " + address);
 		}

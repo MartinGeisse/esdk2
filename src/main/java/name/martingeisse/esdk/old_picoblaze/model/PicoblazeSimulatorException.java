@@ -4,14 +4,14 @@
  * This file is distributed under the terms of the MIT license.
  */
 
-package name.martingeisse.esdk.old_picoblaze.simulation;
+package name.martingeisse.esdk.old_picoblaze.model;
 
 /**
  * General exception supertype for any exception that occurs
  * in the PicoBlaze model and indicates that modeling the
  * real PicoBlaze has failed.
  */
-public class PicoblazeSimulatorException extends Exception {
+public class PicoblazeSimulatorException extends RuntimeException {
 
 	/**
 	 * Constructor.

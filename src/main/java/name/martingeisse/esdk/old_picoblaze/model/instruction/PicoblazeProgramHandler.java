@@ -4,7 +4,7 @@
  * This file is distributed under the terms of the MIT license.
  */
 
-package name.martingeisse.esdk.old_picoblaze.simulation.program;
+package name.martingeisse.esdk.old_picoblaze.model.instruction;
 
 /**
  * Strategy that defines how instructions are loaded.

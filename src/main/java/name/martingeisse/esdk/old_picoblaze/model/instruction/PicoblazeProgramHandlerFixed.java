@@ -1,4 +1,4 @@
-package name.martingeisse.esdk.old_picoblaze.simulation.program;
+package name.martingeisse.esdk.old_picoblaze.model.instruction;
 
 /**
  *

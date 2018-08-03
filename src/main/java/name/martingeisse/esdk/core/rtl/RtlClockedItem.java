@@ -55,7 +55,7 @@ public abstract class RtlClockedItem extends RtlItem {
 
 	/**
 	 * This method computes the next state of this item based on its current state and the signals provided by other
-	 * items. It must not cause changes to any signals.
+	 * items. It must not cause changes to any signals, or to its internal state, or to the state of any other item.
 	 * <p>
 	 * In RTL terms, this method runs between active clock edges and causes the register input signals to stabilize
 	 * to their final values.
@@ -64,8 +64,9 @@ public abstract class RtlClockedItem extends RtlItem {
 
 	/**
 	 * Updates the current state of this item based on the next state computed by {@link #computeNextState()}. This
-	 * method causes signals to change values. It must not obtain the values of any signals since those may or may not
-	 * have changed their value already.
+	 * method causes signals to change values. It must not obtain the values of any signals or call getters of other
+	 * items since those may or may not have changed their value already. It must not change the state of other
+	 * items that trigger on the same clock edge since the order in which effects happen is undefined.
 	 * <p>
 	 * In RTL terms, this method runs at an active clock edge and causes all registers to load a new value.
 	 */

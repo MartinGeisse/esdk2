@@ -1,4 +1,4 @@
-package name.martingeisse.esdk.old_picoblaze.simulation;
+package name.martingeisse.esdk.old_picoblaze.model.rtl;
 
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlClockedItem;
@@ -7,28 +7,15 @@ import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.signal.custom.RtlCustomBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.custom.RtlCustomVectorSignal;
-import name.martingeisse.esdk.core.util.vector.VectorValue;
-import name.martingeisse.esdk.old_picoblaze.simulation.port.PicoblazePortHandler;
-import name.martingeisse.esdk.old_picoblaze.simulation.port.PicoblazePortHandlerRtl;
-import name.martingeisse.esdk.old_picoblaze.simulation.program.PicoblazeProgramHandler;
-import name.martingeisse.esdk.old_picoblaze.simulation.program.PicoblazeProgramHandlerRtl;
+import name.martingeisse.esdk.old_picoblaze.model.PicoblazeState;
 
 /**
- * An RTL-compatible Picoblaze model.
+ * An RTL Picoblaze model.
  * <p>
  * This model simulates the two-cycle behavior of the Picoblaze, including the I/O address being stable in the first
  * cycle. Use {@link #getIoAddress()} to obtain that address. Use {@link #getInstructionAddress()} to get the
- * instruction address as an RTL signal, but note that this signal is not correct during the first cycle.
- * <p>
- * The actual I/O behavior can still be configured using a {@link PicoblazePortHandler}. To build a pure RTL model,
- * use a {@link PicoblazePortHandlerRtl}.
- * <p>
- * Similarly, the program can be configured using a {@link PicoblazeProgramHandler}. For a pure RTL model, use
- * a {@link PicoblazeProgramHandlerRtl}.
- * <p>
- * This model supports resetting the Picoblaze either through an RTL signal or by calling a method. Both ways can be
- * mixed; however, if the reset method gets called from within {@link RtlClockedItem#updateState()}, then it is
- * undefined whether the Picoblaze executes the current cycle before or after the reset.
+ * instruction address as an RTL signal, but note that this signal is not correct during the first cycle, just like
+ * for the real Picoblaze.
  */
 public class PicoblazeRtl extends RtlClockedItem {
 
@@ -37,6 +24,9 @@ public class PicoblazeRtl extends RtlClockedItem {
 	public PicoblazeRtl(RtlRealm realm, RtlClockNetwork clockNetwork) {
 		super(realm, clockNetwork);
 		this.state = new PicoblazeState();
+
+		// TODO no program handler or port handler for an RTL model!
+
 	}
 
 	public PicoblazeState getState() {
@@ -70,6 +60,9 @@ public class PicoblazeRtl extends RtlClockedItem {
 	@Override
 	public void computeNextState() {
 		// TODO
+		// Problem: The PicoblazeState doesn't conform to RtlClockedItem -- it reads external state and changes
+		// internal state in the same method call. It even changes external state through the port handler in the
+		// same call.
 	}
 
 	@Override

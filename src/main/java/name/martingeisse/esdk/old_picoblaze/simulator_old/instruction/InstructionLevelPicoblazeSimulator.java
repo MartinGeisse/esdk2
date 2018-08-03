@@ -6,9 +6,9 @@
 
 package name.martingeisse.esdk.old_picoblaze.simulator_old.instruction;
 
-import name.martingeisse.esdk.old_picoblaze.simulation.PicoblazeSimulatorException;
-import name.martingeisse.esdk.old_picoblaze.simulation.PicoblazeState;
-import name.martingeisse.esdk.old_picoblaze.simulation.port.PicoblazePortHandler;
+import name.martingeisse.esdk.old_picoblaze.model.PicoblazeSimulatorException;
+import name.martingeisse.esdk.old_picoblaze.model.PicoblazeState;
+import name.martingeisse.esdk.old_picoblaze.model.instruction.PicoblazePortHandler;
 
 import java.io.File;
 import java.io.IOException;
@@ -122,9 +122,8 @@ public final class InstructionLevelPicoblazeSimulator {
 	 * performs an interrupt entry, depending on the interrupt signal. If an instruction
 	 * is executed, a program memory is needed and used. Depending on the instruction,
 	 * a port handler is also needed and used.
-	 * @throws PicoblazeSimulatorException when this model fails
 	 */
-	public void performInstructionCycle() throws PicoblazeSimulatorException {
+	public void performInstructionCycle() {
 		if (interruptSignal != null && interruptSignal.isActive()) {
 			state.performInterrupt();
 		} else if (instructionMemory == null) {
@@ -137,9 +136,8 @@ public final class InstructionLevelPicoblazeSimulator {
 	/**
 	 * Performs the specified number of instruction cycles.
 	 * @param count the number of instruction cycles to perform
-	 * @throws PicoblazeSimulatorException when this model fails
 	 */
-	public void performMultipleInstructionCycles(final int count) throws PicoblazeSimulatorException {
+	public void performMultipleInstructionCycles(final int count) {
 		for (int i = 0; i < count; i++) {
 			performInstructionCycle();
 		}
