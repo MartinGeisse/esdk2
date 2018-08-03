@@ -3,10 +3,13 @@ package name.martingeisse.esdk.old_picoblaze.model.rtl;
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlClockedItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
+import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.signal.custom.RtlCustomBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.custom.RtlCustomVectorSignal;
+import name.martingeisse.esdk.core.util.vector.VectorValue;
+import name.martingeisse.esdk.old_picoblaze.model.PicoblazeSimulatorException;
 import name.martingeisse.esdk.old_picoblaze.model.PicoblazeState;
 
 /**
@@ -20,13 +23,41 @@ import name.martingeisse.esdk.old_picoblaze.model.PicoblazeState;
 public class PicoblazeRtl extends RtlClockedItem {
 
 	private final PicoblazeState state;
+	private RtlBitSignal resetSignal;
+	private boolean sampledResetValue;
+	private RtlVectorSignal instructionSignal;
+	private VectorValue sampledInstructionValue;
+	private RtlVectorSignal portInputDataSignal;
+	private VectorValue sampledPortInputDataValue;
+	private boolean secondCycle;
 
 	public PicoblazeRtl(RtlRealm realm, RtlClockNetwork clockNetwork) {
 		super(realm, clockNetwork);
-		this.state = new PicoblazeState();
+		this.state = new PicoblazeState() {
 
-		// TODO no program handler or port handler for an RTL model!
+			@Override
+			protected int handleInput(int address) {
+				return sampledPortInputDataValue.getAsUnsignedInt();
+			}
 
+			@Override
+			protected void handleOutput(int address, int value) {
+			}
+
+		};
+		this.resetSignal = new RtlBitConstant(realm, false);
+	}
+
+	public void setResetSignal(RtlBitSignal resetSignal) {
+		this.resetSignal = resetSignal;
+	}
+
+	public void setInstructionSignal(RtlVectorSignal instructionSignal) {
+		this.instructionSignal = instructionSignal;
+	}
+
+	public void setPortInputDataSignal(RtlVectorSignal portInputDataSignal) {
+		this.portInputDataSignal = portInputDataSignal;
 	}
 
 	public PicoblazeState getState() {
@@ -46,28 +77,48 @@ public class PicoblazeRtl extends RtlClockedItem {
 	}
 
 	public RtlBitSignal getReadStrobe() {
-		return RtlCustomBitSignal.of(getRealm(), state::getReadStrobe);
+		return RtlCustomBitSignal.of(getRealm(), () -> secondCycle && state.isInputInstruction());
 	}
 
 	public RtlBitSignal getWriteStrobe() {
-		return RtlCustomBitSignal.of(getRealm(), state::getWriteStrobe);
+		return RtlCustomBitSignal.of(getRealm(), () -> secondCycle && state.isOutputInstruction());
 	}
 
 	@Override
 	public void initializeSimulation() {
+		if (resetSignal == null) {
+			throw new PicoblazeSimulatorException("no reset signal was set");
+		}
+		if (instructionSignal == null) {
+			throw new PicoblazeSimulatorException("no instruction signal was set");
+		}
+		if (portInputDataSignal == null) {
+			throw new PicoblazeSimulatorException("no port input data signal was set");
+		}
 	}
 
 	@Override
 	public void computeNextState() {
-		// TODO
-		// Problem: The PicoblazeState doesn't conform to RtlClockedItem -- it reads external state and changes
-		// internal state in the same method call. It even changes external state through the port handler in the
-		// same call.
+		sampledResetValue = resetSignal.getValue();
+		sampledInstructionValue = instructionSignal.getValue();
+		sampledPortInputDataValue = portInputDataSignal.getValue();
 	}
 
 	@Override
 	public void updateState() {
-		// TODO
+		if (sampledResetValue) {
+			state.reset();
+			// State state object will initialize the instruction to a NOP and here we jump right to execution
+			// (second cycle). This will have no effect other than immediately loading the first instruction.
+			secondCycle = true;
+		} else if (secondCycle) {
+			state.performSecondCycle();
+			secondCycle = false;
+		} else {
+			state.setInstruction(sampledInstructionValue.getAsUnsignedInt());
+			state.performFirstCycle();
+			secondCycle = true;
+		}
 	}
 
 }

@@ -6,9 +6,6 @@
 
 package name.martingeisse.esdk.old_picoblaze.model;
 
-import name.martingeisse.esdk.old_picoblaze.model.instruction.PicoblazePortHandler;
-import name.martingeisse.esdk.old_picoblaze.model.instruction.PicoblazeProgramHandler;
-
 /**
  * An abstraction level-neutral representation of the internal state of a PicoBlaze
  * instance. This state model can be used both for simulating a PB program within
@@ -17,7 +14,7 @@ import name.martingeisse.esdk.old_picoblaze.model.instruction.PicoblazeProgramHa
  * <p>
  * Note that the instruction store is *NOT* part of this model.
  */
-public final class PicoblazeState {
+public abstract class PicoblazeState {
 
 	// ISA-visible state
 	private final byte[] registers;
@@ -31,7 +28,6 @@ public final class PicoblazeState {
 	private boolean preservedCarry;
 
 	// instruction execution state
-	private boolean secondCycle;
 	private int instruction;
 
 	/**
@@ -53,13 +49,16 @@ public final class PicoblazeState {
 		setInterruptEnable(false);
 		setZero(false);
 		setCarry(false);
-
-		// Initialize the instruction to a NOP and jump right to execution (second cycle). This will have no effect
-		// other than immediately loading the first instruction.
-		// TODO move to RTL model; the RTL can detect reset by looking at the signal and the highlevel model doesn't need this flag
-		this.secondCycle = true;
-		this.instruction = 0x01000; // LOAD s0, s0
+		setInstruction(0x01000); // LOAD s0, s0
 	}
+
+//region subclass behavior
+
+	protected abstract int handleInput(int address);
+
+	protected abstract void handleOutput(int address, int value);
+
+//endregion
 
 //region accessors
 
@@ -336,16 +335,6 @@ public final class PicoblazeState {
 		return getPrimaryOpcode() == 2;
 	}
 
-	// TODO move to RTL model
-	public boolean getReadStrobe() {
-		return secondCycle && (getPrimaryOpcode() == 2);
-	}
-
-	// TODO move to RTL model
-	public boolean getWriteStrobe() {
-		return secondCycle && (getPrimaryOpcode() == 22);
-	}
-
 	public boolean isOutputInstruction() {
 		return getPrimaryOpcode() == 22;
 	}
@@ -382,8 +371,6 @@ public final class PicoblazeState {
 
 	/**
 	 * This method does not correspond to an instruction, but to an asserted interrupt signal.
-	 *
-	 * TODO how does this work together with the two-cycle instruction execution?
 	 */
 	public void performInterrupt() {
 		setReturnStackPointer(getReturnStackPointer() + 1);
@@ -497,10 +484,7 @@ public final class PicoblazeState {
 
 			// INPUT
 			case 2:
-				if (portHandler == null) {
-					throw new PicoblazeSimulatorException("no port handler");
-				}
-				setLeftOperand(portHandler.handleInput(getRightOperand()));
+				setLeftOperand(handleInput(getRightOperand()));
 				break;
 
 			// FETCH
@@ -601,10 +585,7 @@ public final class PicoblazeState {
 
 			// OUTPUT
 			case 22:
-				if (portHandler == null) {
-					throw new PicoblazeSimulatorException("no port handler");
-				}
-				portHandler.handleOutput(getRightOperand(), getLeftOperand());
+				handleOutput(getRightOperand(), getLeftOperand());
 				break;
 
 			// STORE
@@ -633,17 +614,6 @@ public final class PicoblazeState {
 			default:
 				throw new UndefinedInstructionCodeException("unknown primary opcode (highest five bits): " + getPrimaryOpcode());
 
-		}
-	}
-
-	// TODO move to RTL model
-	public void performCycle() {
-		if (secondCycle) {
-			performSecondCycle();
-			secondCycle = false;
-		} else {
-			performFirstCycle();
-			secondCycle = true;
 		}
 	}
 
