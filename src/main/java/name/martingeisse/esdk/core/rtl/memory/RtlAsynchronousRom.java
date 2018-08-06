@@ -36,13 +36,7 @@ public final class RtlAsynchronousRom extends RtlItem {
 	}
 
 	public void setAddressSignal(RtlVectorSignal addressSignal) {
-		if (addressSignal.getWidth() > 30) {
-			throw new IllegalArgumentException("address width of " + addressSignal.getWidth() + " not supported");
-		}
-		if (1 << addressSignal.getWidth() > matrix.getRowCount()) {
-			throw new IllegalArgumentException("address width of " + addressSignal.getWidth() +
-				" is too large for matrix row count " + matrix.getRowCount());
-		}
+		MemoryImplementationUtil.checkAddressSignal(addressSignal, matrix.getRowCount());
 		this.addressSignal = addressSignal;
 	}
 
