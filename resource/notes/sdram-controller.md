@@ -63,11 +63,34 @@ signal is a different signal, not using the same signal. "open" and "close-open"
 same: close the current row and open another one. PROBLEM: The "close" might be executed by the "open"
 delayed because of a higher-priority concurrent request or because of refresh.
 
-TODO: 
-* should column addresses use the same address lines
-* how do banks work with all this
-  * opening multiple banks simultaneously, then accessing them interleaved saves a clock cycle per row
-    but only if large amounts of data get read/written (i.e. four whole rows) or if the access pattern
-    actually needs all banks.
-  * all banks can be closed (precharged) at the same time.
-  * bottom line: I don't need this for now. One bank at a time is enough for now.
+## Design decisions
+
+*Should column addresses use the same address lines?* Probably yes. If they don't, we have to add a
+multiplexer, which can easily be done by the client. There is no added advantage doing it inside
+the RAM controller. On the other hand, by NOT doing it inside the controller, the client has more
+freedom to build a mux implicitly, e.g. by loading an address register with either the row or column
+index from a microcontroller (e.g. Picoblaze).
+
+*How do banks work with all this?* Opening multiple banks simultaneously, then accessing them
+interleaved saves a clock cycle per row, but only if large amounts of data get read/written
+(i.e. four whole rows) or if the access pattern actually needs all banks. All banks can be closed
+(precharged) at the same time, saving another few cycles. Bottom line: I don't need this for now.
+One bank at a time is enough for now.
+
+## Client interface
+
+clock, reset. TODO is there any way to reset the SDRAM-internal state machine?
+
+address: Transmits the row address during open commands, column address during read/write commands.
+The bank number is part of the row address and is saved internally until the row gets closed.
+
+readData, writeData: obviously. Since the SDRAM transfers 2x16 bits per clock cycle, an interface
+for 32 bits per clock cycle would be obvious. An internal DDR interface with 2x16 bits is too
+much over the top for now.
+
+open, close: (00) leaves the rows opened/closed. (1x) opens a row, closing the current one if any
+is open. (01) closes the current row.
+
+read/write -- TODO: check bursts, burst interruption etc.
+
+

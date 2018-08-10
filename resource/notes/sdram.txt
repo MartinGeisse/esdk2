@@ -1,0 +1,88 @@
+Aufschrift: 46V32M16-6T F
+Revision ist vermutlich die Revision
+
+------------------------------------------------------------------------------------------------------------------------
+
+Größe: 8M x 16 x 4 Banks (32M x 16)
+
+• Bidirectional data strobe (DQS) transmitted/ received with data, i.e., source-synchronous data capture (x16 has two – one per byte)
+• Differential clock inputs (CK and CK#)
+• Commands entered on each positive CK edge
+• DQS edge-aligned with data for READs; center-aligned with data for WRITEs
+• DLL to align DQ and DQS transitions with CK
+• Data mask (DM) for masking write data (x16 has two – one per byte)
+• Autorefresh – 64ms, 8192-cycle
+• Concurrent auto precharge option is supported
+• tRAS lockout supported (tRAP = tRCD)
+
+-6T: 6ns@CL = 2.5 (DDR333), Revision F
+
+CL = CAS (READ) latency; data-out window is MIN clock rate with 50% duty cycle at CL = 2, CL = 2.5, or CL = 3
+-6T: 133 bei CL=2, 167 bei CL=2.5, CL=3 unmöglich,
+	Data-Out Window 2.0ns
+	Access Window +-0.70ns
+	DQS-DQ skew 0.45ns
+
+Refresh count: 8k
+Row Address: 8k (a0..a12)
+Bank address: 4 (ba0, ba1)
+Column Address: 1k (a0..a9)
+
+CS# dauerhaft low setzen. Man kann per NOP command dasselbe erreichen.
+CKE dauerhaft high nach init --> kein self refresh
+data mask (DM): low = write enable, high = write inhibit
+
+------------------------------------------------------------------------------------------------------------
+Commands (RAS#, CAS#, WE#, Parameter):
+
+LLL: LOAD MODE REGISTER (ba1=0; ba0=0 selects mode register, ba0=1 selects extended mode register; address = value to write)
+	states: all banks must be idle
+LLH: AUTO REFRESH; other inputs except CKE are don't care
+	states: all banks must be idle
+LHL: PRECHARGE (a10=all banks, sonst +bank)
+	states: active, reading, writing
+	must not precharge idle bank! --> use specific precharge to the current bank, not precharge all, since we only open 1 bank
+LHH: ACTIVE (bank, a12..a0)
+	states: idle
+
+HLL: WRITE (bank, aX..a0, a10=autoPrecharge)
+	states: active, reading w/o auto precharge, writing reading w/o auto precharge
+	must not interrupt READ by write; issue WRITE while READ is finishing or issue BST
+HLH: READ (bank, aX..a0, a10=autoPrecharge)
+	states: active, reading reading w/o auto precharge, writing reading w/o auto precharge
+HHL: BST (READ without auto precharge only; won't use this)
+	states: reading
+	"BURST TERMINATE affects the most recent READ burst, regardless of bank."
+HHH: NOP
+	states: all
+
+fill with NOP or other bank commands during: precharging, activating, r/w with auto precharge
+fill with NOP during: refresh, access mode reg, precharge all 
+terminating a write burst needs masking of the last data words using DM
+all commands are sampled at the active (low-to-high) edge of CK
+
+use CAS latency = 2. This is allowed for 100 MHz and is both faster and easier to use than CL=2.5
+use burst length = 2 and work without bursts. Easier to use. Sequential/interleaved doesn't matter for BL=2
+
+mode reg (reset DLL) value: 0x121 (BL = 2)
+mode reg (keep DLL) value: 0x021 (BL = 2)
+ext mode reg value: 0
+
+BL = 2?
+- consecutive (random) writes: WRITE command each cycle; 2 words written -> ok
+- consecutive (random) reads: READ command each cycle; 2 words read -> ok
+- read-to-write: two NOPs (or BST, NOP) needed between READ and WRITE to reverse data flow direction
+- write-to-read: interrupting is possible but useless for BL=2; needs 2 NOPs between WRITE and READ (3 NOPs for BL=4, ...)
+-->
+BL=2 does not decrease performance compared to BL=4 since consecutive reads or consecutive writes are possible just the same
+with BL=2. All the delay involves changing from read to write or vice versa, which is not improved with BL>2.
+
+Read-to-precharge: Delay between READ and PRECHARGE must be as long as data, e.g. 1 cycle (no NOP in between) for BL=2.
+Write-to-precharge: After the WRITE, n cycles transfer 2n write-data words together with NOPs. After that, another two NOPs
+	(tWR = 15ns) are needed before the PRECHARGE can be sent.
+
+Banking: tRRD and tRCD are different but both round up to 2 cycles. So there is no speedup in *opening* multiple rows. But closing
+four rows takes 8 cycles, while a PRECHARGE ALL only takes 2 -> 6 cycles saved. This is only useful when accessing all four rows,
+which in turn is useful only for larger transfers, otherwise opening too many rows takes too long.
+--> Banking *could* save time, but is too complicated at the beginning. Prepare for this: linear addresses are mapped to:
+(row, bank, column) -> consecutive screen rows cycle through banks, then rows. 1 screen row is as long as one bank-row in the SDRAM.
