@@ -36,7 +36,7 @@ public class AssociatedPicoblazeProgramRom extends RtlItem {
 
 	public AssociatedPicoblazeProgramRom(RtlRealm realm, RtlClockNetwork clockNetwork, Class<?> anchorClass, String suffix) {
 		super(realm);
-		rom = new RtlSynchronousRom(realm, clockNetwork, 1024, 18);
+		rom = new RtlSynchronousRom(clockNetwork, 1024, 18);
 		if (anchorClass == null) {
 			anchorClass = getClass();
 		}

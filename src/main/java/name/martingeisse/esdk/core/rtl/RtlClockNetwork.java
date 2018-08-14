@@ -54,7 +54,7 @@ public final class RtlClockNetwork extends RtlItem {
 	// ----------------------------------------------------------------------------------------------------------------
 
 	public RtlClockedBlock createBlock() {
-		return new RtlClockedBlock(getRealm(), this);
+		return new RtlClockedBlock(this);
 	}
 
 	// ----------------------------------------------------------------------------------------------------------------

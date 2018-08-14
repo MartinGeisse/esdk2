@@ -11,6 +11,7 @@ import name.martingeisse.esdk.core.rtl.signal.RtlVectorConstant;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
+import name.martingeisse.esdk.core.util.vector.VectorValue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,17 +45,18 @@ public class RtlStatementSequence extends RtlStatement {
 		return assignment;
 	}
 
-	public final RtlBitAssignment assignBit(RtlBitAssignmentTarget destination, boolean value) {
-		RtlBitConstant constant = new RtlBitConstant(getRealm(), value);
-		RtlBitAssignment assignment = new RtlBitAssignment(getRealm(), destination, constant);
-		addStatement(assignment);
-		return assignment;
+	public final RtlBitAssignment assign(RtlBitAssignmentTarget destination, boolean value) {
+		return assign(destination, new RtlBitConstant(getRealm(), value));
 	}
 
 	public final RtlVectorAssignment assign(RtlVectorAssignmentTarget destination, RtlVectorSignal source) {
 		RtlVectorAssignment assignment = new RtlVectorAssignment(getRealm(), destination, source);
 		addStatement(assignment);
 		return assignment;
+	}
+
+	public final RtlVectorAssignment assign(RtlVectorAssignmentTarget destination, VectorValue value) {
+		return assign(destination, new RtlVectorConstant(getRealm(), value));
 	}
 
 	public final RtlVectorAssignment assignUnsigned(RtlVectorAssignmentTarget destination, int value) {
@@ -71,6 +73,12 @@ public class RtlStatementSequence extends RtlStatement {
 		RtlWhenStatement whenStatement = new RtlWhenStatement(getRealm(), condition);
 		addStatement(whenStatement);
 		return whenStatement;
+	}
+
+	public final RtlConditionChain conditionChain() {
+		RtlConditionChain chain = new RtlConditionChain(getRealm());
+		addStatement(chain);
+		return chain;
 	}
 
 	// ----------------------------------------------------------------------------------------------------------------
