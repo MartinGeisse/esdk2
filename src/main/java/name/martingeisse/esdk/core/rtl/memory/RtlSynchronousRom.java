@@ -6,7 +6,6 @@ package name.martingeisse.esdk.core.rtl.memory;
 
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlClockedItem;
-import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.signal.custom.RtlCustomVectorSignal;
 import name.martingeisse.esdk.core.util.Matrix;
@@ -22,14 +21,14 @@ public final class RtlSynchronousRom extends RtlClockedItem {
 	private VectorValue readData;
 	private VectorValue nextReadData;
 
-	public RtlSynchronousRom(RtlRealm realm, RtlClockNetwork clockNetwork, Matrix matrix) {
-		super(realm, clockNetwork);
+	public RtlSynchronousRom(RtlClockNetwork clockNetwork, Matrix matrix) {
+		super(clockNetwork);
 		this.matrix = matrix;
 		this.readData = this.nextReadData = VectorValue.ofUnsigned(matrix.getColumnCount(), 0);
 	}
 
-	public RtlSynchronousRom(RtlRealm realm, RtlClockNetwork clockNetwork, int rowCount, int columnCount) {
-		this(realm, clockNetwork, new Matrix(rowCount, columnCount));
+	public RtlSynchronousRom(RtlClockNetwork clockNetwork, int rowCount, int columnCount) {
+		this(clockNetwork, new Matrix(rowCount, columnCount));
 	}
 
 	public Matrix getMatrix() {

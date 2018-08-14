@@ -4,8 +4,6 @@
  */
 package name.martingeisse.esdk.core.rtl;
 
-import name.martingeisse.esdk.core.rtl.block.RtlProceduralSignal;
-
 /**
  *
  */
@@ -13,12 +11,12 @@ public abstract class RtlClockedItem extends RtlItem {
 
 	private final RtlClockNetwork clockNetwork;
 
-	public RtlClockedItem(RtlRealm realm, RtlClockNetwork clockNetwork) {
-		super(realm);
-		this.clockNetwork = checkSameRealm(clockNetwork);
+	public RtlClockedItem(RtlClockNetwork clockNetwork) {
+		super(clockNetwork.getRealm());
+		this.clockNetwork = clockNetwork;
 
 		RealmRegistrationKey key = new RealmRegistrationKey();
-		realm.registerClockedItem(key, this);
+		getRealm().registerClockedItem(key, this);
 		key.valid = false;
 	}
 

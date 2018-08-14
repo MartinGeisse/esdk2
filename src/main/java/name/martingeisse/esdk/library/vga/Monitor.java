@@ -33,8 +33,8 @@ public final class Monitor extends RtlClockedItem {
 	private int sampledR, sampledG, sampledB;
 	private boolean sampledHsync, sampledVsync;
 
-	public Monitor(RtlRealm realm, RtlClockNetwork clockNetwork) {
-		super(realm, clockNetwork);
+	public Monitor(RtlClockNetwork clockNetwork) {
+		super(clockNetwork);
 	}
 
 	public void setR(RtlVectorSignal r) {

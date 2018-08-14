@@ -1,7 +1,6 @@
 package name.martingeisse.esdk.core.rtl.memory;
 
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
-import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.signal.custom.RtlCustomVectorSignal;
 import name.martingeisse.esdk.core.util.Matrix;
@@ -11,12 +10,12 @@ import name.martingeisse.esdk.core.util.Matrix;
  */
 public final class RtlAsynchronouslyReadSynchronouslyWrittenRam extends RtlAbstractSynchronousRam {
 
-	public RtlAsynchronouslyReadSynchronouslyWrittenRam(RtlRealm realm, RtlClockNetwork clockNetwork, Matrix matrix) {
-		super(realm, clockNetwork, matrix);
+	public RtlAsynchronouslyReadSynchronouslyWrittenRam(RtlClockNetwork clockNetwork, Matrix matrix) {
+		super(clockNetwork, matrix);
 	}
 
-	public RtlAsynchronouslyReadSynchronouslyWrittenRam(RtlRealm realm, RtlClockNetwork clockNetwork, int rowCount, int columnCount) {
-		super(realm, clockNetwork, rowCount, columnCount);
+	public RtlAsynchronouslyReadSynchronouslyWrittenRam(RtlClockNetwork clockNetwork, int rowCount, int columnCount) {
+		super(clockNetwork, rowCount, columnCount);
 	}
 
 	@Override

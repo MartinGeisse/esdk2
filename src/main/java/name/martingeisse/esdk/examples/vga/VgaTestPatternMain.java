@@ -1,4 +1,4 @@
-package name.martingeisse.esdk.examples;
+package name.martingeisse.esdk.examples.vga;
 
 import name.martingeisse.esdk.core.model.Design;
 import name.martingeisse.esdk.core.rtl.RtlRealm;

@@ -6,7 +6,6 @@ package name.martingeisse.esdk.core.rtl.memory;
 
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlClockedItem;
-import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.util.Matrix;
@@ -25,13 +24,13 @@ public abstract class RtlAbstractSynchronousRam extends RtlClockedItem {
 	private int writeAddress;
 	private VectorValue writeData;
 
-	public RtlAbstractSynchronousRam(RtlRealm realm, RtlClockNetwork clockNetwork, Matrix matrix) {
-		super(realm, clockNetwork);
+	public RtlAbstractSynchronousRam(RtlClockNetwork clockNetwork, Matrix matrix) {
+		super(clockNetwork);
 		this.matrix = matrix;
 	}
 
-	public RtlAbstractSynchronousRam(RtlRealm realm, RtlClockNetwork clockNetwork, int rowCount, int columnCount) {
-		this(realm, clockNetwork, new Matrix(rowCount, columnCount));
+	public RtlAbstractSynchronousRam(RtlClockNetwork clockNetwork, int rowCount, int columnCount) {
+		this(clockNetwork, new Matrix(rowCount, columnCount));
 	}
 
 	public Matrix getMatrix() {

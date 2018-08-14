@@ -2,7 +2,6 @@ package name.martingeisse.esdk.old_picoblaze.model.rtl;
 
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlClockedItem;
-import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
@@ -31,8 +30,8 @@ public class PicoblazeRtl extends RtlClockedItem {
 	private VectorValue sampledPortInputDataValue;
 	private boolean secondCycle;
 
-	public PicoblazeRtl(RtlRealm realm, RtlClockNetwork clockNetwork) {
-		super(realm, clockNetwork);
+	public PicoblazeRtl(RtlClockNetwork clockNetwork) {
+		super(clockNetwork);
 		this.state = new PicoblazeState() {
 
 			@Override
@@ -45,7 +44,7 @@ public class PicoblazeRtl extends RtlClockedItem {
 			}
 
 		};
-		this.resetSignal = new RtlBitConstant(realm, false);
+		this.resetSignal = new RtlBitConstant(getRealm(), false);
 	}
 
 	public void setResetSignal(RtlBitSignal resetSignal) {

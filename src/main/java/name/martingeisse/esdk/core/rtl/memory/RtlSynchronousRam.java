@@ -5,7 +5,6 @@
 package name.martingeisse.esdk.core.rtl.memory;
 
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
-import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.signal.custom.RtlCustomVectorSignal;
 import name.martingeisse.esdk.core.util.Matrix;
@@ -19,13 +18,13 @@ public final class RtlSynchronousRam extends RtlAbstractSynchronousRam {
 	private VectorValue readData;
 	private VectorValue nextReadData;
 
-	public RtlSynchronousRam(RtlRealm realm, RtlClockNetwork clockNetwork, Matrix matrix) {
-		super(realm, clockNetwork, matrix);
+	public RtlSynchronousRam(RtlClockNetwork clockNetwork, Matrix matrix) {
+		super(clockNetwork, matrix);
 		this.readData = this.nextReadData = VectorValue.ofUnsigned(matrix.getColumnCount(), 0);
 	}
 
-	public RtlSynchronousRam(RtlRealm realm, RtlClockNetwork clockNetwork, int rowCount, int columnCount) {
-		super(realm, clockNetwork, rowCount, columnCount);
+	public RtlSynchronousRam(RtlClockNetwork clockNetwork, int rowCount, int columnCount) {
+		super(clockNetwork, rowCount, columnCount);
 		this.readData = this.nextReadData = VectorValue.ofUnsigned(getMatrix().getColumnCount(), 0);
 	}
 

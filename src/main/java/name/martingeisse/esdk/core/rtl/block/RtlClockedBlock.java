@@ -6,7 +6,6 @@ package name.martingeisse.esdk.core.rtl.block;
 
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlClockedItem;
-import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.block.statement.RtlStatementSequence;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
 
@@ -26,12 +25,12 @@ public final class RtlClockedBlock extends RtlClockedItem {
 	private final RtlStatementSequence initializerStatements;
 	private final RtlStatementSequence statements;
 
-	public RtlClockedBlock(RtlRealm realm, RtlClockNetwork clockNetwork) {
-		super(realm, clockNetwork);
+	public RtlClockedBlock(RtlClockNetwork clockNetwork) {
+		super(clockNetwork);
 
 		this.proceduralSignals = new ArrayList<>();
-		this.initializerStatements = new RtlStatementSequence(realm);
-		this.statements = new RtlStatementSequence(realm);
+		this.initializerStatements = new RtlStatementSequence(getRealm());
+		this.statements = new RtlStatementSequence(getRealm());
 	}
 
 

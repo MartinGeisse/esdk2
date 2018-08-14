@@ -9,8 +9,6 @@ import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.util.BitProvider;
 
-import java.util.function.Predicate;
-
 /**
  * Helper class that extends both {@link RtlItem} and {@link RtlBitSignal} and the same time. An anonymous signal
  * class couldn't do this otherwise.
