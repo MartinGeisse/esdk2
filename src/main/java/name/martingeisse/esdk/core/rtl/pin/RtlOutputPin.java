@@ -5,6 +5,7 @@
 package name.martingeisse.esdk.core.rtl.pin;
 
 import name.martingeisse.esdk.core.rtl.RtlRealm;
+import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
 
 /**
@@ -12,17 +13,17 @@ import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
  */
 public final class RtlOutputPin extends RtlPin {
 
-	private RtlSignal outputSignal;
+	private RtlBitSignal outputSignal;
 
 	public RtlOutputPin(RtlRealm realm) {
 		super(realm);
 	}
 
-	public RtlSignal getOutputSignal() {
+	public RtlBitSignal getOutputSignal() {
 		return outputSignal;
 	}
 
-	public void setOutputSignal(RtlSignal outputSignal) {
+	public void setOutputSignal(RtlBitSignal outputSignal) {
 		this.outputSignal = checkSameRealm(outputSignal);
 	}
 

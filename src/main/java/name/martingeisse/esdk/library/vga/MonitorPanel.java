@@ -18,11 +18,13 @@ public class MonitorPanel extends JPanel {
 	private final Monitor monitor;
 	private final BufferedImageOutput imageOutput;
 
-	public MonitorPanel(RtlRealm realm, RtlClockNetwork clockNetwork, int width, int height) {
+	public MonitorPanel(RtlClockNetwork clockNetwork, int width, int height) {
 		super(false);
 		imageOutput = new BufferedImageOutput(width, height);
 		monitor = new Monitor(clockNetwork);
 		monitor.setImageDecoder(new ImageDecoder(width, height, imageOutput));
+		setSize(width, height);
+		setPreferredSize(new Dimension(width, height));
 	}
 
 	public Monitor getMonitor() {
