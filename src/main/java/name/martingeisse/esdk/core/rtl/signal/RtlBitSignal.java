@@ -51,4 +51,8 @@ public interface RtlBitSignal extends RtlSignal {
 		return new RtlOneBitVectorSignal(getRtlItem().getRealm(), this);
 	}
 
+	default RtlBitRepetition repeat(int repetitions) {
+		return new RtlBitRepetition(getRtlItem().getRealm(), this, repetitions);
+	}
+
 }

@@ -64,9 +64,9 @@ public class SimulationMain {
 
 		MonitorPanel monitorPanel = new MonitorPanel(clock, 120, 106, 1);
 		Monitor monitor = monitorPanel.getMonitor();
-		monitor.setR(r.asOneBitVector());
-		monitor.setG(g.asOneBitVector());
-		monitor.setB(b.asOneBitVector());
+		monitor.setR(r.repeat(8));
+		monitor.setG(g.repeat(8));
+		monitor.setB(b.repeat(8));
 		monitor.setHsync(hsync);
 		monitor.setVsync(vsync);
 

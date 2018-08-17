@@ -9,22 +9,28 @@ import name.martingeisse.esdk.core.util.vector.VectorValue;
 /**
  *
  */
-public final class RtlOneBitVectorSignal extends RtlItem implements RtlVectorSignal {
+public final class RtlBitRepetition extends RtlItem implements RtlVectorSignal {
 
 	private final RtlBitSignal bitSignal;
+	private final int repetitions;
 
-	public RtlOneBitVectorSignal(RtlRealm realm, RtlBitSignal bitSignal) {
+	public RtlBitRepetition(RtlRealm realm, RtlBitSignal bitSignal, int repetitions) {
 		super(realm);
 		this.bitSignal = bitSignal;
+		this.repetitions = repetitions;
 	}
 
 	public RtlBitSignal getBitSignal() {
 		return bitSignal;
 	}
 
+	public int getRepetitions() {
+		return repetitions;
+	}
+
 	@Override
 	public int getWidth() {
-		return 1;
+		return repetitions;
 	}
 
 	// ----------------------------------------------------------------------------------------------------------------
@@ -33,17 +39,16 @@ public final class RtlOneBitVectorSignal extends RtlItem implements RtlVectorSig
 
 	@Override
 	public VectorValue getValue() {
-		return VectorValue.ofUnsigned(1, bitSignal.getValue() ? 1 : 0);
-	}
-
-	@Override
-	public boolean compliesWith(VerilogGenerator.VerilogExpressionNesting nesting) {
-		return bitSignal.compliesWith(nesting);
+		return VectorValue.ofUnsigned(repetitions, bitSignal.getValue() ? ((1 << repetitions) - 1) : 0);
 	}
 
 	@Override
 	public void printVerilogExpression(VerilogExpressionWriter out) {
+		out.print('{');
+		out.print(repetitions);
+		out.print('{');
 		out.print(bitSignal, VerilogGenerator.VerilogExpressionNesting.SIGNALS_AND_CONSTANTS);
+		out.print("}}");
 	}
 
 }

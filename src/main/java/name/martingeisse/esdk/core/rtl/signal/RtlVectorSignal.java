@@ -159,4 +159,12 @@ public interface RtlVectorSignal extends RtlSignal {
 		return comparison(RtlVectorComparison.Operator.UNSIGNED_GREATER_THAN_OR_EQUAL, rightOperand);
 	}
 
+	//
+	// other
+	//
+
+	default RtlVectorRepetition repeat(int repetitions) {
+		return new RtlVectorRepetition(getRtlItem().getRealm(), this, repetitions);
+	}
+
 }
