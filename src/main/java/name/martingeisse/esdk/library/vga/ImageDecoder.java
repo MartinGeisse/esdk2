@@ -11,29 +11,38 @@ public final class ImageDecoder {
 
 	private final int width;
 	private final int height;
+	private final int clocksPerPixel;
 	private final Output output;
+	private int w;
 	private int x;
 	private int y;
 	private boolean rowStarted;
 
-	public ImageDecoder(int width, int height, Output output) {
+	public ImageDecoder(int width, int height, int clocksPerPixel, Output output) {
 		this.width = width;
 		this.height = height;
+		this.clocksPerPixel = clocksPerPixel;
 		this.output = output;
+		this.w = 0;
 		this.x = 0;
 		this.y = 0;
 		this.rowStarted = false;
 	}
 
-	public void consumePixel(int r, int g, int b, boolean hsync, boolean vsync) {
-		if (vsync) {
+	public void consumeDataUnit(int r, int g, int b, boolean hsync, boolean vsync) {
+		if (!vsync) {
+			if (w != 0 || x != 0 || y != 0) {
+				output.onFrameFinished();
+			}
+			w = 0;
 			x = 0;
 			y = 0;
 			rowStarted = false;
 			return;
 		}
-		if (hsync) {
+		if (!hsync) {
 			if (rowStarted) {
+				w = 0;
 				x = 0;
 				y++;
 			}
@@ -41,14 +50,22 @@ public final class ImageDecoder {
 			return;
 		}
 		rowStarted = true;
-		if (x < width && y < height) {
-			output.outputPixel(x, y, r, g, b);
+		w++;
+		if (w == clocksPerPixel) {
+			w = 0;
+			if (x < width && y < height) {
+				output.outputPixel(x, y, r, g, b);
+			}
+			x++;
 		}
-		x++;
 	}
 
 	public interface Output {
+
 		void outputPixel(int x, int y, int r, int g, int b);
+
+		void onFrameFinished();
+
 	}
 
 }

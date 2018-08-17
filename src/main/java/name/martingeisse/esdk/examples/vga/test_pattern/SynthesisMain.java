@@ -1,7 +1,6 @@
-package name.martingeisse.esdk.examples.vga;
+package name.martingeisse.esdk.examples.vga.test_pattern;
 
 import name.martingeisse.esdk.core.rtl.synthesis.xilinx.ProjectGenerator;
-import name.martingeisse.esdk.examples.moving_light.MovingLightDesign;
 
 import java.io.File;
 

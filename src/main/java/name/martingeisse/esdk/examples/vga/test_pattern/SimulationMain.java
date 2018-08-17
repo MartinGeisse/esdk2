@@ -1,4 +1,4 @@
-package name.martingeisse.esdk.examples.vga;
+package name.martingeisse.esdk.examples.vga.test_pattern;
 
 import name.martingeisse.esdk.core.rtl.simulation.RtlClockGenerator;
 import name.martingeisse.esdk.library.vga.Monitor;
@@ -16,7 +16,7 @@ public class SimulationMain {
 		VgaTestPatternDesign design = new VgaTestPatternDesign();
 		new RtlClockGenerator(design.getClock(), 10);
 
-		MonitorPanel monitorPanel = new MonitorPanel(design.getClock(), 640, 480);
+		MonitorPanel monitorPanel = new MonitorPanel(design.getClock(), 640 + 16 + 48, 480 + 10 + 33, 2);
 		Monitor monitor = monitorPanel.getMonitor();
 		monitor.setR(design.getR().getOutputSignal().asOneBitVector());
 		monitor.setG(design.getG().getOutputSignal().asOneBitVector());

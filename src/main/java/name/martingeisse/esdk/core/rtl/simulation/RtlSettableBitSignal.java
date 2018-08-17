@@ -25,7 +25,6 @@ public final class RtlSettableBitSignal extends RtlSettableSignal implements Rtl
 
 	public void setValue(boolean value) {
 		this.value = value;
-		// TODO notify RTL simulation core
 	}
 
 }

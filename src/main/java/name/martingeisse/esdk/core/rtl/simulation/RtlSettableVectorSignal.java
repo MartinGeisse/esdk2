@@ -34,7 +34,6 @@ public final class RtlSettableVectorSignal extends RtlSettableSignal implements 
 
 	public void setValue(VectorValue value) {
 		this.value = value;
-		// TODO notify RTL simulation core
 	}
 
 }

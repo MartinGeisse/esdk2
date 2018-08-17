@@ -88,7 +88,7 @@ public final class Monitor extends RtlClockedItem {
 
 	@Override
 	public void updateState() {
-		imageDecoder.consumePixel(sampledR, sampledG, sampledB, sampledHsync, sampledVsync);
+		imageDecoder.consumeDataUnit(sampledR, sampledG, sampledB, sampledHsync, sampledVsync);
 	}
 
 }
