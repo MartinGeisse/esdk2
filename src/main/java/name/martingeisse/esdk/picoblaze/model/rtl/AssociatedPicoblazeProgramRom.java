@@ -9,8 +9,7 @@ import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.memory.RtlSynchronousRom;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
-import name.martingeisse.esdk.core.util.vector.VectorValue;
-import name.martingeisse.esdk.picoblaze.model.instruction.AssociatedPicoblazeProgram;
+import name.martingeisse.esdk.picoblaze.model.ProgramRomUtil;
 
 /**
  * This is a synchronous ROM that loads and assembles a .psm from an associated resource.
@@ -30,20 +29,16 @@ public class AssociatedPicoblazeProgramRom extends RtlItem {
 		this(realm, clockNetwork, anchorClass, null);
 	}
 
-	public AssociatedPicoblazeProgramRom(RtlRealm realm, RtlClockNetwork clockNetwork, String suffix) {
-		this(realm, clockNetwork, null, suffix);
+	public AssociatedPicoblazeProgramRom(RtlRealm realm, RtlClockNetwork clockNetwork, String programSuffix) {
+		this(realm, clockNetwork, null, programSuffix);
 	}
 
-	public AssociatedPicoblazeProgramRom(RtlRealm realm, RtlClockNetwork clockNetwork, Class<?> anchorClass, String suffix) {
+	public AssociatedPicoblazeProgramRom(RtlRealm realm, RtlClockNetwork clockNetwork, Class<?> anchorClass, String programSuffix) {
 		super(realm);
-		rom = new RtlSynchronousRom(clockNetwork, 1024, 18);
 		if (anchorClass == null) {
 			anchorClass = getClass();
 		}
-		AssociatedPicoblazeProgram program = new AssociatedPicoblazeProgram(anchorClass, suffix);
-		for (int i = 0; i < 1024; i++) {
-			rom.getMatrix().setRow(i, VectorValue.ofUnsigned(18, program.readInstruction(i)));
-		}
+		rom = ProgramRomUtil.loadAssociatedProgramRom(clockNetwork, anchorClass, programSuffix);
 	}
 
 	public void setAddressSignal(RtlVectorSignal addressSignal) {
