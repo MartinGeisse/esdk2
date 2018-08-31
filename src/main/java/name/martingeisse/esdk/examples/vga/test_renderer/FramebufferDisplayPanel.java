@@ -4,8 +4,6 @@
  */
 package name.martingeisse.esdk.examples.vga.test_renderer;
 
-import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -16,22 +14,16 @@ import java.awt.image.BufferedImage;
 public final class FramebufferDisplayPanel extends JPanel {
 
 	private final BufferedImage framebuffer;
-	private final FramebufferDisplay display;
 
-	public FramebufferDisplayPanel(RtlClockNetwork clockNetwork, int width, int height, int widthBits) {
+	public FramebufferDisplayPanel(BufferedImage framebuffer) {
 		super(false);
-		framebuffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-		display = new FramebufferDisplay(clockNetwork, framebuffer, widthBits);
-		setSize(width, height);
-		setPreferredSize(new Dimension(width, height));
+		this.framebuffer = framebuffer;
+		setSize(framebuffer.getWidth(), framebuffer.getHeight());
+		setPreferredSize(new Dimension(framebuffer.getWidth(), framebuffer.getHeight()));
 	}
 
 	public BufferedImage getFramebuffer() {
 		return framebuffer;
-	}
-
-	public FramebufferDisplay getDisplay() {
-		return display;
 	}
 
 	@Override
