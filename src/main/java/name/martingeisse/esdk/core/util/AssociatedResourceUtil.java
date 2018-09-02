@@ -24,9 +24,9 @@ public final class AssociatedResourceUtil {
 		while (currentClass != null) {
 			InputStream inputStream;
 			if (suffix == null) {
-				inputStream = currentClass.getResourceAsStream(currentClass.getName() + dotExtension);
+				inputStream = currentClass.getResourceAsStream(currentClass.getSimpleName() + dotExtension);
 			} else {
-				inputStream = currentClass.getResourceAsStream(currentClass.getName() + '_' + suffix + dotExtension);
+				inputStream = currentClass.getResourceAsStream(currentClass.getSimpleName() + '_' + suffix + dotExtension);
 			}
 			if (inputStream != null) {
 				return inputStream;

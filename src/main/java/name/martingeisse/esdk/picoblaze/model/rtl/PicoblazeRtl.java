@@ -15,7 +15,7 @@ import name.martingeisse.esdk.picoblaze.model.PicoblazeState;
  * An RTL Picoblaze model.
  * <p>
  * This model simulates the two-cycle behavior of the Picoblaze, including the I/O address being stable in the first
- * cycle. Use {@link #getIoAddress()} to obtain that address. Use {@link #getInstructionAddress()} to get the
+ * cycle. Use {@link #getPortAddress()} to obtain that address. Use {@link #getInstructionAddress()} to get the
  * instruction address as an RTL signal, but note that this signal is not correct during the first cycle, just like
  * for the real Picoblaze.
  */
@@ -45,6 +45,7 @@ public class PicoblazeRtl extends RtlClockedItem {
 
 		};
 		this.resetSignal = new RtlBitConstant(getRealm(), false);
+		this.secondCycle = true;
 	}
 
 	public void setResetSignal(RtlBitSignal resetSignal) {
@@ -67,12 +68,12 @@ public class PicoblazeRtl extends RtlClockedItem {
 		return RtlCustomVectorSignal.ofUnsigned(getRealm(), 10, state::getPc);
 	}
 
-	public RtlVectorSignal getIoAddress() {
-		return RtlCustomVectorSignal.ofUnsigned(getRealm(), 10, state::getPortAddress);
+	public RtlVectorSignal getPortAddress() {
+		return RtlCustomVectorSignal.ofUnsigned(getRealm(), 8, state::getPortAddress);
 	}
 
-	public RtlVectorSignal getIoData() {
-		return RtlCustomVectorSignal.ofUnsigned(getRealm(), 10, state::getPortOutputData);
+	public RtlVectorSignal getOutputData() {
+		return RtlCustomVectorSignal.ofUnsigned(getRealm(), 8, state::getPortOutputData);
 	}
 
 	public RtlBitSignal getReadStrobe() {

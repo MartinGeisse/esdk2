@@ -4,6 +4,7 @@
  */
 package name.martingeisse.esdk.examples.vga.test_renderer;
 
+import name.martingeisse.esdk.core.model.items.IntervalItem;
 import name.martingeisse.esdk.core.rtl.simulation.RtlClockGenerator;
 
 import javax.swing.*;
@@ -28,6 +29,7 @@ public class SimulationMain {
 		frame.setResizable(false);
 		frame.setVisible(true);
 
+		new IntervalItem(design, 5, 10_000, frame::repaint);
 		design.simulate();
 	}
 

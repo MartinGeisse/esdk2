@@ -308,7 +308,7 @@ public abstract class PicoblazeState {
 			return (instruction & 255);
 		} else {
 			// register
-			return getRegisterValue((getRightOperand() >> 4) & 15);
+			return getRegisterValue((instruction >> 4) & 15);
 		}
 	}
 
