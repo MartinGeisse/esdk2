@@ -18,7 +18,6 @@ public class SimulationMain {
 	public static void main(String[] args) throws Exception {
 
 		BufferedImage framebuffer = new BufferedImage(128, 128, BufferedImage.TYPE_INT_RGB);
-		framebuffer.setRGB(30, 10, 0xffffffff);
 		TestRendererDesign design = new TestRendererDesign(framebuffer, 7);
 		new RtlClockGenerator(design.getClock(), 10);
 
