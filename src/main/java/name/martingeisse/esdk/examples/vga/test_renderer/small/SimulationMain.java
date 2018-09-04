@@ -2,10 +2,11 @@
  * Copyright (c) 2018 Martin Geisse
  * This file is distributed under the terms of the MIT license.
  */
-package name.martingeisse.esdk.examples.vga.test_renderer;
+package name.martingeisse.esdk.examples.vga.test_renderer.small;
 
 import name.martingeisse.esdk.core.model.items.IntervalItem;
 import name.martingeisse.esdk.core.rtl.simulation.RtlClockGenerator;
+import name.martingeisse.esdk.examples.vga.test_renderer.FramebufferDisplayPanel;
 
 import javax.swing.*;
 import java.awt.image.BufferedImage;
