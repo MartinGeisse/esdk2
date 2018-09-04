@@ -39,6 +39,10 @@ public class RtlStatementSequence extends RtlStatement {
 	// factory methods
 	// ----------------------------------------------------------------------------------------------------------------
 
+	public RtlStatementBuilder builder() {
+		return new RtlStatementBuilder(this);
+	}
+
 	public final RtlBitAssignment assign(RtlBitAssignmentTarget destination, RtlBitSignal source) {
 		RtlBitAssignment assignment = new RtlBitAssignment(getRealm(), destination, source);
 		addStatement(assignment);
