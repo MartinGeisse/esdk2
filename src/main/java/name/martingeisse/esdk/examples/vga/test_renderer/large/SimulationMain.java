@@ -18,8 +18,8 @@ public class SimulationMain {
 
 	public static void main(String[] args) throws Exception {
 
-		BufferedImage framebuffer = new BufferedImage(512, 512, BufferedImage.TYPE_INT_RGB);
-		TestRendererDesign design = new TestRendererDesign(framebuffer, 7);
+		BufferedImage framebuffer = new BufferedImage(640, 480, BufferedImage.TYPE_INT_RGB);
+		TestRendererDesign design = new TestRendererDesign(framebuffer, 10);
 		new RtlClockGenerator(design.getClock(), 10);
 
 		JFrame frame = new JFrame("Framebuffer Display");

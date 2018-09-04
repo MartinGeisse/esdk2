@@ -1,34 +1,23 @@
 
+; initialize row
+LOAD s0, 00
+OUTPUT s0, 40
 LOAD s0, 10
-OUTPUT s0, 80
+OUTPUT s0, 40
 
-LOAD s0, 04
-OUTPUT s0, 08
-LOAD s0, 02
+; initialize column
+LOAD s0, 00
 OUTPUT s0, 10
-LOAD s0, 01
-OUTPUT s0, 18
-LOAD s0, 04
-OUTPUT s0, 20
-LOAD s0, 02
-OUTPUT s0, 28
-LOAD s0, 01
-OUTPUT s0, 30
-
-LOAD s0, 20
-OUTPUT s0, 80
-
-LOAD s0, 07
-OUTPUT s0, 08
-LOAD s0, 07
+LOAD s0, 10
 OUTPUT s0, 10
-LOAD s0, 01
-OUTPUT s0, 18
-LOAD s0, 07
-OUTPUT s0, 20
-LOAD s0, 07
-OUTPUT s0, 28
-LOAD s0, 01
-OUTPUT s0, 30
 
+; draw a line
+LOAD s0, 00
+LOAD s1, 07
+line:
+OUTPUT s1, c1
+SUB s0, 01
+JUMP NZ, line
+
+; hang
 hang: JUMP hang
