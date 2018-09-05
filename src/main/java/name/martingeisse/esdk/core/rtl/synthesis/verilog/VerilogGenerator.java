@@ -66,7 +66,7 @@ public class VerilogGenerator {
 			if (item instanceof RtlClockedBlock) {
 				clockedBlocks.add((RtlClockedBlock)item);
 			} else {
-				throw new RuntimeException("cannot synthesize RtlClockedItems except RtlClockedBlock");
+				throw new RuntimeException("cannot synthesize RtlClockedItems except RtlClockedBlock, found: " + item);
 			}
 		}
 

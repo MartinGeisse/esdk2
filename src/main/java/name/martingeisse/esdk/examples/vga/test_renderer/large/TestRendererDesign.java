@@ -23,23 +23,21 @@ public final class TestRendererDesign extends Design {
 
 	private final RtlRealm realm;
 	private final RtlClockNetwork clock;
-	private final FramebufferDisplay display;
 	private final PicoblazeRtlWithAssociatedProgram cpu;
+	private final RtlProceduralVectorSignal rowRegister;
+	private final RtlProceduralVectorSignal columnRegister;
 
-	public TestRendererDesign(BufferedImage framebuffer, int widthBits) {
+	public TestRendererDesign(int widthBits, int heightBits) {
 		realm = new RtlRealm(this);
 		clock = realm.createClockNetwork(new RtlBitConstant(realm, false));
-		display = new FramebufferDisplay(clock, framebuffer, widthBits);
 		cpu = new PicoblazeRtlWithAssociatedProgram(clock, getClass());
 
-		RtlProceduralVectorSignal rowRegister;
-		RtlProceduralVectorSignal columnRegister;
 		{
 			RtlClockedBlock block = new RtlClockedBlock(clock);
-			rowRegister = block.createVector(10);
-			columnRegister = block.createVector(9);
-			block.getInitializerStatements().assign(rowRegister, VectorValue.ofUnsigned(10, 0));
-			block.getInitializerStatements().assign(columnRegister, VectorValue.ofUnsigned(9, 0));
+			rowRegister = block.createVector(widthBits);
+			columnRegister = block.createVector(heightBits);
+			block.getInitializerStatements().assign(rowRegister, VectorValue.ofUnsigned(widthBits, 0));
+			block.getInitializerStatements().assign(columnRegister, VectorValue.ofUnsigned(heightBits, 0));
 
 			RtlStatementBuilder builder = block.getStatements().builder();
 			builder.when(cpu.getWriteStrobe());
@@ -82,9 +80,6 @@ public final class TestRendererDesign extends Design {
 
 		cpu.setPortInputDataSignal(new RtlVectorConstant(realm, VectorValue.ofUnsigned(8, 0)));
 		cpu.setResetSignal(new RtlBitConstant(realm, false));
-		display.setWriteAddressSignal(new RtlConcatenation(realm, columnRegister, rowRegister));
-		display.setWriteStrobeSignal(cpu.getWriteStrobe().and(cpu.getPortAddress().select(0)));
-		display.setWriteDataSignal(cpu.getOutputData().select(2, 0));
 
 	}
 
@@ -96,8 +91,10 @@ public final class TestRendererDesign extends Design {
 		return clock;
 	}
 
-	public FramebufferDisplay getDisplay() {
-		return display;
+	public void connectDisplay(FramebufferDisplay display) {
+		display.setWriteAddressSignal(new RtlConcatenation(realm, columnRegister, rowRegister));
+		display.setWriteStrobeSignal(cpu.getWriteStrobe().and(cpu.getPortAddress().select(0)));
+		display.setWriteDataSignal(cpu.getOutputData().select(2, 0));
 	}
 
 }
