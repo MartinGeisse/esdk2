@@ -6,16 +6,12 @@ import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.block.RtlClockedBlock;
 import name.martingeisse.esdk.core.rtl.block.RtlProceduralVectorSignal;
 import name.martingeisse.esdk.core.rtl.block.statement.RtlStatementBuilder;
-import name.martingeisse.esdk.core.rtl.block.statement.RtlWhenStatement;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
 import name.martingeisse.esdk.core.rtl.signal.RtlConcatenation;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorConstant;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 import name.martingeisse.esdk.examples.vga.test_renderer.FramebufferDisplay;
-import name.martingeisse.esdk.examples.vga.test_renderer.FramebufferDisplayInterface;
 import name.martingeisse.esdk.picoblaze.model.rtl.PicoblazeRtlWithAssociatedProgram;
-
-import java.awt.image.BufferedImage;
 
 /**
  *
@@ -92,7 +88,7 @@ public final class TestRendererDesign extends Design {
 		return clock;
 	}
 
-	public void connectDisplay(FramebufferDisplayInterface display) {
+	public void connectDisplay(FramebufferDisplay display) {
 		display.setWriteAddressSignal(new RtlConcatenation(realm, columnRegister, rowRegister));
 		display.setWriteStrobeSignal(cpu.getWriteStrobe().and(cpu.getPortAddress().select(0)));
 		display.setWriteDataSignal(cpu.getOutputData().select(2, 0));

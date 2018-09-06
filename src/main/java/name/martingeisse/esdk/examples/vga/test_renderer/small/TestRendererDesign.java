@@ -6,7 +6,7 @@ import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.*;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
-import name.martingeisse.esdk.examples.vga.test_renderer.FramebufferDisplay;
+import name.martingeisse.esdk.examples.vga.test_renderer.SimulatedFramebufferDisplay;
 import name.martingeisse.esdk.picoblaze.model.rtl.PicoblazeRtlWithAssociatedProgram;
 
 import java.awt.image.BufferedImage;
@@ -18,13 +18,13 @@ public final class TestRendererDesign extends Design {
 
 	private final RtlRealm realm;
 	private final RtlClockNetwork clock;
-	private final FramebufferDisplay display;
+	private final SimulatedFramebufferDisplay display;
 	private final PicoblazeRtlWithAssociatedProgram cpu;
 
 	public TestRendererDesign(BufferedImage framebuffer, int widthBits) {
 		realm = new RtlRealm(this);
 		clock = realm.createClockNetwork(new RtlBitConstant(realm, false));
-		display = new FramebufferDisplay(clock, framebuffer, widthBits);
+		display = new SimulatedFramebufferDisplay(clock, framebuffer, widthBits);
 		cpu = new PicoblazeRtlWithAssociatedProgram(clock, getClass());
 
 		RtlVectorSignal rowRegister;
@@ -50,7 +50,7 @@ public final class TestRendererDesign extends Design {
 		return clock;
 	}
 
-	public FramebufferDisplay getDisplay() {
+	public SimulatedFramebufferDisplay getDisplay() {
 		return display;
 	}
 
