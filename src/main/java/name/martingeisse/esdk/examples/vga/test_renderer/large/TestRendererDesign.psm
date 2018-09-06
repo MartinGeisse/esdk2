@@ -7,35 +7,35 @@ CONSTANT DIRECTION_RIGHT, c1
 ; initialize row
     LOAD s0, 00
     OUTPUT s0, 40
-    LOAD s0, 14
+    LOAD s0, 10
     OUTPUT s0, 40
 
 ; initialize column
     LOAD s0, 00
     OUTPUT s0, 10
-    LOAD s0, 14
+    LOAD s0, 10
     OUTPUT s0, 10
 
 ; draw a rectangle
     LOAD s0, 07
     LOAD s1, DIRECTION_RIGHT
-    LOAD s2, 58
-    LOAD s3, 02
+    LOAD s2, 60
+    LOAD s3, 00
     CALL horizontalLine
     LOAD s0, 04
     LOAD s1, DIRECTION_DOWN
-    LOAD s2, b8
-    LOAD s3, 01
+    LOAD s2, 60
+    LOAD s3, 00
     CALL horizontalLine
     LOAD s0, 02
     LOAD s1, DIRECTION_LEFT
-    LOAD s2, 58
-    LOAD s3, 02
+    LOAD s2, 60
+    LOAD s3, 00
     CALL horizontalLine
     LOAD s0, 01
     LOAD s1, DIRECTION_UP
-    LOAD s2, b8
-    LOAD s3, 01
+    LOAD s2, 60
+    LOAD s3, 00
     CALL horizontalLine
     JUMP hang
 
