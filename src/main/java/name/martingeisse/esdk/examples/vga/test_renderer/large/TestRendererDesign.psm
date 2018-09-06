@@ -22,14 +22,17 @@ CONSTANT DIRECTION_RIGHT, c1
     LOAD s2, 58
     LOAD s3, 02
     CALL horizontalLine
+    LOAD s0, 04
     LOAD s1, DIRECTION_DOWN
     LOAD s2, b8
     LOAD s3, 01
     CALL horizontalLine
+    LOAD s0, 02
     LOAD s1, DIRECTION_LEFT
     LOAD s2, 58
     LOAD s3, 02
     CALL horizontalLine
+    LOAD s0, 01
     LOAD s1, DIRECTION_UP
     LOAD s2, b8
     LOAD s3, 01
