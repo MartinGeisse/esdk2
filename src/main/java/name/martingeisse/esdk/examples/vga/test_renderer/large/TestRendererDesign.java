@@ -10,7 +10,7 @@ import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
 import name.martingeisse.esdk.core.rtl.signal.RtlConcatenation;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorConstant;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
-import name.martingeisse.esdk.examples.vga.test_renderer.FramebufferDisplay;
+import name.martingeisse.esdk.examples.vga.test_renderer.display.FramebufferDisplay;
 import name.martingeisse.esdk.picoblaze.model.rtl.PicoblazeRtlWithAssociatedProgram;
 
 /**

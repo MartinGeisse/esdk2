@@ -6,8 +6,8 @@ package name.martingeisse.esdk.examples.vga.test_renderer.large;
 
 import name.martingeisse.esdk.core.model.items.IntervalItem;
 import name.martingeisse.esdk.core.rtl.simulation.RtlClockGenerator;
-import name.martingeisse.esdk.examples.vga.test_renderer.FramebufferDisplayPanel;
-import name.martingeisse.esdk.examples.vga.test_renderer.SimulatedFramebufferDisplay;
+import name.martingeisse.esdk.examples.vga.test_renderer.display.SimulatedFramebufferDisplayPanel;
+import name.martingeisse.esdk.examples.vga.test_renderer.display.SimulatedFramebufferDisplay;
 
 import javax.swing.*;
 import java.awt.image.BufferedImage;
@@ -26,7 +26,7 @@ public class SimulationMain {
 		new RtlClockGenerator(design.getClock(), 10);
 
 		JFrame frame = new JFrame("Framebuffer Display");
-		frame.add(new FramebufferDisplayPanel(framebuffer));
+		frame.add(new SimulatedFramebufferDisplayPanel(framebuffer));
 		frame.pack();
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		frame.setResizable(false);

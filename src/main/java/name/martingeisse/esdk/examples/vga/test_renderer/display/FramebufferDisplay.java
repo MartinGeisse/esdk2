@@ -1,4 +1,4 @@
-package name.martingeisse.esdk.examples.vga.test_renderer;
+package name.martingeisse.esdk.examples.vga.test_renderer.display;
 
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;

@@ -2,7 +2,7 @@
  * Copyright (c) 2018 Martin Geisse
  * This file is distributed under the terms of the MIT license.
  */
-package name.martingeisse.esdk.examples.vga.test_renderer;
+package name.martingeisse.esdk.examples.vga.test_renderer.display;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,11 +11,11 @@ import java.awt.image.BufferedImage;
 /**
  *
  */
-public final class FramebufferDisplayPanel extends JPanel {
+public final class SimulatedFramebufferDisplayPanel extends JPanel {
 
 	private final BufferedImage framebuffer;
 
-	public FramebufferDisplayPanel(BufferedImage framebuffer) {
+	public SimulatedFramebufferDisplayPanel(BufferedImage framebuffer) {
 		super(false);
 		this.framebuffer = framebuffer;
 		setSize(framebuffer.getWidth(), framebuffer.getHeight());

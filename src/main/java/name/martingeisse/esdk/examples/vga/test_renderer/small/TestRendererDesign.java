@@ -6,7 +6,7 @@ import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.*;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
-import name.martingeisse.esdk.examples.vga.test_renderer.SimulatedFramebufferDisplay;
+import name.martingeisse.esdk.examples.vga.test_renderer.display.SimulatedFramebufferDisplay;
 import name.martingeisse.esdk.picoblaze.model.rtl.PicoblazeRtlWithAssociatedProgram;
 
 import java.awt.image.BufferedImage;

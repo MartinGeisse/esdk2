@@ -1,7 +1,7 @@
 package name.martingeisse.esdk.examples.vga.test_renderer.large;
 
 import name.martingeisse.esdk.core.rtl.synthesis.xilinx.ProjectGenerator;
-import name.martingeisse.esdk.examples.vga.test_renderer.SimulatedFramebufferDisplay;
+import name.martingeisse.esdk.examples.vga.test_renderer.display.SimulatedFramebufferDisplay;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
