@@ -10,7 +10,7 @@ import java.awt.image.BufferedImage;
 /**
  *
  */
-public final class FramebufferDisplay extends RtlClockedItem {
+public final class FramebufferDisplay extends RtlClockedItem implements FramebufferDisplayInterface {
 
 	private final BufferedImage framebuffer;
 	private final int widthBits;
