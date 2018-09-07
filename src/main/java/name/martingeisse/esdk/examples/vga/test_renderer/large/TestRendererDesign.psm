@@ -39,6 +39,10 @@ CONSTANT DIRECTION_RIGHT, c1
     CALL horizontalLine
     JUMP hang
 
+; enable screen output (cannot write afterwards)
+    LOAD s0, 01
+    OUTPUT s0, 08
+
 ; hang
 hang: JUMP hang
 

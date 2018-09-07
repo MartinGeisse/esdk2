@@ -24,7 +24,7 @@ public class RtlSimulationMain {
 		new RtlClockGenerator(design.getClock(), 10);
 
 		JFrame frame = new JFrame("RTL Magic Framebuffer Display");
-		frame.add(new RtlFramebufferDisplayPanel(display.getFramebuffer().getMatrix(), 7, 7, v -> true));
+		frame.add(new RtlFramebufferDisplayPanel(display.getFramebuffer().getMatrix(), 7, 7, design.getScreenEnablePredicate()));
 		frame.pack();
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		frame.setResizable(false);
