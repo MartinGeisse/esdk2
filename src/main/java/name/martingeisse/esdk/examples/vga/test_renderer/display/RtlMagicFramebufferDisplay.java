@@ -9,13 +9,13 @@ import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 /**
  *
  */
-public final class RtlFramebufferDisplay extends RtlItem implements FramebufferDisplay {
+public final class RtlMagicFramebufferDisplay extends RtlItem implements FramebufferDisplay {
 
 	private final int widthBits;
 	private final int heightBits;
 	private final RtlSynchronousRam framebuffer;
 
-	public RtlFramebufferDisplay(RtlClockNetwork clockNetwork, int widthBits, int heightBits) {
+	public RtlMagicFramebufferDisplay(RtlClockNetwork clockNetwork, int widthBits, int heightBits) {
 		super(clockNetwork.getRealm());
 		this.widthBits = widthBits;
 		this.heightBits = heightBits;
