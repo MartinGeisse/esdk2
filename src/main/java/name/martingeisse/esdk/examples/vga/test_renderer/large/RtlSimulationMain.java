@@ -6,7 +6,7 @@ package name.martingeisse.esdk.examples.vga.test_renderer.large;
 
 import name.martingeisse.esdk.core.model.items.IntervalItem;
 import name.martingeisse.esdk.core.rtl.simulation.RtlClockGenerator;
-import name.martingeisse.esdk.examples.vga.test_renderer.display.RtlMagicFramebufferDisplay;
+import name.martingeisse.esdk.examples.vga.test_renderer.display.RtlFramebufferDisplay;
 import name.martingeisse.esdk.examples.vga.test_renderer.display.RtlFramebufferDisplayPanel;
 
 import javax.swing.*;
@@ -14,12 +14,12 @@ import javax.swing.*;
 /**
  *
  */
-public class RtlMagicSimulationMain {
+public class RtlSimulationMain {
 
 	public static void main(String[] args) throws Exception {
 
 		TestRendererDesign design = new TestRendererDesign(7, 7);
-		RtlMagicFramebufferDisplay display = new RtlMagicFramebufferDisplay(design.getClock(), 7, 7);
+		RtlFramebufferDisplay display = new RtlFramebufferDisplay(design.getClock(), 7, 7);
 		design.connectDisplay(display);
 		new RtlClockGenerator(design.getClock(), 10);
 
