@@ -37,7 +37,6 @@ CONSTANT DIRECTION_RIGHT, c1
     LOAD s2, 60
     LOAD s3, 00
     CALL horizontalLine
-    JUMP hang
 
 ; enable screen output (cannot write afterwards)
     LOAD s0, 01
@@ -46,11 +45,9 @@ CONSTANT DIRECTION_RIGHT, c1
 ; hang
 hang: JUMP hang
 
-
-
-
-
+; ---------------------------------------------------------------------------------------------------------------------
 ; routines
+; ---------------------------------------------------------------------------------------------------------------------
 
 ; Draws a short (< 256 pixels) horizontal line to the right.
 ;
