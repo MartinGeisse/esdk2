@@ -8,7 +8,8 @@ import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 
 /**
- *
+ * Simple but wrong implementation that won't delay a write when reading pixels, instead writing correctly and
+ * reading that pixel instead of the one that should actually be read.
  */
 public final class RtlFramebufferDisplay extends RtlItem implements FramebufferDisplay {
 

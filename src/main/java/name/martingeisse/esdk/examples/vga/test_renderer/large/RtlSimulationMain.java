@@ -4,7 +4,11 @@
  */
 package name.martingeisse.esdk.examples.vga.test_renderer.large;
 
+import name.martingeisse.esdk.core.model.Design;
 import name.martingeisse.esdk.core.model.items.IntervalItem;
+import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
+import name.martingeisse.esdk.core.rtl.RtlRealm;
+import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
 import name.martingeisse.esdk.core.rtl.simulation.RtlClockGenerator;
 import name.martingeisse.esdk.examples.vga.test_renderer.display.RtlFramebufferDisplay;
 import name.martingeisse.esdk.examples.vga.test_renderer.display.RtlFramebufferDisplayPanel;
@@ -18,10 +22,17 @@ public class RtlSimulationMain {
 
 	public static void main(String[] args) throws Exception {
 
-		TestRendererDesign design = new TestRendererDesign(7, 7);
-		RtlFramebufferDisplay display = new RtlFramebufferDisplay(design.getClock(), 7, 7);
-		design.connectDisplay(display);
-		new RtlClockGenerator(design.getClock(), 10);
+		int widthBits = 7;
+		int heightBits = 7;
+
+		Design design = new Design();
+		RtlRealm realm = new RtlRealm(design);
+		RtlClockNetwork clock = realm.createClockNetwork(new RtlBitConstant(realm, false));
+		TestRenderer testRenderer = new TestRenderer(realm, clock, widthBits, heightBits);
+
+		RtlFramebufferDisplay display = new RtlFramebufferDisplay(clock, widthBits, heightBits);
+		testRenderer.connectDisplay(display);
+		new RtlClockGenerator(clock, 10);
 
 		JFrame frame = new JFrame("RTL Magic Framebuffer Display");
 		frame.add(new RtlFramebufferDisplayPanel(display.getFramebuffer().getMatrix(), 7, 7));
