@@ -1,4 +1,4 @@
-package name.martingeisse.esdk.examples.vga.test_pattern;
+package name.martingeisse.esdk.examples.vga;
 
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.block.RtlClockedBlock;

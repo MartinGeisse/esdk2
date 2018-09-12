@@ -5,7 +5,9 @@ import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.memory.RtlSynchronousRam;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
+import name.martingeisse.esdk.core.rtl.signal.RtlConditionalVectorOperation;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
+import name.martingeisse.esdk.core.rtl.signal.connector.RtlBitSignalConnector;
 
 /**
  * Simple but wrong implementation that won't delay a write when reading pixels, instead writing correctly and
@@ -17,6 +19,9 @@ public final class RtlFramebufferDisplay extends RtlItem implements FramebufferD
 	private final int heightBits;
 	private final RtlSynchronousRam framebuffer;
 	private final RtlBitSignal readySignal;
+	private RtlVectorSignal writeAddressSignal;
+	private RtlVectorSignal dacAddressSignal;
+	private RtlBitSignalConnector addressSelector;
 
 	public RtlFramebufferDisplay(RtlClockNetwork clockNetwork, int widthBits, int heightBits) {
 		super(clockNetwork.getRealm());
@@ -26,14 +31,37 @@ public final class RtlFramebufferDisplay extends RtlItem implements FramebufferD
 		// has one row per pixel and 3 columns (bits) for the 3 color channels.
 		this.framebuffer = new RtlSynchronousRam(clockNetwork, 1 << (widthBits + heightBits), 3);
 		this.readySignal = new RtlBitConstant(clockNetwork.getRealm(), true);
+		this.addressSelector = new RtlBitSignalConnector(getRealm());
 	}
 
 	public void setWriteStrobeSignal(RtlBitSignal writeStrobeSignal) {
 		framebuffer.setWriteEnableSignal(writeStrobeSignal);
+		addressSelector.setConnected(writeStrobeSignal);
 	}
 
 	public void setWriteAddressSignal(RtlVectorSignal writeAddressSignal) {
-		framebuffer.setAddressSignal(writeAddressSignal);
+		this.writeAddressSignal = writeAddressSignal;
+		updateFramebufferAddressSignal();
+	}
+
+	public void setDacAddressSignal(RtlVectorSignal dacAddressSignal) {
+		this.dacAddressSignal = dacAddressSignal;
+		updateFramebufferAddressSignal();
+	}
+
+	private void updateFramebufferAddressSignal() {
+		if (writeAddressSignal != null) {
+			if (dacAddressSignal != null) {
+				framebuffer.setAddressSignal(new RtlConditionalVectorOperation(getRealm(),
+					addressSelector, writeAddressSignal, dacAddressSignal));
+			} else {
+				framebuffer.setAddressSignal(writeAddressSignal);
+			}
+		} else {
+			if (dacAddressSignal != null) {
+				framebuffer.setAddressSignal(dacAddressSignal);
+			}
+		}
 	}
 
 	public void setWriteDataSignal(RtlVectorSignal writeDataSignal) {
@@ -47,6 +75,10 @@ public final class RtlFramebufferDisplay extends RtlItem implements FramebufferD
 
 	public RtlSynchronousRam getFramebuffer() {
 		return framebuffer;
+	}
+
+	public RtlVectorSignal getDacReadDataSignal() {
+		return framebuffer.getReadDataSignal();
 	}
 
 }
