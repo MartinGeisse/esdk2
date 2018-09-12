@@ -42,7 +42,8 @@ public class RtlRamdacSimulationMain {
 		new RtlClockGenerator(clock, 10);
 
 		RtlVectorSignal dacReadData = display.getDacReadDataSignal();
-		RtlBitSignal blank = vgaTimer.getBlank().or(vgaTimer.getX().select(9).or(vgaTimer.getY().select(9)));
+		RtlBitSignal blank = vgaTimer.getBlank().or(vgaTimer.getX().select(8)).or(vgaTimer.getX().select(9))
+			.or(vgaTimer.getY().select(8)).or(vgaTimer.getY().select(9));
 		MonitorPanel monitorPanel = new MonitorPanel(clock, 640 + 16 + 48, 480 + 10 + 33, 2);
 		Monitor monitor = monitorPanel.getMonitor();
 		monitor.setR(new RtlConditionalVectorOperation(realm, blank, RtlVectorConstant.ofUnsigned(realm, 8, 0), dacReadData.select(2).repeat(8)));
