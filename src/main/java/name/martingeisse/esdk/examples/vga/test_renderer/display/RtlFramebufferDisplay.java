@@ -3,6 +3,7 @@ package name.martingeisse.esdk.examples.vga.test_renderer.display;
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.memory.RtlSynchronousRam;
+import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 
@@ -14,6 +15,7 @@ public final class RtlFramebufferDisplay extends RtlItem implements FramebufferD
 	private final int widthBits;
 	private final int heightBits;
 	private final RtlSynchronousRam framebuffer;
+	private final RtlBitSignal readySignal;
 
 	public RtlFramebufferDisplay(RtlClockNetwork clockNetwork, int widthBits, int heightBits) {
 		super(clockNetwork.getRealm());
@@ -22,6 +24,7 @@ public final class RtlFramebufferDisplay extends RtlItem implements FramebufferD
 		// Note: rows and columns of the frame are not rows and columns of the RAM. Instead, the RAM
 		// has one row per pixel and 3 columns (bits) for the 3 color channels.
 		this.framebuffer = new RtlSynchronousRam(clockNetwork, 1 << (widthBits + heightBits), 3);
+		this.readySignal = new RtlBitConstant(clockNetwork.getRealm(), true);
 	}
 
 	public void setWriteStrobeSignal(RtlBitSignal writeStrobeSignal) {
@@ -34,6 +37,11 @@ public final class RtlFramebufferDisplay extends RtlItem implements FramebufferD
 
 	public void setWriteDataSignal(RtlVectorSignal writeDataSignal) {
 		framebuffer.setWriteDataSignal(writeDataSignal);
+	}
+
+	@Override
+	public RtlBitSignal getReadySignal() {
+		return readySignal;
 	}
 
 	public RtlSynchronousRam getFramebuffer() {

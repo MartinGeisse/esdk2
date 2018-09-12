@@ -2,6 +2,7 @@ package name.martingeisse.esdk.examples.vga.test_renderer.display;
 
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlClockedItem;
+import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 
@@ -15,6 +16,7 @@ public final class SimulatedFramebufferDisplay extends RtlClockedItem implements
 	private final BufferedImage framebuffer;
 	private final int widthBits;
 	private final int xMask;
+	private final RtlBitSignal readySignal;
 
 	private RtlBitSignal writeStrobeSignal;
 	private RtlVectorSignal writeAddressSignal;
@@ -29,6 +31,7 @@ public final class SimulatedFramebufferDisplay extends RtlClockedItem implements
 		this.framebuffer = framebuffer;
 		this.widthBits = widthBits;
 		this.xMask = (1 << widthBits) - 1;
+		this.readySignal = new RtlBitConstant(clockNetwork.getRealm(), true);
 	}
 
 	public BufferedImage getFramebuffer() {
@@ -60,6 +63,11 @@ public final class SimulatedFramebufferDisplay extends RtlClockedItem implements
 			throw new IllegalArgumentException("write data width must be 3, is " + writeDataSignal.getWidth());
 		}
 		this.writeDataSignal = writeDataSignal;
+	}
+
+	@Override
+	public RtlBitSignal getReadySignal() {
+		return readySignal;
 	}
 
 	@Override

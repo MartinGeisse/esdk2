@@ -11,6 +11,7 @@ import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlConcatenation;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorConstant;
+import name.martingeisse.esdk.core.rtl.signal.connector.RtlBitSignalConnector;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 import name.martingeisse.esdk.examples.vga.test_renderer.display.FramebufferDisplay;
 import name.martingeisse.esdk.picoblaze.model.rtl.PicoblazeRtlWithAssociatedProgram;
@@ -25,20 +26,20 @@ public final class TestRendererDesign extends Design {
 	private final RtlRealm realm;
 	private final RtlClockNetwork clock;
 	private final PicoblazeRtlWithAssociatedProgram cpu;
+	private final RtlBitSignalConnector displayReady;
 	private final RtlProceduralVectorSignal columnRegister;
 	private final RtlProceduralVectorSignal rowRegister;
-	private final RtlProceduralBitSignal screenEnable;
 
 	public TestRendererDesign(int widthBits, int heightBits) {
 		realm = new RtlRealm(this);
 		clock = realm.createClockNetwork(new RtlBitConstant(realm, false));
 		cpu = new PicoblazeRtlWithAssociatedProgram(clock, getClass());
+		displayReady = new RtlBitSignalConnector(realm);
 
 		{
 			RtlClockedBlock block = new RtlClockedBlock(clock);
 			columnRegister = block.createVector(widthBits);
 			rowRegister = block.createVector(heightBits);
-			screenEnable = block.createBit();
 			block.getInitializerStatements().assign(columnRegister, VectorValue.ofUnsigned(widthBits, 0));
 			block.getInitializerStatements().assign(rowRegister, VectorValue.ofUnsigned(heightBits, 0));
 
@@ -83,14 +84,13 @@ public final class TestRendererDesign extends Design {
 					builder.endWhen();
 				}
 				builder.endWhen();
-				builder.when(cpu.getPortAddress().select(3));
-				builder.assign(screenEnable, cpu.getOutputData().select(0));
-				builder.endWhen();
 			}
 			builder.endWhen();
 		}
 
-		cpu.setPortInputDataSignal(new RtlVectorConstant(realm, VectorValue.ofUnsigned(8, 0)));
+		cpu.setPortInputDataSignal(new RtlConcatenation(realm,
+			new RtlVectorConstant(realm, VectorValue.ofUnsigned(7, 0)),
+			displayReady));
 		cpu.setResetSignal(new RtlBitConstant(realm, false));
 
 	}
@@ -103,14 +103,11 @@ public final class TestRendererDesign extends Design {
 		return clock;
 	}
 
-	public Predicate<Void> getScreenEnablePredicate() {
-		return v -> screenEnable.getValue();
-	}
-
 	public void connectDisplay(FramebufferDisplay display) {
 		display.setWriteAddressSignal(new RtlConcatenation(realm, rowRegister, columnRegister));
-		display.setWriteStrobeSignal(cpu.getWriteStrobe().and(cpu.getPortAddress().select(0)).and(screenEnable.not()));
+		display.setWriteStrobeSignal(cpu.getWriteStrobe().and(cpu.getPortAddress().select(0)));
 		display.setWriteDataSignal(cpu.getOutputData().select(2, 0));
+		displayReady.setConnected(display.getReadySignal());
 	}
 
 }
