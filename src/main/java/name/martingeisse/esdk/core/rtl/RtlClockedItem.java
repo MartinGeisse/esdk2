@@ -4,6 +4,11 @@
  */
 package name.martingeisse.esdk.core.rtl;
 
+import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.SynthesisNotSupportedException;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
+
 /**
  *
  */
@@ -69,5 +74,22 @@ public abstract class RtlClockedItem extends RtlItem {
 	 * In RTL terms, this method runs at an active clock edge and causes all registers to load a new value.
 	 */
 	public abstract void updateState();
+
+	// ----------------------------------------------------------------------------------------------------------------
+	// Verilog generation
+	// ----------------------------------------------------------------------------------------------------------------
+
+	public void printExpressionsDryRun(VerilogExpressionWriter expressionWriter) {
+		throw newSynthesisNotSupportedException();
+	}
+
+	public void printImplementation(VerilogWriter out) {
+		throw newSynthesisNotSupportedException();
+	}
+
+	public Iterable<? extends RtlSignal> getSignalsThatMustBeDeclaredInVerilog() {
+		throw newSynthesisNotSupportedException();
+	}
+
 
 }

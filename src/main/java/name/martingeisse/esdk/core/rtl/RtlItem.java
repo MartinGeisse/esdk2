@@ -5,6 +5,7 @@
 package name.martingeisse.esdk.core.rtl;
 
 import name.martingeisse.esdk.core.model.Item;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.SynthesisNotSupportedException;
 
 /**
  *
@@ -35,6 +36,10 @@ public abstract class RtlItem extends Item implements RtlItemOwned {
 	@Override
 	public final RtlItem getRtlItem() {
 		return this;
+	}
+
+	public SynthesisNotSupportedException newSynthesisNotSupportedException() {
+		return new SynthesisNotSupportedException("synthesis not supported for " + this);
 	}
 
 }

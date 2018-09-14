@@ -28,6 +28,8 @@ public abstract class RtlAssignment extends RtlStatement {
 
 	@Override
 	public void printExpressionsDryRun(VerilogExpressionWriter expressionWriter) {
+		// TODO what if the destination is a selection with a complex index? Shouldn't this dry-run-print the
+		// destination too?
 		expressionWriter.print(getSource(), VerilogGenerator.VerilogExpressionNesting.ALL);
 	}
 

@@ -9,6 +9,7 @@ import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogGenerator;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogSignalKind;
 
 /**
  * This signal simply produces the same values as another signal which is settable after construction. This helps

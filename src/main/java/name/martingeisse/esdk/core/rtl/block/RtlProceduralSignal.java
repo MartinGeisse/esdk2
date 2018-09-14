@@ -9,6 +9,7 @@ import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.block.statement.RtlAssignmentTarget;
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogSignalKind;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
 
 /**
@@ -40,6 +41,11 @@ public abstract class RtlProceduralSignal extends RtlItem implements RtlSignal, 
 	// ----------------------------------------------------------------------------------------------------------------
 	// Verilog generation
 	// ----------------------------------------------------------------------------------------------------------------
+
+	@Override
+	public VerilogSignalKind getVerilogSignalKind() {
+		return VerilogSignalKind.REG;
+	}
 
 	@Override
 	public final void printVerilogAssignmentTarget(VerilogWriter out) {

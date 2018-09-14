@@ -7,6 +7,7 @@ package name.martingeisse.esdk.core.rtl.signal;
 import name.martingeisse.esdk.core.rtl.RtlItemOwned;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogGenerator;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogSignalKind;
 
 /**
  * Note: If an implementation redefines equals() / hashCode(), then "equal" signals must be exchangeable without
@@ -18,6 +19,10 @@ public interface RtlSignal extends RtlItemOwned {
 	// ----------------------------------------------------------------------------------------------------------------
 	// Verilog generation
 	// ----------------------------------------------------------------------------------------------------------------
+
+	default VerilogSignalKind getVerilogSignalKind() {
+		return VerilogSignalKind.WIRE;
+	}
 
 	/**
 	 * Returns true iff the expression for this signal can be generated with the specified nesting.

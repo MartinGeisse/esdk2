@@ -7,6 +7,8 @@ package name.martingeisse.esdk.core.rtl.block;
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlClockedItem;
 import name.martingeisse.esdk.core.rtl.block.statement.RtlStatementSequence;
+import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
 
 import java.util.ArrayList;
@@ -85,7 +87,14 @@ public final class RtlClockedBlock extends RtlClockedItem {
 	// Verilog generation
 	// ----------------------------------------------------------------------------------------------------------------
 
-	public void printVerilogBlocks(VerilogWriter out) {
+	@Override
+	public void printExpressionsDryRun(VerilogExpressionWriter expressionWriter) {
+		initializerStatements.printExpressionsDryRun(expressionWriter);
+		statements.printExpressionsDryRun(expressionWriter);
+	}
+
+	@Override
+	public void printImplementation(VerilogWriter out) {
 
 		out.startProceduralInitialBlock();
 		initializerStatements.printVerilogStatements(out);
@@ -95,6 +104,11 @@ public final class RtlClockedBlock extends RtlClockedItem {
 		getStatements().printVerilogStatements(out);
 		out.endProceduralAlwaysBlock();
 
+	}
+
+	@Override
+	public Iterable<RtlProceduralSignal> getSignalsThatMustBeDeclaredInVerilog() {
+		return proceduralSignals;
 	}
 
 }
