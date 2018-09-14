@@ -21,6 +21,7 @@ public class VerilogWriter {
 	private int indentation = 0;
 	private Map<RtlClockNetwork, String> clockNames;
 	private Map<RtlSignal, String> declaredSignals;
+	private int instanceCounter = 0;
 
 	public VerilogWriter(PrintWriter out) {
 		this.out = out;
@@ -201,6 +202,15 @@ public class VerilogWriter {
 			throw new IllegalArgumentException("no name allocated for procedural signal " + signal);
 		}
 		out.print(name);
+	}
+
+	//
+	// module instances
+	//
+
+	public String newInstanceName() {
+		instanceCounter++;
+		return "instance" + instanceCounter;
 	}
 
 }

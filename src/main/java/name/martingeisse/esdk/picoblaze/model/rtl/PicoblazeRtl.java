@@ -4,12 +4,18 @@ import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlClockedItem;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
+import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.signal.custom.RtlCustomBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.custom.RtlCustomVectorSignal;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogModuleInstanceWriter;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 import name.martingeisse.esdk.picoblaze.model.PicoblazeSimulatorException;
 import name.martingeisse.esdk.picoblaze.model.PicoblazeState;
+
+import java.util.ArrayList;
 
 /**
  * An RTL Picoblaze model.
@@ -119,6 +125,33 @@ public class PicoblazeRtl extends RtlClockedItem {
 			state.performFirstCycle();
 			secondCycle = true;
 		}
+	}
+
+	@Override
+	public void printExpressionsDryRun(VerilogExpressionWriter expressionWriter) {
+		super.printExpressionsDryRun(expressionWriter);
+	}
+
+	@Override
+	public void printImplementation(VerilogWriter out) {
+		// TODO this probably can't handle output signals correctly
+		VerilogModuleInstanceWriter writer = new VerilogModuleInstanceWriter(out);
+		writer.beginInstance("kcpsm3");
+		writer.assignPort("clk", getClockNetwork().getClockSignal());
+		writer.assignPort("reset", resetSignal);
+		writer.assignPort("address", getInstructionAddress());
+		writer.assignPort("instruction", instructionSignal);
+		writer.assignPort("write_strobe", xxxxxxxxxxx);
+		writer.assignPort("read_strobe", xxxxxxxxxxx);
+		writer.assignPort("port_id", xxxxxxxxxxx);
+		writer.assignPort("out_port", xxxxxxxxxxx);
+		writer.assignPort("in_port", xxxxxxxxxxx);
+		writer.assignPort("interrupt", new RtlBitConstant(getRealm(), false));
+	}
+
+	@Override
+	public Iterable<? extends RtlSignal> getSignalsThatMustBeDeclaredInVerilog() {
+		return new ArrayList<>();
 	}
 
 }
