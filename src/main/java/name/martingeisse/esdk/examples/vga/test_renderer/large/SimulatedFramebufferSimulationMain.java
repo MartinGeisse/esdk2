@@ -19,7 +19,7 @@ import java.awt.image.BufferedImage;
 /**
  *
  */
-public class SimulationMain {
+public class SimulatedFramebufferSimulationMain {
 
 	public static void main(String[] args) throws Exception {
 
