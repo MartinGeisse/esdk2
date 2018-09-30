@@ -1,0 +1,36 @@
+
+How should verilog generation work? The ad-hoc "generate text from RTL objects" scheme has its limits, but each
+problem could be solved independently without using a totally new approach:
+
+- complex expressions that can't be verilog expressions (e.g. mux with 2+ selector bits -> switch-expression)
+	-> add a method to expressions to implement themselves as statements; the default generates an assignment but
+		the switch-expression would generate a switch statement with multiple assignments
+- output signals from module instances (unsolved)
+	-> support module instances as a first-class object; output signals are defined signals whose "assignment generator"
+		writes nothing; instead, the module instance writes itself
+	-> has to generate a definition for the output signals but no assignment
+		-> similar to switch-expression!
+- how to handle allowed and disallowed nesting properly and in an elegant way, including things like "forwarding"
+	for connector signals
+	--> ignore elegance for connector signals
+	--> maybe evne ignore allowed nesting and just generate a helper signal for each signal object. The generated
+		code is ugly anyway
+		-> beautiful code is not a priority ATM !!!
+
+May write verilog directly OR may generate a lowlevel "almost-netlist":
+- nodes have lowlevel meaning but refer to highlevel signal objects for their operands
+- node types:
+	- signal
+		- unary: use, not, fixed-range-select
+		- binary: index-select, AND, ADD
+		- ternary: conditional
+	- block
+		Just refers to the RTL block. The statements are okay, signals aren't.
+	- instance
+		...
+
+Seems like a lot of work. What's the simplest thing that could possibly work?
+- ask signals if they can be expressions; otherwise they must be extracted and are asked to implement themselves
+- add first-class module instances which define their outputs and write themselves
+- implement connectors in an inelegant way; all else as before
+--> seems okay
