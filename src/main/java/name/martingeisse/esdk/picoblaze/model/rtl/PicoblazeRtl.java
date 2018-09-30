@@ -141,11 +141,11 @@ public class PicoblazeRtl extends RtlClockedItem {
 		writer.assignPort("reset", resetSignal);
 		writer.assignPort("address", getInstructionAddress());
 		writer.assignPort("instruction", instructionSignal);
-		writer.assignPort("write_strobe", xxxxxxxxxxx);
-		writer.assignPort("read_strobe", xxxxxxxxxxx);
-		writer.assignPort("port_id", xxxxxxxxxxx);
-		writer.assignPort("out_port", xxxxxxxxxxx);
-		writer.assignPort("in_port", xxxxxxxxxxx);
+//		writer.assignPort("write_strobe", xxxxxxxxxxx);
+//		writer.assignPort("read_strobe", xxxxxxxxxxx);
+//		writer.assignPort("port_id", xxxxxxxxxxx);
+//		writer.assignPort("out_port", xxxxxxxxxxx);
+//		writer.assignPort("in_port", xxxxxxxxxxx);
 		writer.assignPort("interrupt", new RtlBitConstant(getRealm(), false));
 	}
 
