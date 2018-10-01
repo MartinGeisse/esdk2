@@ -7,6 +7,9 @@ package name.martingeisse.esdk.core.rtl.synthesis.verilog;
 import name.martingeisse.esdk.core.rtl.RtlClockedItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.block.RtlProceduralSignal;
+import name.martingeisse.esdk.core.rtl.module.RtlInstanceOutputPort;
+import name.martingeisse.esdk.core.rtl.module.RtlInstancePort;
+import name.martingeisse.esdk.core.rtl.module.RtlModuleInstance;
 import name.martingeisse.esdk.core.rtl.pin.RtlBidirectionalPin;
 import name.martingeisse.esdk.core.rtl.pin.RtlInputPin;
 import name.martingeisse.esdk.core.rtl.pin.RtlOutputPin;
@@ -93,6 +96,17 @@ final class SignalAnalyzer {
 			for (RtlSignal signal : item.getProceduralSignals()) {
 				analyzedSignals.add(signal);
 				declareSignal(signal);
+			}
+		}
+
+		// module output signals must be declared
+		for (RtlModuleInstance moduleInstance : realm.getModuleInstances()) {
+			for (RtlInstancePort port : moduleInstance.getPorts()) {
+				if (port instanceof RtlInstanceOutputPort) {
+					RtlInstanceOutputPort outputPort = (RtlInstanceOutputPort) port;
+					analyzedSignals.add(outputPort);
+					declareSignal(outputPort);
+				}
 			}
 		}
 

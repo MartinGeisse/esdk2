@@ -7,6 +7,10 @@ package name.martingeisse.esdk.core.rtl.synthesis.verilog;
 import name.martingeisse.esdk.core.rtl.RtlClockedItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.block.RtlProceduralSignal;
+import name.martingeisse.esdk.core.rtl.module.RtlInstanceInputPort;
+import name.martingeisse.esdk.core.rtl.module.RtlInstanceOutputPort;
+import name.martingeisse.esdk.core.rtl.module.RtlInstancePort;
+import name.martingeisse.esdk.core.rtl.module.RtlModuleInstance;
 import name.martingeisse.esdk.core.rtl.pin.RtlBidirectionalPin;
 import name.martingeisse.esdk.core.rtl.pin.RtlOutputPin;
 import name.martingeisse.esdk.core.rtl.pin.RtlPin;
@@ -46,6 +50,8 @@ public class VerilogGenerator {
 		printBlocks();
 		out.getOut().println();
 		printOutputPinAssignments();
+		out.getOut().println();
+		printModuleInstances();
 		out.getOut().println();
 		out.printOutro();
 	}
@@ -107,6 +113,35 @@ public class VerilogGenerator {
 				out.printExpression(bidirectionalPin.getOutputSignal());
 				out.getOut().println(" : 1'bz;");
 			}
+		}
+	}
+
+	private void printModuleInstances() {
+		int counter = 0;
+		for (RtlModuleInstance moduleInstance : realm.getModuleInstances()) {
+			out.getOut().print(moduleInstance.getModuleName() + " m" + counter + " (");
+			boolean firstPort = true;
+			for (RtlInstancePort port : moduleInstance.getPorts()) {
+				if (firstPort) {
+					firstPort = false;
+					out.getOut().println();
+				} else {
+					out.getOut().println(",");
+				}
+				out.getOut().print("\t." + port.getPortName() + "(");
+				if (port instanceof RtlInstanceInputPort) {
+					RtlInstanceInputPort inputPort = (RtlInstanceInputPort)port;
+					out.printExpression(inputPort.getAssignedSignal());
+				} else if (port instanceof RtlInstanceOutputPort) {
+					RtlInstanceOutputPort outputPort = (RtlInstanceOutputPort)port;
+					out.printExpression(outputPort);
+				} else {
+					throw new RuntimeException("unknown instance port type");
+				}
+				out.getOut().print(')');
+			}
+			out.getOut().println(");");
+			counter++;
 		}
 	}
 

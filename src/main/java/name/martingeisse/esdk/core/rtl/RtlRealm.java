@@ -85,6 +85,10 @@ public final class RtlRealm extends Item {
 		return clockedItems;
 	}
 
+	public List<RtlModuleInstance> getModuleInstances() {
+		return moduleInstances;
+	}
+
 	// ----------------------------------------------------------------------------------------------------------------
 	// factory methods
 	// ----------------------------------------------------------------------------------------------------------------

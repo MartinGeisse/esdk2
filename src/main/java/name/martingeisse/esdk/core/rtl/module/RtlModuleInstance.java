@@ -19,8 +19,7 @@ import java.util.List;
 public final class RtlModuleInstance extends RtlItem {
 
 	private String moduleName;
-	private final List<RtlInstanceInputPort> inputPorts = new ArrayList<>();
-	private final List<RtlInstanceOutputPort> outputPorts = new ArrayList<>();
+	private final List<RtlInstancePort> ports = new ArrayList<>();
 
 	public RtlModuleInstance(RtlRealm realm) {
 		super(realm);
@@ -64,35 +63,31 @@ public final class RtlModuleInstance extends RtlItem {
 		this.moduleName = moduleName;
 	}
 
-	public Iterable<RtlInstanceInputPort> getInputPorts() {
-		return inputPorts;
+	public List<RtlInstancePort> getPorts() {
+		return ports;
 	}
 
 	public RtlInstanceBitInputPort createBitInputPort(String portName, RtlBitSignal assignedSignal) {
 		RtlInstanceBitInputPort inputPort = new RtlInstanceBitInputPort(this, portName, assignedSignal);
-		inputPorts.add(inputPort);
+		ports.add(inputPort);
 		return inputPort;
 	}
 
 	public RtlInstanceVectorInputPort createVectorInputPort(String portName, RtlVectorSignal assignedSignal) {
 		RtlInstanceVectorInputPort inputPort = new RtlInstanceVectorInputPort(this, portName, assignedSignal);
-		inputPorts.add(inputPort);
+		ports.add(inputPort);
 		return inputPort;
-	}
-
-	public Iterable<RtlInstanceOutputPort> getOutputPorts() {
-		return outputPorts;
 	}
 
 	public RtlInstanceBitOutputPort createBitOutputPort(String portName) {
 		RtlInstanceBitOutputPort outputPort = new RtlInstanceBitOutputPort(this, portName);
-		outputPorts.add(outputPort);
+		ports.add(outputPort);
 		return outputPort;
 	}
 
 	public RtlInstanceVectorOutputPort createVectorOutputPort(String portName, int width) {
 		RtlInstanceVectorOutputPort outputPort = new RtlInstanceVectorOutputPort(this, portName, width);
-		outputPorts.add(outputPort);
+		ports.add(outputPort);
 		return outputPort;
 	}
 
