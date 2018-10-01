@@ -6,6 +6,7 @@ package name.martingeisse.esdk.core.rtl;
 
 import name.martingeisse.esdk.core.model.Design;
 import name.martingeisse.esdk.core.model.Item;
+import name.martingeisse.esdk.core.rtl.module.RtlModuleInstance;
 import name.martingeisse.esdk.core.rtl.pin.RtlPin;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 
@@ -26,6 +27,7 @@ public final class RtlRealm extends Item {
 	private final List<RtlPin> pins = new ArrayList<>();
 	private final List<RtlClockNetwork> clockNetworks = new ArrayList<>();
 	private final List<RtlClockedItem> clockedItems = new ArrayList<>();
+	private final List<RtlModuleInstance> moduleInstances = new ArrayList<>();
 
 	public RtlRealm(Design design) {
 		super(design);
@@ -59,6 +61,16 @@ public final class RtlRealm extends Item {
 			throw new IllegalArgumentException("invalid registration key");
 		}
 		clockedItems.add(item);
+	}
+
+	/**
+	 * Non-public API. Do not call. Only marked public because Java forces us to if we want to use packages.
+	 */
+	public void registerModuleInstance(RtlModuleInstance.RealmRegistrationKey key, RtlModuleInstance item) {
+		if (!key.isValid()) {
+			throw new IllegalArgumentException("invalid registration key");
+		}
+		moduleInstances.add(item);
 	}
 
 	public Iterable<RtlPin> getPins() {

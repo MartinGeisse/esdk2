@@ -4,6 +4,7 @@
  */
 package name.martingeisse.esdk.core.rtl.module;
 
+import name.martingeisse.esdk.core.rtl.RtlClockedItem;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
@@ -23,11 +24,36 @@ public final class RtlModuleInstance extends RtlItem {
 
 	public RtlModuleInstance(RtlRealm realm) {
 		super(realm);
+		register();
 	}
 
 	public RtlModuleInstance(RtlRealm realm, String moduleName) {
 		super(realm);
+		register();
 		this.moduleName = moduleName;
+	}
+
+	private void register() {
+		RealmRegistrationKey key = new RealmRegistrationKey();
+		getRealm().registerModuleInstance(key, this);
+		key.valid = false;
+	}
+
+	/**
+	 * This class is used to ensure that {@link RtlRealm#registerClockedItem(RtlClockedItem.RealmRegistrationKey, RtlClockedItem)}
+	 * isn't called except through the {@link RtlClockedItem} constructor.
+	 */
+	public static final class RealmRegistrationKey {
+
+		private boolean valid = true;
+
+		private RealmRegistrationKey() {
+		}
+
+		public boolean isValid() {
+			return valid;
+		}
+
 	}
 
 	public String getModuleName() {
