@@ -8,7 +8,7 @@ import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 
 /**
- *
+ * Bit-typed signal connector. See {@link RtlSignalConnector} for details.
  */
 public final class RtlBitSignalConnector extends RtlSignalConnector implements RtlBitSignal {
 

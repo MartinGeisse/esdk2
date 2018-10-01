@@ -10,8 +10,9 @@ import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.util.BitProvider;
 
 /**
- * Helper class that extends both {@link RtlItem} and {@link RtlBitSignal} and the same time. An anonymous signal
- * class couldn't do this otherwise.
+ * Helper class that extends both {@link RtlItem} and {@link RtlBitSignal} and the same time to implement custom
+ * bit-typed signals. (You cannot create an anonymous class that extends both at the same time, but now you can
+ * extend this class).
  */
 public abstract class RtlCustomBitSignal extends RtlCustomSignal implements RtlBitSignal {
 

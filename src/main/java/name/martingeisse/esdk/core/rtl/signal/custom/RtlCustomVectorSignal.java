@@ -12,8 +12,9 @@ import name.martingeisse.esdk.core.util.VectorProvider;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 
 /**
- * Helper class that extends both {@link RtlItem} and {@link RtlVectorSignal} and the same time. An anonymous signal
- * class couldn't do this otherwise.
+ * Helper class that extends both {@link RtlItem} and {@link RtlVectorSignal} and the same time to implement custom
+ * vector-typed signals. (You cannot create an anonymous class that extends both at the same time, but now you can
+ * extend this class).
  */
 public abstract class RtlCustomVectorSignal extends RtlCustomSignal implements RtlVectorSignal {
 

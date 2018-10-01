@@ -9,7 +9,7 @@ import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 
 /**
- *
+ * Vector-typed signal connector. See {@link RtlSignalConnector} for details.
  */
 public final class RtlVectorSignalConnector extends RtlSignalConnector implements RtlVectorSignal {
 
