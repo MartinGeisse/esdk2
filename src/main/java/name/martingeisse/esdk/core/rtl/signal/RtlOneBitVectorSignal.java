@@ -2,8 +2,8 @@ package name.martingeisse.esdk.core.rtl.signal;
 
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionNesting;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogGenerator;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 
 /**
@@ -37,13 +37,13 @@ public final class RtlOneBitVectorSignal extends RtlItem implements RtlVectorSig
 	}
 
 	@Override
-	public boolean compliesWith(VerilogGenerator.VerilogExpressionNesting nesting) {
+	public boolean compliesWith(VerilogExpressionNesting nesting) {
 		return bitSignal.compliesWith(nesting);
 	}
 
 	@Override
 	public void printVerilogImplementationExpression(VerilogExpressionWriter out) {
-		out.print(bitSignal, VerilogGenerator.VerilogExpressionNesting.SIGNALS_AND_CONSTANTS);
+		out.print(bitSignal, VerilogExpressionNesting.SIGNALS_AND_CONSTANTS);
 	}
 
 }

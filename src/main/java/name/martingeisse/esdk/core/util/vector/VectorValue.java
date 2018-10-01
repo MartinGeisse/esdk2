@@ -6,8 +6,8 @@ package name.martingeisse.esdk.core.util.vector;
 
 import name.martingeisse.esdk.core.rtl.block.RtlProceduralSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionNesting;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogGenerator;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -194,7 +194,7 @@ public abstract class VectorValue {
 			}
 
 			@Override
-			public VerilogExpressionWriter print(RtlSignal signal, VerilogGenerator.VerilogExpressionNesting nesting) {
+			public VerilogExpressionWriter print(RtlSignal signal, VerilogExpressionNesting nesting) {
 				throw new UnsupportedOperationException();
 			}
 

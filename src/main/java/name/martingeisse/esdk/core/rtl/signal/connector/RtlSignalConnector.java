@@ -7,8 +7,8 @@ package name.martingeisse.esdk.core.rtl.signal.connector;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionNesting;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogGenerator;
 
 /**
  * This signal simply produces the same values as another signal which is settable after construction. This helps
@@ -30,14 +30,14 @@ public abstract class RtlSignalConnector extends RtlItem implements RtlSignal {
 	// ----------------------------------------------------------------------------------------------------------------
 
 	@Override
-	public boolean compliesWith(VerilogGenerator.VerilogExpressionNesting nesting) {
+	public boolean compliesWith(VerilogExpressionNesting nesting) {
 		return getConnected().compliesWith(nesting);
 	}
 
 	@Override
 	public void printVerilogImplementationExpression(VerilogExpressionWriter out) {
 		// we allow "all" here because we detect invalid nesting in compliesWith()
-		out.print(getConnected(), VerilogGenerator.VerilogExpressionNesting.ALL);
+		out.print(getConnected(), VerilogExpressionNesting.ALL);
 	}
 
 }

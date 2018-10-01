@@ -2,8 +2,8 @@ package name.martingeisse.esdk.core.rtl.signal;
 
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionNesting;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogGenerator;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 
 /**
@@ -52,7 +52,7 @@ public final class RtlVectorRepetition extends RtlItem implements RtlVectorSigna
 		out.print('{');
 		out.print(repetitions);
 		out.print('{');
-		out.print(vectorSignal, VerilogGenerator.VerilogExpressionNesting.SIGNALS_AND_CONSTANTS);
+		out.print(vectorSignal, VerilogExpressionNesting.SIGNALS_AND_CONSTANTS);
 		out.print("}}");
 	}
 

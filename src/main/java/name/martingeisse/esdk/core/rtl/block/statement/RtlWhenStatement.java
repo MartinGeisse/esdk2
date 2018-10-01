@@ -6,8 +6,8 @@ package name.martingeisse.esdk.core.rtl.block.statement;
 
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionNesting;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogGenerator;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
 
 /**
@@ -53,7 +53,7 @@ public final class RtlWhenStatement extends RtlStatement {
 
 	@Override
 	public void printExpressionsDryRun(VerilogExpressionWriter expressionWriter) {
-		expressionWriter.print(condition, VerilogGenerator.VerilogExpressionNesting.ALL);
+		expressionWriter.print(condition, VerilogExpressionNesting.ALL);
 		thenBranch.printExpressionsDryRun(expressionWriter);
 		otherwiseBranch.printExpressionsDryRun(expressionWriter);
 	}

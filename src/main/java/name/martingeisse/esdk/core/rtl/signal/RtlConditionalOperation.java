@@ -6,8 +6,8 @@ package name.martingeisse.esdk.core.rtl.signal;
 
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionNesting;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogGenerator;
 
 /**
  *
@@ -35,11 +35,11 @@ public abstract class RtlConditionalOperation extends RtlItem implements RtlSign
 
 	@Override
 	public void printVerilogImplementationExpression(VerilogExpressionWriter out) {
-		out.print(condition, VerilogGenerator.VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
+		out.print(condition, VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
 		out.print(" ? ");
-		out.print(getOnTrue(), VerilogGenerator.VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
+		out.print(getOnTrue(), VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
 		out.print(" : ");
-		out.print(getOnFalse(), VerilogGenerator.VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
+		out.print(getOnFalse(), VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
 	}
 
 }

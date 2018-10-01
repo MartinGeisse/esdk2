@@ -6,8 +6,8 @@ package name.martingeisse.esdk.core.rtl.signal;
 
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionNesting;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogGenerator;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 
 /**
@@ -61,13 +61,13 @@ public class RtlRangeSelection extends RtlItem implements RtlVectorSignal {
 	// ----------------------------------------------------------------------------------------------------------------
 
 	@Override
-	public boolean compliesWith(VerilogGenerator.VerilogExpressionNesting nesting) {
-		return nesting != VerilogGenerator.VerilogExpressionNesting.SIGNALS_AND_CONSTANTS;
+	public boolean compliesWith(VerilogExpressionNesting nesting) {
+		return nesting != VerilogExpressionNesting.SIGNALS_AND_CONSTANTS;
 	}
 
 	@Override
 	public void printVerilogImplementationExpression(VerilogExpressionWriter out) {
-		out.print(containerSignal, VerilogGenerator.VerilogExpressionNesting.SIGNALS_AND_CONSTANTS);
+		out.print(containerSignal, VerilogExpressionNesting.SIGNALS_AND_CONSTANTS);
 		out.print('[');
 		out.print(from);
 		out.print(':');

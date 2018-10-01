@@ -5,8 +5,8 @@
 package name.martingeisse.esdk.core.rtl.signal;
 
 import name.martingeisse.esdk.core.rtl.RtlItemOwned;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionNesting;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogGenerator;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogSignalKind;
 
 /**
@@ -30,16 +30,16 @@ public interface RtlSignal extends RtlItemOwned {
 	 * The default implementation only complies with ALL nesting. This is correct in all cases but may extract an
 	 * expression to a helper signal unnecessarily.
 	 */
-	default boolean compliesWith(VerilogGenerator.VerilogExpressionNesting nesting) {
-		return nesting == VerilogGenerator.VerilogExpressionNesting.ALL;
+	default boolean compliesWith(VerilogExpressionNesting nesting) {
+		return nesting == VerilogExpressionNesting.ALL;
 	}
 
 	/**
 	 * Writes a Verilog expression for this signal. This method only exists so nobody calls
 	 * {@link #printVerilogImplementationExpression(VerilogExpressionWriter)} accidentally. It is equivalent to
-	 * {@link VerilogExpressionWriter#print(RtlSignal, VerilogGenerator.VerilogExpressionNesting)}.
+	 * {@link VerilogExpressionWriter#print(RtlSignal, VerilogExpressionNesting)}.
 	 */
-	default void printVerilogExpression(VerilogExpressionWriter out, VerilogGenerator.VerilogExpressionNesting nesting) {
+	default void printVerilogExpression(VerilogExpressionWriter out, VerilogExpressionNesting nesting) {
 		out.print(this, nesting);
 	}
 

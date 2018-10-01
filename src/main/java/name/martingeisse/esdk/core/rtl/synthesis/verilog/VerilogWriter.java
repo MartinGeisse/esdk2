@@ -182,7 +182,7 @@ public class VerilogWriter {
 			}
 
 			@Override
-			public VerilogExpressionWriter print(RtlSignal signal, VerilogGenerator.VerilogExpressionNesting nesting) {
+			public VerilogExpressionWriter print(RtlSignal signal, VerilogExpressionNesting nesting) {
 				printExpression(signal);
 				return this;
 			}

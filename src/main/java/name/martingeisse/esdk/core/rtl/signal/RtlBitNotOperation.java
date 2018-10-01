@@ -6,8 +6,8 @@ package name.martingeisse.esdk.core.rtl.signal;
 
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionNesting;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogGenerator;
 
 /**
  *
@@ -41,7 +41,7 @@ public final class RtlBitNotOperation extends RtlItem implements RtlBitSignal {
 	@Override
 	public void printVerilogImplementationExpression(VerilogExpressionWriter out) {
 		out.print('~');
-		out.print(operand, VerilogGenerator.VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
+		out.print(operand, VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
 	}
 
 }
