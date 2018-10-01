@@ -16,6 +16,10 @@ import java.util.List;
  * An RTL realm is a part ({@link Item}) of a {@link Design} that is expressed on register-transfer level.
  *
  * An RTL realm has its own sub-items of type {@link RtlItem}.
+ *
+ * TODO reconsider if RtlRealm is needed. A central registration point for all RtlItems is certainly needed
+ * (for running initialization code; for synthesis; ...) but maybe {@link Design} can handle that. Then {@link RtlItem}
+ * could be merged into {@link Item} and RtlRealm could be removed.
  */
 public final class RtlRealm extends Item {
 
