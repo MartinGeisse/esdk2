@@ -81,7 +81,7 @@ public final class RtlConcatenation extends RtlItem implements RtlVectorSignal {
 	// ----------------------------------------------------------------------------------------------------------------
 
 	@Override
-	public void printVerilogExpression(VerilogExpressionWriter out) {
+	public void printVerilogImplementationExpression(VerilogExpressionWriter out) {
 		if (width == 0) {
 			throw new RuntimeException("cannot print zero-width concatenation");
 		}

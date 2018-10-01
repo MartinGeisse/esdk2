@@ -149,7 +149,7 @@ public class VerilogWriter {
 	public void printExpression(RtlSignal signal) {
 		String name = declaredSignals.get(signal);
 		if (name == null) {
-			printDefiningExpression(signal);
+			printImplementationExpression(signal);
 		} else {
 			out.print(name);
 		}
@@ -160,8 +160,8 @@ public class VerilogWriter {
 	 * is usually the right method to use. This method works similarly, but for declared signals,
 	 * it prints the defining expression, not the declared name.
 	 */
-	public void printDefiningExpression(RtlSignal signal) {
-		signal.printVerilogExpression(new VerilogExpressionWriter() {
+	public void printImplementationExpression(RtlSignal signal) {
+		signal.printVerilogImplementationExpression(new VerilogExpressionWriter() {
 
 			@Override
 			public VerilogExpressionWriter print(String s) {

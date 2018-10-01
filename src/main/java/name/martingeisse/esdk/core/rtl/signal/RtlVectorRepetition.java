@@ -48,7 +48,7 @@ public final class RtlVectorRepetition extends RtlItem implements RtlVectorSigna
 	}
 
 	@Override
-	public void printVerilogExpression(VerilogExpressionWriter out) {
+	public void printVerilogImplementationExpression(VerilogExpressionWriter out) {
 		out.print('{');
 		out.print(repetitions);
 		out.print('{');

@@ -43,7 +43,7 @@ public final class RtlBitRepetition extends RtlItem implements RtlVectorSignal {
 	}
 
 	@Override
-	public void printVerilogExpression(VerilogExpressionWriter out) {
+	public void printVerilogImplementationExpression(VerilogExpressionWriter out) {
 		out.print('{');
 		out.print(repetitions);
 		out.print('{');

@@ -53,7 +53,7 @@ public abstract class RtlProceduralSignal extends RtlItem implements RtlSignal, 
 	}
 
 	@Override
-	public final void printVerilogExpression(VerilogExpressionWriter out) {
+	public final void printVerilogImplementationExpression(VerilogExpressionWriter out) {
 		out.printProceduralSignalName(this);
 	}
 

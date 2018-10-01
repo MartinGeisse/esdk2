@@ -26,7 +26,7 @@ public abstract class RtlSettableSignal extends RtlItem implements RtlSignal {
 	// ----------------------------------------------------------------------------------------------------------------
 
 	@Override
-	public void printVerilogExpression(VerilogExpressionWriter out) {
+	public void printVerilogImplementationExpression(VerilogExpressionWriter out) {
 		throw new UnsupportedOperationException("cannot synthesize " + getClass());
 	}
 

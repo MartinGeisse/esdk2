@@ -35,8 +35,20 @@ public interface RtlSignal extends RtlItemOwned {
 	}
 
 	/**
-	 * Writes a Verilog expression for this signal. See {@link VerilogExpressionWriter} for details.
+	 * Writes a Verilog expression for this signal. This method only exists so nobody calls
+	 * {@link #printVerilogImplementationExpression(VerilogExpressionWriter)} accidentally. It is equivalent to
+	 * {@link VerilogExpressionWriter#print(RtlSignal, VerilogGenerator.VerilogExpressionNesting)}.
 	 */
-	void printVerilogExpression(VerilogExpressionWriter out);
+	default void printVerilogExpression(VerilogExpressionWriter out, VerilogGenerator.VerilogExpressionNesting nesting) {
+		out.print(this, nesting);
+	}
+
+	/**
+	 * Writes a Verilog implementation expression for this signal. This method should only be called by the verilog
+	 * generation core since it repeats the implementation expression for each usage of a shared signal. Also, not all
+	 * signals support this method -- some need an extracted signal definition which is given a meaning by different
+	 * means than an implementation expression (for example, switch-expressions and instance output ports).
+	 */
+	void printVerilogImplementationExpression(VerilogExpressionWriter out);
 
 }

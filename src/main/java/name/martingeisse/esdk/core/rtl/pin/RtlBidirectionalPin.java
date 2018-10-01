@@ -57,7 +57,7 @@ public final class RtlBidirectionalPin extends RtlPin implements RtlBitSignal {
 	// ----------------------------------------------------------------------------------------------------------------
 
 	@Override
-	public void printVerilogExpression(VerilogExpressionWriter out) {
+	public void printVerilogImplementationExpression(VerilogExpressionWriter out) {
 		out.print(getNetName());
 	}
 

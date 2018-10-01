@@ -34,7 +34,7 @@ public abstract class RtlConditionalOperation extends RtlItem implements RtlSign
 	// ----------------------------------------------------------------------------------------------------------------
 
 	@Override
-	public void printVerilogExpression(VerilogExpressionWriter out) {
+	public void printVerilogImplementationExpression(VerilogExpressionWriter out) {
 		out.print(condition, VerilogGenerator.VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
 		out.print(" ? ");
 		out.print(getOnTrue(), VerilogGenerator.VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);

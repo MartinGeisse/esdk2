@@ -7,7 +7,6 @@ package name.martingeisse.esdk.core.rtl.block;
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlClockedItem;
 import name.martingeisse.esdk.core.rtl.block.statement.RtlStatementSequence;
-import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
 

@@ -112,7 +112,7 @@ public final class RtlVectorComparison extends RtlItem implements RtlBitSignal {
 	// ----------------------------------------------------------------------------------------------------------------
 
 	@Override
-	public void printVerilogExpression(VerilogExpressionWriter out) {
+	public void printVerilogImplementationExpression(VerilogExpressionWriter out) {
 		out.print(leftOperand, VerilogGenerator.VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
 		out.print(' ');
 		out.print(operator.getSymbol());

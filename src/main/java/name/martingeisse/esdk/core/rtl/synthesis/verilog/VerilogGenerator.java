@@ -16,7 +16,10 @@ import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 
 import java.io.PrintWriter;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  *
@@ -30,7 +33,6 @@ public class VerilogGenerator {
 	private Set<RtlSignal> allSignals;
 	private Map<RtlSignal, String> declaredSignals;
 	private VerilogExpressionWriter dryRunExpressionWriter;
-
 
 	public VerilogGenerator(PrintWriter out, RtlRealm realm, String name) {
 		this.out = new VerilogWriter(out);
@@ -93,7 +95,7 @@ public class VerilogGenerator {
 		// pins are implicitly declared
 		for (RtlPin pin : realm.getPins()) {
 			if (pin instanceof RtlInputPin) {
-				declaredSignals.put((RtlInputPin)pin, pin.getNetName());
+				declaredSignals.put((RtlInputPin) pin, pin.getNetName());
 			}
 		}
 
@@ -108,10 +110,10 @@ public class VerilogGenerator {
 		// analyze output and output-enable signals for signals to extract
 		for (RtlPin pin : realm.getPins()) {
 			if (pin instanceof RtlOutputPin) {
-				RtlOutputPin outputPin = (RtlOutputPin)pin;
+				RtlOutputPin outputPin = (RtlOutputPin) pin;
 				analyzeSignal(outputPin.getOutputSignal(), VerilogExpressionNesting.ALL);
 			} else if (pin instanceof RtlBidirectionalPin) {
-				RtlBidirectionalPin bidirectionalPin = (RtlBidirectionalPin)pin;
+				RtlBidirectionalPin bidirectionalPin = (RtlBidirectionalPin) pin;
 				analyzeSignal(bidirectionalPin.getOutputSignal(), VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
 				analyzeSignal(bidirectionalPin.getOutputEnableSignal(), VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
 			}
@@ -140,7 +142,7 @@ public class VerilogGenerator {
 
 		// Analyze signals for sub-expressions by calling a "dry-run" printing process. While this sounds more complex,
 		// it concentrates the complexity here, in one place, and simplifies the RtlSignal implementations.
-		signal.printVerilogExpression(dryRunExpressionWriter);
+		signal.printVerilogImplementationExpression(dryRunExpressionWriter);
 
 	}
 
@@ -173,7 +175,7 @@ public class VerilogGenerator {
 				out.getOut().print("wire");
 			}
 			if (signal instanceof RtlVectorSignal) {
-				RtlVectorSignal vectorSignal = (RtlVectorSignal)signal;
+				RtlVectorSignal vectorSignal = (RtlVectorSignal) signal;
 				out.getOut().print('[');
 				out.getOut().print(vectorSignal.getWidth() - 1);
 				out.getOut().print(":0] ");
@@ -195,7 +197,7 @@ public class VerilogGenerator {
 				continue;
 			}
 			out.getOut().print("assign " + signalName + " = ");
-			out.printDefiningExpression(signal);
+			out.printImplementationExpression(signal);
 			out.getOut().println(";");
 		}
 	}
@@ -213,7 +215,7 @@ public class VerilogGenerator {
 				out.printExpression(((RtlOutputPin) pin).getOutputSignal());
 				out.getOut().println(";");
 			} else if (pin instanceof RtlBidirectionalPin) {
-				RtlBidirectionalPin bidirectionalPin = (RtlBidirectionalPin)pin;
+				RtlBidirectionalPin bidirectionalPin = (RtlBidirectionalPin) pin;
 				out.getOut().print("assign " + pin.getNetName() + " = ");
 				out.printExpression(bidirectionalPin.getOutputEnableSignal());
 				out.getOut().println(" ? ");

@@ -66,7 +66,7 @@ public class RtlRangeSelection extends RtlItem implements RtlVectorSignal {
 	}
 
 	@Override
-	public void printVerilogExpression(VerilogExpressionWriter out) {
+	public void printVerilogImplementationExpression(VerilogExpressionWriter out) {
 		out.print(containerSignal, VerilogGenerator.VerilogExpressionNesting.SIGNALS_AND_CONSTANTS);
 		out.print('[');
 		out.print(from);

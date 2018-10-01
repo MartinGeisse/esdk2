@@ -50,7 +50,7 @@ public final class RtlVectorConstant extends RtlItem implements RtlVectorSignal 
 	}
 
 	@Override
-	public void printVerilogExpression(VerilogExpressionWriter out) {
+	public void printVerilogImplementationExpression(VerilogExpressionWriter out) {
 		value.printVerilogExpression(out);
 	}
 

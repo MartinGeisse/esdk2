@@ -4,8 +4,10 @@
  */
 package name.martingeisse.esdk.core.util.vector;
 
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.PrintWriterVerilogExpressionWriter;
+import name.martingeisse.esdk.core.rtl.block.RtlProceduralSignal;
+import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogGenerator;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -171,7 +173,37 @@ public abstract class VectorValue {
 	public abstract int compareUnsigned(VectorValue other);
 
 	public void printVerilogExpression(PrintWriter out) {
-		printVerilogExpression(new PrintWriterVerilogExpressionWriter(out));
+		printVerilogExpression(new VerilogExpressionWriter() {
+
+			@Override
+			public final VerilogExpressionWriter print(String s) {
+				out.print(s);
+				return this;
+			}
+
+			@Override
+			public final VerilogExpressionWriter print(int i) {
+				out.print(i);
+				return this;
+			}
+
+			@Override
+			public final VerilogExpressionWriter print(char c) {
+				out.print(c);
+				return this;
+			}
+
+			@Override
+			public VerilogExpressionWriter print(RtlSignal signal, VerilogGenerator.VerilogExpressionNesting nesting) {
+				throw new UnsupportedOperationException();
+			}
+
+			@Override
+			public VerilogExpressionWriter printProceduralSignalName(RtlProceduralSignal signal) {
+				throw new UnsupportedOperationException();
+			}
+
+		});
 	}
 
 	public void printVerilogExpression(VerilogExpressionWriter out) {

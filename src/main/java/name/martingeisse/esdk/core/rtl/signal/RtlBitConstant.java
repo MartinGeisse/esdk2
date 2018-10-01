@@ -33,7 +33,7 @@ public final class RtlBitConstant extends RtlItem implements RtlBitSignal {
 	// ----------------------------------------------------------------------------------------------------------------
 
 	@Override
-	public void printVerilogExpression(VerilogExpressionWriter out) {
+	public void printVerilogImplementationExpression(VerilogExpressionWriter out) {
 		out.print(value ? "1'b1" : "1'b0");
 	}
 

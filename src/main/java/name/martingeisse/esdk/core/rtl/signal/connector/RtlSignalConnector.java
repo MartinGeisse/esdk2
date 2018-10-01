@@ -9,7 +9,6 @@ import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogGenerator;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogSignalKind;
 
 /**
  * This signal simply produces the same values as another signal which is settable after construction. This helps
@@ -36,7 +35,7 @@ public abstract class RtlSignalConnector extends RtlItem implements RtlSignal {
 	}
 
 	@Override
-	public void printVerilogExpression(VerilogExpressionWriter out) {
+	public void printVerilogImplementationExpression(VerilogExpressionWriter out) {
 		// we allow "all" here because we detect invalid nesting in compliesWith()
 		out.print(getConnected(), VerilogGenerator.VerilogExpressionNesting.ALL);
 	}
