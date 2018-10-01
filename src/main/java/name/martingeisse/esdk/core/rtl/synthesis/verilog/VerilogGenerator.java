@@ -8,7 +8,6 @@ import name.martingeisse.esdk.core.rtl.RtlClockedItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.block.RtlProceduralSignal;
 import name.martingeisse.esdk.core.rtl.pin.RtlBidirectionalPin;
-import name.martingeisse.esdk.core.rtl.pin.RtlInputPin;
 import name.martingeisse.esdk.core.rtl.pin.RtlOutputPin;
 import name.martingeisse.esdk.core.rtl.pin.RtlPin;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
@@ -17,9 +16,7 @@ import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 
 import java.io.PrintWriter;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 /**
  *
@@ -30,9 +27,7 @@ public class VerilogGenerator {
 	private final RtlRealm realm;
 	private final String name;
 
-	private Set<RtlSignal> allSignals;
-	private Map<RtlSignal, String> declaredSignals;
-	private VerilogExpressionWriter dryRunExpressionWriter;
+	private SignalAnalyzer signalAnalyzer;
 
 	public VerilogGenerator(PrintWriter out, RtlRealm realm, String name) {
 		this.out = new VerilogWriter(out);
@@ -41,8 +36,8 @@ public class VerilogGenerator {
 	}
 
 	public void generate() {
-		analyzeSignals();
-		out.prepare(new HashMap<>(), declaredSignals);
+		signalAnalyzer = new SignalAnalyzer(realm);
+		out.prepare(new HashMap<>(), signalAnalyzer.getNamedSignals());
 		out.printIntro(name, realm.getPins());
 		printSignalDeclarations();
 		out.getOut().println();
@@ -55,118 +50,8 @@ public class VerilogGenerator {
 		out.printOutro();
 	}
 
-	//
-	// analysis
-	//
-
-	private void analyzeSignals() {
-		allSignals = new HashSet<>();
-		declaredSignals = new HashMap<>();
-		dryRunExpressionWriter = new VerilogExpressionWriter() {
-
-			@Override
-			public VerilogExpressionWriter print(String s) {
-				return this;
-			}
-
-			@Override
-			public VerilogExpressionWriter print(int i) {
-				return this;
-			}
-
-			@Override
-			public VerilogExpressionWriter print(char c) {
-				return this;
-			}
-
-			@Override
-			public VerilogExpressionWriter print(RtlSignal subSignal, VerilogExpressionNesting subNesting) {
-				analyzeSignal(subSignal, subNesting);
-				return this;
-			}
-
-			@Override
-			public VerilogExpressionWriter printProceduralSignalName(RtlProceduralSignal signal) {
-				return this;
-			}
-
-		};
-
-		// pins are implicitly declared
-		for (RtlPin pin : realm.getPins()) {
-			if (pin instanceof RtlInputPin) {
-				declaredSignals.put((RtlInputPin) pin, pin.getNetName());
-			}
-		}
-
-		// procedural signals must be declared
-		for (RtlClockedItem item : realm.getClockedItems()) {
-			for (RtlSignal signal : item.getSignalsThatMustBeDeclaredInVerilog()) {
-				allSignals.add(signal);
-				declareSignal(signal);
-			}
-		}
-
-		// analyze output and output-enable signals for signals to extract
-		for (RtlPin pin : realm.getPins()) {
-			if (pin instanceof RtlOutputPin) {
-				RtlOutputPin outputPin = (RtlOutputPin) pin;
-				analyzeSignal(outputPin.getOutputSignal(), VerilogExpressionNesting.ALL);
-			} else if (pin instanceof RtlBidirectionalPin) {
-				RtlBidirectionalPin bidirectionalPin = (RtlBidirectionalPin) pin;
-				analyzeSignal(bidirectionalPin.getOutputSignal(), VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
-				analyzeSignal(bidirectionalPin.getOutputEnableSignal(), VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
-			}
-		}
-
-		// analyze signal "expressions" in blocks for signals to extract
-		for (RtlClockedItem item : realm.getClockedItems()) {
-			item.printExpressionsDryRun(dryRunExpressionWriter);
-		}
-
-	}
-
-	private void analyzeSignal(RtlSignal signal, VerilogExpressionNesting nesting) {
-
-		// extract all signals that are used in more than one place. Those have been analyzed already.
-		if (!allSignals.add(signal)) {
-			declareSignal(signal);
-			return;
-		}
-
-		// also extract signals that do not comply with the current nesting level
-		boolean compliesWithNesting = signal.compliesWith(nesting);
-		if (!compliesWithNesting) {
-			declareSignal(signal);
-		}
-
-		// Analyze signals for sub-expressions by calling a "dry-run" printing process. While this sounds more complex,
-		// it concentrates the complexity here, in one place, and simplifies the RtlSignal implementations.
-		signal.printVerilogImplementationExpression(dryRunExpressionWriter);
-
-	}
-
-	private String declareSignal(RtlSignal signal) {
-		String name = declaredSignals.get(signal);
-		if (name == null) {
-			name = "s" + declaredSignals.size();
-			declaredSignals.put(signal, name);
-		}
-		return name;
-	}
-
-	public enum VerilogExpressionNesting {
-		ALL,
-		SELECTIONS_SIGNALS_AND_CONSTANTS,
-		SIGNALS_AND_CONSTANTS
-	}
-
-	//
-	// code generation
-	//
-
 	private void printSignalDeclarations() {
-		for (Map.Entry<RtlSignal, String> signalEntry : declaredSignals.entrySet()) {
+		for (Map.Entry<RtlSignal, String> signalEntry : signalAnalyzer.getDeclaredSignals().entrySet()) {
 			RtlSignal signal = signalEntry.getKey();
 			String signalName = signalEntry.getValue();
 			if (signal instanceof RtlProceduralSignal) {
@@ -190,7 +75,7 @@ public class VerilogGenerator {
 	}
 
 	private void printSignalAssignments() {
-		for (Map.Entry<RtlSignal, String> signalEntry : declaredSignals.entrySet()) {
+		for (Map.Entry<RtlSignal, String> signalEntry : signalAnalyzer.getNamedSignals().entrySet()) {
 			RtlSignal signal = signalEntry.getKey();
 			String signalName = signalEntry.getValue();
 			if (signal instanceof RtlPin || signal instanceof RtlProceduralSignal) {

@@ -2,9 +2,9 @@ package name.martingeisse.esdk.picoblaze.model.rtl;
 
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlClockedItem;
+import name.martingeisse.esdk.core.rtl.block.RtlProceduralSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
-import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.signal.custom.RtlCustomBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.custom.RtlCustomVectorSignal;
@@ -150,7 +150,7 @@ public class PicoblazeRtl extends RtlClockedItem {
 	}
 
 	@Override
-	public Iterable<? extends RtlSignal> getSignalsThatMustBeDeclaredInVerilog() {
+	public Iterable<RtlProceduralSignal> getProceduralSignals() {
 		return new ArrayList<>();
 	}
 

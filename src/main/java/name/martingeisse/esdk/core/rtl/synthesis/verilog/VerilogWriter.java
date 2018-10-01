@@ -20,17 +20,17 @@ public class VerilogWriter {
 	private final PrintWriter out;
 	private int indentation = 0;
 	private Map<RtlClockNetwork, String> clockNames;
-	private Map<RtlSignal, String> declaredSignals;
+	private Map<RtlSignal, String> namedSignals;
 	private int instanceCounter = 0;
 
 	public VerilogWriter(PrintWriter out) {
 		this.out = out;
 	}
 
-	// note: the declaredSignals must include mappings for all input pins
-	void prepare(Map<RtlClockNetwork, String> clockNames, Map<RtlSignal, String> declaredSignals) {
+	// note: the namedSignals must include mappings for all input pins
+	void prepare(Map<RtlClockNetwork, String> clockNames, Map<RtlSignal, String> namedSignals) {
 		this.clockNames = clockNames;
-		this.declaredSignals = declaredSignals;
+		this.namedSignals = namedSignals;
 	}
 
 	public PrintWriter getOut() {
@@ -60,7 +60,7 @@ public class VerilogWriter {
 	//
 
 	public String getSignalName(RtlSignal signal) {
-		String name = declaredSignals.get(signal);
+		String name = namedSignals.get(signal);
 		if (name == null) {
 			throw new IllegalArgumentException("could not find name for signal: " + signal);
 		}
@@ -147,7 +147,7 @@ public class VerilogWriter {
 	 * Prints the expression to use for a signal at a point where the signal gets used.
 	 */
 	public void printExpression(RtlSignal signal) {
-		String name = declaredSignals.get(signal);
+		String name = namedSignals.get(signal);
 		if (name == null) {
 			printImplementationExpression(signal);
 		} else {
@@ -157,8 +157,8 @@ public class VerilogWriter {
 
 	/**
 	 * This method should normally not be called directly since {@link #printExpression(RtlSignal)}
-	 * is usually the right method to use. This method works similarly, but for declared signals,
-	 * it prints the defining expression, not the declared name.
+	 * is usually the right method to use. This method works similarly, but for named signals,
+	 * it prints the defining expression, not the name.
 	 */
 	public void printImplementationExpression(RtlSignal signal) {
 		signal.printVerilogImplementationExpression(new VerilogExpressionWriter() {
@@ -197,7 +197,7 @@ public class VerilogWriter {
 	}
 
 	public void printProceduralSignalName(RtlProceduralSignal signal) {
-		String name = declaredSignals.get(signal);
+		String name = namedSignals.get(signal);
 		if (name == null) {
 			throw new IllegalArgumentException("no name allocated for procedural signal " + signal);
 		}

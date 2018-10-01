@@ -39,6 +39,7 @@ public final class RtlClockedBlock extends RtlClockedItem {
 		proceduralSignals.add(proceduralSignal);
 	}
 
+	@Override
 	public Iterable<RtlProceduralSignal> getProceduralSignals() {
 		return proceduralSignals;
 	}
@@ -103,11 +104,6 @@ public final class RtlClockedBlock extends RtlClockedItem {
 		getStatements().printVerilogStatements(out);
 		out.endProceduralAlwaysBlock();
 
-	}
-
-	@Override
-	public Iterable<RtlProceduralSignal> getSignalsThatMustBeDeclaredInVerilog() {
-		return proceduralSignals;
 	}
 
 }
