@@ -2,21 +2,14 @@ package name.martingeisse.esdk.picoblaze.model.rtl;
 
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlClockedItem;
-import name.martingeisse.esdk.core.rtl.block.RtlProceduralSignal;
-import name.martingeisse.esdk.core.rtl.module.*;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.signal.custom.RtlCustomBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.custom.RtlCustomVectorSignal;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogModuleInstanceWriter;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 import name.martingeisse.esdk.picoblaze.model.PicoblazeSimulatorException;
 import name.martingeisse.esdk.picoblaze.model.PicoblazeState;
-
-import java.util.ArrayList;
 
 /**
  * An RTL Picoblaze model.
@@ -26,21 +19,14 @@ import java.util.ArrayList;
  * instruction address as an RTL signal, but note that this signal is not correct during the first cycle, just like
  * for the real Picoblaze.
  */
-public class PicoblazeRtl extends RtlClockedItem {
+public class PicoblazeRtl extends RtlClockedItem.EmptySynthesis {
 
 	private final PicoblazeState state;
-	private RtlBitSignal resetSignal;
-	private boolean sampledResetValue;
-	private RtlVectorSignal instructionSignal;
-	private VectorValue sampledInstructionValue;
-	private RtlVectorSignal portInputDataSignal;
-	private VectorValue sampledPortInputDataValue;
 	private boolean secondCycle;
-
-	// TODO remove this comment
-	// store signals in module instance, maybe have ports sample their values automatically
-	// --> not sample auto because there can't be any built-in clock handling
 	private final Kcpsm3ModuleInstance moduleInstance;
+	private boolean sampledResetValue;
+	private VectorValue sampledInstructionValue;
+	private VectorValue sampledPortInputDataValue;
 
 	public PicoblazeRtl(RtlClockNetwork clockNetwork) {
 		super(clockNetwork);
@@ -56,27 +42,28 @@ public class PicoblazeRtl extends RtlClockedItem {
 			}
 
 		};
-		this.resetSignal = new RtlBitConstant(getRealm(), false);
 		this.secondCycle = true;
-		this.moduleInstance = new RtlModuleInstance(clockNetwork.getRealm(), "kcpsm3");
-
+		this.moduleInstance = new Kcpsm3ModuleInstance(clockNetwork.getRealm());
+		moduleInstance.getResetPort().setAssignedSignal(new RtlBitConstant(getRealm(), false));
 	}
 
 	public void setResetSignal(RtlBitSignal resetSignal) {
-		this.resetSignal = resetSignal;
+		moduleInstance.getResetPort().setAssignedSignal(resetSignal);
 	}
 
 	public void setInstructionSignal(RtlVectorSignal instructionSignal) {
-		this.instructionSignal = instructionSignal;
+		moduleInstance.getInstructionPort().setAssignedSignal(instructionSignal);
 	}
 
 	public void setPortInputDataSignal(RtlVectorSignal portInputDataSignal) {
-		this.portInputDataSignal = portInputDataSignal;
+		moduleInstance.getDataInputPort().setAssignedSignal(portInputDataSignal);
 	}
 
 	public PicoblazeState getState() {
 		return state;
 	}
+
+	// TODO RtlModuleInstanceOutputPort uses a SettableSignal but here we need a custom signal!
 
 	public RtlVectorSignal getInstructionAddress() {
 		return RtlCustomVectorSignal.ofUnsigned(getRealm(), 10, state::getPc);
@@ -100,22 +87,22 @@ public class PicoblazeRtl extends RtlClockedItem {
 
 	@Override
 	public void initializeSimulation() {
-		if (resetSignal == null) {
+		if (moduleInstance.getResetPort().getAssignedSignal() == null) {
 			throw new PicoblazeSimulatorException("no reset signal was set");
 		}
-		if (instructionSignal == null) {
+		if (moduleInstance.getInstructionPort().getAssignedSignal() == null) {
 			throw new PicoblazeSimulatorException("no instruction signal was set");
 		}
-		if (portInputDataSignal == null) {
+		if (moduleInstance.getDataInputPort().getAssignedSignal() == null) {
 			throw new PicoblazeSimulatorException("no port input data signal was set");
 		}
 	}
 
 	@Override
 	public void computeNextState() {
-		sampledResetValue = resetSignal.getValue();
-		sampledInstructionValue = instructionSignal.getValue();
-		sampledPortInputDataValue = portInputDataSignal.getValue();
+		sampledResetValue = moduleInstance.getResetPort().getAssignedSignal().getValue();
+		sampledInstructionValue = moduleInstance.getInstructionPort().getAssignedSignal().getValue();
+		sampledPortInputDataValue = moduleInstance.getDataInputPort().getAssignedSignal().getValue();
 	}
 
 	@Override
@@ -133,33 +120,6 @@ public class PicoblazeRtl extends RtlClockedItem {
 			state.performFirstCycle();
 			secondCycle = true;
 		}
-	}
-
-	@Override
-	public void printExpressionsDryRun(VerilogExpressionWriter expressionWriter) {
-		super.printExpressionsDryRun(expressionWriter);
-	}
-
-	@Override
-	public void printImplementation(VerilogWriter out) {
-		// TODO this probably can't handle output signals correctly
-		VerilogModuleInstanceWriter writer = new VerilogModuleInstanceWriter(out);
-		writer.beginInstance("kcpsm3");
-		writer.assignPort("clk", getClockNetwork().getClockSignal());
-		writer.assignPort("reset", resetSignal);
-		writer.assignPort("address", getInstructionAddress());
-		writer.assignPort("instruction", instructionSignal);
-//		writer.assignPort("write_strobe", xxxxxxxxxxx);
-//		writer.assignPort("read_strobe", xxxxxxxxxxx);
-//		writer.assignPort("port_id", xxxxxxxxxxx);
-//		writer.assignPort("out_port", xxxxxxxxxxx);
-//		writer.assignPort("in_port", xxxxxxxxxxx);
-		writer.assignPort("interrupt", new RtlBitConstant(getRealm(), false));
-	}
-
-	@Override
-	public Iterable<RtlProceduralSignal> getProceduralSignals() {
-		return new ArrayList<>();
 	}
 
 }

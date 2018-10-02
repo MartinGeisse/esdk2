@@ -8,6 +8,8 @@ import name.martingeisse.esdk.core.rtl.block.RtlProceduralSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
 
+import java.util.ArrayList;
+
 /**
  *
  */
@@ -90,4 +92,24 @@ public abstract class RtlClockedItem extends RtlItem {
 		throw newSynthesisNotSupportedException();
 	}
 
+	/**
+	 * This item vanishes during synthesis instead of throwing an exception.
+	 */
+	public static abstract class EmptySynthesis extends RtlClockedItem {
+
+		public EmptySynthesis(RtlClockNetwork clockNetwork) {
+			super(clockNetwork);
+		}
+
+		public void printExpressionsDryRun(VerilogExpressionWriter expressionWriter) {
+		}
+
+		public void printImplementation(VerilogWriter out) {
+		}
+
+		public Iterable<RtlProceduralSignal> getProceduralSignals() {
+			return new ArrayList<>();
+		}
+
+	}
 }
