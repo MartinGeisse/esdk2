@@ -2,6 +2,7 @@ package name.martingeisse.esdk.picoblaze.model.rtl;
 
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlClockedItem;
+import name.martingeisse.esdk.core.rtl.module.*;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
@@ -18,19 +19,34 @@ import name.martingeisse.esdk.picoblaze.model.PicoblazeState;
  * cycle. Use {@link #getPortAddress()} to obtain that address. Use {@link #getInstructionAddress()} to get the
  * instruction address as an RTL signal, but note that this signal is not correct during the first cycle, just like
  * for the real Picoblaze.
+ * <p>
+ * TODO: interrupts
  */
 public class PicoblazeRtl extends RtlClockedItem.EmptySynthesis {
 
 	private final PicoblazeState state;
 	private boolean secondCycle;
-	private final Kcpsm3ModuleInstance moduleInstance;
+
+	private final RtlModuleInstance moduleInstance;
+	private final RtlInstanceBitInputPort clockPort;
+	private final RtlInstanceBitInputPort resetPort;
+	private final RtlInstanceVectorOutputPort instructionAddressPort;
+	private final RtlInstanceVectorInputPort instructionPort;
+	private final RtlInstanceBitOutputPort readStrobePort;
+	private final RtlInstanceBitOutputPort writeStrobePort;
+	private final RtlInstanceVectorOutputPort portIdPort;
+	private final RtlInstanceVectorInputPort dataInputPort;
+	private final RtlInstanceVectorOutputPort dataOutputPort;
+	private final RtlInstanceBitInputPort interruptPort;
+	private final RtlInstanceBitOutputPort interruptAckPort;
+
 	private boolean sampledResetValue;
 	private VectorValue sampledInstructionValue;
 	private VectorValue sampledPortInputDataValue;
 
 	public PicoblazeRtl(RtlClockNetwork clockNetwork) {
 		super(clockNetwork);
-		this.state = new PicoblazeState() {
+		state = new PicoblazeState() {
 
 			@Override
 			protected int handleInput(int address) {
@@ -42,69 +58,88 @@ public class PicoblazeRtl extends RtlClockedItem.EmptySynthesis {
 			}
 
 		};
-		this.secondCycle = true;
-		this.moduleInstance = new Kcpsm3ModuleInstance(clockNetwork.getRealm());
-		moduleInstance.getResetPort().setAssignedSignal(new RtlBitConstant(getRealm(), false));
-		moduleInstance.getInstructionAddressPort().setSimulationSignal(RtlCustomVectorSignal.ofUnsigned(getRealm(), 10, state::getPc));
+		secondCycle = true;
 
+		moduleInstance = new RtlModuleInstance(clockNetwork.getRealm(), "kcpsm3");
+		clockPort = moduleInstance.createBitInputPort("clk");
+		clockPort.setAssignedSignal(clockNetwork.getClockSignal());
+		resetPort = moduleInstance.createBitInputPort("reset");
+		resetPort.setAssignedSignal(new RtlBitConstant(getRealm(), false));
+		instructionAddressPort = moduleInstance.createVectorOutputPort("address", 10);
+		instructionAddressPort.setSimulationSignal(RtlCustomVectorSignal.ofUnsigned(getRealm(), 10, state::getPc));
+		instructionPort = moduleInstance.createVectorInputPort("instruction", 18);
+		readStrobePort = moduleInstance.createBitOutputPort("read_strobe");
+		readStrobePort.setSimulationSignal(RtlCustomBitSignal.of(getRealm(), () -> secondCycle && state.isInputInstruction()));
+		writeStrobePort = moduleInstance.createBitOutputPort("write_strobe");
+		writeStrobePort.setSimulationSignal(RtlCustomBitSignal.of(getRealm(), () -> secondCycle && state.isOutputInstruction()));
+		portIdPort = moduleInstance.createVectorOutputPort("port_id", 8);
+		portIdPort.setSimulationSignal(RtlCustomVectorSignal.ofUnsigned(getRealm(), 8, state::getPortAddress));
+		dataInputPort = moduleInstance.createVectorInputPort("in_port", 8);
+		dataOutputPort = moduleInstance.createVectorOutputPort("out_port", 8);
+		dataOutputPort.setSimulationSignal(RtlCustomVectorSignal.ofUnsigned(getRealm(), 8, state::getPortOutputData));
+		interruptPort = moduleInstance.createBitInputPort("interrupt");
+		interruptAckPort = moduleInstance.createBitOutputPort("interrupt_ack");
+		interruptAckPort.setSimulationSignal(new RtlBitConstant(getRealm(), false));
 	}
 
 	public void setResetSignal(RtlBitSignal resetSignal) {
-		moduleInstance.getResetPort().setAssignedSignal(resetSignal);
+		resetPort.setAssignedSignal(resetSignal);
 	}
 
 	public void setInstructionSignal(RtlVectorSignal instructionSignal) {
-		moduleInstance.getInstructionPort().setAssignedSignal(instructionSignal);
+		instructionPort.setAssignedSignal(instructionSignal);
 	}
 
 	public void setPortInputDataSignal(RtlVectorSignal portInputDataSignal) {
-		moduleInstance.getDataInputPort().setAssignedSignal(portInputDataSignal);
+		dataInputPort.setAssignedSignal(portInputDataSignal);
+	}
+
+	public void setInterruptSignal(RtlBitSignal resetSignal) {
+		interruptPort.setAssignedSignal(resetSignal);
 	}
 
 	public PicoblazeState getState() {
 		return state;
 	}
 
-	// TODO RtlModuleInstanceOutputPort uses a SettableSignal but here we need a custom signal!
-
 	public RtlVectorSignal getInstructionAddress() {
-		return moduleInstance.getInstructionAddressPort().getSimulationSignal();
+		return instructionAddressPort.getSimulationSignal();
 	}
 
 	public RtlVectorSignal getPortAddress() {
-		return RtlCustomVectorSignal.ofUnsigned(getRealm(), 8, state::getPortAddress);
+		return portIdPort.getSimulationSignal();
 	}
 
 	public RtlVectorSignal getOutputData() {
-		return RtlCustomVectorSignal.ofUnsigned(getRealm(), 8, state::getPortOutputData);
+		return dataOutputPort.getSimulationSignal();
 	}
 
 	public RtlBitSignal getReadStrobe() {
-		return RtlCustomBitSignal.of(getRealm(), () -> secondCycle && state.isInputInstruction());
+		return readStrobePort.getSimulationSignal();
 	}
 
 	public RtlBitSignal getWriteStrobe() {
-		return RtlCustomBitSignal.of(getRealm(), () -> secondCycle && state.isOutputInstruction());
+		return writeStrobePort.getSimulationSignal();
 	}
 
 	@Override
 	public void initializeSimulation() {
-		if (moduleInstance.getResetPort().getAssignedSignal() == null) {
+		if (resetPort.getAssignedSignal() == null) {
 			throw new PicoblazeSimulatorException("no reset signal was set");
 		}
-		if (moduleInstance.getInstructionPort().getAssignedSignal() == null) {
+		if (instructionPort.getAssignedSignal() == null) {
 			throw new PicoblazeSimulatorException("no instruction signal was set");
 		}
-		if (moduleInstance.getDataInputPort().getAssignedSignal() == null) {
+		if (dataInputPort.getAssignedSignal() == null) {
 			throw new PicoblazeSimulatorException("no port input data signal was set");
 		}
 	}
 
 	@Override
 	public void computeNextState() {
-		sampledResetValue = moduleInstance.getResetPort().getAssignedSignal().getValue();
-		sampledInstructionValue = moduleInstance.getInstructionPort().getAssignedSignal().getValue();
-		sampledPortInputDataValue = moduleInstance.getDataInputPort().getAssignedSignal().getValue();
+		sampledResetValue = resetPort.getAssignedSignal().getValue();
+		sampledInstructionValue = instructionPort.getAssignedSignal().getValue();
+		sampledPortInputDataValue = dataInputPort.getAssignedSignal().getValue();
 	}
 
 	@Override
