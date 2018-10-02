@@ -5,7 +5,6 @@
 package name.martingeisse.esdk.library.vga;
 
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
-import name.martingeisse.esdk.core.rtl.RtlRealm;
 
 import javax.swing.*;
 import java.awt.*;
