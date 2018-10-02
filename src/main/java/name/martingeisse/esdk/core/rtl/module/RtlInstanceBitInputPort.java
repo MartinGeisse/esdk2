@@ -11,7 +11,11 @@ import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
  */
 public final class RtlInstanceBitInputPort extends RtlInstanceInputPort {
 
-	private final RtlBitSignal assignedSignal;
+	private RtlBitSignal assignedSignal;
+
+	public RtlInstanceBitInputPort(RtlModuleInstance moduleInstance, String portName) {
+		this(moduleInstance, portName, null);
+	}
 
 	public RtlInstanceBitInputPort(RtlModuleInstance moduleInstance, String portName, RtlBitSignal assignedSignal) {
 		super(moduleInstance, portName);
@@ -21,6 +25,10 @@ public final class RtlInstanceBitInputPort extends RtlInstanceInputPort {
 	@Override
 	public RtlBitSignal getAssignedSignal() {
 		return assignedSignal;
+	}
+
+	public void setAssignedSignal(RtlBitSignal assignedSignal) {
+		this.assignedSignal = assignedSignal;
 	}
 
 }

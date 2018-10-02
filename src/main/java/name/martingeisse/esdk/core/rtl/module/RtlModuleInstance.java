@@ -10,8 +10,8 @@ import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -19,7 +19,7 @@ import java.util.List;
 public final class RtlModuleInstance extends RtlItem {
 
 	private String moduleName;
-	private final List<RtlInstancePort> ports = new ArrayList<>();
+	private final Map<String, RtlInstancePort> ports = new HashMap<>();
 
 	public RtlModuleInstance(RtlRealm realm) {
 		super(realm);
@@ -63,32 +63,48 @@ public final class RtlModuleInstance extends RtlItem {
 		this.moduleName = moduleName;
 	}
 
-	public List<RtlInstancePort> getPorts() {
-		return ports;
+	public Iterable<RtlInstancePort> getPorts() {
+		return ports.values();
+	}
+
+	public RtlInstanceBitInputPort createBitInputPort(String portName) {
+		return createBitInputPort(portName, null);
 	}
 
 	public RtlInstanceBitInputPort createBitInputPort(String portName, RtlBitSignal assignedSignal) {
 		RtlInstanceBitInputPort inputPort = new RtlInstanceBitInputPort(this, portName, assignedSignal);
-		ports.add(inputPort);
+		addPort(portName, inputPort);
 		return inputPort;
 	}
 
-	public RtlInstanceVectorInputPort createVectorInputPort(String portName, RtlVectorSignal assignedSignal) {
-		RtlInstanceVectorInputPort inputPort = new RtlInstanceVectorInputPort(this, portName, assignedSignal);
-		ports.add(inputPort);
+	public RtlInstanceVectorInputPort createVectorInputPort(String portName, int width) {
+		return createVectorInputPort(portName, width, null);
+	}
+
+	public RtlInstanceVectorInputPort createVectorInputPort(String portName, int width, RtlVectorSignal assignedSignal) {
+		RtlInstanceVectorInputPort inputPort = new RtlInstanceVectorInputPort(this, portName, width, assignedSignal);
+		addPort(portName, inputPort);
 		return inputPort;
 	}
 
 	public RtlInstanceBitOutputPort createBitOutputPort(String portName) {
 		RtlInstanceBitOutputPort outputPort = new RtlInstanceBitOutputPort(this, portName);
-		ports.add(outputPort);
+		addPort(portName, outputPort);
 		return outputPort;
 	}
 
 	public RtlInstanceVectorOutputPort createVectorOutputPort(String portName, int width) {
 		RtlInstanceVectorOutputPort outputPort = new RtlInstanceVectorOutputPort(this, portName, width);
-		ports.add(outputPort);
+		addPort(portName, outputPort);
 		return outputPort;
+	}
+
+	private void addPort(String portName, RtlInstancePort port) {
+		RtlInstancePort oldPort = ports.put(portName, port);
+		if (oldPort != null) {
+			ports.put(portName, oldPort);
+			throw new IllegalStateException("a port with name " + portName + " was already added");
+		}
 	}
 
 }

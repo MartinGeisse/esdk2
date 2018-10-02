@@ -3,6 +3,7 @@ package name.martingeisse.esdk.picoblaze.model.rtl;
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlClockedItem;
 import name.martingeisse.esdk.core.rtl.block.RtlProceduralSignal;
+import name.martingeisse.esdk.core.rtl.module.*;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
@@ -36,6 +37,11 @@ public class PicoblazeRtl extends RtlClockedItem {
 	private VectorValue sampledPortInputDataValue;
 	private boolean secondCycle;
 
+	// TODO remove this comment
+	// store signals in module instance, maybe have ports sample their values automatically
+	// --> not sample auto because there can't be any built-in clock handling
+	private final Kcpsm3ModuleInstance moduleInstance;
+
 	public PicoblazeRtl(RtlClockNetwork clockNetwork) {
 		super(clockNetwork);
 		this.state = new PicoblazeState() {
@@ -52,6 +58,8 @@ public class PicoblazeRtl extends RtlClockedItem {
 		};
 		this.resetSignal = new RtlBitConstant(getRealm(), false);
 		this.secondCycle = true;
+		this.moduleInstance = new RtlModuleInstance(clockNetwork.getRealm(), "kcpsm3");
+
 	}
 
 	public void setResetSignal(RtlBitSignal resetSignal) {
