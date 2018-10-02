@@ -19,11 +19,6 @@ public class Design {
 		items.add(item);
 	}
 
-	public void fire(Runnable eventCallback, long ticks) {
-		needSimulation();
-		simulation.fire(eventCallback, ticks);
-	}
-
 	public void simulate() {
 		needSimulation();
 		for (Item item : items) {
@@ -35,6 +30,11 @@ public class Design {
 	public void stopSimulation() {
 		needSimulation();
 		simulation.stop();
+	}
+
+	public void fire(Runnable eventCallback, long ticks) {
+		needSimulation();
+		simulation.fire(eventCallback, ticks);
 	}
 
 	private void needSimulation() {
