@@ -45,6 +45,8 @@ public class PicoblazeRtl extends RtlClockedItem.EmptySynthesis {
 		this.secondCycle = true;
 		this.moduleInstance = new Kcpsm3ModuleInstance(clockNetwork.getRealm());
 		moduleInstance.getResetPort().setAssignedSignal(new RtlBitConstant(getRealm(), false));
+		moduleInstance.getInstructionAddressPort().setSimulationSignal(RtlCustomVectorSignal.ofUnsigned(getRealm(), 10, state::getPc));
+
 	}
 
 	public void setResetSignal(RtlBitSignal resetSignal) {
@@ -66,7 +68,7 @@ public class PicoblazeRtl extends RtlClockedItem.EmptySynthesis {
 	// TODO RtlModuleInstanceOutputPort uses a SettableSignal but here we need a custom signal!
 
 	public RtlVectorSignal getInstructionAddress() {
-		return RtlCustomVectorSignal.ofUnsigned(getRealm(), 10, state::getPc);
+		return moduleInstance.getInstructionAddressPort().getSimulationSignal();
 	}
 
 	public RtlVectorSignal getPortAddress() {

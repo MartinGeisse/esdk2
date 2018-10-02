@@ -4,9 +4,8 @@
  */
 package name.martingeisse.esdk.core.rtl.module;
 
+import name.martingeisse.esdk.core.rtl.signal.RtlVectorConstant;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
-import name.martingeisse.esdk.core.rtl.simulation.RtlSettableSignal;
-import name.martingeisse.esdk.core.rtl.simulation.RtlSettableVectorSignal;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 
 /**
@@ -14,26 +13,30 @@ import name.martingeisse.esdk.core.util.vector.VectorValue;
  */
 public final class RtlInstanceVectorOutputPort extends RtlInstanceOutputPort implements RtlVectorSignal {
 
-	private final RtlSettableVectorSignal settableSignal;
+	private RtlVectorSignal simulationSignal;
 
 	public RtlInstanceVectorOutputPort(RtlModuleInstance moduleInstance, String portName, int width) {
 		super(moduleInstance, portName);
-		this.settableSignal = new RtlSettableVectorSignal(getRealm(), width);
+		this.simulationSignal = new RtlVectorConstant(getRealm(), VectorValue.ofUnsigned(width, 0));
 	}
 
 	@Override
-	public RtlSettableSignal getSettableSignal() {
-		return settableSignal;
+	public RtlVectorSignal getSimulationSignal() {
+		return simulationSignal;
+	}
+
+	public void setSimulationSignal(RtlVectorSignal simulationSignal) {
+		this.simulationSignal = simulationSignal;
 	}
 
 	@Override
 	public int getWidth() {
-		return settableSignal.getWidth();
+		return simulationSignal.getWidth();
 	}
 
 	@Override
 	public VectorValue getValue() {
-		return settableSignal.getValue();
+		return simulationSignal.getValue();
 	}
 
 }

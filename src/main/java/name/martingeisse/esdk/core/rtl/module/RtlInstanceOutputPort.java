@@ -17,7 +17,7 @@ public abstract class RtlInstanceOutputPort extends RtlInstancePort implements R
 		super(moduleInstance, portName);
 	}
 
-	public abstract RtlSettableSignal getSettableSignal();
+	public abstract RtlSignal getSimulationSignal();
 
 	@Override
 	public final void printVerilogImplementationExpression(VerilogExpressionWriter out) {

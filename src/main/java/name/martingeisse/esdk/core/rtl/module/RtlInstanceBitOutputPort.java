@@ -4,30 +4,33 @@
  */
 package name.martingeisse.esdk.core.rtl.module;
 
+import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
-import name.martingeisse.esdk.core.rtl.simulation.RtlSettableBitSignal;
-import name.martingeisse.esdk.core.rtl.simulation.RtlSettableSignal;
 
 /**
  *
  */
 public final class RtlInstanceBitOutputPort extends RtlInstanceOutputPort implements RtlBitSignal {
 
-	private final RtlSettableBitSignal settableSignal;
+	private RtlBitSignal simulationSignal;
 
 	public RtlInstanceBitOutputPort(RtlModuleInstance moduleInstance, String portName) {
 		super(moduleInstance, portName);
-		this.settableSignal = new RtlSettableBitSignal(getRealm());
+		this.simulationSignal = new RtlBitConstant(getRealm(), false);
 	}
 
 	@Override
-	public RtlSettableSignal getSettableSignal() {
-		return settableSignal;
+	public RtlBitSignal getSimulationSignal() {
+		return simulationSignal;
+	}
+
+	public void setSimulationSignal(RtlBitSignal simulationSignal) {
+		this.simulationSignal = simulationSignal;
 	}
 
 	@Override
 	public boolean getValue() {
-		return settableSignal.getValue();
+		return simulationSignal.getValue();
 	}
 
 }
