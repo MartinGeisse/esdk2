@@ -8,9 +8,16 @@ import name.martingeisse.esdk.core.model.Item;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.SynthesisNotSupportedException;
 
 /**
- *
+ * TODO: There is no useful way to generalize how the RTL code is built. It is just a huge pile of workarounds for
+ * Verilog quirks. Solution:
+ * (1) Enforce that RTL classes are extended only in a very controlled way.
+ * (2) Define what is supported, and implement that in the simplest way possible (this includes memories)
+ * (3) Remove all support for any customization in the RTL classes except as allowed in (1).
+ * (4) Clean up Verilog generation and consider allowing customization there.
  */
 public abstract class RtlItem extends Item implements RtlItemOwned {
+
+	TODO comment
 
 	private final RtlRealm realm;
 
