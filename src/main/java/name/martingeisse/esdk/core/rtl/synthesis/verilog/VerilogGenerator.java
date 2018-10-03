@@ -7,6 +7,7 @@ package name.martingeisse.esdk.core.rtl.synthesis.verilog;
 import name.martingeisse.esdk.core.rtl.RtlClockedItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.block.RtlProceduralSignal;
+import name.martingeisse.esdk.core.rtl.memory.RtlSynchronousRom;
 import name.martingeisse.esdk.core.rtl.module.RtlInstanceInputPort;
 import name.martingeisse.esdk.core.rtl.module.RtlInstanceOutputPort;
 import name.martingeisse.esdk.core.rtl.module.RtlInstancePort;
@@ -85,7 +86,8 @@ public class VerilogGenerator {
 		for (Map.Entry<RtlSignal, String> signalEntry : signalAnalyzer.getNamedSignals().entrySet()) {
 			RtlSignal signal = signalEntry.getKey();
 			String signalName = signalEntry.getValue();
-			if (signal instanceof RtlPin || signal instanceof RtlProceduralSignal) {
+			if (signal instanceof RtlPin || signal instanceof RtlProceduralSignal ||
+				signal instanceof RtlInstanceOutputPort || signal instanceof RtlSynchronousRom.ReadDataSignal) {
 				continue;
 			}
 			out.getOut().print("assign " + signalName + " = ");
@@ -120,7 +122,7 @@ public class VerilogGenerator {
 	private void printModuleInstances() {
 		int counter = 0;
 		for (RtlModuleInstance moduleInstance : realm.getModuleInstances()) {
-			out.getOut().print(moduleInstance.getModuleName() + " m" + counter + " (");
+			out.getOut().print(moduleInstance.getModuleName() + " m" + counter + "(");
 			boolean firstPort = true;
 			for (RtlInstancePort port : moduleInstance.getPorts()) {
 				if (firstPort) {
@@ -132,6 +134,10 @@ public class VerilogGenerator {
 				out.getOut().print("\t." + port.getPortName() + "(");
 				if (port instanceof RtlInstanceInputPort) {
 					RtlInstanceInputPort inputPort = (RtlInstanceInputPort)port;
+					if (inputPort.getAssignedSignal() == null) {
+						throw new IllegalStateException("input port " + inputPort.getPortName() + " of instance of module "
+							+ moduleInstance.getModuleName() + " has no assigned signal");
+					}
 					out.printExpression(inputPort.getAssignedSignal());
 				} else if (port instanceof RtlInstanceOutputPort) {
 					RtlInstanceOutputPort outputPort = (RtlInstanceOutputPort)port;
@@ -141,6 +147,7 @@ public class VerilogGenerator {
 				}
 				out.getOut().print(')');
 			}
+			out.getOut().println();
 			out.getOut().println(");");
 			counter++;
 		}

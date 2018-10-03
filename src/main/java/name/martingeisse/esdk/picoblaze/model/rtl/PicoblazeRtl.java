@@ -78,6 +78,7 @@ public class PicoblazeRtl extends RtlClockedItem.EmptySynthesis {
 		dataOutputPort = moduleInstance.createVectorOutputPort("out_port", 8);
 		dataOutputPort.setSimulationSignal(RtlCustomVectorSignal.ofUnsigned(getRealm(), 8, state::getPortOutputData));
 		interruptPort = moduleInstance.createBitInputPort("interrupt");
+		interruptPort.setAssignedSignal(new RtlBitConstant(getRealm(), false));
 		interruptAckPort = moduleInstance.createBitOutputPort("interrupt_ack");
 		interruptAckPort.setSimulationSignal(new RtlBitConstant(getRealm(), false));
 	}
@@ -103,23 +104,23 @@ public class PicoblazeRtl extends RtlClockedItem.EmptySynthesis {
 	}
 
 	public RtlVectorSignal getInstructionAddress() {
-		return instructionAddressPort.getSimulationSignal();
+		return instructionAddressPort;
 	}
 
 	public RtlVectorSignal getPortAddress() {
-		return portIdPort.getSimulationSignal();
+		return portIdPort;
 	}
 
 	public RtlVectorSignal getOutputData() {
-		return dataOutputPort.getSimulationSignal();
+		return dataOutputPort;
 	}
 
 	public RtlBitSignal getReadStrobe() {
-		return readStrobePort.getSimulationSignal();
+		return readStrobePort;
 	}
 
 	public RtlBitSignal getWriteStrobe() {
-		return writeStrobePort.getSimulationSignal();
+		return writeStrobePort;
 	}
 
 	@Override

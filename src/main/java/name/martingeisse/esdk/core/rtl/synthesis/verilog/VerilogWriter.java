@@ -155,6 +155,9 @@ public class VerilogWriter {
 	 * Prints the expression to use for a signal at a point where the signal gets used.
 	 */
 	public void printExpression(RtlSignal signal) {
+		if (signal == null) {
+			throw new IllegalArgumentException("signal argument is null");
+		}
 		String name = namedSignals.get(signal);
 		if (name == null) {
 			printImplementationExpression(signal);

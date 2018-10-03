@@ -6,6 +6,7 @@ package name.martingeisse.esdk.core.rtl.memory;
 
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlClockedItem;
+import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.signal.custom.RtlCustomVectorSignal;
@@ -32,7 +33,7 @@ public final class RtlSynchronousRom extends RtlClockedItem {
 	public RtlSynchronousRom(RtlClockNetwork clockNetwork, Matrix matrix) {
 		super(clockNetwork);
 		this.matrix = matrix;
-		this.readDataSignal = RtlCustomVectorSignal.of(getRealm(), matrix.getColumnCount(), () -> readData);
+		this.readDataSignal = new ReadDataSignal(getRealm());
 		this.readData = this.nextReadData = VectorValue.ofUnsigned(matrix.getColumnCount(), 0);
 	}
 
@@ -119,5 +120,27 @@ public final class RtlSynchronousRom extends RtlClockedItem {
 	public Iterable<? extends RtlSignal> getSignalsThatRequireDeclarationInVerilog() {
 		return Arrays.asList(readDataSignal);
 	}
+
+	//
+	//
+	//
+
+	public final class ReadDataSignal extends RtlCustomVectorSignal {
+
+		public ReadDataSignal(RtlRealm realm) {
+			super(realm);
+		}
+
+		@Override
+		public int getWidth() {
+			return matrix.getColumnCount();
+		}
+
+		@Override
+		public VectorValue getValue() {
+			return readData;
+		}
+
+	};
 
 }
