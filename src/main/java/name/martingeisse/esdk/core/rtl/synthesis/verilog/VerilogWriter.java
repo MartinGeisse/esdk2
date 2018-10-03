@@ -8,8 +8,13 @@ import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.block.RtlProceduralSignal;
 import name.martingeisse.esdk.core.rtl.pin.RtlPin;
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
+import name.martingeisse.esdk.core.util.Matrix;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 /**
@@ -18,13 +23,16 @@ import java.util.Map;
 public class VerilogWriter {
 
 	private final PrintWriter out;
+	private final AuxiliaryFileFactory auxiliaryFileFactory;
 	private int indentation = 0;
 	private Map<RtlClockNetwork, String> clockNames;
 	private Map<RtlSignal, String> namedSignals;
 	private int instanceCounter = 0;
+	private int memoryCounter = 0;
 
-	public VerilogWriter(PrintWriter out) {
+	public VerilogWriter(PrintWriter out, AuxiliaryFileFactory auxiliaryFileFactory) {
 		this.out = out;
+		this.auxiliaryFileFactory = auxiliaryFileFactory;
 	}
 
 	// note: the namedSignals must include mappings for all input pins
@@ -211,6 +219,37 @@ public class VerilogWriter {
 	public String newInstanceName() {
 		instanceCounter++;
 		return "instance" + instanceCounter;
+	}
+
+	//
+	// memories
+	//
+
+	public String newMemoryName() {
+		memoryCounter++;
+		return "memory" + memoryCounter;
+	}
+
+	//
+	// memories and MIFs
+	//
+
+	public void generateMif(String filename, Matrix matrix) throws IllegalArgumentException, IOException {
+		if (filename == null) {
+			throw new IllegalArgumentException("filename argument is null");
+		}
+		if (matrix == null) {
+			throw new IllegalArgumentException("matrix argument is null");
+		}
+		try (OutputStream outputStream = auxiliaryFileFactory.create(filename)) {
+			try (OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream, StandardCharsets.US_ASCII)) {
+				matrix.writeToMif(new PrintWriter(outputStreamWriter));
+			}
+		}
+	}
+
+	public interface AuxiliaryFileFactory {
+		OutputStream create(String filename) throws IOException;
 	}
 
 }

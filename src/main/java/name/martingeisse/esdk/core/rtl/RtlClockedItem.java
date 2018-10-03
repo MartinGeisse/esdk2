@@ -5,6 +5,7 @@
 package name.martingeisse.esdk.core.rtl;
 
 import name.martingeisse.esdk.core.rtl.block.RtlProceduralSignal;
+import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
 
@@ -88,7 +89,7 @@ public abstract class RtlClockedItem extends RtlItem {
 		throw newSynthesisNotSupportedException();
 	}
 
-	public Iterable<RtlProceduralSignal> getProceduralSignals() {
+	public Iterable<? extends RtlSignal> getSignalsThatRequireDeclarationInVerilog() {
 		throw newSynthesisNotSupportedException();
 	}
 
@@ -107,7 +108,7 @@ public abstract class RtlClockedItem extends RtlItem {
 		public void printImplementation(VerilogWriter out) {
 		}
 
-		public Iterable<RtlProceduralSignal> getProceduralSignals() {
+		public Iterable<? extends RtlSignal> getSignalsThatRequireDeclarationInVerilog() {
 			return new ArrayList<>();
 		}
 

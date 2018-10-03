@@ -5,6 +5,9 @@
 package name.martingeisse.esdk.core.util;
 
 import name.martingeisse.esdk.core.util.vector.VectorValue;
+import org.apache.commons.lang3.StringUtils;
+
+import java.io.PrintWriter;
 
 /**
  * A mutable bit matrix. This is basically a mutable fixed-size array of {@link VectorValue}s which all have the same
@@ -53,6 +56,18 @@ public final class Matrix {
 			throw new IllegalArgumentException("row has wrong width " + row.getWidth() + ", expected " + columnCount);
 		}
 		rows[rowIndex] = row;
+	}
+
+	public void writeToMif(PrintWriter out) {
+		int matrixDigitCount = (columnCount + 3) / 4;
+		String allZeros = StringUtils.repeat('0', matrixDigitCount);
+		for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+			VectorValue row = rows[rowIndex];
+			String digits = row.getDigits();
+			String zeros = allZeros.substring(digits.length());
+			out.print(zeros);
+			out.println(digits);
+		}
 	}
 
 }

@@ -8,6 +8,7 @@ import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.pin.RtlPin;
 import name.martingeisse.esdk.core.rtl.pin.RtlPinConfiguration;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogGenerator;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -40,8 +41,11 @@ public class ProjectGenerator {
 	public void generate() throws IOException {
 		outputFolder.mkdirs();
 
+		VerilogWriter.AuxiliaryFileFactory auxiliaryFileFactory =
+			filename -> new FileOutputStream(new File(outputFolder, filename));
+
 		generateFile(name + ".v", out -> {
-			new VerilogGenerator(out, realm, name).generate();
+			new VerilogGenerator(out, realm, name, auxiliaryFileFactory).generate();
 		});
 
 		generateFile("environment.sh", out -> {

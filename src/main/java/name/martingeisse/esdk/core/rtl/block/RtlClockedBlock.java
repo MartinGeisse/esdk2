@@ -40,7 +40,7 @@ public final class RtlClockedBlock extends RtlClockedItem {
 	}
 
 	@Override
-	public Iterable<RtlProceduralSignal> getProceduralSignals() {
+	public Iterable<RtlProceduralSignal> getSignalsThatRequireDeclarationInVerilog() {
 		return proceduralSignals;
 	}
 

@@ -6,10 +6,17 @@ package name.martingeisse.esdk.core.rtl.memory;
 
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlClockedItem;
+import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.signal.custom.RtlCustomVectorSignal;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionNesting;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
 import name.martingeisse.esdk.core.util.Matrix;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
+
+import java.io.IOException;
+import java.util.Arrays;
 
 /**
  *
@@ -17,6 +24,7 @@ import name.martingeisse.esdk.core.util.vector.VectorValue;
 public final class RtlSynchronousRom extends RtlClockedItem {
 
 	private final Matrix matrix;
+	private final RtlVectorSignal readDataSignal;
 	private RtlVectorSignal addressSignal;
 	private VectorValue readData;
 	private VectorValue nextReadData;
@@ -24,6 +32,7 @@ public final class RtlSynchronousRom extends RtlClockedItem {
 	public RtlSynchronousRom(RtlClockNetwork clockNetwork, Matrix matrix) {
 		super(clockNetwork);
 		this.matrix = matrix;
+		this.readDataSignal = RtlCustomVectorSignal.of(getRealm(), matrix.getColumnCount(), () -> readData);
 		this.readData = this.nextReadData = VectorValue.ofUnsigned(matrix.getColumnCount(), 0);
 	}
 
@@ -45,8 +54,12 @@ public final class RtlSynchronousRom extends RtlClockedItem {
 	}
 
 	public RtlVectorSignal getReadDataSignal() {
-		return RtlCustomVectorSignal.of(getRealm(), matrix.getColumnCount(), () -> readData);
+		return readDataSignal;
 	}
+
+	// ----------------------------------------------------------------------------------------------------------------
+	// simulation
+	// ----------------------------------------------------------------------------------------------------------------
 
 	@Override
 	public void initializeSimulation() {
@@ -60,6 +73,51 @@ public final class RtlSynchronousRom extends RtlClockedItem {
 	@Override
 	public void updateState() {
 		readData = nextReadData;
+	}
+
+	// ----------------------------------------------------------------------------------------------------------------
+	// Verilog generation
+	// ----------------------------------------------------------------------------------------------------------------
+
+	public void printExpressionsDryRun(VerilogExpressionWriter expressionWriter) {
+		expressionWriter.print(addressSignal, VerilogExpressionNesting.SIGNALS_AND_CONSTANTS);
+	}
+
+	public void printImplementation(VerilogWriter out) {
+		String memoryName = out.newMemoryName();
+		String mifName = memoryName + ".mif";
+
+		// memory
+		out.getOut().println("reg [" + (matrix.getColumnCount() - 1) + ":0] " + memoryName + " [" +
+			(matrix.getRowCount() - 1) + ":0];");
+
+		// initialization
+		out.getOut().println("initial $readmemh(\"" + mifName + "\", rom, 0, " + (matrix.getRowCount() - 1) + ");\n");
+
+		//
+		out.getOut().print("always @(posedge ");
+		out.printExpression(getClockNetwork().getClockSignal());
+		out.getOut().println(" begin");
+
+		//
+		out.getOut().print('\t');
+		out.printExpression(readDataSignal);
+		out.getOut().print(" <= " + memoryName + "[");
+		out.printExpression(addressSignal);
+		out.getOut().println("];");
+
+		//
+		out.getOut().println("end");
+
+		try {
+			out.generateMif(mifName, matrix);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public Iterable<? extends RtlSignal> getSignalsThatRequireDeclarationInVerilog() {
+		return Arrays.asList(readDataSignal);
 	}
 
 }

@@ -191,7 +191,7 @@ public final class LongVectorValue extends VectorValue {
 		return Long.compareUnsigned(value, expectSameWidth(other));
 	}
 
-	protected void printDigits(VerilogExpressionWriter out) {
+	public void printDigits(VerilogExpressionWriter out) {
 		int width = getWidth();
 		int printWidth = (width + 3) / 4;
 		String zeros = StringUtils.repeat('0', printWidth);

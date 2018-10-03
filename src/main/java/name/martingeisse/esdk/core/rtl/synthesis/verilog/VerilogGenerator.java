@@ -33,14 +33,15 @@ public class VerilogGenerator {
 
 	private SignalAnalyzer signalAnalyzer;
 
-	public VerilogGenerator(PrintWriter out, RtlRealm realm, String name) {
-		this.out = new VerilogWriter(out);
+	public VerilogGenerator(PrintWriter out, RtlRealm realm, String name, VerilogWriter.AuxiliaryFileFactory auxiliaryFileFactory) {
+		this.out = new VerilogWriter(out, auxiliaryFileFactory);
 		this.realm = realm;
 		this.name = name;
 	}
 
 	public void generate() {
 		signalAnalyzer = new SignalAnalyzer(realm);
+		signalAnalyzer.analyze();
 		out.prepare(new HashMap<>(), signalAnalyzer.getNamedSignals());
 		out.printIntro(name, realm.getPins());
 		printSignalDeclarations();

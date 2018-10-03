@@ -172,38 +172,14 @@ public abstract class VectorValue {
 	 */
 	public abstract int compareUnsigned(VectorValue other);
 
+	public String getVerilogExpression() {
+		StringWriter stringWriter = new StringWriter();
+		printVerilogExpression(new PrintWriter(stringWriter));
+		return stringWriter.toString();
+	}
+
 	public void printVerilogExpression(PrintWriter out) {
-		printVerilogExpression(new VerilogExpressionWriter() {
-
-			@Override
-			public final VerilogExpressionWriter print(String s) {
-				out.print(s);
-				return this;
-			}
-
-			@Override
-			public final VerilogExpressionWriter print(int i) {
-				out.print(i);
-				return this;
-			}
-
-			@Override
-			public final VerilogExpressionWriter print(char c) {
-				out.print(c);
-				return this;
-			}
-
-			@Override
-			public VerilogExpressionWriter print(RtlSignal signal, VerilogExpressionNesting nesting) {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public VerilogExpressionWriter printProceduralSignalName(RtlProceduralSignal signal) {
-				throw new UnsupportedOperationException();
-			}
-
-		});
+		printVerilogExpression(new MyVerilogExpressionWriter(out));
 	}
 
 	public void printVerilogExpression(VerilogExpressionWriter out) {
@@ -212,7 +188,17 @@ public abstract class VectorValue {
 		printDigits(out);
 	}
 
-	protected abstract void printDigits(VerilogExpressionWriter out);
+	public String getDigits() {
+		StringWriter stringWriter = new StringWriter();
+		printDigits(new PrintWriter(stringWriter));
+		return stringWriter.toString();
+	}
+
+	public void printDigits(PrintWriter out) {
+		printDigits(new MyVerilogExpressionWriter(out));
+	}
+
+	public abstract void printDigits(VerilogExpressionWriter out);
 
 	@Override
 	public String toString() {
@@ -223,4 +209,41 @@ public abstract class VectorValue {
 		return stringWriter.toString();
 	}
 
+	private static final class MyVerilogExpressionWriter implements VerilogExpressionWriter {
+
+		private final PrintWriter out;
+
+		MyVerilogExpressionWriter(PrintWriter out) {
+			this.out = out;
+		}
+
+		@Override
+		public final VerilogExpressionWriter print(String s) {
+			out.print(s);
+			return this;
+		}
+
+		@Override
+		public final VerilogExpressionWriter print(int i) {
+			out.print(i);
+			return this;
+		}
+
+		@Override
+		public final VerilogExpressionWriter print(char c) {
+			out.print(c);
+			return this;
+		}
+
+		@Override
+		public VerilogExpressionWriter print(RtlSignal signal, VerilogExpressionNesting nesting) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public VerilogExpressionWriter printProceduralSignalName(RtlProceduralSignal signal) {
+			throw new UnsupportedOperationException();
+		}
+
+	}
 }

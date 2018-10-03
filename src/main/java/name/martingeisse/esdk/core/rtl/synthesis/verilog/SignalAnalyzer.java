@@ -91,9 +91,9 @@ final class SignalAnalyzer {
 			}
 		}
 
-		// procedural signals must be declared
+		// procedural signals and similar signals must be declared
 		for (RtlClockedItem item : realm.getClockedItems()) {
-			for (RtlSignal signal : item.getProceduralSignals()) {
+			for (RtlSignal signal : item.getSignalsThatRequireDeclarationInVerilog()) {
 				analyzedSignals.add(signal);
 				declareSignal(signal);
 			}
