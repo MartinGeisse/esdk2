@@ -12,7 +12,10 @@ public class SynthesisMain {
 
 	public static void main(String[] args) throws Exception {
 		PicoBlinkDesign design = new PicoBlinkDesign();
-		new ProjectGenerator(design.getRealm(), "PicoBlink", new File("ise/pico_blink"), "XC3S500E-FG320-4").generate();
+		ProjectGenerator projectGenerator = new ProjectGenerator(design.getRealm(), "PicoBlink",
+			new File("ise/pico_blink"), "XC3S500E-FG320-4");
+		projectGenerator.addVerilogFile(new File("resource/external/kcpsm3.v"));
+		projectGenerator.generate();
 	}
 
 }

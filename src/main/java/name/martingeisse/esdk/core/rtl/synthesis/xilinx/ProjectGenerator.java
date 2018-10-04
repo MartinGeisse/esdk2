@@ -9,6 +9,7 @@ import name.martingeisse.esdk.core.rtl.pin.RtlPin;
 import name.martingeisse.esdk.core.rtl.pin.RtlPinConfiguration;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogGenerator;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
+import org.apache.commons.io.FileUtils;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -26,6 +27,7 @@ public class ProjectGenerator {
 	private final File outputFolder;
 	private final String fpgaPartId;
 	private final List<String> additionalUcfLines = new ArrayList<>();
+	private final List<File> additionalVerilogFiles = new ArrayList<>();
 
 	public ProjectGenerator(RtlRealm realm, String name, File outputFolder, String fpgaPartId) {
 		this.realm = realm;
@@ -38,8 +40,16 @@ public class ProjectGenerator {
 		additionalUcfLines.add(line);
 	}
 
+	public void addVerilogFile(File path) {
+		additionalVerilogFiles.add(path);
+	}
+
 	public void generate() throws IOException {
 		outputFolder.mkdirs();
+
+		for (File file : additionalVerilogFiles) {
+			FileUtils.copyFileToDirectory(file, outputFolder);
+		}
 
 		VerilogWriter.AuxiliaryFileFactory auxiliaryFileFactory =
 			filename -> new FileOutputStream(new File(outputFolder, filename));
@@ -67,6 +77,9 @@ public class ProjectGenerator {
 
 		generateFile("build.prj", out -> {
 			out.println("verilog work " + name + ".v");
+			for (File file : additionalVerilogFiles) {
+				out.println("verilog work " + file.getName());
+			}
 		});
 
 		generateFile("build.sh", out -> {

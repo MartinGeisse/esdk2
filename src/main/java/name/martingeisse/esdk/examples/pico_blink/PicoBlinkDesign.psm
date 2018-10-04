@@ -13,7 +13,7 @@ wait2:
 	SUB s2, 01
 	JUMP Z, wait1
 
-	LOAD s3, 01
+	LOAD s3, 08
 wait3:
 	SUB s3, 01
 	JUMP Z, wait2
