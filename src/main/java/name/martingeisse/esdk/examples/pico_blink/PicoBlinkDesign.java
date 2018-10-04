@@ -11,6 +11,7 @@ import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.pin.RtlInputPin;
 import name.martingeisse.esdk.core.rtl.pin.RtlOutputPin;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
+import name.martingeisse.esdk.core.rtl.signal.RtlConcatenation;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorConstant;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.xilinx.XilinxPinConfiguration;
@@ -33,7 +34,12 @@ public class PicoBlinkDesign extends Design {
 		clock = realm.createClockNetwork(clockPin(realm));
 		slideSwitch = slideSwitchPin(realm, "L13");
 		cpu = new PicoblazeRtlWithAssociatedProgram(clock, getClass());
-		cpu.setPortInputDataSignal(new RtlVectorConstant(realm, VectorValue.ofUnsigned(8, 0)));
+		cpu.setPortInputDataSignal(
+			new RtlConcatenation(realm,
+				new RtlVectorConstant(realm, VectorValue.ofUnsigned(7, 0)),
+				slideSwitch
+			)
+		);
 		leds = RtlBuilder.vectorRegister(clock, cpu.getOutputData(), cpu.getWriteStrobe());
 
 		ledPin(realm, "F12", leds.select(0));
