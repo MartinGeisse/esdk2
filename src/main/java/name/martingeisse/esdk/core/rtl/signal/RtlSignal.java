@@ -44,6 +44,19 @@ public interface RtlSignal extends RtlItemOwned {
 	}
 
 	/**
+	 * If this method returns true, and the signal was determined to be declared explicitly, then an assignment using
+	 * {@link #printVerilogImplementationExpression(VerilogExpressionWriter)} will be generated.
+	 *
+	 * This method returns false if assignment is too complex for a Verilog assignment clause (e.g. switch-expression)
+	 * or if the signal doesn't need an assignment (e.g. module output port). In such a case,
+	 * {@link #printVerilogImplementationExpression(VerilogExpressionWriter)} is expected to throw an
+	 * {@link UnsupportedOperationException}. TODO pins violate this
+	 */
+	default boolean isGenerateVerilogAssignmentForDeclaration() {
+		return true;
+	}
+
+	/**
 	 * Writes a Verilog implementation expression for this signal. This method should only be called by the verilog
 	 * generation core since it repeats the implementation expression for each usage of a shared signal. Also, not all
 	 * signals support this method -- some need an extracted signal definition which is given a meaning by different

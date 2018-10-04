@@ -17,8 +17,6 @@ import name.martingeisse.esdk.core.rtl.synthesis.verilog.SynthesisNotSupportedEx
  */
 public abstract class RtlItem extends Item implements RtlItemOwned {
 
-	TODO comment
-
 	private final RtlRealm realm;
 
 	public RtlItem(RtlRealm realm) {

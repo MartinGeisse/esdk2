@@ -60,13 +60,10 @@ public class VerilogGenerator {
 
 	private void printSignalDeclarations() {
 		for (Map.Entry<RtlSignal, String> signalEntry : signalAnalyzer.getDeclaredSignals().entrySet()) {
-			RtlSignal signal = signalEntry.getKey();
 			String signalName = signalEntry.getValue();
-			if (signal instanceof RtlProceduralSignal) {
-				out.getOut().print("reg");
-			} else {
-				out.getOut().print("wire");
-			}
+			RtlSignal signal = signalEntry.getKey();
+
+			out.getOut().print(signal.getVerilogSignalKind().name().toLowerCase());
 			if (signal instanceof RtlVectorSignal) {
 				RtlVectorSignal vectorSignal = (RtlVectorSignal) signal;
 				out.getOut().print('[');
@@ -85,14 +82,12 @@ public class VerilogGenerator {
 	private void printSignalAssignments() {
 		for (Map.Entry<RtlSignal, String> signalEntry : signalAnalyzer.getNamedSignals().entrySet()) {
 			RtlSignal signal = signalEntry.getKey();
-			String signalName = signalEntry.getValue();
-			if (signal instanceof RtlPin || signal instanceof RtlProceduralSignal ||
-				signal instanceof RtlInstanceOutputPort || signal instanceof RtlSynchronousRom.ReadDataSignal) {
-				continue;
+			if (signal.isGenerateVerilogAssignmentForDeclaration()) {
+				String signalName = signalEntry.getValue();
+				out.getOut().print("assign " + signalName + " = ");
+				out.printImplementationExpression(signal);
+				out.getOut().println(";");
 			}
-			out.getOut().print("assign " + signalName + " = ");
-			out.printImplementationExpression(signal);
-			out.getOut().println(";");
 		}
 	}
 

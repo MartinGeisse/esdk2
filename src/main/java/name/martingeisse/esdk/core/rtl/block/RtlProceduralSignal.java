@@ -43,6 +43,11 @@ public abstract class RtlProceduralSignal extends RtlItem implements RtlSignal, 
 	// ----------------------------------------------------------------------------------------------------------------
 
 	@Override
+	public boolean isGenerateVerilogAssignmentForDeclaration() {
+		return false;
+	}
+
+	@Override
 	public VerilogSignalKind getVerilogSignalKind() {
 		return VerilogSignalKind.REG;
 	}
@@ -54,7 +59,7 @@ public abstract class RtlProceduralSignal extends RtlItem implements RtlSignal, 
 
 	@Override
 	public final void printVerilogImplementationExpression(VerilogExpressionWriter out) {
-		out.printProceduralSignalName(this);
+		throw new UnsupportedOperationException("cannot write an implementation expression for procedural signals");
 	}
 
 }

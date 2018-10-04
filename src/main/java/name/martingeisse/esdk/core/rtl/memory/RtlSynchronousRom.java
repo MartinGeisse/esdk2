@@ -141,6 +141,11 @@ public final class RtlSynchronousRom extends RtlClockedItem {
 			return readData;
 		}
 
+		@Override
+		public boolean isGenerateVerilogAssignmentForDeclaration() {
+			return false;
+		}
+
 	};
 
 }
