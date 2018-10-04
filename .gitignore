@@ -1,5 +1,6 @@
 .DS_Store
 *~
+kcpsm3.v
 /out
 /.idea
 /esdk2.iml

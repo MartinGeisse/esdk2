@@ -12,9 +12,11 @@ import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.signal.custom.RtlCustomVectorSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionNesting;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogSignalKind;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
 import name.martingeisse.esdk.core.util.Matrix;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
+import sun.misc.Version;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -93,12 +95,12 @@ public final class RtlSynchronousRom extends RtlClockedItem {
 			(matrix.getRowCount() - 1) + ":0];");
 
 		// initialization
-		out.getOut().println("initial $readmemh(\"" + mifName + "\", rom, 0, " + (matrix.getRowCount() - 1) + ");\n");
+		out.getOut().println("initial $readmemh(\"" + mifName + "\", " + memoryName + ", 0, " + (matrix.getRowCount() - 1) + ");\n");
 
 		//
 		out.getOut().print("always @(posedge ");
 		out.printExpression(getClockNetwork().getClockSignal());
-		out.getOut().println(" begin");
+		out.getOut().println(") begin");
 
 		//
 		out.getOut().print('\t');
@@ -139,6 +141,11 @@ public final class RtlSynchronousRom extends RtlClockedItem {
 		@Override
 		public VectorValue getValue() {
 			return readData;
+		}
+
+		@Override
+		public VerilogSignalKind getVerilogSignalKind() {
+			return VerilogSignalKind.REG;
 		}
 
 		@Override
