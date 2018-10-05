@@ -5,14 +5,13 @@
 package name.martingeisse.esdk.core.rtl.synthesis.verilog_v2;
 
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
 
 /**
  *
  */
 public interface SignalUsageConsumer {
 
-	void consumeSignalUsage(RtlSignal signal);
+	void consumeSignalUsage(RtlSignal signal, VerilogExpressionNesting nesting);
 
 	VerilogExpressionWriter getFakeExpressionWriter();
 

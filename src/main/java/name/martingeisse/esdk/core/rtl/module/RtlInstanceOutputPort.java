@@ -5,8 +5,7 @@
 package name.martingeisse.esdk.core.rtl.module;
 
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
-import name.martingeisse.esdk.core.rtl.simulation.RtlSettableSignal;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog_v2.VerilogExpressionWriter;
 
 /**
  *

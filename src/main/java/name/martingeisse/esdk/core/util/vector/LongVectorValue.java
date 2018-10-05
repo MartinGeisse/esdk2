@@ -4,7 +4,7 @@
  */
 package name.martingeisse.esdk.core.util.vector;
 
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog_v2.VerilogExpressionWriter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 

@@ -4,35 +4,23 @@
  */
 package name.martingeisse.esdk.core.rtl.synthesis.verilog_v2;
 
-import java.io.PrintWriter;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
 
 /**
  *
  */
-public final class VerilogGenerationPreventer implements VerilogContribution {
+public final class EmptyVerilogContribution implements VerilogContribution {
 
 	@Override
 	public void prepareSynthesis(SynthesisPreparationContext context) {
-		fail();
 	}
 
 	@Override
 	public void analyzeSignalUsage(SignalUsageConsumer consumer) {
-		fail();
 	}
 
 	@Override
-	public void analyzePins(PinConsumer consumer) {
-		fail();
-	}
-
-	@Override
-	public void printImplementation(PrintWriter out) {
-		fail();
-	}
-
-	private void fail() {
-		throw new SynthesisNotSupportedException();
+	public void printImplementation(VerilogWriter writer) {
 	}
 
 }

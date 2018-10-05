@@ -5,7 +5,6 @@
 package name.martingeisse.esdk.core.rtl.synthesis.verilog_v2;
 
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogSignalKind;
 
 /**
  *
@@ -16,12 +15,12 @@ public interface SynthesisPreparationContext {
 
 	String explicitlyDeclareSignalWithAssignedName(RtlSignal signal, String prefix, VerilogSignalKind signalKind);
 
-	String implicitlyDeclareSignalWithFixedName(RtlSignal signal, String name);
+	void implicitlyDeclareSignalWithFixedName(RtlSignal signal, String name);
 
-	String explicitlyDeclareSignalWithFixedName(RtlSignal signal, String name, VerilogSignalKind signalKind);
+	void explicitlyDeclareSignalWithFixedName(RtlSignal signal, String name, VerilogSignalKind signalKind);
 
-	String reserveAssignedName(String prefix);
+	String assignGeneratedName(String prefix);
 
-	String reserveFixedName(String name);
+	void assignFixedName(String name);
 
 }

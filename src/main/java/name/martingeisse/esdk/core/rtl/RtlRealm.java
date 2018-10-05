@@ -24,6 +24,7 @@ import java.util.List;
  */
 public final class RtlRealm extends Item {
 
+	private final List<RtlItem> items = new ArrayList<>();
 	private final List<RtlPin> pins = new ArrayList<>();
 	private final List<RtlClockNetwork> clockNetworks = new ArrayList<>();
 	private final List<RtlClockedItem> clockedItems = new ArrayList<>();
@@ -31,6 +32,10 @@ public final class RtlRealm extends Item {
 
 	public RtlRealm(Design design) {
 		super(design);
+	}
+
+	void registerItem(RtlItem item) {
+		items.add(item);
 	}
 
 	/**
@@ -71,6 +76,10 @@ public final class RtlRealm extends Item {
 			throw new IllegalArgumentException("invalid registration key");
 		}
 		moduleInstances.add(item);
+	}
+
+	public Iterable<RtlItem> getItems() {
+		return items;
 	}
 
 	public Iterable<RtlPin> getPins() {

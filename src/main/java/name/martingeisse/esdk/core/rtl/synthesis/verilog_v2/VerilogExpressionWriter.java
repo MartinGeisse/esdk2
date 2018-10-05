@@ -2,9 +2,8 @@
  * Copyright (c) 2018 Martin Geisse
  * This file is distributed under the terms of the MIT license.
  */
-package name.martingeisse.esdk.core.rtl.synthesis.verilog;
+package name.martingeisse.esdk.core.rtl.synthesis.verilog_v2;
 
-import name.martingeisse.esdk.core.rtl.block.RtlProceduralSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
 
 /**
@@ -20,13 +19,8 @@ import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
  * results and is not allowed.
  */
 public interface VerilogExpressionWriter {
-
 	VerilogExpressionWriter print(String s);
 	VerilogExpressionWriter print(int i);
 	VerilogExpressionWriter print(char c);
-
 	VerilogExpressionWriter print(RtlSignal signal, VerilogExpressionNesting nesting);
-
-	VerilogExpressionWriter printProceduralSignalName(RtlProceduralSignal signal);
-
 }

@@ -7,7 +7,7 @@ package name.martingeisse.esdk.core.rtl.pin;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.simulation.RtlSettableBitSignal;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog_v2.VerilogExpressionWriter;
 
 /**
  * TODO generate tri-state assignment

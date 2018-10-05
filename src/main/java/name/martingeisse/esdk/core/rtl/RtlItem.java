@@ -5,7 +5,8 @@
 package name.martingeisse.esdk.core.rtl;
 
 import name.martingeisse.esdk.core.model.Item;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.SynthesisNotSupportedException;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog_v2.SynthesisNotSupportedException;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog_v2.VerilogContribution;
 
 /**
  * TODO: There is no useful way to generalize how the RTL code is built. It is just a huge pile of workarounds for
@@ -22,6 +23,7 @@ public abstract class RtlItem extends Item implements RtlItemOwned {
 	public RtlItem(RtlRealm realm) {
 		super(realm.getDesign());
 		this.realm = realm;
+		realm.registerItem(this);
 	}
 
 	public final RtlRealm getRealm() {
@@ -41,6 +43,10 @@ public abstract class RtlItem extends Item implements RtlItemOwned {
 	@Override
 	public final RtlItem getRtlItem() {
 		return this;
+	}
+
+	public VerilogContribution getVerilogContribution() {
+		throw newSynthesisNotSupportedException();
 	}
 
 	public SynthesisNotSupportedException newSynthesisNotSupportedException() {

@@ -4,8 +4,9 @@
  */
 package name.martingeisse.esdk.core.rtl.synthesis.verilog_v2;
 
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
+
+import java.io.PrintWriter;
 
 /**
  *
@@ -16,6 +17,8 @@ public interface VerilogContribution {
 
 	void analyzeSignalUsage(SignalUsageConsumer consumer);
 
-	void printImplementation(VerilogWriter writer);
+	void analyzePins(PinConsumer consumer);
+
+	void printImplementation(PrintWriter out);
 
 }

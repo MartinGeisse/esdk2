@@ -6,8 +6,8 @@ package name.martingeisse.esdk.core.rtl.signal;
 
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionNesting;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog_v2.VerilogExpressionNesting;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog_v2.VerilogExpressionWriter;
 
 /**
  * Unlike {@link RtlIndexSelection} with an {@link RtlVectorConstant} as the index, this class can select the upper

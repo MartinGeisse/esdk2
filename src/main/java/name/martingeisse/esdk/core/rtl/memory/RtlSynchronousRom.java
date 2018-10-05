@@ -10,13 +10,12 @@ import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.signal.custom.RtlCustomVectorSignal;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionNesting;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogSignalKind;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog_v2.VerilogExpressionNesting;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog_v2.VerilogExpressionWriter;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog_v2.VerilogSignalKind;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
 import name.martingeisse.esdk.core.util.Matrix;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
-import sun.misc.Version;
 
 import java.io.IOException;
 import java.util.Arrays;
