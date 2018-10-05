@@ -1,7 +1,7 @@
 package name.martingeisse.esdk.core.rtl.memory;
 
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog_v2.AuxiliaryFileFactory;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.AuxiliaryFileFactory;
 import name.martingeisse.esdk.core.util.Matrix;
 
 import java.io.IOException;

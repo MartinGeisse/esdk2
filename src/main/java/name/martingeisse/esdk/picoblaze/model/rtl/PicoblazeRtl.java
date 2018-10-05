@@ -8,8 +8,8 @@ import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.signal.custom.RtlCustomBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.custom.RtlCustomVectorSignal;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog_v2.EmptyVerilogContribution;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog_v2.VerilogContribution;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.EmptyVerilogContribution;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 import name.martingeisse.esdk.picoblaze.model.PicoblazeSimulatorException;
 import name.martingeisse.esdk.picoblaze.model.PicoblazeState;
@@ -166,5 +166,5 @@ public class PicoblazeRtl extends RtlClockedItem {
 	public VerilogContribution getVerilogContribution() {
 		return new EmptyVerilogContribution();
 	}
-	
+
 }

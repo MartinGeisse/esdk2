@@ -5,7 +5,7 @@
 package name.martingeisse.esdk.core.rtl.block.statement;
 
 import name.martingeisse.esdk.core.rtl.RtlItemOwned;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog_v2.VerilogWriter;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
 
 /**
  *

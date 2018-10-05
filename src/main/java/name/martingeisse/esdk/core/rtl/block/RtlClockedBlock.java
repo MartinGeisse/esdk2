@@ -8,7 +8,7 @@ import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlClockedItem;
 import name.martingeisse.esdk.core.rtl.block.statement.RtlStatementSequence;
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog_v2.*;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.*;
 
 import java.util.ArrayList;
 import java.util.List;
