@@ -10,14 +10,10 @@ import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.signal.custom.RtlCustomVectorSignal;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog_v2.VerilogExpressionNesting;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog_v2.VerilogExpressionWriter;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog_v2.VerilogSignalKind;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog_v2.*;
 import name.martingeisse.esdk.core.util.Matrix;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 
-import java.io.IOException;
 import java.util.Arrays;
 
 /**
@@ -81,45 +77,56 @@ public final class RtlSynchronousRom extends RtlClockedItem {
 	// Verilog generation
 	// ----------------------------------------------------------------------------------------------------------------
 
-	public void printExpressionsDryRun(VerilogExpressionWriter expressionWriter) {
-		expressionWriter.print(addressSignal, VerilogExpressionNesting.SIGNALS_AND_CONSTANTS);
-	}
+	@Override
+	public VerilogContribution getVerilogContribution() {
+		return new VerilogContribution() {
 
-	public void printImplementation(VerilogWriter out) {
-		String memoryName = out.newMemoryName();
-		String mifName = memoryName + ".mif";
+			private String memoryName;
 
-		// memory
-		out.getOut().println("reg [" + (matrix.getColumnCount() - 1) + ":0] " + memoryName + " [" +
-			(matrix.getRowCount() - 1) + ":0];");
+			@Override
+			public void prepareSynthesis(SynthesisPreparationContext context) {
+				memoryName = context.reserveName("mem", true);
+				context.declareSignal(readDataSignal, "s", true, VerilogSignalKind.REG, false);
+				MemoryImplementationUtil.generateMif(context.getAuxiliaryFileFactory(), memoryName + ".mif", matrix);
+			}
 
-		// initialization
-		out.getOut().println("initial $readmemh(\"" + mifName + "\", " + memoryName + ", 0, " + (matrix.getRowCount() - 1) + ");\n");
+			@Override
+			public void analyzeSignalUsage(SignalUsageConsumer consumer) {
+				consumer.consumeSignalUsage(addressSignal, VerilogExpressionNesting.SIGNALS_AND_CONSTANTS);
+			}
 
-		//
-		out.getOut().print("always @(posedge ");
-		out.printExpression(getClockNetwork().getClockSignal());
-		out.getOut().println(") begin");
+			@Override
+			public void analyzePins(PinConsumer consumer) {
+			}
 
-		//
-		out.getOut().print('\t');
-		out.printExpression(readDataSignal);
-		out.getOut().print(" <= " + memoryName + "[");
-		out.printExpression(addressSignal);
-		out.getOut().println("];");
+			@Override
+			public void printImplementation(VerilogWriter out) {
 
-		//
-		out.getOut().println("end");
+				// memory
+				out.println("reg [" + (matrix.getColumnCount() - 1) + ":0] " + memoryName + " [" +
+					(matrix.getRowCount() - 1) + ":0];");
 
-		try {
-			out.generateMif(mifName, matrix);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
+				// initialization
+				out.println("initial $readmemh(\"" + memoryName + ".mif\", " + memoryName + ", 0, " + (matrix.getRowCount() - 1) + ");\n");
 
-	public Iterable<? extends RtlSignal> getSignalsThatRequireDeclarationInVerilog() {
-		return Arrays.asList(readDataSignal);
+				//
+				out.print("always @(posedge ");
+				out.print(getClockNetwork().getClockSignal());
+				out.println(") begin");
+
+				//
+				out.print('\t');
+				out.print(readDataSignal);
+				out.print(" <= " + memoryName + "[");
+				out.print(addressSignal);
+				out.println("];");
+
+				//
+				out.println("end");
+
+			}
+
+		};
 	}
 
 	//
@@ -152,6 +159,8 @@ public final class RtlSynchronousRom extends RtlClockedItem {
 			return false;
 		}
 
-	};
+	}
+
+	;
 
 }

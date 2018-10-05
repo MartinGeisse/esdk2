@@ -6,7 +6,9 @@ package name.martingeisse.esdk.core.rtl.synthesis.verilog_v2;
 
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
+import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
+import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -26,7 +28,6 @@ public class VerilogGenerator {
 	private final Set<String> fixedNames = new HashSet<>();
 	private final Map<String, MutableInt> prefixNameCounters = new HashMap<>();
 	private final Map<RtlSignal, NamedSignal> namedSignals = new HashMap<>();
-
 
 	public VerilogGenerator(VerilogWriter out, RtlRealm realm, String toplevelModuleName, AuxiliaryFileFactory auxiliaryFileFactory) {
 		this.out = out;
@@ -52,37 +53,29 @@ public class VerilogGenerator {
 			SynthesisPreparationContext synthesisPreparationContext = new SynthesisPreparationContext() {
 
 				@Override
-				public String implicitlyDeclareSignalWithAssignedName(RtlSignal signal, String prefix) {
-					String name = VerilogGenerator.this.assignGeneratedName(prefix);
-					namedSignals.put(signal, new NamedSignal(signal, name, false, null));
-					return name;
+				public String declareSignal(RtlSignal signal, String nameOrPrefix, boolean appendCounterSuffix, VerilogSignalKind signalKindForExplicitDeclarationOrNullForNoDeclaration, boolean generateAssignment) {
+					String name = reserveName(nameOrPrefix, appendCounterSuffix);
+					namedSignals.put(signal, new NamedSignal(signal, name,
+						signalKindForExplicitDeclarationOrNullForNoDeclaration != null,
+						signalKindForExplicitDeclarationOrNullForNoDeclaration,
+						generateAssignment
+					));
+
+					return null;
 				}
 
 				@Override
-				public String explicitlyDeclareSignalWithAssignedName(RtlSignal signal, String prefix, VerilogSignalKind signalKind) {
-					String name = VerilogGenerator.this.assignGeneratedName(prefix);
-					namedSignals.put(signal, new NamedSignal(signal, name, true, signalKind));
-					return name;
+				public String reserveName(String nameOrPrefix, boolean appendCounterSuffix) {
+					if (appendCounterSuffix) {
+						return VerilogGenerator.this.assignGeneratedName(nameOrPrefix);
+					} else {
+						return VerilogGenerator.this.assignFixedName(nameOrPrefix);
+					}
 				}
 
 				@Override
-				public void implicitlyDeclareSignalWithFixedName(RtlSignal signal, String name) {
-					namedSignals.put(signal, new NamedSignal(signal, VerilogGenerator.this.assignFixedName(name), false, null));
-				}
-
-				@Override
-				public void explicitlyDeclareSignalWithFixedName(RtlSignal signal, String name, VerilogSignalKind signalKind) {
-					namedSignals.put(signal, new NamedSignal(signal, VerilogGenerator.this.assignFixedName(name), true, signalKind));
-				}
-
-				@Override
-				public String assignGeneratedName(String prefix) {
-					return VerilogGenerator.this.assignGeneratedName(prefix);
-				}
-
-				@Override
-				public void assignFixedName(String name) {
-					VerilogGenerator.this.assignFixedName(name);
+				public AuxiliaryFileFactory getAuxiliaryFileFactory() {
+					return auxiliaryFileFactory;
 				}
 
 			};
@@ -145,8 +138,9 @@ public class VerilogGenerator {
 				}
 
 				private void declareSignal(RtlSignal signal) {
-					namedSignals.put(signal, new NamedSignal(signal, assignGeneratedName("s"), true, signal.getVerilogSignalKind()));
-
+					if (namedSignals.get(signal) == null) {
+						namedSignals.put(signal, new NamedSignal(signal, assignGeneratedName("s"), true, VerilogSignalKind.WIRE, true));
+					}
 				}
 
 				@Override
@@ -193,6 +187,36 @@ public class VerilogGenerator {
 				out.println(pin.getLeft() + ' ' + pin.getRight() + ';');
 			}
 			out.println();
+		}
+		out.println();
+		for (Map.Entry<RtlSignal, NamedSignal> signalEntry : namedSignals.entrySet()) {
+			RtlSignal signal = signalEntry.getKey();
+			NamedSignal namedSignal = signalEntry.getValue();
+			if (namedSignal.explicitDeclaration) {
+				out.print(namedSignal.kind.name().toLowerCase());
+				if (signal instanceof RtlVectorSignal) {
+					RtlVectorSignal vectorSignal = (RtlVectorSignal) signal;
+					out.print('[');
+					out.print(vectorSignal.getWidth() - 1);
+					out.print(":0] ");
+				} else if (signal instanceof RtlBitSignal) {
+					out.print(' ');
+				} else {
+					throw new RuntimeException("signal is neither a bit signal nor a vector signal: " + signal);
+				}
+				out.print(namedSignal.name);
+				out.println(';');
+			}
+		}
+		out.println();
+		for (Map.Entry<RtlSignal, NamedSignal> signalEntry : namedSignals.entrySet()) {
+			RtlSignal signal = signalEntry.getKey();
+			NamedSignal namedSignal = signalEntry.getValue();
+			if (namedSignal.assignment) {
+				out.print("assign " + namedSignal.name + " = ");
+				out.printImplementationExpression(signal);
+				out.println(";");
+			}
 		}
 		out.println();
 		for (VerilogContribution contribution : contributions) {
@@ -244,12 +268,14 @@ public class VerilogGenerator {
 		final String name;
 		final boolean explicitDeclaration;
 		final VerilogSignalKind kind;
+		final boolean assignment;
 
-		NamedSignal(RtlSignal signal, String name, boolean explicitDeclaration, VerilogSignalKind kind) {
+		NamedSignal(RtlSignal signal, String name, boolean explicitDeclaration, VerilogSignalKind kind, boolean assignment) {
 			this.signal = signal;
 			this.name = name;
 			this.explicitDeclaration = explicitDeclaration;
 			this.kind = kind;
+			this.assignment = assignment;
 		}
 
 	}

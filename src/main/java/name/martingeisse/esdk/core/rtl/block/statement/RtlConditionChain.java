@@ -2,8 +2,8 @@ package name.martingeisse.esdk.core.rtl.block.statement;
 
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog_v2.VerilogExpressionWriter;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog_v2.SignalUsageConsumer;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog_v2.VerilogWriter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +37,7 @@ public final class RtlConditionChain extends RtlStatement {
 
 	public RtlStatementSequence otherwise() {
 		if (defaultCase instanceof RtlStatementSequence) {
-			return (RtlStatementSequence)defaultCase;
+			return (RtlStatementSequence) defaultCase;
 		}
 		RtlStatementSequence branch = new RtlStatementSequence(getRealm());
 		if (defaultCase != null) {
@@ -97,9 +97,9 @@ public final class RtlConditionChain extends RtlStatement {
 	}
 
 	@Override
-	public void printExpressionsDryRun(VerilogExpressionWriter expressionWriter) {
+	public void analyzeSignalUsage(SignalUsageConsumer consumer) {
 		materialize();
-		materializedChain.printExpressionsDryRun(expressionWriter);
+		materializedChain.analyzeSignalUsage(consumer);
 	}
 
 	@Override

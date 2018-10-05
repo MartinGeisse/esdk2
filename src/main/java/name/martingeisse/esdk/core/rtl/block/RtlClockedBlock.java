@@ -7,8 +7,8 @@ package name.martingeisse.esdk.core.rtl.block;
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlClockedItem;
 import name.martingeisse.esdk.core.rtl.block.statement.RtlStatementSequence;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog_v2.VerilogExpressionWriter;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
+import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog_v2.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,13 +34,11 @@ public final class RtlClockedBlock extends RtlClockedItem {
 		this.statements = new RtlStatementSequence(getRealm());
 	}
 
-
 	void registerProceduralSignal(RtlProceduralSignal proceduralSignal) {
 		proceduralSignals.add(proceduralSignal);
 	}
 
-	@Override
-	public Iterable<RtlProceduralSignal> getSignalsThatRequireDeclarationInVerilog() {
+	public List<RtlProceduralSignal> getProceduralSignals() {
 		return proceduralSignals;
 	}
 
@@ -88,22 +86,51 @@ public final class RtlClockedBlock extends RtlClockedItem {
 	// ----------------------------------------------------------------------------------------------------------------
 
 	@Override
-	public void printExpressionsDryRun(VerilogExpressionWriter expressionWriter) {
-		initializerStatements.printExpressionsDryRun(expressionWriter);
-		statements.printExpressionsDryRun(expressionWriter);
-	}
+	public VerilogContribution getVerilogContribution() {
+		return new VerilogContribution() {
 
-	@Override
-	public void printImplementation(VerilogWriter out) {
+			@Override
+			public void prepareSynthesis(SynthesisPreparationContext context) {
+				for (RtlSignal signal : proceduralSignals) {
+					context.declareSignal(signal, "r", true, VerilogSignalKind.REG, false);
+				}
+			}
 
-		out.startProceduralInitialBlock();
-		initializerStatements.printVerilogStatements(out);
-		out.endProceduralAlwaysBlock();
+			@Override
+			public void analyzeSignalUsage(SignalUsageConsumer consumer) {
+				initializerStatements.analyzeSignalUsage(consumer);
+				statements.analyzeSignalUsage(consumer);
+			}
 
-		out.startProceduralAlwaysBlock("posedge " + out.getSignalName(getClockNetwork().getClockSignal()));
-		getStatements().printVerilogStatements(out);
-		out.endProceduralAlwaysBlock();
+			@Override
+			public void analyzePins(PinConsumer consumer) {
 
+			}
+
+			@Override
+			public void printImplementation(VerilogWriter out) {
+
+				out.indent();
+				out.println("initial begin");
+				out.startIndentation();
+				initializerStatements.printVerilogStatements(out);
+				out.endIndentation();
+				out.indent();
+				out.println("end");
+
+				out.indent();
+				out.print("always @(posedge");
+				out.print(getClockNetwork().getClockSignal());
+				out.println(") begin");
+				out.startIndentation();
+				statements.printVerilogStatements(out);
+				out.endIndentation();
+				out.indent();
+				out.println("end");
+
+			}
+
+		};
 	}
 
 }

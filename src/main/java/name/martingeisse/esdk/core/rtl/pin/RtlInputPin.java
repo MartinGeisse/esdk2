@@ -7,7 +7,7 @@ package name.martingeisse.esdk.core.rtl.pin;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.simulation.RtlSettableBitSignal;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog_v2.VerilogExpressionWriter;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog_v2.*;
 
 /**
  *
@@ -39,18 +39,28 @@ public final class RtlInputPin extends RtlPin implements RtlBitSignal {
 	// ----------------------------------------------------------------------------------------------------------------
 
 	@Override
-	public boolean isGenerateVerilogAssignmentForDeclaration() {
-		return false;
-	}
+	public VerilogContribution getVerilogContribution() {
+		return new VerilogContribution() {
 
-	@Override
-	public final void printVerilogImplementationExpression(VerilogExpressionWriter out) {
-		throw new UnsupportedOperationException("cannot write an implementation expression for input pins");
-	}
+			@Override
+			public void prepareSynthesis(SynthesisPreparationContext context) {
+				context.declareSignal(RtlInputPin.this, getNetName(), false, null, false);
+			}
 
-	@Override
-	public String getVerilogDirectionKeyword() {
-		return "input";
+			@Override
+			public void analyzeSignalUsage(SignalUsageConsumer consumer) {
+			}
+
+			@Override
+			public void analyzePins(PinConsumer consumer) {
+				consumer.consumePin("input", getNetName());
+			}
+
+			@Override
+			public void printImplementation(VerilogWriter out) {
+			}
+
+		};
 	}
 
 }

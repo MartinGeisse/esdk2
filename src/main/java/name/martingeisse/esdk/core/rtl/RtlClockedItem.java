@@ -4,12 +4,6 @@
  */
 package name.martingeisse.esdk.core.rtl;
 
-import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog_v2.VerilogExpressionWriter;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
-
-import java.util.ArrayList;
-
 /**
  *
  */
@@ -76,40 +70,4 @@ public abstract class RtlClockedItem extends RtlItem {
 	 */
 	public abstract void updateState();
 
-	// ----------------------------------------------------------------------------------------------------------------
-	// Verilog generation
-	// ----------------------------------------------------------------------------------------------------------------
-
-	public void printExpressionsDryRun(VerilogExpressionWriter expressionWriter) {
-		throw newSynthesisNotSupportedException();
-	}
-
-	public void printImplementation(VerilogWriter out) {
-		throw newSynthesisNotSupportedException();
-	}
-
-	public Iterable<? extends RtlSignal> getSignalsThatRequireDeclarationInVerilog() {
-		throw newSynthesisNotSupportedException();
-	}
-
-	/**
-	 * This item vanishes during synthesis instead of throwing an exception.
-	 */
-	public static abstract class EmptySynthesis extends RtlClockedItem {
-
-		public EmptySynthesis(RtlClockNetwork clockNetwork) {
-			super(clockNetwork);
-		}
-
-		public void printExpressionsDryRun(VerilogExpressionWriter expressionWriter) {
-		}
-
-		public void printImplementation(VerilogWriter out) {
-		}
-
-		public Iterable<? extends RtlSignal> getSignalsThatRequireDeclarationInVerilog() {
-			return new ArrayList<>();
-		}
-
-	}
 }

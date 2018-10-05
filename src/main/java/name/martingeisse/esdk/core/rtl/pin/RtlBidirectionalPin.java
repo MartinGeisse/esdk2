@@ -7,7 +7,7 @@ package name.martingeisse.esdk.core.rtl.pin;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.simulation.RtlSettableBitSignal;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog_v2.VerilogExpressionWriter;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog_v2.*;
 
 /**
  * TODO generate tri-state assignment
@@ -57,18 +57,35 @@ public final class RtlBidirectionalPin extends RtlPin implements RtlBitSignal {
 	// ----------------------------------------------------------------------------------------------------------------
 
 	@Override
-	public boolean isGenerateVerilogAssignmentForDeclaration() {
-		return false;
-	}
+	public VerilogContribution getVerilogContribution() {
+		return new VerilogContribution() {
 
-	@Override
-	public final void printVerilogImplementationExpression(VerilogExpressionWriter out) {
-		throw new UnsupportedOperationException("cannot write an implementation expression for bidirectional pins");
-	}
+			@Override
+			public void prepareSynthesis(SynthesisPreparationContext context) {
+				context.declareSignal(RtlBidirectionalPin.this, getNetName(), false, null, false);
+			}
 
-	@Override
-	public String getVerilogDirectionKeyword() {
-		return "inout";
+			@Override
+			public void analyzeSignalUsage(SignalUsageConsumer consumer) {
+				consumer.consumeSignalUsage(outputSignal, VerilogExpressionNesting.ALL);
+				consumer.consumeSignalUsage(outputEnableSignal, VerilogExpressionNesting.ALL);
+			}
+
+			@Override
+			public void analyzePins(PinConsumer consumer) {
+				consumer.consumePin("inout", getNetName());
+			}
+
+			@Override
+			public void printImplementation(VerilogWriter out) {
+				out.print("assign " + getNetName() + " = ");
+				out.print(outputEnableSignal);
+				out.println(" ? ");
+				out.print(outputSignal);
+				out.println(" : 1'bz;");
+			}
+
+		};
 	}
 
 }

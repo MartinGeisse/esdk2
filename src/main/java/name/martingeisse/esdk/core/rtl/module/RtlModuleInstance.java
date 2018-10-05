@@ -9,7 +9,9 @@ import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog_v2.*;
 
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -107,4 +109,68 @@ public final class RtlModuleInstance extends RtlItem {
 		}
 	}
 
+	@Override
+	public VerilogContribution getVerilogContribution() {
+		return new VerilogContribution() {
+
+			private String instanceName;
+
+			@Override
+			public void prepareSynthesis(SynthesisPreparationContext context) {
+				instanceName = context.reserveName("m", true);
+				for (RtlInstancePort port : ports.values()) {
+					if (port instanceof RtlInstanceOutputPort) {
+						RtlInstanceOutputPort outputPort = (RtlInstanceOutputPort) port;
+						context.declareSignal(outputPort, "mp", true, VerilogSignalKind.WIRE, false);
+					}
+				}
+			}
+
+			@Override
+			public void analyzeSignalUsage(SignalUsageConsumer consumer) {
+				for (RtlInstancePort port : ports.values()) {
+					if (port instanceof RtlInstanceInputPort) {
+						RtlInstanceInputPort inputPort = (RtlInstanceInputPort) port;
+						consumer.consumeSignalUsage(inputPort.getAssignedSignal(), VerilogExpressionNesting.SIGNALS_AND_CONSTANTS);
+					}
+				}
+			}
+
+			@Override
+			public void analyzePins(PinConsumer consumer) {
+			}
+
+			@Override
+			public void printImplementation(PrintWriter out) {
+				out.print(moduleName + ' ' + instanceName + '(');
+				boolean firstPort = true;
+				for (RtlInstancePort port : ports.values()) {
+					if (firstPort) {
+						firstPort = false;
+						out.println();
+					} else {
+						out.println(",");
+					}
+					out.print("\t." + port.getPortName() + "(");
+					if (port instanceof RtlInstanceInputPort) {
+						RtlInstanceInputPort inputPort = (RtlInstanceInputPort) port;
+						if (inputPort.getAssignedSignal() == null) {
+							throw new IllegalStateException("input port " + inputPort.getPortName() +
+								" of instance of module " + moduleName + " has no assigned signal");
+						}
+						out.print(inputPort.getAssignedSignal());
+					} else if (port instanceof RtlInstanceOutputPort) {
+						RtlInstanceOutputPort outputPort = (RtlInstanceOutputPort) port;
+						out.print(outputPort);
+					} else {
+						throw new RuntimeException("unknown instance port type");
+					}
+					out.print(')');
+				}
+				out.println();
+				out.println(");");
+			}
+
+		};
+	}
 }

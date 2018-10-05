@@ -7,7 +7,6 @@ package name.martingeisse.esdk.core.rtl.synthesis.xilinx;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.pin.RtlPin;
 import name.martingeisse.esdk.core.rtl.pin.RtlPinConfiguration;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog_v2.VerilogGenerator;
 import org.apache.commons.io.FileUtils;
 

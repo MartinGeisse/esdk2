@@ -11,16 +11,13 @@ import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
  */
 public interface SynthesisPreparationContext {
 
-	String implicitlyDeclareSignalWithAssignedName(RtlSignal signal, String prefix);
+	String declareSignal(RtlSignal signal,
+						 String nameOrPrefix, boolean appendCounterSuffix,
+						 VerilogSignalKind signalKindForExplicitDeclarationOrNullForNoDeclaration,
+						 boolean generateAssignment);
 
-	String explicitlyDeclareSignalWithAssignedName(RtlSignal signal, String prefix, VerilogSignalKind signalKind);
+	String reserveName(String nameOrPrefix, boolean appendCounterSuffix);
 
-	void implicitlyDeclareSignalWithFixedName(RtlSignal signal, String name);
-
-	void explicitlyDeclareSignalWithFixedName(RtlSignal signal, String name, VerilogSignalKind signalKind);
-
-	String assignGeneratedName(String prefix);
-
-	void assignFixedName(String name);
+	AuxiliaryFileFactory getAuxiliaryFileFactory();
 
 }

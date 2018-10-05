@@ -20,7 +20,7 @@ public abstract class RtlCustomSignal extends RtlItem implements RtlSignal {
 
 	@Override
 	public void printVerilogImplementationExpression(VerilogExpressionWriter out) {
-		throw new UnsupportedOperationException("This class does not support Verilog generation");
+		throw new UnsupportedOperationException("cannot print implementation expression for " + this);
 	}
 
 }

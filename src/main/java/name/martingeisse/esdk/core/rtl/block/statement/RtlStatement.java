@@ -6,8 +6,8 @@ package name.martingeisse.esdk.core.rtl.block.statement;
 
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog_v2.VerilogExpressionWriter;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog_v2.SignalUsageConsumer;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog_v2.VerilogWriter;
 
 /**
  *
@@ -28,7 +28,7 @@ public abstract class RtlStatement extends RtlItem {
 	// Verilog generation
 	// ----------------------------------------------------------------------------------------------------------------
 
-	public abstract void printExpressionsDryRun(VerilogExpressionWriter expressionWriter);
+	public abstract void analyzeSignalUsage(SignalUsageConsumer consumer);
 
 	public abstract void printVerilogStatements(VerilogWriter out);
 

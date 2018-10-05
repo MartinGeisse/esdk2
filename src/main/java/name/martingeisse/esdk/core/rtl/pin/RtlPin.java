@@ -7,7 +7,6 @@ package name.martingeisse.esdk.core.rtl.pin;
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
 
 /**
  *
@@ -61,16 +60,6 @@ public abstract class RtlPin extends RtlItem {
 
 	public String getNetName() {
 		return "pin" + id;
-	}
-
-	// ----------------------------------------------------------------------------------------------------------------
-	// Verilog generation
-	// ----------------------------------------------------------------------------------------------------------------
-
-	public abstract String getVerilogDirectionKeyword();
-
-	public void writeModuleLocalDeclarations(VerilogWriter out) {
-		// TODO
 	}
 
 }

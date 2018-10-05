@@ -9,8 +9,8 @@ import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorConstant;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog_v2.VerilogExpressionWriter;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog_v2.SignalUsageConsumer;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog_v2.VerilogWriter;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 
 import java.util.ArrayList;
@@ -101,9 +101,9 @@ public class RtlStatementSequence extends RtlStatement {
 	// ----------------------------------------------------------------------------------------------------------------
 
 	@Override
-	public void printExpressionsDryRun(VerilogExpressionWriter expressionWriter) {
+	public void analyzeSignalUsage(SignalUsageConsumer consumer) {
 		for (RtlStatement statement : statements) {
-			statement.printExpressionsDryRun(expressionWriter);
+			statement.analyzeSignalUsage(consumer);
 		}
 	}
 

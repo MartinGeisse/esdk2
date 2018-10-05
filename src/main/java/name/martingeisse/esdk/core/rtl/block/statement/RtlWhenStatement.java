@@ -6,9 +6,9 @@ package name.martingeisse.esdk.core.rtl.block.statement;
 
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog_v2.SignalUsageConsumer;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog_v2.VerilogExpressionNesting;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog_v2.VerilogExpressionWriter;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog_v2.VerilogWriter;
 
 /**
  *
@@ -52,30 +52,30 @@ public final class RtlWhenStatement extends RtlStatement {
 	// ----------------------------------------------------------------------------------------------------------------
 
 	@Override
-	public void printExpressionsDryRun(VerilogExpressionWriter expressionWriter) {
-		expressionWriter.print(condition, VerilogExpressionNesting.ALL);
-		thenBranch.printExpressionsDryRun(expressionWriter);
-		otherwiseBranch.printExpressionsDryRun(expressionWriter);
+	public void analyzeSignalUsage(SignalUsageConsumer consumer) {
+		consumer.getFakeExpressionWriter().print(condition, VerilogExpressionNesting.ALL);
+		thenBranch.analyzeSignalUsage(consumer);
+		otherwiseBranch.analyzeSignalUsage(consumer);
 	}
 
 	@Override
 	public void printVerilogStatements(VerilogWriter out) {
 		out.indent();
-		out.getOut().print("if (");
-		out.printExpression(condition);
-		out.getOut().println(") begin");
+		out.print("if (");
+		out.print(condition);
+		out.println(") begin");
 		out.startIndentation();
 		thenBranch.printVerilogStatements(out);
 		if (!otherwiseBranch.isEmpty()) {
 			out.endIndentation();
 			out.indent();
-			out.getOut().println("end else begin");
+			out.println("end else begin");
 			out.startIndentation();
 			otherwiseBranch.printVerilogStatements(out);
 		}
 		out.endIndentation();
 		out.indent();
-		out.getOut().println("end");
+		out.println("end");
 	}
 
 }
