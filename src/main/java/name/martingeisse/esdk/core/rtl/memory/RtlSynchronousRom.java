@@ -7,14 +7,11 @@ package name.martingeisse.esdk.core.rtl.memory;
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlClockedItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
-import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.signal.custom.RtlCustomVectorSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog_v2.*;
 import name.martingeisse.esdk.core.util.Matrix;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
-
-import java.util.Arrays;
 
 /**
  *
@@ -149,18 +146,6 @@ public final class RtlSynchronousRom extends RtlClockedItem {
 			return readData;
 		}
 
-		@Override
-		public VerilogSignalKind getVerilogSignalKind() {
-			return VerilogSignalKind.REG;
-		}
-
-		@Override
-		public boolean isGenerateVerilogAssignmentForDeclaration() {
-			return false;
-		}
-
 	}
-
-	;
 
 }

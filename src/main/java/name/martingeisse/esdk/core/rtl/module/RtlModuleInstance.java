@@ -11,7 +11,6 @@ import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog_v2.*;
 
-import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -141,7 +140,7 @@ public final class RtlModuleInstance extends RtlItem {
 			}
 
 			@Override
-			public void printImplementation(PrintWriter out) {
+			public void printImplementation(VerilogWriter out) {
 				out.print(moduleName + ' ' + instanceName + '(');
 				boolean firstPort = true;
 				for (RtlInstancePort port : ports.values()) {

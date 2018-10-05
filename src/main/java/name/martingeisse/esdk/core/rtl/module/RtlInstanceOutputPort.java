@@ -19,11 +19,6 @@ public abstract class RtlInstanceOutputPort extends RtlInstancePort implements R
 	public abstract RtlSignal getSimulationSignal();
 
 	@Override
-	public boolean isGenerateVerilogAssignmentForDeclaration() {
-		return false;
-	}
-
-	@Override
 	public final void printVerilogImplementationExpression(VerilogExpressionWriter out) {
 		throw new UnsupportedOperationException("cannot write an implementation expression for instance output ports");
 	}

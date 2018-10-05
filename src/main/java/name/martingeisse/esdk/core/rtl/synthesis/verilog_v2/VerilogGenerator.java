@@ -12,6 +12,7 @@ import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.io.Writer;
 import java.util.*;
 
 /**
@@ -29,8 +30,14 @@ public class VerilogGenerator {
 	private final Map<String, MutableInt> prefixNameCounters = new HashMap<>();
 	private final Map<RtlSignal, NamedSignal> namedSignals = new HashMap<>();
 
-	public VerilogGenerator(VerilogWriter out, RtlRealm realm, String toplevelModuleName, AuxiliaryFileFactory auxiliaryFileFactory) {
-		this.out = out;
+	public VerilogGenerator(Writer out, RtlRealm realm, String toplevelModuleName, AuxiliaryFileFactory auxiliaryFileFactory) {
+		this.out = new VerilogWriter(out) {
+			@Override
+			protected String getSignalName(RtlSignal signal) {
+				NamedSignal namedSignal = namedSignals.get(signal);
+				return (namedSignal == null) ? null : namedSignal.name;
+			}
+		};
 		this.realm = realm;
 		this.toplevelModuleName = toplevelModuleName;
 		this.auxiliaryFileFactory = auxiliaryFileFactory;

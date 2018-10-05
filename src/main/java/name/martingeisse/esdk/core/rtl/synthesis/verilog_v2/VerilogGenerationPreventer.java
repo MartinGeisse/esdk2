@@ -4,8 +4,6 @@
  */
 package name.martingeisse.esdk.core.rtl.synthesis.verilog_v2;
 
-import java.io.PrintWriter;
-
 /**
  *
  */
@@ -27,7 +25,7 @@ public final class VerilogGenerationPreventer implements VerilogContribution {
 	}
 
 	@Override
-	public void printImplementation(PrintWriter out) {
+	public void printImplementation(VerilogWriter out) {
 		fail();
 	}
 

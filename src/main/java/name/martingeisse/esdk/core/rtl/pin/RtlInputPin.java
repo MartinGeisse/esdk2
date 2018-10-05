@@ -39,6 +39,11 @@ public final class RtlInputPin extends RtlPin implements RtlBitSignal {
 	// ----------------------------------------------------------------------------------------------------------------
 
 	@Override
+	public void printVerilogImplementationExpression(VerilogExpressionWriter out) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
 	public VerilogContribution getVerilogContribution() {
 		return new VerilogContribution() {
 
