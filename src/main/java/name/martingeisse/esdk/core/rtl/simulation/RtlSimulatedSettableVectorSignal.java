@@ -5,14 +5,14 @@ import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 
 /**
- * Vector version of {@link RtlSettableSignal}.
+ * Vector version of {@link RtlSimulatedSettableSignal}.
  */
-public final class RtlSettableVectorSignal extends RtlSettableSignal implements RtlVectorSignal {
+public final class RtlSimulatedSettableVectorSignal extends RtlSimulatedSettableSignal implements RtlVectorSignal {
 
 	private final int width;
 	private VectorValue value;
 
-	public RtlSettableVectorSignal(RtlRealm realm, int width) {
+	public RtlSimulatedSettableVectorSignal(RtlRealm realm, int width) {
 		super(realm);
 		this.width = width;
 		this.value = VectorValue.ofUnsigned(width, 0);
@@ -33,6 +33,9 @@ public final class RtlSettableVectorSignal extends RtlSettableSignal implements 
 	}
 
 	public void setValue(VectorValue value) {
+		if (value.getWidth() != width) {
+			throw new IllegalArgumentException("get vector value of wrong width " + value.getWidth() + ", expected " + width);
+		}
 		this.value = value;
 	}
 

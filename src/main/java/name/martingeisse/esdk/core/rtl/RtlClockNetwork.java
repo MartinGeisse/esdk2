@@ -7,6 +7,7 @@ package name.martingeisse.esdk.core.rtl;
 import name.martingeisse.esdk.core.rtl.block.RtlClockedBlock;
 import name.martingeisse.esdk.core.rtl.pin.RtlPin;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.EmptyVerilogContribution;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
 
 /**
@@ -72,7 +73,7 @@ public final class RtlClockNetwork extends RtlItem {
 
 	@Override
 	public VerilogContribution getVerilogContribution() {
-		throw newSynthesisNotSupportedException();
+		return new EmptyVerilogContribution();
 	}
 
 }

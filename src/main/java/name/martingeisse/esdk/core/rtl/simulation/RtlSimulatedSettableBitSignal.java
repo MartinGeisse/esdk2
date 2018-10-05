@@ -4,13 +4,13 @@ import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 
 /**
- * Bit version of {@link RtlSettableSignal}.
+ * Bit version of {@link RtlSimulatedSettableSignal}.
  */
-public final class RtlSettableBitSignal extends RtlSettableSignal implements RtlBitSignal {
+public final class RtlSimulatedSettableBitSignal extends RtlSimulatedSettableSignal implements RtlBitSignal {
 
 	private boolean value;
 
-	public RtlSettableBitSignal(RtlRealm realm) {
+	public RtlSimulatedSettableBitSignal(RtlRealm realm) {
 		super(realm);
 	}
 

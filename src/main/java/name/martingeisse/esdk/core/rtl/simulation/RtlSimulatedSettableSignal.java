@@ -5,6 +5,7 @@ import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.block.RtlProceduralSignal;
 import name.martingeisse.esdk.core.rtl.block.statement.RtlStatement;
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.EmptyVerilogContribution;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
 
@@ -15,10 +16,13 @@ import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter
  * Unlike {@link RtlProceduralSignal}, this class does not work together with {@link RtlStatement}. This makes it
  * easier to use, but it cannot be synthesized. Also, changes to the value are reflected directly, so it is not
  * possible to update multiple settable signals synchronously to a clock edge.
+ *
+ * Using this signal in a way that is not relevant to synthesis, such as a simulation replacement signal of instance
+ * ports, is allowed.
  */
-public abstract class RtlSettableSignal extends RtlItem implements RtlSignal {
+public abstract class RtlSimulatedSettableSignal extends RtlItem implements RtlSignal {
 
-	RtlSettableSignal(RtlRealm realm) {
+	RtlSimulatedSettableSignal(RtlRealm realm) {
 		super(realm);
 	}
 
@@ -27,14 +31,13 @@ public abstract class RtlSettableSignal extends RtlItem implements RtlSignal {
 	// ----------------------------------------------------------------------------------------------------------------
 
 	@Override
-	public VerilogContribution getVerilogContribution() {
-		// TODO this should be okay but currently it crashes -- why?
-		throw newSynthesisNotSupportedException();
+	public final VerilogContribution getVerilogContribution() {
+		return new EmptyVerilogContribution();
 	}
 
 	@Override
-	public void printVerilogImplementationExpression(VerilogExpressionWriter out) {
-		throw new UnsupportedOperationException("cannot synthesize " + getClass());
+	public final void printVerilogImplementationExpression(VerilogExpressionWriter out) {
+		throw new UnsupportedOperationException("cannot print an implementation expression for " + this);
 	}
 
 }

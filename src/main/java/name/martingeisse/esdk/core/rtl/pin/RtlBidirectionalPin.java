@@ -6,7 +6,6 @@ package name.martingeisse.esdk.core.rtl.pin;
 
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
-import name.martingeisse.esdk.core.rtl.simulation.RtlSettableBitSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.*;
 
 /**
@@ -14,16 +13,16 @@ import name.martingeisse.esdk.core.rtl.synthesis.verilog.*;
  */
 public final class RtlBidirectionalPin extends RtlPin implements RtlBitSignal {
 
-	private final RtlSettableBitSignal settableInputBitSignal;
+	private final PinSimulationSignal settableInputBitSignal;
 	private RtlBitSignal outputSignal;
 	private RtlBitSignal outputEnableSignal;
 
 	public RtlBidirectionalPin(RtlRealm realm) {
 		super(realm);
-		this.settableInputBitSignal = new RtlSettableBitSignal(realm);
+		this.settableInputBitSignal = new PinSimulationSignal(realm);
 	}
 
-	public RtlSettableBitSignal getSettableInputBitSignal() {
+	public PinSimulationSignal getSettableInputBitSignal() {
 		return settableInputBitSignal;
 	}
 

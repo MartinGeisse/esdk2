@@ -7,7 +7,6 @@ package name.martingeisse.esdk.core.rtl.memory;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
-import name.martingeisse.esdk.core.rtl.signal.custom.RtlCustomVectorSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.*;
 import name.martingeisse.esdk.core.util.Matrix;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
@@ -118,7 +117,7 @@ public final class RtlAsynchronousRom extends RtlItem {
 	//
 	//
 
-	public final class ReadDataSignal extends RtlCustomVectorSignal {
+	public final class ReadDataSignal extends RtlItem implements RtlVectorSignal {
 
 		public ReadDataSignal(RtlRealm realm) {
 			super(realm);
@@ -132,6 +131,17 @@ public final class RtlAsynchronousRom extends RtlItem {
 		@Override
 		public VectorValue getValue() {
 			return matrix.getRow(addressSignal.getValue().getAsUnsignedInt());
+		}
+
+		@Override
+		public VerilogContribution getVerilogContribution() {
+			return new EmptyVerilogContribution();
+		}
+
+		@Override
+		public void printVerilogImplementationExpression(VerilogExpressionWriter out) {
+			// this signal should be declared without assignment, so this method should never be called
+			throw new UnsupportedOperationException();
 		}
 
 	}

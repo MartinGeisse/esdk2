@@ -6,7 +6,7 @@ import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
 import name.martingeisse.esdk.core.rtl.simulation.RtlClockGenerator;
-import name.martingeisse.esdk.core.rtl.simulation.RtlSettableBitSignal;
+import name.martingeisse.esdk.core.rtl.simulation.RtlSimulatedSettableBitSignal;
 import name.martingeisse.esdk.library.vga.Monitor;
 import name.martingeisse.esdk.library.vga.MonitorPanel;
 
@@ -27,11 +27,11 @@ public class SimulationMain {
 		RtlClockNetwork clock = realm.createClockNetwork(new RtlBitConstant(realm, false));
 		new RtlClockGenerator(clock, 10);
 
-		RtlSettableBitSignal r = new RtlSettableBitSignal(realm);
-		RtlSettableBitSignal g = new RtlSettableBitSignal(realm);
-		RtlSettableBitSignal b = new RtlSettableBitSignal(realm);
-		RtlSettableBitSignal hsync = new RtlSettableBitSignal(realm);
-		RtlSettableBitSignal vsync = new RtlSettableBitSignal(realm);
+		RtlSimulatedSettableBitSignal r = new RtlSimulatedSettableBitSignal(realm);
+		RtlSimulatedSettableBitSignal g = new RtlSimulatedSettableBitSignal(realm);
+		RtlSimulatedSettableBitSignal b = new RtlSimulatedSettableBitSignal(realm);
+		RtlSimulatedSettableBitSignal hsync = new RtlSimulatedSettableBitSignal(realm);
+		RtlSimulatedSettableBitSignal vsync = new RtlSimulatedSettableBitSignal(realm);
 
 		new IntervalItem(design, 5, 10, () -> {
 			x++;
