@@ -4,15 +4,15 @@
  */
 package name.martingeisse.esdk.core.rtl.signal.custom;
 
-import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
+import name.martingeisse.esdk.core.rtl.signal.RtlSignalBase;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
 
 /**
  * Base class for {@link RtlCustomBitSignal} and {@link RtlCustomVectorSignal}.
  */
-public abstract class RtlCustomSignal extends RtlItem implements RtlSignal {
+public abstract class RtlCustomSignal extends RtlSignalBase implements RtlSignal {
 
 	public RtlCustomSignal(RtlRealm realm) {
 		super(realm);

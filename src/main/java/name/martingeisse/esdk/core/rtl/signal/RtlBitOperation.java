@@ -12,7 +12,7 @@ import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter
 /**
  *
  */
-public final class RtlBitOperation extends RtlItem implements RtlBitSignal {
+public final class RtlBitOperation extends RtlSignalBase implements RtlBitSignal {
 
 	private final Operator operator;
 	private final RtlBitSignal leftOperand;

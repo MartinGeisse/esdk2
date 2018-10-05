@@ -12,7 +12,7 @@ import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter
 /**
  *
  */
-public abstract class RtlConditionalOperation extends RtlItem implements RtlSignal {
+public abstract class RtlConditionalOperation extends RtlSignalBase implements RtlSignal {
 
 	private final RtlBitSignal condition;
 

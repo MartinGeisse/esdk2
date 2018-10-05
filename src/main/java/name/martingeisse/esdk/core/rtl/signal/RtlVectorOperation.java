@@ -14,7 +14,7 @@ import name.martingeisse.esdk.core.util.vector.VectorValue;
  * See {@link RtlShiftOperation} for shifting. That class is separate because it has different width constraints on
  * the right operand.
  */
-public final class RtlVectorOperation extends RtlItem implements RtlVectorSignal {
+public final class RtlVectorOperation extends RtlSignalBase implements RtlVectorSignal {
 
 	private final Operator operator;
 	private final RtlVectorSignal leftOperand;

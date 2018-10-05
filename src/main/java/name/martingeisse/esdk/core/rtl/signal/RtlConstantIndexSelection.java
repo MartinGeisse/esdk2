@@ -14,7 +14,7 @@ import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter
  * bits of a vector whose width is not a power-of-two. A non-constant selection cannot do that because it cannot
  * statically prove that the index is always within range.
  */
-public final class RtlConstantIndexSelection extends RtlItem implements RtlBitSignal {
+public final class RtlConstantIndexSelection extends RtlSignalBase implements RtlBitSignal {
 
 	private final RtlVectorSignal containerSignal;
 	private final int index;

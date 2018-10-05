@@ -13,7 +13,7 @@ import name.martingeisse.esdk.core.util.vector.VectorValue;
 /**
  *
  */
-public final class RtlVectorComparison extends RtlItem implements RtlBitSignal {
+public final class RtlVectorComparison extends RtlSignalBase implements RtlBitSignal {
 
 	private final Operator operator;
 	private final RtlVectorSignal leftOperand;

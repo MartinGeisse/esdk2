@@ -9,7 +9,7 @@ import name.martingeisse.esdk.core.util.vector.VectorValue;
 /**
  *
  */
-public final class RtlVectorRepetition extends RtlItem implements RtlVectorSignal {
+public final class RtlVectorRepetition extends RtlSignalBase implements RtlVectorSignal {
 
 	private final RtlVectorSignal vectorSignal;
 	private final int repetitions;

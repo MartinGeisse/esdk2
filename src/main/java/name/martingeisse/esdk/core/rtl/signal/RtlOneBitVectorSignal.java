@@ -9,7 +9,7 @@ import name.martingeisse.esdk.core.util.vector.VectorValue;
 /**
  *
  */
-public final class RtlOneBitVectorSignal extends RtlItem implements RtlVectorSignal {
+public final class RtlOneBitVectorSignal extends RtlSignalBase implements RtlVectorSignal {
 
 	private final RtlBitSignal bitSignal;
 

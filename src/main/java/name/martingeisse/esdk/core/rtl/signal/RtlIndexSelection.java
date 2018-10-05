@@ -12,7 +12,7 @@ import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter
 /**
  *
  */
-public final class RtlIndexSelection extends RtlItem implements RtlBitSignal {
+public final class RtlIndexSelection extends RtlSignalBase implements RtlBitSignal {
 
 	private final RtlVectorSignal containerSignal;
 	private final RtlVectorSignal indexSignal;

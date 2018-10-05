@@ -28,7 +28,7 @@ import name.martingeisse.esdk.core.util.vector.VectorValue;
  * small shift amount or if it causes the result to be zero (both cases are implemented in various systems, and
  * any confusion here can easily cause errors or inefficencies).
  */
-public final class RtlShiftOperation extends RtlItem implements RtlVectorSignal {
+public final class RtlShiftOperation extends RtlSignalBase implements RtlVectorSignal {
 
 	private final Direction direction;
 	private final RtlVectorSignal leftOperand;

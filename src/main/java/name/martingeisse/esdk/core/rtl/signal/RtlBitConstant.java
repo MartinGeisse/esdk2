@@ -11,7 +11,7 @@ import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter
 /**
  *
  */
-public final class RtlBitConstant extends RtlItem implements RtlBitSignal {
+public final class RtlBitConstant extends RtlSignalBase implements RtlBitSignal {
 
 	private final boolean value;
 

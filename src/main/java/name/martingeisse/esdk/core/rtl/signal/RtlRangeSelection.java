@@ -13,7 +13,7 @@ import name.martingeisse.esdk.core.util.vector.VectorValue;
 /**
  *
  */
-public class RtlRangeSelection extends RtlItem implements RtlVectorSignal {
+public class RtlRangeSelection extends RtlSignalBase implements RtlVectorSignal {
 
 	private final RtlVectorSignal containerSignal;
 	private final int from;

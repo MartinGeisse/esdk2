@@ -13,7 +13,7 @@ import name.martingeisse.esdk.core.util.vector.VectorValue;
 /**
  *
  */
-public final class RtlVectorConstant extends RtlItem implements RtlVectorSignal {
+public final class RtlVectorConstant extends RtlSignalBase implements RtlVectorSignal {
 
 	private final VectorValue value;
 
