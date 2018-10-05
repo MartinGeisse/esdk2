@@ -10,6 +10,8 @@ import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
 import name.martingeisse.esdk.core.rtl.signal.RtlConcatenation;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorConstant;
 import name.martingeisse.esdk.core.rtl.signal.connector.RtlBitSignalConnector;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.EmptyVerilogContribution;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 import name.martingeisse.esdk.examples.vga.test_renderer.display.FramebufferDisplay;
 import name.martingeisse.esdk.picoblaze.model.rtl.PicoblazeRtlWithAssociatedProgram;
@@ -26,7 +28,7 @@ public final class TestRenderer extends RtlItem {
 	private final RtlProceduralVectorSignal rowRegister;
 
 	public TestRenderer(RtlRealm realm, RtlClockNetwork clock, int widthBits, int heightBits) {
-		super(clock.getRealm());
+		super(realm);
 		this.clock = clock;
 		cpu = new PicoblazeRtlWithAssociatedProgram(clock, getClass());
 		displayReady = new RtlBitSignalConnector(realm);
@@ -95,6 +97,11 @@ public final class TestRenderer extends RtlItem {
 		display.setWriteStrobeSignal(cpu.getWriteStrobe().and(cpu.getPortAddress().select(0)));
 		display.setWriteDataSignal(cpu.getOutputData().select(2, 0));
 		displayReady.setConnected(display.getReadySignal());
+	}
+
+	@Override
+	public VerilogContribution getVerilogContribution() {
+		return new EmptyVerilogContribution();
 	}
 
 }

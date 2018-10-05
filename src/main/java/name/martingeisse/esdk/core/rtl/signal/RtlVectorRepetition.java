@@ -2,6 +2,8 @@ package name.martingeisse.esdk.core.rtl.signal;
 
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.EmptyVerilogContribution;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionNesting;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
@@ -9,7 +11,7 @@ import name.martingeisse.esdk.core.util.vector.VectorValue;
 /**
  *
  */
-public final class RtlVectorRepetition extends RtlSignalBase implements RtlVectorSignal {
+public final class RtlVectorRepetition extends RtlItem implements RtlVectorSignal {
 
 	private final RtlVectorSignal vectorSignal;
 	private final int repetitions;
@@ -45,6 +47,15 @@ public final class RtlVectorRepetition extends RtlSignalBase implements RtlVecto
 			result = result.concat(single);
 		}
 		return result;
+	}
+
+	// ----------------------------------------------------------------------------------------------------------------
+	// Verilog generation
+	// ----------------------------------------------------------------------------------------------------------------
+
+	@Override
+	public VerilogContribution getVerilogContribution() {
+		return new EmptyVerilogContribution();
 	}
 
 	@Override

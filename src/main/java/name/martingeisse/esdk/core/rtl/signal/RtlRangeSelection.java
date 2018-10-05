@@ -6,6 +6,8 @@ package name.martingeisse.esdk.core.rtl.signal;
 
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.EmptyVerilogContribution;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionNesting;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
@@ -13,7 +15,7 @@ import name.martingeisse.esdk.core.util.vector.VectorValue;
 /**
  *
  */
-public class RtlRangeSelection extends RtlSignalBase implements RtlVectorSignal {
+public class RtlRangeSelection extends RtlItem implements RtlVectorSignal {
 
 	private final RtlVectorSignal containerSignal;
 	private final int from;
@@ -59,6 +61,11 @@ public class RtlRangeSelection extends RtlSignalBase implements RtlVectorSignal 
 	// ----------------------------------------------------------------------------------------------------------------
 	// Verilog generation
 	// ----------------------------------------------------------------------------------------------------------------
+
+	@Override
+	public VerilogContribution getVerilogContribution() {
+		return new EmptyVerilogContribution();
+	}
 
 	@Override
 	public boolean compliesWith(VerilogExpressionNesting nesting) {

@@ -8,6 +8,8 @@ import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlConditionalVectorOperation;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.signal.connector.RtlBitSignalConnector;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.EmptyVerilogContribution;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
 
 /**
  * Simple but wrong implementation that won't delay a write when reading pixels, instead writing correctly and
@@ -79,6 +81,11 @@ public final class RtlFramebufferDisplay extends RtlItem implements FramebufferD
 
 	public RtlVectorSignal getDacReadDataSignal() {
 		return framebuffer.getReadDataSignal();
+	}
+
+	@Override
+	public VerilogContribution getVerilogContribution() {
+		return new EmptyVerilogContribution();
 	}
 
 }

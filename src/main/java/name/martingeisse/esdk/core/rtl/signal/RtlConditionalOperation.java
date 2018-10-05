@@ -6,13 +6,15 @@ package name.martingeisse.esdk.core.rtl.signal;
 
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.EmptyVerilogContribution;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionNesting;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
 
 /**
  *
  */
-public abstract class RtlConditionalOperation extends RtlSignalBase implements RtlSignal {
+public abstract class RtlConditionalOperation extends RtlItem implements RtlSignal {
 
 	private final RtlBitSignal condition;
 
@@ -32,6 +34,11 @@ public abstract class RtlConditionalOperation extends RtlSignalBase implements R
 	// ----------------------------------------------------------------------------------------------------------------
 	// Verilog generation
 	// ----------------------------------------------------------------------------------------------------------------
+
+	@Override
+	public VerilogContribution getVerilogContribution() {
+		return new EmptyVerilogContribution();
+	}
 
 	@Override
 	public void printVerilogImplementationExpression(VerilogExpressionWriter out) {

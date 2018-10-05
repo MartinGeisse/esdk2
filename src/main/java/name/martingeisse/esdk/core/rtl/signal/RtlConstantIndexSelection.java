@@ -6,6 +6,8 @@ package name.martingeisse.esdk.core.rtl.signal;
 
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.EmptyVerilogContribution;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionNesting;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
 
@@ -14,7 +16,7 @@ import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter
  * bits of a vector whose width is not a power-of-two. A non-constant selection cannot do that because it cannot
  * statically prove that the index is always within range.
  */
-public final class RtlConstantIndexSelection extends RtlSignalBase implements RtlBitSignal {
+public final class RtlConstantIndexSelection extends RtlItem implements RtlBitSignal {
 
 	private final RtlVectorSignal containerSignal;
 	private final int index;
@@ -48,6 +50,11 @@ public final class RtlConstantIndexSelection extends RtlSignalBase implements Rt
 	// ----------------------------------------------------------------------------------------------------------------
 	// Verilog generation
 	// ----------------------------------------------------------------------------------------------------------------
+
+	@Override
+	public VerilogContribution getVerilogContribution() {
+		return new EmptyVerilogContribution();
+	}
 
 	@Override
 	public boolean compliesWith(VerilogExpressionNesting nesting) {

@@ -45,9 +45,7 @@ public abstract class RtlItem extends Item implements RtlItemOwned {
 		return this;
 	}
 
-	public VerilogContribution getVerilogContribution() {
-		throw newSynthesisNotSupportedException();
-	}
+	public abstract VerilogContribution getVerilogContribution();
 
 	public SynthesisNotSupportedException newSynthesisNotSupportedException() {
 		return new SynthesisNotSupportedException("synthesis not supported for " + this);

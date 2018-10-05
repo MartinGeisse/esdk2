@@ -5,6 +5,8 @@ import name.martingeisse.esdk.core.rtl.RtlClockedItem;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.EmptyVerilogContribution;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
 
 import java.awt.image.BufferedImage;
 
@@ -93,6 +95,11 @@ public final class SimulatedFramebufferDisplay extends RtlClockedItem implements
 				framebuffer.setRGB(x, y, rgb);
 			}
 		}
+	}
+
+	@Override
+	public VerilogContribution getVerilogContribution() {
+		throw newSynthesisNotSupportedException();
 	}
 
 }

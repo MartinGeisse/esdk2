@@ -5,6 +5,7 @@ import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.block.RtlProceduralSignal;
 import name.martingeisse.esdk.core.rtl.block.statement.RtlStatement;
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
 
 /**
@@ -24,6 +25,12 @@ public abstract class RtlSettableSignal extends RtlItem implements RtlSignal {
 	// ----------------------------------------------------------------------------------------------------------------
 	// Verilog generation
 	// ----------------------------------------------------------------------------------------------------------------
+
+	@Override
+	public VerilogContribution getVerilogContribution() {
+		// TODO this should be okay but currently it crashes -- why?
+		throw newSynthesisNotSupportedException();
+	}
 
 	@Override
 	public void printVerilogImplementationExpression(VerilogExpressionWriter out) {

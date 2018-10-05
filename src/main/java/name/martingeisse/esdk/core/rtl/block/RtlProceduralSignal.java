@@ -8,6 +8,8 @@ import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.block.statement.RtlAssignmentTarget;
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.EmptyVerilogContribution;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
 
@@ -40,6 +42,12 @@ public abstract class RtlProceduralSignal extends RtlItem implements RtlSignal, 
 	// ----------------------------------------------------------------------------------------------------------------
 	// Verilog generation
 	// ----------------------------------------------------------------------------------------------------------------
+
+	@Override
+	public VerilogContribution getVerilogContribution() {
+		// procedural signals are synthesized as part of the block that defines them
+		return new EmptyVerilogContribution();
+	}
 
 	@Override
 	public final void printVerilogAssignmentTarget(VerilogWriter out) {

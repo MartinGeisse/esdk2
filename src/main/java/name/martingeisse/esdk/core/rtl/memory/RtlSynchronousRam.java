@@ -7,6 +7,7 @@ package name.martingeisse.esdk.core.rtl.memory;
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.signal.custom.RtlCustomVectorSignal;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
 import name.martingeisse.esdk.core.util.Matrix;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 
@@ -46,6 +47,12 @@ public final class RtlSynchronousRam extends RtlAbstractSynchronousRam {
 	public void updateState() {
 		super.updateState();
 		readData = nextReadData;
+	}
+
+	@Override
+	public VerilogContribution getVerilogContribution() {
+		// TODO
+		throw newSynthesisNotSupportedException();
 	}
 
 }

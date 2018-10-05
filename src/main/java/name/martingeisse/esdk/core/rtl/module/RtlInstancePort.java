@@ -5,6 +5,8 @@
 package name.martingeisse.esdk.core.rtl.module;
 
 import name.martingeisse.esdk.core.rtl.RtlItem;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.EmptyVerilogContribution;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
 
 /**
  *
@@ -26,6 +28,12 @@ public abstract class RtlInstancePort extends RtlItem {
 
 	public final String getPortName() {
 		return portName;
+	}
+
+	@Override
+	public VerilogContribution getVerilogContribution() {
+		// ports are synthesized as part of the instance they belong to
+		return new EmptyVerilogContribution();
 	}
 
 }

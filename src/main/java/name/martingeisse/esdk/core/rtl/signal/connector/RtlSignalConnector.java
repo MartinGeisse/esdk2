@@ -7,7 +7,8 @@ package name.martingeisse.esdk.core.rtl.signal.connector;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
-import name.martingeisse.esdk.core.rtl.signal.RtlSignalBase;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.EmptyVerilogContribution;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionNesting;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
 
@@ -18,7 +19,7 @@ import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter
  * This class is not meant to dynamically change the connected signal. Even though simulation won't choke on that,
  * it is not synthesizable (synthesis will simply use the signal connected at the time the synthesis is run).
  */
-public abstract class RtlSignalConnector extends RtlSignalBase implements RtlSignal {
+public abstract class RtlSignalConnector extends RtlItem implements RtlSignal {
 
 	public RtlSignalConnector(RtlRealm realm) {
 		super(realm);
@@ -29,6 +30,11 @@ public abstract class RtlSignalConnector extends RtlSignalBase implements RtlSig
 	// ----------------------------------------------------------------------------------------------------------------
 	// Verilog generation
 	// ----------------------------------------------------------------------------------------------------------------
+
+	@Override
+	public VerilogContribution getVerilogContribution() {
+		return new EmptyVerilogContribution();
+	}
 
 	@Override
 	public boolean compliesWith(VerilogExpressionNesting nesting) {

@@ -9,6 +9,8 @@ import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.memory.RtlSynchronousRom;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.EmptyVerilogContribution;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
 import name.martingeisse.esdk.picoblaze.model.ProgramRomUtil;
 
 /**
@@ -52,4 +54,10 @@ public class AssociatedPicoblazeProgramRom extends RtlItem {
 	public RtlSynchronousRom getRom() {
 		return rom;
 	}
+
+	@Override
+	public VerilogContribution getVerilogContribution() {
+		return new EmptyVerilogContribution();
+	}
+
 }

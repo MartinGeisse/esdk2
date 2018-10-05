@@ -6,12 +6,14 @@ package name.martingeisse.esdk.core.rtl.signal;
 
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.EmptyVerilogContribution;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
 
 /**
  *
  */
-public final class RtlBitConstant extends RtlSignalBase implements RtlBitSignal {
+public final class RtlBitConstant extends RtlItem implements RtlBitSignal {
 
 	private final boolean value;
 
@@ -31,6 +33,11 @@ public final class RtlBitConstant extends RtlSignalBase implements RtlBitSignal 
 	// ----------------------------------------------------------------------------------------------------------------
 	// Verilog generation
 	// ----------------------------------------------------------------------------------------------------------------
+
+	@Override
+	public VerilogContribution getVerilogContribution() {
+		return new EmptyVerilogContribution();
+	}
 
 	@Override
 	public void printVerilogImplementationExpression(VerilogExpressionWriter out) {

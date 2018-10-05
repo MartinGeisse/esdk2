@@ -7,6 +7,7 @@ package name.martingeisse.esdk.core.rtl;
 import name.martingeisse.esdk.core.rtl.block.RtlClockedBlock;
 import name.martingeisse.esdk.core.rtl.pin.RtlPin;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
 
 /**
  * A real clock network (after synthesis) reacts to real clock edges, i.e. 0-to-1 transitions of the clock signal. In
@@ -63,6 +64,15 @@ public final class RtlClockNetwork extends RtlItem {
 
 	public void simulateClockEdge() {
 		getRealm().onClockEdge(this);
+	}
+
+	// ----------------------------------------------------------------------------------------------------------------
+	// Verilog generation
+	// ----------------------------------------------------------------------------------------------------------------
+
+	@Override
+	public VerilogContribution getVerilogContribution() {
+		throw newSynthesisNotSupportedException();
 	}
 
 }

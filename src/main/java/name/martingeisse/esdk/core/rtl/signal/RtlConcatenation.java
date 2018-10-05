@@ -7,6 +7,8 @@ package name.martingeisse.esdk.core.rtl.signal;
 import com.google.common.collect.ImmutableList;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.EmptyVerilogContribution;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionNesting;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
@@ -15,7 +17,7 @@ import name.martingeisse.esdk.core.util.vector.VectorValue;
  * Note: Unlike other object fields, the list of signals must be determined in advance. This is to ensure that the
  * result width doesn't change.
  */
-public final class RtlConcatenation extends RtlSignalBase implements RtlVectorSignal {
+public final class RtlConcatenation extends RtlItem implements RtlVectorSignal {
 
 	private final ImmutableList<RtlSignal> signals;
 	private final int width;
@@ -79,6 +81,11 @@ public final class RtlConcatenation extends RtlSignalBase implements RtlVectorSi
 	// ----------------------------------------------------------------------------------------------------------------
 	// Verilog generation
 	// ----------------------------------------------------------------------------------------------------------------
+
+	@Override
+	public VerilogContribution getVerilogContribution() {
+		return new EmptyVerilogContribution();
+	}
 
 	@Override
 	public void printVerilogImplementationExpression(VerilogExpressionWriter out) {

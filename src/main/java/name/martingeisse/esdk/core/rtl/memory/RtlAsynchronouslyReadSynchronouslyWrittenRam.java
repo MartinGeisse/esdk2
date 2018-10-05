@@ -3,6 +3,8 @@ package name.martingeisse.esdk.core.rtl.memory;
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.signal.custom.RtlCustomVectorSignal;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.EmptyVerilogContribution;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
 import name.martingeisse.esdk.core.util.Matrix;
 
 /**
@@ -22,6 +24,12 @@ public final class RtlAsynchronouslyReadSynchronouslyWrittenRam extends RtlAbstr
 	public RtlVectorSignal getReadDataSignal() {
 		return RtlCustomVectorSignal.of(getRealm(), getMatrix().getColumnCount(),
 			() -> getMatrix().getRow(getAddressSignal().getValue().getAsUnsignedInt()));
+	}
+
+	@Override
+	public VerilogContribution getVerilogContribution() {
+		// TODO
+		throw newSynthesisNotSupportedException();
 	}
 
 }
