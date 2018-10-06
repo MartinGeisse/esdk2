@@ -119,7 +119,7 @@ public final class RtlClockedBlock extends RtlClockedItem {
 				out.println("end");
 
 				out.indent();
-				out.print("always @(posedge");
+				out.print("always @(posedge ");
 				out.print(getClockNetwork().getClockSignal());
 				out.println(") begin");
 				out.startIndentation();
