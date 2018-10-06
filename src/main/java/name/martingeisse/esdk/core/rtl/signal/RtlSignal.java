@@ -5,6 +5,8 @@
 package name.martingeisse.esdk.core.rtl.signal;
 
 import name.martingeisse.esdk.core.rtl.RtlItemOwned;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.SignalUsageConsumer;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionNesting;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
 
@@ -27,6 +29,16 @@ public interface RtlSignal extends RtlItemOwned {
 	 */
 	default boolean compliesWith(VerilogExpressionNesting nesting) {
 		return nesting == VerilogExpressionNesting.ALL;
+	}
+
+	/**
+	 * See {@link VerilogContribution#analyzeSignalUsage(SignalUsageConsumer)}. The default implementation will use
+	 * the consumer's fake {@link VerilogExpressionWriter} to analyze signal usage, re-using the code for actual
+	 * verilog generation. Signals that are synthesizable through other means than an implementation expression should
+	 * override this method to analyze signal usage by other means.
+	 */
+	default void analyzeSignalUsage(SignalUsageConsumer consumer) {
+		printVerilogImplementationExpression(consumer.getFakeExpressionWriter());
 	}
 
 	/**

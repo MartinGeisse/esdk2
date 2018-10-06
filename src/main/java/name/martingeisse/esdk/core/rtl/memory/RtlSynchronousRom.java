@@ -152,6 +152,13 @@ public final class RtlSynchronousRom extends RtlClockedItem {
 		}
 
 		@Override
+		public void analyzeSignalUsage(SignalUsageConsumer consumer) {
+			// Usage of the address signal gets reported in our VerilogContribution, which is correct because
+			// the memory-reading always-block gets generated regardless of whether the read data signal is
+			// actually used anywhere. As a consequence, there is nothing to do here.
+		}
+
+		@Override
 		public void printVerilogImplementationExpression(VerilogExpressionWriter out) {
 			// this signal should be declared without assignment, so this method should never be called
 			throw new UnsupportedOperationException();

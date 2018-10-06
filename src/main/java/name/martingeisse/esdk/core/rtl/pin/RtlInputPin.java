@@ -38,6 +38,11 @@ public final class RtlInputPin extends RtlPin implements RtlBitSignal {
 	// ----------------------------------------------------------------------------------------------------------------
 
 	@Override
+	public void analyzeSignalUsage(SignalUsageConsumer consumer) {
+		// input pins don't use any other signals
+	}
+
+	@Override
 	public void printVerilogImplementationExpression(VerilogExpressionWriter out) {
 		throw new UnsupportedOperationException();
 	}

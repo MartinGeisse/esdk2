@@ -138,9 +138,8 @@ public class VerilogGenerator {
 						declareSignal(signal);
 					}
 
-					// Analyze signals for sub-expressions by calling a "dry-run" printing process. While this sounds more complex,
-					// it concentrates the complexity here, in one place, and simplifies the RtlSignal implementations.
-					signal.printVerilogImplementationExpression(fakeExpressionWriter);
+					// analyze signals for shared sub-expressions
+					signal.analyzeSignalUsage(this);
 
 				}
 

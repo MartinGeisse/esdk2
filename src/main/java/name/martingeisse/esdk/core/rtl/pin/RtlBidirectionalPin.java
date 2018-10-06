@@ -56,6 +56,13 @@ public final class RtlBidirectionalPin extends RtlPin implements RtlBitSignal {
 	// ----------------------------------------------------------------------------------------------------------------
 
 	@Override
+	public void analyzeSignalUsage(SignalUsageConsumer consumer) {
+		// We analyze the output and output-enable signals in a separate VerilogContribution.
+		// This is correct; we cannot analyze them here because those usages should be analyzed
+		// regardless of whether the pin's input signal is used anywhere.
+	}
+
+	@Override
 	public void printVerilogImplementationExpression(VerilogExpressionWriter out) {
 		throw new UnsupportedOperationException();
 	}

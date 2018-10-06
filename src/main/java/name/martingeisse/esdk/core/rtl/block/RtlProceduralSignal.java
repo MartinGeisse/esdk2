@@ -8,10 +8,7 @@ import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.block.statement.RtlAssignmentTarget;
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.EmptyVerilogContribution;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.*;
 
 /**
  *
@@ -52,6 +49,12 @@ public abstract class RtlProceduralSignal extends RtlItem implements RtlSignal, 
 	@Override
 	public final void printVerilogAssignmentTarget(VerilogWriter out) {
 		out.print(this);
+	}
+
+	@Override
+	public void analyzeSignalUsage(SignalUsageConsumer consumer) {
+		// procedural signals themselves don't use other signals; the assignments that
+		// assign values to them do.
 	}
 
 	@Override

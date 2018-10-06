@@ -5,6 +5,7 @@
 package name.martingeisse.esdk.core.rtl.module;
 
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.SignalUsageConsumer;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
 
 /**
@@ -17,6 +18,11 @@ public abstract class RtlInstanceOutputPort extends RtlInstancePort implements R
 	}
 
 	public abstract RtlSignal getSimulationSignal();
+
+	@Override
+	public void analyzeSignalUsage(SignalUsageConsumer consumer) {
+		// Instance output ports don't use other signals during synthesis -- the simulation signal gets ignored for that.
+	}
 
 	@Override
 	public final void printVerilogImplementationExpression(VerilogExpressionWriter out) {

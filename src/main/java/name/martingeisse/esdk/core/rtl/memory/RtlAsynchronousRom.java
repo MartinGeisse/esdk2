@@ -138,6 +138,11 @@ public final class RtlAsynchronousRom extends RtlItem {
 			return new EmptyVerilogContribution();
 		}
 
+		// TODO ???
+//		@Override
+//		public void analyzeSignalUsage(SignalUsageConsumer consumer) {
+//		}
+
 		@Override
 		public void printVerilogImplementationExpression(VerilogExpressionWriter out) {
 			// this signal should be declared without assignment, so this method should never be called
