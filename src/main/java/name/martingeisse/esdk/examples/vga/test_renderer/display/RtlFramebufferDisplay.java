@@ -39,6 +39,7 @@ public final class RtlFramebufferDisplay extends RtlItem implements FramebufferD
 	public void setWriteStrobeSignal(RtlBitSignal writeStrobeSignal) {
 		framebuffer.setWriteEnableSignal(writeStrobeSignal);
 		addressSelector.setConnected(writeStrobeSignal);
+		updateFramebufferAddressSignal();
 	}
 
 	public void setWriteAddressSignal(RtlVectorSignal writeAddressSignal) {

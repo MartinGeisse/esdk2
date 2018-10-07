@@ -63,6 +63,9 @@ public final class Matrix {
 		String allZeros = StringUtils.repeat('0', matrixDigitCount);
 		for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
 			VectorValue row = rows[rowIndex];
+			if (row == null) {
+				row = defaultRowValue;
+			}
 			String digits = row.getDigits();
 			String zeros = allZeros.substring(digits.length());
 			out.print(zeros);

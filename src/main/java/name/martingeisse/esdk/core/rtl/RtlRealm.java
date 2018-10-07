@@ -102,6 +102,8 @@ public final class RtlRealm extends Item {
 	// factory methods
 	// ----------------------------------------------------------------------------------------------------------------
 
+	// TODO synthesis should perform plausibility checks such as if the clock source is constant, to avoid looking for
+	// errors in the generated code which is hard to read.
 	public RtlClockNetwork createClockNetwork(RtlBitSignal clockSignal) {
 		return new RtlClockNetwork(this, clockSignal);
 	}

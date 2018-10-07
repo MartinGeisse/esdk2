@@ -40,7 +40,7 @@ public class RtlRamdacDesign extends Design {
 		int heightBits = 7;
 
 		realm = new RtlRealm(this);
-		clock = realm.createClockNetwork(new RtlBitConstant(realm, false));
+		clock = realm.createClockNetwork(clockPin(realm));
 		testRenderer = new TestRenderer(realm, clock, widthBits, heightBits);
 
 		display = new RtlFramebufferDisplay(clock, widthBits, heightBits);
