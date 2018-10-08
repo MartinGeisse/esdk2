@@ -1,12 +1,12 @@
-package name.martingeisse.esdk.examples.vga.test_renderer.display;
+package name.martingeisse.esdk.examples.vga.test_renderer.sim;
 
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlClockedItem;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.EmptyVerilogContribution;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
+import name.martingeisse.esdk.examples.vga.test_renderer.FramebufferDisplay;
 
 import java.awt.image.BufferedImage;
 

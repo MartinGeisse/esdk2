@@ -1,4 +1,4 @@
-package name.martingeisse.esdk.examples.vga.test_renderer.display;
+package name.martingeisse.esdk.examples.vga.test_renderer;
 
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlItem;
@@ -10,6 +10,7 @@ import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.signal.connector.RtlBitSignalConnector;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.EmptyVerilogContribution;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
+import name.martingeisse.esdk.examples.vga.test_renderer.FramebufferDisplay;
 
 /**
  * Simple but wrong implementation that won't delay a write when reading pixels, instead writing correctly and

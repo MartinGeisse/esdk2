@@ -2,7 +2,7 @@
  * Copyright (c) 2018 Martin Geisse
  * This file is distributed under the terms of the MIT license.
  */
-package name.martingeisse.esdk.examples.vga.test_renderer.display;
+package name.martingeisse.esdk.examples.vga.test_renderer.sim;
 
 import name.martingeisse.esdk.core.util.Matrix;
 
