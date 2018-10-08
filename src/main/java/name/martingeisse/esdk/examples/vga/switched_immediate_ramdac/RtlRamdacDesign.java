@@ -22,17 +22,15 @@ import name.martingeisse.esdk.examples.vga.VgaTimer;
  */
 public class RtlRamdacDesign extends Design {
 
-	public static final int widthBits = 7;
-	public static final int heightBits = 7;
+	public static final int WIDTH_BITS = 7;
+	public static final int HEIGHT_BITS = 7;
 
 	private final RtlRealm realm;
 	private final RtlClockNetwork clock;
 	private final TestRenderer testRenderer;
 	private final VgaTimer vgaTimer;
-
+	private final RtlVectorSignal dacAddressSignal;
 	private final RtlSynchronousRam framebuffer;
-	private RtlVectorSignal writeAddressSignal;
-	private RtlVectorSignal dacAddressSignal;
 
 	private final RtlOutputPin r;
 	private final RtlOutputPin g;
@@ -44,18 +42,17 @@ public class RtlRamdacDesign extends Design {
 
 		realm = new RtlRealm(this);
 		clock = realm.createClockNetwork(clockPin(realm));
-		testRenderer = new TestRenderer(realm, clock, widthBits, heightBits);
+		testRenderer = new TestRenderer(realm, clock, WIDTH_BITS, HEIGHT_BITS);
 		vgaTimer = new VgaTimer(clock);
+		dacAddressSignal = new RtlConcatenation(realm, vgaTimer.getY().select(7, 1), vgaTimer.getX().select(7, 1));
 
 		// Note: rows and columns of the frame are not rows and columns of the RAM. Instead, the RAM
 		// has one row per pixel and 3 columns (bits) for the 3 color channels.
-		RtlBitSignal displayWriteStrobe = testRenderer.getCpu().getWriteStrobe().and(testRenderer.getCpu().getPortAddress().select(0));
-		writeAddressSignal = new RtlConcatenation(getRealm(), testRenderer.getRowRegister(), testRenderer.getColumnRegister());
-		dacAddressSignal = new RtlConcatenation(realm, vgaTimer.getY().select(7, 1), vgaTimer.getX().select(7, 1));
-		framebuffer = new RtlSynchronousRam(clock, 1 << (widthBits + heightBits), 3);
-		framebuffer.setWriteEnableSignal(displayWriteStrobe);
-		framebuffer.setWriteDataSignal(testRenderer.getCpu().getOutputData().select(2, 0));
-		framebuffer.setAddressSignal(new RtlConditionalVectorOperation(getRealm(), displayWriteStrobe, writeAddressSignal, dacAddressSignal));
+		framebuffer = new RtlSynchronousRam(clock, 1 << (WIDTH_BITS + HEIGHT_BITS), 3);
+		framebuffer.setWriteEnableSignal(testRenderer.getWriteStrobe());
+		framebuffer.setWriteDataSignal(testRenderer.getWriteData().select(2, 0));
+		framebuffer.setAddressSignal(new RtlConditionalVectorOperation(getRealm(), testRenderer.getWriteStrobe(),
+			testRenderer.getWriteAddress(), dacAddressSignal));
 
 		// VGA interface
 		RtlVectorSignal dacReadData = framebuffer.getReadDataSignal();

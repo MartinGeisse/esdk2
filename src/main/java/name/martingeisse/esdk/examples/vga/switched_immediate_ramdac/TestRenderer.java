@@ -6,9 +6,7 @@ import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.block.RtlClockedBlock;
 import name.martingeisse.esdk.core.rtl.block.RtlProceduralVectorSignal;
 import name.martingeisse.esdk.core.rtl.block.statement.RtlStatementBuilder;
-import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
-import name.martingeisse.esdk.core.rtl.signal.RtlConcatenation;
-import name.martingeisse.esdk.core.rtl.signal.RtlVectorConstant;
+import name.martingeisse.esdk.core.rtl.signal.*;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.EmptyVerilogContribution;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
@@ -22,6 +20,9 @@ public final class TestRenderer extends RtlItem {
 	private final PicoblazeRtlWithAssociatedProgram cpu;
 	private final RtlProceduralVectorSignal columnRegister;
 	private final RtlProceduralVectorSignal rowRegister;
+	private final RtlBitSignal writeStrobe;
+	private final RtlVectorSignal writeAddress;
+	private final RtlVectorSignal writeData;
 
 	public TestRenderer(RtlRealm realm, RtlClockNetwork clock, int widthBits, int heightBits) {
 		super(realm);
@@ -82,18 +83,21 @@ public final class TestRenderer extends RtlItem {
 		cpu.setPortInputDataSignal(new RtlVectorConstant(realm, VectorValue.ofUnsigned(8, 0)));
 		cpu.setResetSignal(new RtlBitConstant(realm, false));
 
+		writeStrobe = cpu.getWriteStrobe().and(cpu.getPortAddress().select(0));
+		writeAddress = new RtlConcatenation(getRealm(), rowRegister, columnRegister);
+		writeData = cpu.getOutputData().select(2, 0);
 	}
 
-	public RtlProceduralVectorSignal getRowRegister() {
-		return rowRegister;
+	public RtlBitSignal getWriteStrobe() {
+		return writeStrobe;
 	}
 
-	public RtlProceduralVectorSignal getColumnRegister() {
-		return columnRegister;
+	public RtlVectorSignal getWriteAddress() {
+		return writeAddress;
 	}
 
-	public PicoblazeRtlWithAssociatedProgram getCpu() {
-		return cpu;
+	public RtlVectorSignal getWriteData() {
+		return writeData;
 	}
 
 	@Override
