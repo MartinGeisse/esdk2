@@ -4,6 +4,7 @@ import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.block.RtlClockedBlock;
+import name.martingeisse.esdk.core.rtl.block.RtlProceduralBitSignal;
 import name.martingeisse.esdk.core.rtl.block.RtlProceduralVectorSignal;
 import name.martingeisse.esdk.core.rtl.block.statement.RtlStatementBuilder;
 import name.martingeisse.esdk.core.rtl.signal.*;
@@ -20,6 +21,7 @@ public final class TestRenderer extends RtlItem {
 	private final PicoblazeRtlWithAssociatedProgram cpu;
 	private final RtlProceduralVectorSignal columnRegister;
 	private final RtlProceduralVectorSignal rowRegister;
+	private final RtlProceduralBitSignal framebufferRamdacSwitch;
 	private final RtlBitSignal framebufferWriteStrobe;
 	private final RtlVectorSignal framebufferWriteAddress;
 	private final RtlVectorSignal framebufferWriteData;
@@ -32,8 +34,10 @@ public final class TestRenderer extends RtlItem {
 			RtlClockedBlock block = new RtlClockedBlock(clock);
 			columnRegister = block.createVector(widthBits);
 			rowRegister = block.createVector(heightBits);
+			framebufferRamdacSwitch = block.createBit();
 			block.getInitializerStatements().assign(columnRegister, VectorValue.ofUnsigned(widthBits, 0));
 			block.getInitializerStatements().assign(rowRegister, VectorValue.ofUnsigned(heightBits, 0));
+			block.getInitializerStatements().assign(framebufferRamdacSwitch, false);
 
 			RtlStatementBuilder builder = block.getStatements().builder();
 			builder.when(cpu.getWriteStrobe());
@@ -76,6 +80,9 @@ public final class TestRenderer extends RtlItem {
 					builder.endWhen();
 				}
 				builder.endWhen();
+				builder.when(cpu.getPortAddress().select(3));
+				builder.assign(framebufferRamdacSwitch, cpu.getOutputData().select(0));
+				builder.endWhen();
 			}
 			builder.endWhen();
 		}
@@ -98,6 +105,10 @@ public final class TestRenderer extends RtlItem {
 
 	public RtlVectorSignal getFramebufferWriteData() {
 		return framebufferWriteData;
+	}
+
+	public RtlProceduralBitSignal getFramebufferRamdacSwitch() {
+		return framebufferRamdacSwitch;
 	}
 
 	@Override

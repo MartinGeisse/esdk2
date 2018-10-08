@@ -51,8 +51,8 @@ public class RtlRamdacDesign extends Design {
 		framebuffer = new RtlSynchronousRam(clock, 1 << (WIDTH_BITS + HEIGHT_BITS), 3);
 		framebuffer.setWriteEnableSignal(testRenderer.getFramebufferWriteStrobe());
 		framebuffer.setWriteDataSignal(testRenderer.getFramebufferWriteData().select(2, 0));
-		framebuffer.setAddressSignal(new RtlConditionalVectorOperation(getRealm(), testRenderer.getFramebufferWriteStrobe(),
-			testRenderer.getFramebufferWriteAddress(), dacAddressSignal));
+		framebuffer.setAddressSignal(new RtlConditionalVectorOperation(getRealm(), testRenderer.getFramebufferRamdacSwitch(),
+			dacAddressSignal, testRenderer.getFramebufferWriteAddress()));
 
 		// VGA interface
 		RtlVectorSignal dacReadData = framebuffer.getReadDataSignal();
