@@ -49,10 +49,10 @@ public class RtlRamdacDesign extends Design {
 		// Note: rows and columns of the frame are not rows and columns of the RAM. Instead, the RAM
 		// has one row per pixel and 3 columns (bits) for the 3 color channels.
 		framebuffer = new RtlSynchronousRam(clock, 1 << (WIDTH_BITS + HEIGHT_BITS), 3);
-		framebuffer.setWriteEnableSignal(testRenderer.getWriteStrobe());
-		framebuffer.setWriteDataSignal(testRenderer.getWriteData().select(2, 0));
-		framebuffer.setAddressSignal(new RtlConditionalVectorOperation(getRealm(), testRenderer.getWriteStrobe(),
-			testRenderer.getWriteAddress(), dacAddressSignal));
+		framebuffer.setWriteEnableSignal(testRenderer.getFramebufferWriteStrobe());
+		framebuffer.setWriteDataSignal(testRenderer.getFramebufferWriteData().select(2, 0));
+		framebuffer.setAddressSignal(new RtlConditionalVectorOperation(getRealm(), testRenderer.getFramebufferWriteStrobe(),
+			testRenderer.getFramebufferWriteAddress(), dacAddressSignal));
 
 		// VGA interface
 		RtlVectorSignal dacReadData = framebuffer.getReadDataSignal();

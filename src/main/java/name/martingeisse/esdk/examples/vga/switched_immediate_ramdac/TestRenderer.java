@@ -20,9 +20,9 @@ public final class TestRenderer extends RtlItem {
 	private final PicoblazeRtlWithAssociatedProgram cpu;
 	private final RtlProceduralVectorSignal columnRegister;
 	private final RtlProceduralVectorSignal rowRegister;
-	private final RtlBitSignal writeStrobe;
-	private final RtlVectorSignal writeAddress;
-	private final RtlVectorSignal writeData;
+	private final RtlBitSignal framebufferWriteStrobe;
+	private final RtlVectorSignal framebufferWriteAddress;
+	private final RtlVectorSignal framebufferWriteData;
 
 	public TestRenderer(RtlRealm realm, RtlClockNetwork clock, int widthBits, int heightBits) {
 		super(realm);
@@ -83,21 +83,21 @@ public final class TestRenderer extends RtlItem {
 		cpu.setPortInputDataSignal(new RtlVectorConstant(realm, VectorValue.ofUnsigned(8, 0)));
 		cpu.setResetSignal(new RtlBitConstant(realm, false));
 
-		writeStrobe = cpu.getWriteStrobe().and(cpu.getPortAddress().select(0));
-		writeAddress = new RtlConcatenation(getRealm(), rowRegister, columnRegister);
-		writeData = cpu.getOutputData().select(2, 0);
+		framebufferWriteStrobe = cpu.getWriteStrobe().and(cpu.getPortAddress().select(0));
+		framebufferWriteAddress = new RtlConcatenation(getRealm(), rowRegister, columnRegister);
+		framebufferWriteData = cpu.getOutputData().select(2, 0);
 	}
 
-	public RtlBitSignal getWriteStrobe() {
-		return writeStrobe;
+	public RtlBitSignal getFramebufferWriteStrobe() {
+		return framebufferWriteStrobe;
 	}
 
-	public RtlVectorSignal getWriteAddress() {
-		return writeAddress;
+	public RtlVectorSignal getFramebufferWriteAddress() {
+		return framebufferWriteAddress;
 	}
 
-	public RtlVectorSignal getWriteData() {
-		return writeData;
+	public RtlVectorSignal getFramebufferWriteData() {
+		return framebufferWriteData;
 	}
 
 	@Override
