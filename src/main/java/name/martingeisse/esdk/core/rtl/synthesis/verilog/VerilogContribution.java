@@ -13,7 +13,11 @@ public interface VerilogContribution {
 
 	void analyzeSignalUsage(SignalUsageConsumer consumer);
 
-	void analyzePins(PinConsumer consumer);
+	default void analyzePins(PinConsumer consumer) {
+	}
+
+	default void printDeclarations(VerilogWriter out) {
+	}
 
 	void printImplementation(VerilogWriter out);
 

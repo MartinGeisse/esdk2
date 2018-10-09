@@ -22,6 +22,10 @@ public final class EmptyVerilogContribution implements VerilogContribution {
 	}
 
 	@Override
+	public void printDeclarations(VerilogWriter out) {
+	}
+
+	@Override
 	public void printImplementation(VerilogWriter writer) {
 	}
 

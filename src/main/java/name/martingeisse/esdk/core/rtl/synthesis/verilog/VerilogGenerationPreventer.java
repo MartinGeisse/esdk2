@@ -25,6 +25,11 @@ public final class VerilogGenerationPreventer implements VerilogContribution {
 	}
 
 	@Override
+	public void printDeclarations(VerilogWriter out) {
+		fail();
+	}
+
+	@Override
 	public void printImplementation(VerilogWriter out) {
 		fail();
 	}

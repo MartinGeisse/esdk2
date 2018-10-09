@@ -136,10 +136,6 @@ public final class RtlModuleInstance extends RtlItem {
 			}
 
 			@Override
-			public void analyzePins(PinConsumer consumer) {
-			}
-
-			@Override
 			public void printImplementation(VerilogWriter out) {
 				out.print(moduleName + ' ' + instanceName + '(');
 				boolean firstPort = true;

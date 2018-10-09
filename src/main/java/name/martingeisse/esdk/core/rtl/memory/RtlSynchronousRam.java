@@ -78,10 +78,6 @@ public final class RtlSynchronousRam extends RtlAbstractSynchronousRam {
 			}
 
 			@Override
-			public void analyzePins(PinConsumer consumer) {
-			}
-
-			@Override
 			public void printImplementation(VerilogWriter out) {
 				Matrix matrix = getMatrix();
 

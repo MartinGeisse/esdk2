@@ -66,10 +66,6 @@ public final class RtlAsynchronousRom extends RtlItem {
 			}
 
 			@Override
-			public void analyzePins(PinConsumer consumer) {
-			}
-
-			@Override
 			public void printImplementation(VerilogWriter out) {
 
 				// TODO

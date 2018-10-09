@@ -103,11 +103,6 @@ public final class RtlClockedBlock extends RtlClockedItem {
 			}
 
 			@Override
-			public void analyzePins(PinConsumer consumer) {
-
-			}
-
-			@Override
 			public void printImplementation(VerilogWriter out) {
 
 				out.indent();

@@ -93,10 +93,6 @@ public final class RtlSynchronousRom extends RtlClockedItem {
 			}
 
 			@Override
-			public void analyzePins(PinConsumer consumer) {
-			}
-
-			@Override
 			public void printImplementation(VerilogWriter out) {
 
 				// memory
