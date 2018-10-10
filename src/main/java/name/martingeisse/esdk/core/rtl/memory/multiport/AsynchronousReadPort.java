@@ -55,8 +55,20 @@ public final class AsynchronousReadPort extends RtlItem implements MemoryPort {
 	}
 
 	@Override
+	public void prepareSynthesis(SynthesisPreparationContext context) {
+	}
+
+	@Override
 	public void analyzeSignalUsage(SignalUsageConsumer consumer) {
 		consumer.consumeSignalUsage(addressSignal, VerilogExpressionNesting.SIGNALS_AND_CONSTANTS);
+	}
+
+	@Override
+	public void printDeclarations(VerilogWriter out) {
+	}
+
+	@Override
+	public void printImplementation(VerilogWriter out) {
 	}
 
 	final class ReadDataSignal extends RtlItem implements RtlVectorSignal {

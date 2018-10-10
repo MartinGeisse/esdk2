@@ -6,10 +6,7 @@ import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.EmptyVerilogContribution;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionNesting;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.*;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 
 /**
@@ -196,11 +193,8 @@ public final class SynchronousPort extends RtlClockedItem implements MemoryPort 
 
 		@Override
 		public void printVerilogImplementationExpression(VerilogExpressionWriter out) {
-			// TODO
-//			out.print(memory.getMemorySignal(), VerilogExpressionNesting.ALL);
-//			out.print('[');
-//			out.print(addressSignal, VerilogExpressionNesting.ALL);
-//			out.print(']');
+			// this signal must have been declared
+			throw new UnsupportedOperationException("cannot write implementation expression for synchronous read data");
 		}
 
 	}
@@ -224,12 +218,43 @@ public final class SynchronousPort extends RtlClockedItem implements MemoryPort 
 
 	@Override
 	public void updateState() {
-		TODO
+		if (!sampledClockEnable) {
+			// inactive
+			return;
+		}
+		int rowIndex = sampledAddress.getAsUnsignedInt();
+		VectorValue currentSynchronousReadResult = memory.getMatrix().getRow(rowIndex);
+		if (writeSupport != WriteSupport.SYNCHRONOUS || !sampledWriteEnable) {
+			// read
+			synchronousReadData = currentSynchronousReadResult;
+			return;
+		}
+		// write
+		memory.getMatrix().setRow(rowIndex, sampledWriteData);
+		switch (readWriteInteractionMode) {
+
+			case NO_READ:
+				break;
+
+			case READ_FIRST:
+				synchronousReadData = currentSynchronousReadResult;
+				break;
+
+			case WRITE_FIRST:
+				synchronousReadData = sampledWriteData;
+				break;
+
+		}
 	}
 
 	// ----------------------------------------------------------------------------------------------------------------
 	// Verilog generation
 	// ----------------------------------------------------------------------------------------------------------------
+
+	@Override
+	public VerilogContribution getVerilogContribution() {
+		return new EmptyVerilogContribution();
+	}
 
 	@Override
 	public void validate() {
@@ -244,6 +269,116 @@ public final class SynchronousPort extends RtlClockedItem implements MemoryPort 
 		if (writeSupport == WriteSupport.NONE && writeDataSignal != null) {
 			throw new IllegalStateException("synchronous memory port with write data signal but no write support");
 		}
+	}
+
+	@Override
+	public void prepareSynthesis(SynthesisPreparationContext context) {
+		if (readSupport == ReadSupport.SYNCHRONOUS) {
+			context.declareSignal(readDataSignal, "s", true, VerilogSignalKind.REG, false);
+		}
+	}
+
+	@Override
+	public void analyzeSignalUsage(SignalUsageConsumer consumer) {
+		consumer.consumeSignalUsage(clockEnableSignal, VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
+		consumer.consumeSignalUsage(writeEnableSignal, VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
+		consumer.consumeSignalUsage(addressSignal, VerilogExpressionNesting.SIGNALS_AND_CONSTANTS);
+		consumer.consumeSignalUsage(writeDataSignal, VerilogExpressionNesting.SIGNALS_AND_CONSTANTS);
+	}
+
+	@Override
+	public void printDeclarations(VerilogWriter out) {
+	}
+
+	@Override
+	public void printImplementation(VerilogWriter out) {
+
+		// begin synchronous block
+		out.indent();
+		out.print("always @(posedge ");
+		out.print(getClockNetwork().getClockSignal());
+		out.println(") begin");
+		out.startIndentation();
+
+		// read/write logic
+		printBeginEnable(out, clockEnableSignal);
+		if (readSupport == ReadSupport.SYNCHRONOUS && writeSupport == WriteSupport.SYNCHRONOUS && readWriteInteractionMode != ReadWriteInteractionMode.READ_FIRST) {
+			if (writeEnableSignal == null) {
+				throw new UnsupportedOperationException("printInteractingPorts() called without write enable -- " +
+					"this is legal in principle but pointless, and therefore currently not supported");
+			}
+			printBeginEnable(out, writeEnableSignal);
+			printWriteStatement(out);
+			if (readWriteInteractionMode == ReadWriteInteractionMode.WRITE_FIRST) {
+				printReadFromWriteStatement(out);
+			}
+			out.indent();
+			out.println("end else begin");
+			printReadStatement(out);
+			printEndEnable(out, writeEnableSignal);
+		} else {
+			if (readSupport == ReadSupport.SYNCHRONOUS) {
+				printReadStatement(out);
+			}
+			if (writeSupport == WriteSupport.SYNCHRONOUS) {
+				printBeginEnable(out, writeEnableSignal);
+				printWriteStatement(out);
+				printEndEnable(out, writeEnableSignal);
+			}
+		}
+		printEndEnable(out, clockEnableSignal);
+
+		// end synchronous block
+		out.endIndentation();
+		out.indent();
+		out.println("end");
+
+	}
+
+	private void printBeginEnable(VerilogWriter out, RtlBitSignal enable) {
+		if (enable != null) {
+			out.indent();
+			out.print("if (");
+			out.print(enable);
+			out.println(") begin");
+			out.startIndentation();
+		}
+	}
+
+	private void printEndEnable(VerilogWriter out, RtlBitSignal enable) {
+		if (enable != null) {
+			out.endIndentation();
+			out.indent();
+			out.println("end");
+		}
+	}
+
+	private void printReadStatement(VerilogWriter out) {
+		out.indent();
+		out.print(readDataSignal);
+		out.print(" <= ");
+		out.print(memory.getMemorySignal());
+		out.print('[');
+		out.print(getAddressSignal());
+		out.println("];");
+	}
+
+	private void printWriteStatement(VerilogWriter out) {
+		out.indent();
+		out.print(memory.getMemorySignal());
+		out.print('[');
+		out.print(getAddressSignal());
+		out.print("] <= ");
+		out.print(writeDataSignal);
+		out.println(';');
+	}
+
+	private void printReadFromWriteStatement(VerilogWriter out) {
+		out.indent();
+		out.print(readDataSignal);
+		out.print(" <= ");
+		out.print(writeDataSignal);
+		out.println("];");
 	}
 
 }

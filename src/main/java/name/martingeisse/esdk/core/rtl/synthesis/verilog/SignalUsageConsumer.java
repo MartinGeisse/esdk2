@@ -11,6 +11,7 @@ import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
  */
 public interface SignalUsageConsumer {
 
+	// note: signal may be null for convenience -- in that case, this method has no effect
 	void consumeSignalUsage(RtlSignal signal, VerilogExpressionNesting nesting);
 
 	VerilogExpressionWriter getFakeExpressionWriter();

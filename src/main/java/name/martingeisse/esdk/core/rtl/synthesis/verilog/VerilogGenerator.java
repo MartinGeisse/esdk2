@@ -124,6 +124,11 @@ public class VerilogGenerator {
 				@Override
 				public void consumeSignalUsage(RtlSignal signal, VerilogExpressionNesting nesting) {
 
+					// for convenience, so this "if" does not have to be repeated over and over again
+					if (signal == null) {
+						return;
+					}
+
 					// Extract all signals that are used in more than one place. Those have been analyzed already when we found them
 					// the first time.
 					if (!analyzedSignals.add(signal)) {
@@ -213,6 +218,10 @@ public class VerilogGenerator {
 				out.print(namedSignal.name);
 				out.println(';');
 			}
+		}
+		out.println();
+		for (VerilogContribution contribution : contributions) {
+			contribution.printDeclarations(out);
 		}
 		out.println();
 		for (Map.Entry<RtlSignal, NamedSignal> signalEntry : namedSignals.entrySet()) {
