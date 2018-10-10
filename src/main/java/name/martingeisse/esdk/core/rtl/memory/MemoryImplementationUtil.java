@@ -1,4 +1,4 @@
-package name.martingeisse.esdk.core.rtl.memory.multiport;
+package name.martingeisse.esdk.core.rtl.memory;
 
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.AuxiliaryFileFactory;

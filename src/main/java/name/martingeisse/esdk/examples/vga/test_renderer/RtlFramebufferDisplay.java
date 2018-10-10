@@ -2,8 +2,8 @@ package name.martingeisse.esdk.examples.vga.test_renderer;
 
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlItem;
-import name.martingeisse.esdk.core.rtl.memory.multiport.RtlMultiportMemory;
-import name.martingeisse.esdk.core.rtl.memory.multiport.RtlSynchronousMemoryPort;
+import name.martingeisse.esdk.core.rtl.memory.RtlMemory;
+import name.martingeisse.esdk.core.rtl.memory.RtlSynchronousMemoryPort;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlConditionalVectorOperation;
@@ -20,7 +20,7 @@ public final class RtlFramebufferDisplay extends RtlItem implements FramebufferD
 
 	private final int widthBits;
 	private final int heightBits;
-	private final RtlMultiportMemory framebuffer;
+	private final RtlMemory framebuffer;
 	private final RtlSynchronousMemoryPort framebufferPort;
 	private final RtlBitSignal readySignal;
 	private RtlVectorSignal writeAddressSignal;
@@ -33,7 +33,7 @@ public final class RtlFramebufferDisplay extends RtlItem implements FramebufferD
 		this.heightBits = heightBits;
 		// Note: rows and columns of the frame are not rows and columns of the RAM. Instead, the RAM
 		// has one row per pixel and 3 columns (bits) for the 3 color channels.
-		this.framebuffer = new RtlMultiportMemory(getRealm(), 1 << (widthBits + heightBits), 3);
+		this.framebuffer = new RtlMemory(getRealm(), 1 << (widthBits + heightBits), 3);
 		this.framebufferPort = framebuffer.createSynchronousPort(clockNetwork,
 			RtlSynchronousMemoryPort.ReadSupport.SYNCHRONOUS,
 			RtlSynchronousMemoryPort.WriteSupport.SYNCHRONOUS,
@@ -82,7 +82,7 @@ public final class RtlFramebufferDisplay extends RtlItem implements FramebufferD
 		return readySignal;
 	}
 
-	public RtlMultiportMemory getFramebuffer() {
+	public RtlMemory getFramebuffer() {
 		return framebuffer;
 	}
 

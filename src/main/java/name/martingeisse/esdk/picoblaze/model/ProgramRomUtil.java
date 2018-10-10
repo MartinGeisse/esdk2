@@ -1,7 +1,7 @@
 package name.martingeisse.esdk.picoblaze.model;
 
 import name.martingeisse.esdk.core.rtl.RtlRealm;
-import name.martingeisse.esdk.core.rtl.memory.multiport.RtlMultiportMemory;
+import name.martingeisse.esdk.core.rtl.memory.RtlMemory;
 import name.martingeisse.esdk.core.util.Matrix;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 import name.martingeisse.esdk.picoblaze.model.instruction.AssociatedPicoblazeProgram;
@@ -15,8 +15,8 @@ public final class ProgramRomUtil {
 	private ProgramRomUtil() {
 	}
 
-	public static RtlMultiportMemory loadAssociatedProgramRom(RtlRealm realm, Class<?> anchorClass, String programSuffix) {
-		RtlMultiportMemory rom = new RtlMultiportMemory(realm, 1024, 18);
+	public static RtlMemory loadAssociatedProgramRom(RtlRealm realm, Class<?> anchorClass, String programSuffix) {
+		RtlMemory rom = new RtlMemory(realm, 1024, 18);
 		loadAssociatedProgramRom(rom.getMatrix(), anchorClass, programSuffix);
 		return rom;
 	}

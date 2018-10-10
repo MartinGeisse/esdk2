@@ -7,8 +7,8 @@ package name.martingeisse.esdk.examples.vga.switched_immediate_ramdac;
 import name.martingeisse.esdk.core.model.Design;
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
-import name.martingeisse.esdk.core.rtl.memory.multiport.RtlMultiportMemory;
-import name.martingeisse.esdk.core.rtl.memory.multiport.RtlSynchronousMemoryPort;
+import name.martingeisse.esdk.core.rtl.memory.RtlMemory;
+import name.martingeisse.esdk.core.rtl.memory.RtlSynchronousMemoryPort;
 import name.martingeisse.esdk.core.rtl.pin.RtlInputPin;
 import name.martingeisse.esdk.core.rtl.pin.RtlOutputPin;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
@@ -31,7 +31,7 @@ public class RtlRamdacDesign extends Design {
 	private final TestRenderer testRenderer;
 	private final VgaTimer vgaTimer;
 	private final RtlVectorSignal dacAddressSignal;
-	private final RtlMultiportMemory framebuffer;
+	private final RtlMemory framebuffer;
 	private final RtlSynchronousMemoryPort framebufferPort;
 
 	private final RtlOutputPin r;
@@ -50,7 +50,7 @@ public class RtlRamdacDesign extends Design {
 
 		// Note: rows and columns of the frame are not rows and columns of the RAM. Instead, the RAM
 		// has one row per pixel and 3 columns (bits) for the 3 color channels.
-		framebuffer = new RtlMultiportMemory(getRealm(), 1 << (WIDTH_BITS + HEIGHT_BITS), 3);
+		framebuffer = new RtlMemory(getRealm(), 1 << (WIDTH_BITS + HEIGHT_BITS), 3);
 		framebufferPort = framebuffer.createSynchronousPort(clock,
 			RtlSynchronousMemoryPort.ReadSupport.SYNCHRONOUS,
 			RtlSynchronousMemoryPort.WriteSupport.SYNCHRONOUS,

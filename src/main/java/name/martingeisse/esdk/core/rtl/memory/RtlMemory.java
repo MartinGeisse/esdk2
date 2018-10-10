@@ -1,4 +1,4 @@
-package name.martingeisse.esdk.core.rtl.memory.multiport;
+package name.martingeisse.esdk.core.rtl.memory;
 
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlItem;
@@ -13,13 +13,13 @@ import java.util.List;
 /**
  *
  */
-public final class RtlMultiportMemory extends RtlItem {
+public final class RtlMemory extends RtlItem {
 
 	private final Matrix matrix;
 	private final List<RtlMemoryPort> ports;
 	private final RtlSignal memorySignal;
 
-	public RtlMultiportMemory(RtlRealm realm, Matrix matrix) {
+	public RtlMemory(RtlRealm realm, Matrix matrix) {
 		super(realm);
 		this.matrix = matrix;
 		this.ports = new ArrayList<>();
@@ -32,13 +32,13 @@ public final class RtlMultiportMemory extends RtlItem {
 
 			@Override
 			public RtlItem getRtlItem() {
-				return RtlMultiportMemory.this;
+				return RtlMemory.this;
 			}
 
 		};
 	}
 
-	public RtlMultiportMemory(RtlRealm realm, int rowCount, int columnCount) {
+	public RtlMemory(RtlRealm realm, int rowCount, int columnCount) {
 		this(realm, new Matrix(rowCount, columnCount));
 	}
 

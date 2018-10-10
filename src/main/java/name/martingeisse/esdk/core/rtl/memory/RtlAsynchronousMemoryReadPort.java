@@ -1,4 +1,4 @@
-package name.martingeisse.esdk.core.rtl.memory.multiport;
+package name.martingeisse.esdk.core.rtl.memory;
 
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
@@ -11,17 +11,17 @@ import name.martingeisse.esdk.core.util.vector.VectorValue;
  */
 public final class RtlAsynchronousMemoryReadPort extends RtlItem implements RtlMemoryPort {
 
-	private final RtlMultiportMemory memory;
+	private final RtlMemory memory;
 	private final RtlVectorSignal readDataSignal;
 	private RtlVectorSignal addressSignal;
 
-	RtlAsynchronousMemoryReadPort(RtlMultiportMemory memory) {
+	RtlAsynchronousMemoryReadPort(RtlMemory memory) {
 		super(memory.getRealm());
 		this.memory = memory;
 		this.readDataSignal = new ReadDataSignal(getRealm());
 	}
 
-	public RtlMultiportMemory getMemory() {
+	public RtlMemory getMemory() {
 		return memory;
 	}
 

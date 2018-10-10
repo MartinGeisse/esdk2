@@ -7,8 +7,8 @@ package name.martingeisse.esdk.picoblaze.model.rtl;
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
-import name.martingeisse.esdk.core.rtl.memory.multiport.RtlMultiportMemory;
-import name.martingeisse.esdk.core.rtl.memory.multiport.RtlSynchronousMemoryPort;
+import name.martingeisse.esdk.core.rtl.memory.RtlMemory;
+import name.martingeisse.esdk.core.rtl.memory.RtlSynchronousMemoryPort;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.EmptyVerilogContribution;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
@@ -22,7 +22,7 @@ import name.martingeisse.esdk.picoblaze.model.ProgramRomUtil;
  */
 public class AssociatedPicoblazeProgramRom extends RtlItem {
 
-	private final RtlMultiportMemory rom;
+	private final RtlMemory rom;
 	private final RtlSynchronousMemoryPort romPort;
 
 	public AssociatedPicoblazeProgramRom(RtlRealm realm, RtlClockNetwork clockNetwork) {
@@ -54,7 +54,7 @@ public class AssociatedPicoblazeProgramRom extends RtlItem {
 		return romPort.getReadDataSignal();
 	}
 
-	public RtlMultiportMemory getRom() {
+	public RtlMemory getRom() {
 		return rom;
 	}
 

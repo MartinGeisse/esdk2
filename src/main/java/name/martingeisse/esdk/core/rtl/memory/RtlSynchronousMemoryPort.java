@@ -1,4 +1,4 @@
-package name.martingeisse.esdk.core.rtl.memory.multiport;
+package name.martingeisse.esdk.core.rtl.memory;
 
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlClockedItem;
@@ -14,7 +14,7 @@ import name.martingeisse.esdk.core.util.vector.VectorValue;
  */
 public final class RtlSynchronousMemoryPort extends RtlClockedItem implements RtlMemoryPort {
 
-	private final RtlMultiportMemory memory;
+	private final RtlMemory memory;
 	private final ReadSupport readSupport;
 	private final WriteSupport writeSupport;
 	private final ReadWriteInteractionMode readWriteInteractionMode;
@@ -32,7 +32,7 @@ public final class RtlSynchronousMemoryPort extends RtlClockedItem implements Rt
 	private VectorValue synchronousReadData;
 	private final RtlVectorSignal readDataSignal;
 
-	RtlSynchronousMemoryPort(RtlClockNetwork clock, RtlMultiportMemory memory,
+	RtlSynchronousMemoryPort(RtlClockNetwork clock, RtlMemory memory,
 							 ReadSupport readSupport, WriteSupport writeSupport,
 							 ReadWriteInteractionMode readWriteInteractionMode) {
 		super(clock);
@@ -67,7 +67,7 @@ public final class RtlSynchronousMemoryPort extends RtlClockedItem implements Rt
 		}
 	}
 
-	public RtlMultiportMemory getMemory() {
+	public RtlMemory getMemory() {
 		return memory;
 	}
 
