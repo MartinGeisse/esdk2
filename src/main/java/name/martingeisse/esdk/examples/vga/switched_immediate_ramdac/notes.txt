@@ -1,0 +1,19 @@
+
+RAMDAC buffer:
+
+KEIN komplette Signal-Buffer, also hsync/vsync am "hinteren ende" erzeugen. Ebenso wird die Zeilennummer am hinteren Ende
+neu erzeugt.
+
+soll heißen:
+
+vorderes Ende: liest je eine Zeile zur richtigen Zeit aus dem Framebuffer und schreibt sie in den Row-Buffer.
+hinteres Ende: liest je eine Zeile aus dem Row-Buffer, generiert blank, hsync, vsync.
+
+Das vordere Ende muss keine Sync-Signale kennen. Es muss aber die richtige Zeilennummer kennen. Idee:
+- Wechsel von Aktiv auf Blank triggert das increment des Zeilenzählers und das Auslesen einer Zeile
+- Wechsel von Vsync=0 auf Vsync=1 triggert den Reset des Zeilenzählers und das Auslesen einer Zeile. Letzteres ist
+	wichtig, da die Zeile 0 sonst fälschlicherweise vom Ende des Framebuffers geladen wird.
+
+Das ist ein einfaches Prinzip. Es wird zwar eine Zeile zu viel gelesen, die nicht angezeigt wird, aber egal. Dafür
+ist der Rest supereinfach.
+
