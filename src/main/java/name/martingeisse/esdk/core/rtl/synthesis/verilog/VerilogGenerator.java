@@ -67,8 +67,7 @@ public class VerilogGenerator {
 						signalKindForExplicitDeclarationOrNullForNoDeclaration,
 						generateAssignment
 					));
-
-					return null;
+					return name;
 				}
 
 				@Override

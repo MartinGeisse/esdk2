@@ -193,6 +193,10 @@ public final class RtlSynchronousMemoryPort extends RtlClockedItem implements Rt
 		}
 
 		@Override
+		public void analyzeSignalUsage(SignalUsageConsumer consumer) {
+		}
+
+		@Override
 		public void printVerilogImplementationExpression(VerilogExpressionWriter out) {
 			// this signal must have been declared
 			throw new UnsupportedOperationException("cannot write implementation expression for synchronous read data");
