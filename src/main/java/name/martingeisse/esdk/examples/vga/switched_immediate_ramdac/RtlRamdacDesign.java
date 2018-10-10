@@ -7,7 +7,8 @@ package name.martingeisse.esdk.examples.vga.switched_immediate_ramdac;
 import name.martingeisse.esdk.core.model.Design;
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
-import name.martingeisse.esdk.core.rtl.memory.RtlSynchronousRam;
+import name.martingeisse.esdk.core.rtl.memory.multiport.RtlMultiportMemory;
+import name.martingeisse.esdk.core.rtl.memory.multiport.RtlSynchronousMemoryPort;
 import name.martingeisse.esdk.core.rtl.pin.RtlInputPin;
 import name.martingeisse.esdk.core.rtl.pin.RtlOutputPin;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
@@ -30,7 +31,8 @@ public class RtlRamdacDesign extends Design {
 	private final TestRenderer testRenderer;
 	private final VgaTimer vgaTimer;
 	private final RtlVectorSignal dacAddressSignal;
-	private final RtlSynchronousRam framebuffer;
+	private final RtlMultiportMemory framebuffer;
+	private final RtlSynchronousMemoryPort framebufferPort;
 
 	private final RtlOutputPin r;
 	private final RtlOutputPin g;
@@ -48,14 +50,18 @@ public class RtlRamdacDesign extends Design {
 
 		// Note: rows and columns of the frame are not rows and columns of the RAM. Instead, the RAM
 		// has one row per pixel and 3 columns (bits) for the 3 color channels.
-		framebuffer = new RtlSynchronousRam(clock, 1 << (WIDTH_BITS + HEIGHT_BITS), 3);
-		framebuffer.setWriteEnableSignal(testRenderer.getFramebufferWriteStrobe());
-		framebuffer.setWriteDataSignal(testRenderer.getFramebufferWriteData().select(2, 0));
-		framebuffer.setAddressSignal(new RtlConditionalVectorOperation(getRealm(), testRenderer.getFramebufferRamdacSwitch(),
+		framebuffer = new RtlMultiportMemory(getRealm(), 1 << (WIDTH_BITS + HEIGHT_BITS), 3);
+		framebufferPort = framebuffer.createSynchronousPort(clock,
+			RtlSynchronousMemoryPort.ReadSupport.SYNCHRONOUS,
+			RtlSynchronousMemoryPort.WriteSupport.SYNCHRONOUS,
+			RtlSynchronousMemoryPort.ReadWriteInteractionMode.READ_FIRST);
+		framebufferPort.setWriteEnableSignal(testRenderer.getFramebufferWriteStrobe());
+		framebufferPort.setWriteDataSignal(testRenderer.getFramebufferWriteData().select(2, 0));
+		framebufferPort.setAddressSignal(new RtlConditionalVectorOperation(getRealm(), testRenderer.getFramebufferRamdacSwitch(),
 			dacAddressSignal, testRenderer.getFramebufferWriteAddress()));
 
 		// VGA interface
-		RtlVectorSignal dacReadData = framebuffer.getReadDataSignal();
+		RtlVectorSignal dacReadData = framebufferPort.getReadDataSignal();
 		RtlBitSignal blank = vgaTimer.getBlank().or(vgaTimer.getX().select(8)).or(vgaTimer.getX().select(9))
 			.or(vgaTimer.getY().select(8)).or(vgaTimer.getY().select(9));
 		RtlBitSignal active = blank.not();
