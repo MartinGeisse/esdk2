@@ -7,7 +7,7 @@ import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
 /**
  *
  */
-public interface MemoryPort {
+public interface RtlMemoryPort {
 
 	void validate();
 

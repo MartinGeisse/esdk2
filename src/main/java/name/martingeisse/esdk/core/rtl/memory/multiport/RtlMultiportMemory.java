@@ -16,7 +16,7 @@ import java.util.List;
 public final class RtlMultiportMemory extends RtlItem {
 
 	private final Matrix matrix;
-	private final List<MemoryPort> ports;
+	private final List<RtlMemoryPort> ports;
 	private final RtlSignal memorySignal;
 
 	public RtlMultiportMemory(RtlRealm realm, Matrix matrix) {
@@ -46,21 +46,21 @@ public final class RtlMultiportMemory extends RtlItem {
 		return matrix;
 	}
 
-	public Iterable<MemoryPort> getPorts() {
+	public Iterable<RtlMemoryPort> getPorts() {
 		return ports;
 	}
 
-	public AsynchronousReadPort createAsynchronousReadPort() {
-		AsynchronousReadPort port = new AsynchronousReadPort(this);
+	public RtlAsynchronousMemoryReadPort createAsynchronousReadPort() {
+		RtlAsynchronousMemoryReadPort port = new RtlAsynchronousMemoryReadPort(this);
 		ports.add(port);
 		return port;
 	}
 
-	public SynchronousPort createSynchronousPort(RtlClockNetwork clock,
-												 SynchronousPort.ReadSupport readSupport,
-												 SynchronousPort.WriteSupport writeSupport,
-												 SynchronousPort.ReadWriteInteractionMode readWriteInteractionMode) {
-		SynchronousPort port = new SynchronousPort(clock, this, readSupport, writeSupport, readWriteInteractionMode);
+	public RtlSynchronousMemoryPort createSynchronousPort(RtlClockNetwork clock,
+														  RtlSynchronousMemoryPort.ReadSupport readSupport,
+														  RtlSynchronousMemoryPort.WriteSupport writeSupport,
+														  RtlSynchronousMemoryPort.ReadWriteInteractionMode readWriteInteractionMode) {
+		RtlSynchronousMemoryPort port = new RtlSynchronousMemoryPort(clock, this, readSupport, writeSupport, readWriteInteractionMode);
 		ports.add(port);
 		return port;
 	}
@@ -81,19 +81,19 @@ public final class RtlMultiportMemory extends RtlItem {
 
 			@Override
 			public void prepareSynthesis(SynthesisPreparationContext context) {
-				for (MemoryPort port : ports) {
+				for (RtlMemoryPort port : ports) {
 					port.validate();
 				}
 				memoryName = context.declareSignal(memorySignal, "mem", true, null, false);
 				MemoryImplementationUtil.generateMif(context.getAuxiliaryFileFactory(), memoryName + ".mif", getMatrix());
-				for (MemoryPort port : ports) {
+				for (RtlMemoryPort port : ports) {
 					port.prepareSynthesis(context);
 				}
 			}
 
 			@Override
 			public void analyzeSignalUsage(SignalUsageConsumer consumer) {
-				for (MemoryPort port : ports) {
+				for (RtlMemoryPort port : ports) {
 					port.analyzeSignalUsage(consumer);
 				}
 			}
@@ -103,7 +103,7 @@ public final class RtlMultiportMemory extends RtlItem {
 				Matrix matrix = getMatrix();
 				out.println("reg [" + (matrix.getColumnCount() - 1) + ":0] " + memoryName + " [" +
 					(matrix.getRowCount() - 1) + ":0];");
-				for (MemoryPort port : ports) {
+				for (RtlMemoryPort port : ports) {
 					port.printDeclarations(out);
 				}
 			}
@@ -113,7 +113,7 @@ public final class RtlMultiportMemory extends RtlItem {
 				Matrix matrix = getMatrix();
 				out.println("initial $readmemh(\"" + memoryName + ".mif\", " + memoryName + ", 0, " +
 					(matrix.getRowCount() - 1) + ");\n");
-				for (MemoryPort port : ports) {
+				for (RtlMemoryPort port : ports) {
 					port.printImplementation(out);
 				}
 			}

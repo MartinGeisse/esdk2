@@ -12,7 +12,7 @@ import name.martingeisse.esdk.core.util.vector.VectorValue;
 /**
  *
  */
-public final class SynchronousPort extends RtlClockedItem implements MemoryPort {
+public final class RtlSynchronousMemoryPort extends RtlClockedItem implements RtlMemoryPort {
 
 	private final RtlMultiportMemory memory;
 	private final ReadSupport readSupport;
@@ -32,9 +32,9 @@ public final class SynchronousPort extends RtlClockedItem implements MemoryPort 
 	private VectorValue synchronousReadData;
 	private final RtlVectorSignal readDataSignal;
 
-	SynchronousPort(RtlClockNetwork clock, RtlMultiportMemory memory,
-					ReadSupport readSupport, WriteSupport writeSupport,
-					ReadWriteInteractionMode readWriteInteractionMode) {
+	RtlSynchronousMemoryPort(RtlClockNetwork clock, RtlMultiportMemory memory,
+							 ReadSupport readSupport, WriteSupport writeSupport,
+							 ReadWriteInteractionMode readWriteInteractionMode) {
 		super(clock);
 		if (readSupport == null) {
 			throw new IllegalArgumentException("readSupport is null");
@@ -56,6 +56,7 @@ public final class SynchronousPort extends RtlClockedItem implements MemoryPort 
 				break;
 
 			case SYNCHRONOUS:
+				synchronousReadData = VectorValue.ofUnsigned(memory.getMatrix().getColumnCount(), 0);
 				readDataSignal = new SynchronousReadDataSignal(getRealm());
 				break;
 

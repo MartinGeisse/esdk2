@@ -9,13 +9,13 @@ import name.martingeisse.esdk.core.util.vector.VectorValue;
 /**
  * Asynchronous read ports are special because they do not need a clock at all.
  */
-public final class AsynchronousReadPort extends RtlItem implements MemoryPort {
+public final class RtlAsynchronousMemoryReadPort extends RtlItem implements RtlMemoryPort {
 
 	private final RtlMultiportMemory memory;
 	private final RtlVectorSignal readDataSignal;
 	private RtlVectorSignal addressSignal;
 
-	AsynchronousReadPort(RtlMultiportMemory memory) {
+	RtlAsynchronousMemoryReadPort(RtlMultiportMemory memory) {
 		super(memory.getRealm());
 		this.memory = memory;
 		this.readDataSignal = new ReadDataSignal(getRealm());
