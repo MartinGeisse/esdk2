@@ -57,6 +57,18 @@ public final class RtlMultiportMemory extends RtlItem {
 	}
 
 	public RtlSynchronousMemoryPort createSynchronousPort(RtlClockNetwork clock,
+														  RtlSynchronousMemoryPort.ReadSupport readSupport) {
+		return createSynchronousPort(clock, readSupport, RtlSynchronousMemoryPort.WriteSupport.NONE,
+			RtlSynchronousMemoryPort.ReadWriteInteractionMode.READ_FIRST);
+	}
+
+	public RtlSynchronousMemoryPort createSynchronousPort(RtlClockNetwork clock,
+														  RtlSynchronousMemoryPort.WriteSupport writeSupport) {
+		return createSynchronousPort(clock, RtlSynchronousMemoryPort.ReadSupport.NONE, writeSupport,
+			RtlSynchronousMemoryPort.ReadWriteInteractionMode.READ_FIRST);
+	}
+
+	public RtlSynchronousMemoryPort createSynchronousPort(RtlClockNetwork clock,
 														  RtlSynchronousMemoryPort.ReadSupport readSupport,
 														  RtlSynchronousMemoryPort.WriteSupport writeSupport,
 														  RtlSynchronousMemoryPort.ReadWriteInteractionMode readWriteInteractionMode) {

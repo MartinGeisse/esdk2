@@ -7,7 +7,8 @@ package name.martingeisse.esdk.picoblaze.model.rtl;
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
-import name.martingeisse.esdk.core.rtl.memory.RtlSynchronousRom;
+import name.martingeisse.esdk.core.rtl.memory.multiport.RtlMultiportMemory;
+import name.martingeisse.esdk.core.rtl.memory.multiport.RtlSynchronousMemoryPort;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.EmptyVerilogContribution;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
@@ -21,7 +22,8 @@ import name.martingeisse.esdk.picoblaze.model.ProgramRomUtil;
  */
 public class AssociatedPicoblazeProgramRom extends RtlItem {
 
-	private final RtlSynchronousRom rom;
+	private final RtlMultiportMemory rom;
+	private final RtlSynchronousMemoryPort romPort;
 
 	public AssociatedPicoblazeProgramRom(RtlRealm realm, RtlClockNetwork clockNetwork) {
 		this(realm, clockNetwork, null, null);
@@ -40,19 +42,24 @@ public class AssociatedPicoblazeProgramRom extends RtlItem {
 		if (anchorClass == null) {
 			anchorClass = getClass();
 		}
-		rom = ProgramRomUtil.loadAssociatedProgramRom(clockNetwork, anchorClass, programSuffix);
+		rom = ProgramRomUtil.loadAssociatedProgramRom(realm, anchorClass, programSuffix);
+		romPort = rom.createSynchronousPort(clockNetwork, RtlSynchronousMemoryPort.ReadSupport.SYNCHRONOUS);
 	}
 
 	public void setAddressSignal(RtlVectorSignal addressSignal) {
-		rom.setAddressSignal(addressSignal);
+		romPort.setAddressSignal(addressSignal);
 	}
 
 	public RtlVectorSignal getInstructionSignal() {
-		return rom.getReadDataSignal();
+		return romPort.getReadDataSignal();
 	}
 
-	public RtlSynchronousRom getRom() {
+	public RtlMultiportMemory getRom() {
 		return rom;
+	}
+
+	public RtlSynchronousMemoryPort getRomPort() {
+		return romPort;
 	}
 
 	@Override
