@@ -67,4 +67,12 @@ public final class RtlBuilder {
 		return register;
 	}
 
+	public static RtlBitSignal synchronousRisingEdge(RtlClockNetwork clock, RtlBitSignal input) {
+		return input.and(bitRegister(clock, input).not());
+	}
+
+	public static RtlBitSignal synchronousFallingEdge(RtlClockNetwork clock, RtlBitSignal input) {
+		return input.not().and(bitRegister(clock, input));
+	}
+
 }
