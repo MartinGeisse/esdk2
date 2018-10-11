@@ -5,12 +5,14 @@
 package name.martingeisse.esdk.examples.vga.switched_immediate_ramdac;
 
 import name.martingeisse.esdk.core.model.Design;
+import name.martingeisse.esdk.core.rtl.RtlBuilder;
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.block.RtlClockedBlock;
 import name.martingeisse.esdk.core.rtl.block.RtlProceduralBitSignal;
 import name.martingeisse.esdk.core.rtl.block.RtlProceduralVectorSignal;
 import name.martingeisse.esdk.core.rtl.block.statement.RtlConditionChain;
+import name.martingeisse.esdk.core.rtl.block.statement.RtlStatementSequence;
 import name.martingeisse.esdk.core.rtl.memory.RtlMemory;
 import name.martingeisse.esdk.core.rtl.memory.RtlSynchronousMemoryPort;
 import name.martingeisse.esdk.core.rtl.pin.RtlInputPin;
@@ -29,6 +31,7 @@ public class RtlRamdacDesign extends Design {
 
 	public static final int WIDTH_BITS = 7;
 	public static final int HEIGHT_BITS = 7;
+	public static final int ROW_COPIER_LAST_COLUMN = 127; // later: 639 or 511
 
 	private final RtlRealm realm;
 	private final RtlClockNetwork clock;
@@ -70,11 +73,30 @@ public class RtlRamdacDesign extends Design {
 		rowCopierFramebufferColumnIndex = rowCopier.createVector(HEIGHT_BITS);
 		rowCopierWriteAddress = rowCopier.createVector(WIDTH_BITS);
 		//
-		RtlConditionChain chain rowCopier.getStatements().conditionChain()
+		{
+			RtlConditionChain chain = rowCopier.getStatements().conditionChain();
+
+			// start frame at end (rising edge) of vsync pulse
+			RtlStatementSequence startFrame = chain.when(RtlBuilder.synchronousRisingEdge(clock, vgaTimer.getVsync()));
+			startFrame.assignUnsigned(rowCopierFramebufferRowIndex, 0);
+			startFrame.assignUnsigned(rowCopierFramebufferColumnIndex, 0);
+			startFrame.assign(rowCopierReadActive, true);
+
+			// go to next row and prefetch it at the end of the current row (rising edge of blank signal)
+			// will fetch one row too much at the end of the frame but we accept that
+			RtlStatementSequence prefetchNextRow = chain.when(RtlBuilder.synchronousRisingEdge(clock, vgaTimer.getBlank()));
+			prefetchNextRow.assign(rowCopierFramebufferRowIndex, rowCopierFramebufferRowIndex.add(1));
+			prefetchNextRow.assignUnsigned(rowCopierFramebufferColumnIndex, 0);
+			prefetchNextRow.assign(rowCopierReadActive, true);
+
+			// during row: increment column index (currently one read per cycle) and detect end of row
+			RtlStatementSequence duringRow = chain.otherwise();
+			duringRow.assign(rowCopierFramebufferColumnIndex, rowCopierFramebufferColumnIndex.add(1));
+			duringRow.when(rowCopierFramebufferRowIndex.compareEqual(ROW_COPIER_LAST_COLUMN)).getThenBranch().assign(rowCopierReadActive, false);
+
+		}
 		rowCopier.getStatements().assign(rowCopierDataAvailable, rowCopierReadActive); // currently reading in 1 cycle
 		rowCopier.getStatements().when(rowCopierDataAvailable).getThenBranch().assign(rowCopierWriteAddress, rowCopierWriteAddress.add(1));
-
-		// TODO dacAddressSignal = new RtlConcatenation(realm, vgaTimer.getY().select(7, 1), vgaTimer.getX().select(7, 1));
 
 		// Note: rows and columns of the frame are not rows and columns of the RAM. Instead, the RAM
 		// has one row per pixel and 3 columns (bits) for the 3 color channels.
