@@ -7,12 +7,14 @@ package name.martingeisse.esdk.examples.vga.switched_immediate_ramdac;
 import name.martingeisse.esdk.core.model.Design;
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
+import name.martingeisse.esdk.core.rtl.block.RtlClockedBlock;
+import name.martingeisse.esdk.core.rtl.block.RtlProceduralBitSignal;
+import name.martingeisse.esdk.core.rtl.block.RtlProceduralVectorSignal;
 import name.martingeisse.esdk.core.rtl.memory.RtlMemory;
 import name.martingeisse.esdk.core.rtl.memory.RtlSynchronousMemoryPort;
 import name.martingeisse.esdk.core.rtl.pin.RtlInputPin;
 import name.martingeisse.esdk.core.rtl.pin.RtlOutputPin;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
-import name.martingeisse.esdk.core.rtl.signal.RtlConcatenation;
 import name.martingeisse.esdk.core.rtl.signal.RtlConditionalVectorOperation;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.xilinx.XilinxPinConfiguration;
@@ -30,9 +32,17 @@ public class RtlRamdacDesign extends Design {
 	private final RtlClockNetwork clock;
 	private final TestRenderer testRenderer;
 	private final VgaTimer vgaTimer;
-	private final RtlVectorSignal dacAddressSignal;
+
 	private final RtlMemory framebuffer;
 	private final RtlSynchronousMemoryPort framebufferPort;
+
+	private final RtlProceduralBitSignal rowCopierActive;
+	private final RtlProceduralVectorSignal rowCopierFramebufferReadAddress;
+	private final RtlProceduralVectorSignal rowCopierWriteAddress;
+
+	private final RtlMemory rowBuffer;
+	private final RtlSynchronousMemoryPort rowBufferWritePort;
+	private final RtlSynchronousMemoryPort rowBufferReadPort;
 
 	private final RtlOutputPin r;
 	private final RtlOutputPin g;
@@ -46,7 +56,14 @@ public class RtlRamdacDesign extends Design {
 		clock = realm.createClockNetwork(clockPin(realm));
 		testRenderer = new TestRenderer(realm, clock, WIDTH_BITS, HEIGHT_BITS);
 		vgaTimer = new VgaTimer(clock);
-		dacAddressSignal = new RtlConcatenation(realm, vgaTimer.getY().select(7, 1), vgaTimer.getX().select(7, 1));
+
+		RtlClockedBlock rowCopier = new RtlClockedBlock(clock);
+		rowCopierActive = rowCopier.createBit();
+		rowCopier.getInitializerStatements().assign(rowCopierActive, false);
+		rowCopierFramebufferReadAddress = rowCopier.createVector(WIDTH_BITS + HEIGHT_BITS);
+		rowCopierWriteAddress = rowCopier.createVector(WIDTH_BITS);
+		// TODO dacAddressSignal = new RtlConcatenation(realm, vgaTimer.getY().select(7, 1), vgaTimer.getX().select(7, 1));
+		// TODO RtlVectorSignal dacReadData = framebufferPort.getReadDataSignal();
 
 		// Note: rows and columns of the frame are not rows and columns of the RAM. Instead, the RAM
 		// has one row per pixel and 3 columns (bits) for the 3 color channels.
@@ -58,10 +75,18 @@ public class RtlRamdacDesign extends Design {
 		framebufferPort.setWriteEnableSignal(testRenderer.getFramebufferWriteStrobe());
 		framebufferPort.setWriteDataSignal(testRenderer.getFramebufferWriteData().select(2, 0));
 		framebufferPort.setAddressSignal(new RtlConditionalVectorOperation(getRealm(), testRenderer.getFramebufferRamdacSwitch(),
-			dacAddressSignal, testRenderer.getFramebufferWriteAddress()));
+			rowCopierFramebufferReadAddress, testRenderer.getFramebufferWriteAddress()));
+
+		rowBuffer = new RtlMemory(getRealm(), 1 << WIDTH_BITS, 3);
+		rowBufferWritePort = rowBuffer.createSynchronousPort(clock, RtlSynchronousMemoryPort.WriteSupport.SYNCHRONOUS);
+		rowBufferWritePort.setWriteEnableSignal();
+		rowBufferWritePort.setAddressSignal();
+		rowBufferWritePort.setWriteDataSignal();
+		rowBufferReadPort = rowBuffer.createSynchronousPort(clock, RtlSynchronousMemoryPort.ReadSupport.SYNCHRONOUS);
+		rowBufferReadPort.setAddressSignal(vgaTimer.getX().select(7, 1));
 
 		// VGA interface
-		RtlVectorSignal dacReadData = framebufferPort.getReadDataSignal();
+		RtlVectorSignal dacReadData = rowBufferReadPort.getReadDataSignal();
 		RtlBitSignal blank = vgaTimer.getBlank().or(vgaTimer.getX().select(8)).or(vgaTimer.getX().select(9))
 			.or(vgaTimer.getY().select(8)).or(vgaTimer.getY().select(9));
 		RtlBitSignal active = blank.not();
