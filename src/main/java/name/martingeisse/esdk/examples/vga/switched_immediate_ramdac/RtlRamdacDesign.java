@@ -80,6 +80,7 @@ public class RtlRamdacDesign extends Design {
 			RtlStatementSequence startFrame = chain.when(RtlBuilder.synchronousRisingEdge(clock, vgaTimer.getVsync()));
 			startFrame.assignUnsigned(rowCopierFramebufferRowIndex, 0);
 			startFrame.assignUnsigned(rowCopierFramebufferColumnIndex, 0);
+			startFrame.assignUnsigned(rowCopierWriteAddress, 0);
 			startFrame.assign(rowCopierReadActive, true);
 
 			// go to next row and prefetch it at the end of the current row (rising edge of blank signal)
@@ -87,16 +88,16 @@ public class RtlRamdacDesign extends Design {
 			RtlStatementSequence prefetchNextRow = chain.when(RtlBuilder.synchronousRisingEdge(clock, vgaTimer.getBlank()));
 			prefetchNextRow.assign(rowCopierFramebufferRowIndex, rowCopierFramebufferRowIndex.add(1));
 			prefetchNextRow.assignUnsigned(rowCopierFramebufferColumnIndex, 0);
+			prefetchNextRow.assignUnsigned(rowCopierWriteAddress, 0);
 			prefetchNextRow.assign(rowCopierReadActive, true);
 
 			// during row: increment column index (currently one read per cycle) and detect end of row
 			RtlStatementSequence duringRow = chain.otherwise();
 			duringRow.assign(rowCopierFramebufferColumnIndex, rowCopierFramebufferColumnIndex.add(1));
+			duringRow.when(rowCopierDataAvailable).getThenBranch().assign(rowCopierWriteAddress, rowCopierWriteAddress.add(1));
 			duringRow.when(rowCopierFramebufferRowIndex.compareEqual(ROW_COPIER_LAST_COLUMN)).getThenBranch().assign(rowCopierReadActive, false);
-
 		}
 		rowCopier.getStatements().assign(rowCopierDataAvailable, rowCopierReadActive); // currently reading in 1 cycle
-		rowCopier.getStatements().when(rowCopierDataAvailable).getThenBranch().assign(rowCopierWriteAddress, rowCopierWriteAddress.add(1));
 
 		// Note: rows and columns of the frame are not rows and columns of the RAM. Instead, the RAM
 		// has one row per pixel and 3 columns (bits) for the 3 color channels.
