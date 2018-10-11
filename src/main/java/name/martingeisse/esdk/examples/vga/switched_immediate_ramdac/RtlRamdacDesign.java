@@ -119,12 +119,12 @@ public class RtlRamdacDesign extends Design {
 		rowBufferWritePort.setAddressSignal(rowCopierWriteAddress);
 		rowBufferWritePort.setWriteDataSignal(framebufferPort.getReadDataSignal());
 		rowBufferReadPort = rowBuffer.createSynchronousPort(clock, RtlSynchronousMemoryPort.ReadSupport.SYNCHRONOUS);
-		rowBufferReadPort.setAddressSignal(vgaTimer.getX().select(7, 1));
+		rowBufferReadPort.setAddressSignal(vgaTimer.getX().select(6, 0));
 
 		// VGA interface
 		RtlVectorSignal dacReadData = rowBufferReadPort.getReadDataSignal();
-		RtlBitSignal blank = vgaTimer.getBlank().or(vgaTimer.getX().select(8)).or(vgaTimer.getX().select(9))
-			.or(vgaTimer.getY().select(8)).or(vgaTimer.getY().select(9));
+		RtlBitSignal blank = vgaTimer.getBlank().or(vgaTimer.getX().select(7)).or(vgaTimer.getX().select(8)).or(vgaTimer.getX().select(9))
+			.or(vgaTimer.getY().select(7)).or(vgaTimer.getY().select(8)).or(vgaTimer.getY().select(9));
 		RtlBitSignal active = blank.not();
 		r = vgaPin(realm, "H14", active.and(dacReadData.select(2)));
 		g = vgaPin(realm, "H15", active.and(dacReadData.select(1)));
