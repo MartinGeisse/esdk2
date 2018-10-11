@@ -10,11 +10,13 @@ import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.block.RtlClockedBlock;
 import name.martingeisse.esdk.core.rtl.block.RtlProceduralBitSignal;
 import name.martingeisse.esdk.core.rtl.block.RtlProceduralVectorSignal;
+import name.martingeisse.esdk.core.rtl.block.statement.RtlConditionChain;
 import name.martingeisse.esdk.core.rtl.memory.RtlMemory;
 import name.martingeisse.esdk.core.rtl.memory.RtlSynchronousMemoryPort;
 import name.martingeisse.esdk.core.rtl.pin.RtlInputPin;
 import name.martingeisse.esdk.core.rtl.pin.RtlOutputPin;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
+import name.martingeisse.esdk.core.rtl.signal.RtlConcatenation;
 import name.martingeisse.esdk.core.rtl.signal.RtlConditionalVectorOperation;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.xilinx.XilinxPinConfiguration;
@@ -36,8 +38,10 @@ public class RtlRamdacDesign extends Design {
 	private final RtlMemory framebuffer;
 	private final RtlSynchronousMemoryPort framebufferPort;
 
-	private final RtlProceduralBitSignal rowCopierActive;
-	private final RtlProceduralVectorSignal rowCopierFramebufferReadAddress;
+	private final RtlProceduralVectorSignal rowCopierFramebufferRowIndex;
+	private final RtlProceduralVectorSignal rowCopierFramebufferColumnIndex;
+	private final RtlProceduralBitSignal rowCopierReadActive;
+	private final RtlProceduralBitSignal rowCopierDataAvailable;
 	private final RtlProceduralVectorSignal rowCopierWriteAddress;
 
 	private final RtlMemory rowBuffer;
@@ -58,12 +62,19 @@ public class RtlRamdacDesign extends Design {
 		vgaTimer = new VgaTimer(clock);
 
 		RtlClockedBlock rowCopier = new RtlClockedBlock(clock);
-		rowCopierActive = rowCopier.createBit();
-		rowCopier.getInitializerStatements().assign(rowCopierActive, false);
-		rowCopierFramebufferReadAddress = rowCopier.createVector(WIDTH_BITS + HEIGHT_BITS);
+		rowCopierReadActive = rowCopier.createBit();
+		rowCopier.getInitializerStatements().assign(rowCopierReadActive, false);
+		rowCopierDataAvailable = rowCopier.createBit();
+		rowCopier.getInitializerStatements().assign(rowCopierDataAvailable, false);
+		rowCopierFramebufferRowIndex = rowCopier.createVector(WIDTH_BITS);
+		rowCopierFramebufferColumnIndex = rowCopier.createVector(HEIGHT_BITS);
 		rowCopierWriteAddress = rowCopier.createVector(WIDTH_BITS);
+		//
+		RtlConditionChain chain rowCopier.getStatements().conditionChain()
+		rowCopier.getStatements().assign(rowCopierDataAvailable, rowCopierReadActive); // currently reading in 1 cycle
+		rowCopier.getStatements().when(rowCopierDataAvailable).getThenBranch().assign(rowCopierWriteAddress, rowCopierWriteAddress.add(1));
+
 		// TODO dacAddressSignal = new RtlConcatenation(realm, vgaTimer.getY().select(7, 1), vgaTimer.getX().select(7, 1));
-		// TODO RtlVectorSignal dacReadData = framebufferPort.getReadDataSignal();
 
 		// Note: rows and columns of the frame are not rows and columns of the RAM. Instead, the RAM
 		// has one row per pixel and 3 columns (bits) for the 3 color channels.
@@ -74,14 +85,16 @@ public class RtlRamdacDesign extends Design {
 			RtlSynchronousMemoryPort.ReadWriteInteractionMode.READ_FIRST);
 		framebufferPort.setWriteEnableSignal(testRenderer.getFramebufferWriteStrobe());
 		framebufferPort.setWriteDataSignal(testRenderer.getFramebufferWriteData().select(2, 0));
-		framebufferPort.setAddressSignal(new RtlConditionalVectorOperation(getRealm(), testRenderer.getFramebufferRamdacSwitch(),
-			rowCopierFramebufferReadAddress, testRenderer.getFramebufferWriteAddress()));
+		framebufferPort.setAddressSignal(new RtlConditionalVectorOperation(getRealm(),
+			testRenderer.getFramebufferRamdacSwitch(),
+			new RtlConcatenation(getRealm(), rowCopierFramebufferRowIndex, rowCopierFramebufferColumnIndex),
+			testRenderer.getFramebufferWriteAddress()));
 
 		rowBuffer = new RtlMemory(getRealm(), 1 << WIDTH_BITS, 3);
 		rowBufferWritePort = rowBuffer.createSynchronousPort(clock, RtlSynchronousMemoryPort.WriteSupport.SYNCHRONOUS);
-		rowBufferWritePort.setWriteEnableSignal();
-		rowBufferWritePort.setAddressSignal();
-		rowBufferWritePort.setWriteDataSignal();
+		rowBufferWritePort.setWriteEnableSignal(rowCopierDataAvailable);
+		rowBufferWritePort.setAddressSignal(rowCopierWriteAddress);
+		rowBufferWritePort.setWriteDataSignal(framebufferPort.getReadDataSignal());
 		rowBufferReadPort = rowBuffer.createSynchronousPort(clock, RtlSynchronousMemoryPort.ReadSupport.SYNCHRONOUS);
 		rowBufferReadPort.setAddressSignal(vgaTimer.getX().select(7, 1));
 
