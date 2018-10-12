@@ -25,7 +25,13 @@ import name.martingeisse.esdk.core.rtl.synthesis.xilinx.XilinxPinConfiguration;
 import name.martingeisse.esdk.examples.vga.VgaTimer;
 
 /**
- *
+ * TODO next:
+ * - add handshake signals to framebuffer
+ * - add handshake validator (check that input data remains stable until acknowledged; check that no ACK arrives
+ *   without request)
+ * - add random delays in framebuffer
+ * - respect handshake signals in logic
+ * - check with validator
  */
 public class RtlRamdacDesign extends Design {
 
