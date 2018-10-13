@@ -155,18 +155,33 @@ public class HandshakeValidator extends RtlClockedItem {
 	@Override
 	public void computeNextState() {
 
-		/*
-		TODO
-		boolean initializationInProgress;
-		boolean sampledReadyValue;
-		boolean sampledRequestValue;
-		boolean sampledPreAcknowledgeValue;
-		boolean sampledPostAcknowledgeValue;
-		private RtlBitSignal[] cachedBitDataSignals;
-		private boolean[] sampledBitDataValues;
-		private RtlVectorSignal[] cachedVectorDataSignals;
-		private VectorValue[] sampledVectorDataValues;
-		*/
+		// analyze and validate control signals
+		boolean expectStableData = false;
+		if (!initializationInProgress) {
+			/*
+			TODO
+			boolean sampledReadyValue;
+			boolean sampledRequestValue;
+			boolean sampledPreAcknowledgeValue;
+			boolean sampledPostAcknowledgeValue;
+			*/
+		}
+
+		// if we expect the data signals to be held stable, validate that
+		if (expectStableData) {
+			for (int i = 0; i < cachedBitDataSignals.length; i++) {
+				if (cachedBitDataSignals[i].getValue() != sampledBitDataValues[i]) {
+					onError("data not stable during request: " + cachedBitDataSignals[i] + " changed from " +
+						sampledBitDataValues[i] + " to " + cachedBitDataSignals[i].getValue());
+				}
+			}
+			for (int i = 0; i < cachedVectorDataSignals.length; i++) {
+				if (!cachedVectorDataSignals[i].getValue().equals(sampledVectorDataValues[i])) {
+					onError("data not stable during request: " + cachedVectorDataSignals[i] + " changed from " +
+						sampledVectorDataValues[i] + " to " + cachedVectorDataSignals[i].getValue());
+				}
+			}
+		}
 
 		// store new sampled values
 		initializationInProgress = false;
@@ -180,6 +195,11 @@ public class HandshakeValidator extends RtlClockedItem {
 		for (int i = 0; i < cachedVectorDataSignals.length; i++) {
 			sampledVectorDataValues[i] = cachedVectorDataSignals[i].getValue();
 		}
+
+	}
+
+	protected void onError(String detailMessage) {
+		throw new RuntimeException("handshake validation error: " + detailMessage);
 	}
 
 	@Override
