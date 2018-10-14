@@ -12,6 +12,7 @@ public class AlgorithmPicoTestMain {
 
 	private static final int ADDRESS_MASK = 0x00ffffff;
 	private static int[] memory = new int[16 * 1024 * 1024];
+	private static MemoryFaultModel memoryFaultModel = MemoryFaultModel.INTACT;
 
 	private int addressRegister = 0;
 	private int writeDataRegister = 0;
@@ -46,9 +47,9 @@ public class AlgorithmPicoTestMain {
 				addressRegister = (addressRegister & mask) | shiftedData;
 			} else {
 				if ((data & 1) == 0) {
-					memory[addressRegister & ADDRESS_MASK] = writeDataRegister;
+					memoryFaultModel.write(addressRegister & ADDRESS_MASK, writeDataRegister);
 				} else {
-					readDataRegister = [addressRegister & ADDRESS_MASK];
+					readDataRegister = memoryFaultModel.read(addressRegister & ADDRESS_MASK);
 				}
 			}
 		} else {
@@ -73,4 +74,34 @@ public class AlgorithmPicoTestMain {
 		return (byte) (value >> shift);
 	}
 
+	enum MemoryFaultModel {
+
+		INTACT(address -> memory[address], (address, data) -> memory[address] = data),
+		READ_ZERO(address -> 0, (address, data) -> memory[address] = data),
+		NO_WRITE(address -> memory[address], (address, data) -> {});
+
+		private final Reader reader;
+		private final Writer writer;
+
+		MemoryFaultModel(Reader reader, Writer writer) {
+			this.reader = reader;
+			this.writer = writer;
+		}
+
+		int read(int address) {
+			return reader.read(address);
+		}
+
+		void write(int address, int data) {
+			writer.write(address, data);
+		}
+
+		interface Reader {
+			int read(int address);
+		}
+
+		interface Writer {
+			void write(int address, int data);
+		}
+	}
 }
