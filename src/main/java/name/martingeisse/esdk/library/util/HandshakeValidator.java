@@ -40,7 +40,7 @@ import java.util.List;
  * <p>
  * - At least one of the three confirmation signals (pre-acknowledge, post-acknowledge, ready) must be provided so this
  * validator knows when the request has been finished.
- *
+ * <p>
  * <p>
  * This item vanishes during synthesis.
  */
@@ -52,15 +52,24 @@ public class HandshakeValidator extends RtlClockedItem {
 	private RtlBitSignal postAcknowledgeSignal;
 	private List<RtlSignal> requestDataSignals = new ArrayList<>();
 
-	boolean initializationInProgress;
+	private RtlBitSignal[] cachedBitDataSignals;
+	private RtlVectorSignal[] cachedVectorDataSignals;
+
 	boolean sampledReadyValue;
 	boolean sampledRequestValue;
 	boolean sampledPreAcknowledgeValue;
 	boolean sampledPostAcknowledgeValue;
-	private RtlBitSignal[] cachedBitDataSignals;
 	private boolean[] sampledBitDataValues;
-	private RtlVectorSignal[] cachedVectorDataSignals;
 	private VectorValue[] sampledVectorDataValues;
+
+	boolean previousReadyValue;
+	boolean previousRequestValue;
+	boolean previousPreAcknowledgeValue;
+	boolean previousPostAcknowledgeValue;
+	private boolean[] previousBitDataValues;
+	private VectorValue[] previousVectorDataValues;
+
+	private RequestState requestState;
 
 	public HandshakeValidator(RtlClockNetwork clockNetwork) {
 		super(clockNetwork);
@@ -118,11 +127,17 @@ public class HandshakeValidator extends RtlClockedItem {
 		if (preAcknowledgeSignal == null && postAcknowledgeSignal == null && readySignal == null) {
 			throw new IllegalStateException("no confirmation signals");
 		}
-		initializationInProgress = true;
+
 		sampledReadyValue = false;
 		sampledRequestValue = false;
 		sampledPreAcknowledgeValue = false;
 		sampledPostAcknowledgeValue = false;
+
+		previousReadyValue = false;
+		previousRequestValue = false;
+		previousPreAcknowledgeValue = false;
+		previousPostAcknowledgeValue = false;
+
 		int bitSignalCount = 0, vectorSignalCount = 0;
 		for (RtlSignal signal : requestDataSignals) {
 			if (signal instanceof RtlBitSignal) {
@@ -135,8 +150,10 @@ public class HandshakeValidator extends RtlClockedItem {
 		}
 		cachedBitDataSignals = new RtlBitSignal[bitSignalCount];
 		sampledBitDataValues = new boolean[bitSignalCount];
+		previousBitDataValues = new boolean[bitSignalCount];
 		cachedVectorDataSignals = new RtlVectorSignal[vectorSignalCount];
 		sampledVectorDataValues = new VectorValue[vectorSignalCount];
+		previousVectorDataValues = new VectorValue[vectorSignalCount];
 		bitSignalCount = 0;
 		vectorSignalCount = 0;
 		for (RtlSignal signal : requestDataSignals) {
@@ -146,45 +163,18 @@ public class HandshakeValidator extends RtlClockedItem {
 			} else {
 				RtlVectorSignal vectorSignal = (RtlVectorSignal) signal;
 				cachedVectorDataSignals[vectorSignalCount] = vectorSignal;
-				sampledVectorDataValues[vectorSignalCount] = VectorValue.ofUnsigned(vectorSignal.getWidth(), 0);
+				previousVectorDataValues[vectorSignalCount] = sampledVectorDataValues[vectorSignalCount] = VectorValue.ofUnsigned(vectorSignal.getWidth(), 0);
 				vectorSignalCount++;
 			}
 		}
+
+		requestState = RequestState.INITIAL;
 	}
 
 	@Override
 	public void computeNextState() {
 
-		// analyze and validate control signals
-		boolean expectStableData = false;
-		if (!initializationInProgress) {
-			/*
-			TODO
-			boolean sampledReadyValue;
-			boolean sampledRequestValue;
-			boolean sampledPreAcknowledgeValue;
-			boolean sampledPostAcknowledgeValue;
-			*/
-		}
-
-		// if we expect the data signals to be held stable, validate that
-		if (expectStableData) {
-			for (int i = 0; i < cachedBitDataSignals.length; i++) {
-				if (cachedBitDataSignals[i].getValue() != sampledBitDataValues[i]) {
-					onError("data not stable during request: " + cachedBitDataSignals[i] + " changed from " +
-						sampledBitDataValues[i] + " to " + cachedBitDataSignals[i].getValue());
-				}
-			}
-			for (int i = 0; i < cachedVectorDataSignals.length; i++) {
-				if (!cachedVectorDataSignals[i].getValue().equals(sampledVectorDataValues[i])) {
-					onError("data not stable during request: " + cachedVectorDataSignals[i] + " changed from " +
-						sampledVectorDataValues[i] + " to " + cachedVectorDataSignals[i].getValue());
-				}
-			}
-		}
-
-		// store new sampled values
-		initializationInProgress = false;
+		// sample all signals
 		sampledReadyValue = readySignal.getValue();
 		sampledRequestValue = requestSignal.getValue();
 		sampledPreAcknowledgeValue = preAcknowledgeSignal.getValue();
@@ -198,13 +188,91 @@ public class HandshakeValidator extends RtlClockedItem {
 
 	}
 
+	@Override
+	public void updateState() {
+
+		// analyze and validate control signals
+		requestState.validate(this);
+
+		// if we expect the data signals to be held stable, validate that
+		if (requestState.isStableDataExpected(this)) {
+			for (int i = 0; i < cachedBitDataSignals.length; i++) {
+				if (sampledBitDataValues[i] != previousBitDataValues[i]) {
+					onError("data not stable during request: " + cachedBitDataSignals[i] + " changed from " +
+						previousBitDataValues[i] + " to " + sampledBitDataValues[i]);
+				}
+			}
+			for (int i = 0; i < cachedVectorDataSignals.length; i++) {
+				if (!sampledVectorDataValues[i].equals(previousVectorDataValues[i])) {
+					onError("data not stable during request: " + cachedVectorDataSignals[i] + " changed from " +
+						previousVectorDataValues[i] + " to " + sampledVectorDataValues[i]);
+				}
+			}
+		}
+
+		// advance request validation state -- this must happen while the current and next signal values are
+		// still present, i.e. before storing the new sampled values below
+		requestState = requestState.getNextState(this);
+
+		// store sampled signals
+		previousReadyValue = sampledReadyValue;
+		previousRequestValue = sampledRequestValue;
+		previousPreAcknowledgeValue = sampledPreAcknowledgeValue;
+		previousPostAcknowledgeValue = sampledPostAcknowledgeValue;
+		System.arraycopy(sampledBitDataValues, 0, previousBitDataValues, 0, sampledBitDataValues.length);
+		System.arraycopy(sampledVectorDataValues, 0, previousVectorDataValues, 0, sampledVectorDataValues.length);
+
+	}
+
 	protected void onError(String detailMessage) {
 		throw new RuntimeException("handshake validation error: " + detailMessage);
 	}
 
-	@Override
-	public void updateState() {
-		// no state updates needed since we have no outputs
+	/**
+	 * We keep an internal request state to interpret the control signals. During each cycle, the current request
+	 * state is the one that validates the signals sampled during that cycle. Previous values are available for
+	 * convenience.
+	 *
+	 * Also, general rules are validated outside the state object. TODO are there any??
+	 * TODO how are the different keep-request-HIGH modes handled?
+	 */
+	private enum RequestState {
+			/*
+			TODO
+			boolean sampledReadyValue;
+			boolean sampledRequestValue;
+			boolean sampledPreAcknowledgeValue;
+			boolean sampledPostAcknowledgeValue;
+			*/
+
+		INITIAL {
+
+			@Override
+			void validate(HandshakeValidator validator) {
+				if (validator.postAcknowledgeSignal != null && validator.sampledPostAcknowledgeValue) {
+					validator.onError("post-acknowledge is true in the initial cycle");
+				}
+				if (validator.readySignal != null && !validator.sampledReadyValue)
+			}
+
+		},
+		IDLE,
+		BUSY,
+		PRE_ACK,
+		POST_ACK;
+
+		void validate(HandshakeValidator validator) {
+		}
+
+		boolean isStableDataExpected(HandshakeValidator validator) {
+			return false;
+		}
+
+		RequestState getNextState(HandshakeValidator validator) {
+			return this;
+		}
+
+
 	}
 
 	// ----------------------------------------------------------------------------------------------------------------
