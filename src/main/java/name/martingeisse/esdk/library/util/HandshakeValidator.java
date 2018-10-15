@@ -252,7 +252,7 @@ public class HandshakeValidator extends RtlClockedItem {
 				if (validator.postAcknowledgeSignal != null && validator.sampledPostAcknowledgeValue) {
 					validator.onError("post-acknowledge is true in the initial cycle");
 				}
-				if (validator.readySignal != null && !validator.sampledReadyValue)
+				// if (validator.readySignal != null && !validator.sampledReadyValue)
 			}
 
 		},

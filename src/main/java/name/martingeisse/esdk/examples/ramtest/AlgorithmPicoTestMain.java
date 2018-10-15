@@ -24,16 +24,17 @@ public class AlgorithmPicoTestMain {
 
 		x = 9;
 		for (int i = 0; i < memory.length; i++) {
-			memory[i] = x;
-			x = (5 * x + 1) % 17;
+			memoryFaultModel.write(i, x);
+			x = 5 * x + 1;
 		}
 
 		x = 9;
 		for (int i = 0; i < memory.length; i++) {
-			if (memory[i] != x) {
-				System.out.println("error at " + i + ": " + memory[i]);
+			int value = memoryFaultModel.read(i);
+			if (value != x) {
+				System.out.println("error at " + i + ": " + value + " should be " + x);
 			}
-			x = (5 * x + 1) % 17;
+			x = 5 * x + 1;
 		}
 
 	}
