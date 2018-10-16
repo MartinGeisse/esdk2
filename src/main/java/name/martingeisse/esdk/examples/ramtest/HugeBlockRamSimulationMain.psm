@@ -1,24 +1,144 @@
-    LOAD s0, 01
-loop:
-    OUTPUT s0, 00
+
+    ; x in s3..s0
+    ; i in s7..s4
+
+    ; x = 9;
+    LOAD s3, 00
+    LOAD s2, 00
+    LOAD s1, 00
+    LOAD s0, 09
+
+    ; i = 0
+    LOAD s7, 00
+    LOAD s6, 00
+    LOAD s5, 00
+    LOAD s4, 00
+
+    ; while (i < 8M)
+writeLoop:
+    COMPARE s6, 80
+    JUMP Z, writePhaseFinished
+
+    ; show i >> 20 on LEDs
+    LOAD sA, s6
+    SR0 sA
+    SR0 sA
+    SR0 sA
+    SR0 sA
+    OUTPUT sA, 08
+
+    ; memory[i] = x;
+    OUTPUT s4, 10
+    OUTPUT s5, 11
+    OUTPUT s6, 12
+    OUTPUT s7, 13
+    OUTPUT s0, 20
+    OUTPUT s1, 21
+    OUTPUT s2, 22
+    OUTPUT s3, 23
+    LOAD sA, 01
+    OUTPUT sA, 80
+
+    ; x = 5 * x + 1;
+    LOAD sC, s0
+    LOAD sD, s1
+    LOAD sE, s2
+    LOAD sF, s3
+    ADD s0, s0
+    ADDCY s1, s1
+    ADDCY s2, s2
+    ADDCY s3, s3
+    ADD s0, s0
+    ADDCY s1, s1
+    ADDCY s2, s2
+    ADDCY s3, s3
+    ADD s0, sC
+    ADDCY s1, sD
+    ADDCY s2, sE
+    ADDCY s3, sF
+    ADD s0, 01
+    ADDCY s1, 00
+    ADDCY s2, 00
+    ADDCY s3, 00
+
+    ; i++
+    ADD s4, 01
+    ADDCY s5, 00
+    ADDCY s6, 00
+    ADDCY s7, 00
+
+    ; end of while
+    JUMP writeLoop
+
+
+writePhaseFinished:
+
+; x = 9;
+; for (int i = 0; i < memory.length; i++) {
+;     int value = memoryFaultModel.read(i);
+;     if (value != x) {
+;         System.out.println("error at " + i + ": " + value + " should be " + x);
+;     }
+;     x = 5 * x + 1;
+; }
+
+    JUMP success
+
+; ---------------------------------------------------------------------------------------------------------------------
+
+success:
+    LOAD s0, 11
+successLoop:
+    OUTPUT s0, 08
     RL s0
 
     LOAD s1, 00
-wait1:
+successWait1:
 	SUB s1, 01
-	JUMP Z, loop
+	JUMP Z, successLoop
 
 	LOAD s2, 00
-wait2:
+successWait2:
 	SUB s2, 01
-	JUMP Z, wait1
+	JUMP Z, successWait1
 
 	LOAD s3, 10
 	INPUT s4, 00
 	TEST s4, FF
-	JUMP Z, wait3
+	JUMP Z, successWait3
 	LOAD s3, 03
-wait3:
+successWait3:
 	SUB s3, 01
-	JUMP Z, wait2
-	JUMP wait3
+	JUMP Z, successWait2
+	JUMP successWait3
+
+; ---------------------------------------------------------------------------------------------------------------------
+
+failure:
+    LOAD s0, 00
+failureLoop:
+    LOAD s1, s0
+    LOAD s0, FF
+    SUB s0, s1
+    OUTPUT s0, 08
+    RL s0
+
+    LOAD s1, 00
+failureWait1:
+	SUB s1, 01
+	JUMP Z, failureLoop
+
+	LOAD s2, 00
+failureWait2:
+	SUB s2, 01
+	JUMP Z, failureWait1
+
+	LOAD s3, 10
+	INPUT s4, 00
+	TEST s4, FF
+	JUMP Z, failureWait3
+	LOAD s3, 03
+failureWait3:
+	SUB s3, 01
+	JUMP Z, failureWait2
+	JUMP failureWait3

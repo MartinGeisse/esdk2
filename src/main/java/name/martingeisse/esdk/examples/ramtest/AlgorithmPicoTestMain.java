@@ -43,33 +43,32 @@ public class AlgorithmPicoTestMain {
 		int shift = (port & 3) * 8;
 		int mask = ~(0xff << shift);
 		int shiftedData = (data & 0xff) << shift;
-		if ((port & 5) == 0) {
-			if ((port & 6) == 0) {
-				addressRegister = (addressRegister & mask) | shiftedData;
+		if ((port & 0x10) != 0) {
+			addressRegister = (addressRegister & mask) | shiftedData;
+		}
+		if ((port & 0x20) != 0) {
+			writeDataRegister = (writeDataRegister & mask) | shiftedData;
+		}
+		// port & 0x40 -- read data, cannot be written by CPU
+		if ((port & 0x80) != 0) {
+			if ((data & 1) != 0) {
+				memoryFaultModel.write(addressRegister & ADDRESS_MASK, writeDataRegister);
 			} else {
-				if ((data & 1) == 0) {
-					memoryFaultModel.write(addressRegister & ADDRESS_MASK, writeDataRegister);
-				} else {
-					readDataRegister = memoryFaultModel.read(addressRegister & ADDRESS_MASK);
-				}
-			}
-		} else {
-			if ((port & 6) == 0) {
-				writeDataRegister = (writeDataRegister & mask) | shiftedData;
-			} else {
-				readDataRegister = (readDataRegister & mask) | shiftedData;
+				readDataRegister = memoryFaultModel.read(addressRegister & ADDRESS_MASK);
 			}
 		}
 	}
 
 	private byte read(int port) {
 		int value;
-		if ((port & 5) == 0) {
+		if ((port & 0x10) != 0) {
 			value = addressRegister;
-		} else if ((port & 6) == 0) {
+		} else if ((port & 0x20) != 0) {
 			value = writeDataRegister;
-		} else {
+		} else if ((port & 0x40) != 0) {
 			value = readDataRegister;
+		} else {
+			value = 0;
 		}
 		int shift = (port & 3) * 8;
 		return (byte) (value >> shift);

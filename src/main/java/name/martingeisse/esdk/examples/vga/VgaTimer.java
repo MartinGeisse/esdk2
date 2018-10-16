@@ -4,7 +4,7 @@ import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.block.RtlClockedBlock;
 import name.martingeisse.esdk.core.rtl.block.RtlProceduralBitSignal;
 import name.martingeisse.esdk.core.rtl.block.RtlProceduralVectorSignal;
-import name.martingeisse.esdk.core.rtl.block.statement.RtlConditionChain;
+import name.martingeisse.esdk.core.rtl.block.statement.RtlConditionChainStatement;
 import name.martingeisse.esdk.core.rtl.block.statement.RtlStatementSequence;
 import name.martingeisse.esdk.core.rtl.block.statement.RtlWhenStatement;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
@@ -57,7 +57,7 @@ public class VgaTimer {
 			}
 			{
 				RtlStatementSequence frameNotFinished = whenFrameFinished.getOtherwiseBranch();
-				RtlConditionChain chain = frameNotFinished.conditionChain();
+				RtlConditionChainStatement chain = frameNotFinished.conditionChain();
 				chain.when(y.compareEqual(479)).assign(yblank, true);
 				chain.when(y.compareEqual(489)).assign(vsync, false);
 				chain.when(y.compareEqual(491)).assign(vsync, true);
@@ -66,7 +66,7 @@ public class VgaTimer {
 		}
 		{
 			RtlStatementSequence rowNotFinished = whenRowFinished.getOtherwiseBranch();
-			RtlConditionChain chain = rowNotFinished.conditionChain();
+			RtlConditionChainStatement chain = rowNotFinished.conditionChain();
 			chain.when(x.compareEqual(639)).assign(xblank, true);
 			chain.when(x.compareEqual(655)).assign(hsync, false);
 			chain.when(x.compareEqual(751)).assign(hsync, true);

@@ -11,7 +11,7 @@ import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.block.RtlClockedBlock;
 import name.martingeisse.esdk.core.rtl.block.RtlProceduralBitSignal;
 import name.martingeisse.esdk.core.rtl.block.RtlProceduralVectorSignal;
-import name.martingeisse.esdk.core.rtl.block.statement.RtlConditionChain;
+import name.martingeisse.esdk.core.rtl.block.statement.RtlConditionChainStatement;
 import name.martingeisse.esdk.core.rtl.block.statement.RtlStatementSequence;
 import name.martingeisse.esdk.core.rtl.memory.RtlMemory;
 import name.martingeisse.esdk.core.rtl.memory.RtlSynchronousMemoryPort;
@@ -80,7 +80,7 @@ public class RtlRamdacDesign extends Design {
 		rowCopierWriteAddress = rowCopier.createVector(WIDTH_BITS);
 		//
 		{
-			RtlConditionChain chain = rowCopier.getStatements().conditionChain();
+			RtlConditionChainStatement chain = rowCopier.getStatements().conditionChain();
 
 			// start frame at end (rising edge) of vsync pulse
 			RtlStatementSequence startFrame = chain.when(RtlBuilder.synchronousRisingEdge(clock, vgaTimer.getVsync()));
