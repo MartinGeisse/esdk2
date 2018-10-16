@@ -11,13 +11,13 @@ import java.util.List;
 /**
  * Represents an if/elseif/elseif/.../else chain. This is easier to use than building such a chain manually.
  */
-public final class RtlConditionChain extends RtlStatement {
+public final class RtlConditionChainStatement extends RtlStatement {
 
 	private final List<Case> cases = new ArrayList<>();
 	private RtlStatement defaultCase;
 	private RtlStatement materializedChain;
 
-	public RtlConditionChain(RtlRealm realm) {
+	public RtlConditionChainStatement(RtlRealm realm) {
 		super(realm);
 	}
 

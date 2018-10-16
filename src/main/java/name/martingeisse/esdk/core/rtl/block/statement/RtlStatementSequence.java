@@ -79,8 +79,8 @@ public class RtlStatementSequence extends RtlStatement {
 		return whenStatement;
 	}
 
-	public final RtlConditionChain conditionChain() {
-		RtlConditionChain chain = new RtlConditionChain(getRealm());
+	public final RtlConditionChainStatement conditionChain() {
+		RtlConditionChainStatement chain = new RtlConditionChainStatement(getRealm());
 		addStatement(chain);
 		return chain;
 	}
