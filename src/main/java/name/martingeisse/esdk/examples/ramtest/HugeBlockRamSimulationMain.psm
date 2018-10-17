@@ -70,19 +70,85 @@ writeLoop:
     ; end of while
     JUMP writeLoop
 
-
 writePhaseFinished:
 
-; x = 9;
-; for (int i = 0; i < memory.length; i++) {
-;     int value = memoryFaultModel.read(i);
-;     if (value != x) {
-;         System.out.println("error at " + i + ": " + value + " should be " + x);
-;     }
-;     x = 5 * x + 1;
-; }
+; ---------------------------------------------------------------------------------------------------------------------
 
-    JUMP success
+    ; x = 9;
+    LOAD s3, 00
+    LOAD s2, 00
+    LOAD s1, 00
+    LOAD s0, 09
+
+    ; i = 0
+    LOAD s7, 00
+    LOAD s6, 00
+    LOAD s5, 00
+    LOAD s4, 00
+
+    ; while (i < 8M)
+readLoop:
+    COMPARE s6, 80
+    JUMP Z, success
+
+    ; show i >> 20 on LEDs
+    LOAD sA, s6
+    SR0 sA
+    SR0 sA
+    SR0 sA
+    SR0 sA
+    OUTPUT sA, 08
+
+    ; assert(memory[i] == x)
+    OUTPUT s4, 10
+    OUTPUT s5, 11
+    OUTPUT s6, 12
+    OUTPUT s7, 13
+    LOAD sA, 00
+    OUTPUT sA, 80
+    INPUT sC, 40
+    INPUT sD, 41
+    INPUT sE, 42
+    INPUT sF, 43
+    COMPARE sC, s0
+    JUMP NZ, failure
+    COMPARE sD, s1
+    JUMP NZ, failure
+    COMPARE sE, s2
+    JUMP NZ, failure
+    COMPARE sF, s3
+    JUMP NZ, failure
+
+    ; x = 5 * x + 1;
+    LOAD sC, s0
+    LOAD sD, s1
+    LOAD sE, s2
+    LOAD sF, s3
+    ADD s0, s0
+    ADDCY s1, s1
+    ADDCY s2, s2
+    ADDCY s3, s3
+    ADD s0, s0
+    ADDCY s1, s1
+    ADDCY s2, s2
+    ADDCY s3, s3
+    ADD s0, sC
+    ADDCY s1, sD
+    ADDCY s2, sE
+    ADDCY s3, sF
+    ADD s0, 01
+    ADDCY s1, 00
+    ADDCY s2, 00
+    ADDCY s3, 00
+
+    ; i++
+    ADD s4, 01
+    ADDCY s5, 00
+    ADDCY s6, 00
+    ADDCY s7, 00
+
+    ; end of while
+    JUMP readLoop
 
 ; ---------------------------------------------------------------------------------------------------------------------
 
