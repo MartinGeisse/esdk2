@@ -48,6 +48,7 @@ public class HandshakeValidator extends RtlClockedItem {
 
 	private RtlBitSignal readySignal;
 	private RtlBitSignal requestSignal;
+	private RequestSignalContinuationExpectation requestSignalContinuationExpectation;
 	private RtlBitSignal preAcknowledgeSignal;
 	private RtlBitSignal postAcknowledgeSignal;
 	private List<RtlSignal> requestDataSignals = new ArrayList<>();
@@ -91,6 +92,14 @@ public class HandshakeValidator extends RtlClockedItem {
 		this.requestSignal = requestSignal;
 	}
 
+	public RequestSignalContinuationExpectation getRequestSignalContinuationExpectation() {
+		return requestSignalContinuationExpectation;
+	}
+
+	public void setRequestSignalContinuationExpectation(RequestSignalContinuationExpectation requestSignalContinuationExpectation) {
+		this.requestSignalContinuationExpectation = requestSignalContinuationExpectation;
+	}
+
 	public RtlBitSignal getPreAcknowledgeSignal() {
 		return preAcknowledgeSignal;
 	}
@@ -115,6 +124,17 @@ public class HandshakeValidator extends RtlClockedItem {
 		this.requestDataSignals = requestDataSignals;
 	}
 
+	public enum RequestSignalContinuationExpectation {
+		TRUE,
+		FALSE,
+		DONT_CARE;
+
+		public boolean isValid(boolean continuationValue) {
+			return (this == TRUE && continuationValue) || (this == FALSE && !continuationValue) || (this == DONT_CARE);
+		}
+
+	}
+
 	// ----------------------------------------------------------------------------------------------------------------
 	// simulation
 	// ----------------------------------------------------------------------------------------------------------------
@@ -123,6 +143,9 @@ public class HandshakeValidator extends RtlClockedItem {
 	public void initializeSimulation() {
 		if (requestSignal == null) {
 			throw new IllegalStateException("no request signal");
+		}
+		if (requestSignalContinuationExpectation == null) {
+			throw new IllegalStateException("request signal continuation expectation not set");
 		}
 		if (preAcknowledgeSignal == null && postAcknowledgeSignal == null && readySignal == null) {
 			throw new IllegalStateException("no confirmation signals");
@@ -245,21 +268,113 @@ public class HandshakeValidator extends RtlClockedItem {
 			boolean sampledPostAcknowledgeValue;
 			*/
 
+		// like IDLE but with the ready signal kept false until now, which is initially allowed
 		INITIAL {
 
 			@Override
 			void validate(HandshakeValidator validator) {
+				if (validator.readySignal != null && validator.requestSignal != null &&
+					!validator.sampledReadyValue && validator.sampledRequestValue) {
+					validator.onError("making request while initially not ready");
+				}
 				if (validator.postAcknowledgeSignal != null && validator.sampledPostAcknowledgeValue) {
 					validator.onError("post-acknowledge is true in the initial cycle");
 				}
-				// if (validator.readySignal != null && !validator.sampledReadyValue)
+				if (validator.requestSignal != null && validator.preAcknowledgeSignal != null &&
+					!validator.sampledRequestValue && validator.sampledPreAcknowledgeValue) {
+					validator.onError("getting pre-ack without request");
+				}
+			}
+
+			@Override
+			RequestState getNextState(HandshakeValidator validator) {
+				if (validator.sampledRequestValue) {
+					if (validator.preAcknowledgeSignal != null && validator.sampledPreAcknowledgeValue) {
+						return PRE_ACKNOWLEDGED;
+					} else {
+						return BUSY;
+					}
+				} else if (validator.readySignal != null && validator.sampledReadyValue) {
+					return IDLE;
+				} else {
+					return this;
+				}
 			}
 
 		},
-		IDLE,
-		BUSY,
-		PRE_ACK,
-		POST_ACK;
+
+		// no request was signalled or active in previous cycle
+		IDLE {
+
+			@Override
+			void validate(HandshakeValidator validator) {
+				// TODO check
+//				if (validator.readySignal != null && validator.requestSignal != null &&
+//					!validator.sampledReadyValue && validator.sampledRequestValue) {
+//					validator.onError("making request while initially not ready");
+//				}
+//				if (validator.postAcknowledgeSignal != null && validator.sampledPostAcknowledgeValue) {
+//					validator.onError("post-acknowledge is true in the initial cycle");
+//				}
+//				if (validator.requestSignal != null && validator.preAcknowledgeSignal != null &&
+//					!validator.sampledRequestValue && validator.sampledPreAcknowledgeValue) {
+//					validator.onError("getting pre-ack without request");
+//				}
+			}
+
+			@Override
+			RequestState getNextState(HandshakeValidator validator) {
+				if (!validator.sampledRequestValue) {
+					return this;
+				} else if (validator.preAcknowledgeSignal != null && validator.sampledPreAcknowledgeValue) {
+					return PRE_ACKNOWLEDGED;
+				} else {
+					return BUSY;
+				}
+			}
+
+		},
+
+		// request was signalled and not yet pre-acked
+		BUSY {
+
+			@Override
+			void validate(HandshakeValidator validator) {
+				// TODO
+			}
+
+			@Override
+			boolean isStableDataExpected(HandshakeValidator validator) {
+				if (validator.postAcknowledgeSignal != null && validator.sampledPostAcknowledgeValue) {
+					return false;
+				}
+				if (validator.readySignal != null && validator.sampledReadyValue) {
+					return false;
+				}
+				return true;
+			}
+
+			@Override
+			RequestState getNextState(HandshakeValidator validator) {
+				// TODO
+			}
+
+		},
+
+		// request was pre-acked in the previous cycle
+		PRE_ACKNOWLEDGED {
+
+			@Override
+			void validate(HandshakeValidator validator) {
+				// TODO
+			}
+
+			@Override
+			RequestState getNextState(HandshakeValidator validator) {
+				return IDLE.getNextState(validator);
+			}
+
+		};
 
 		void validate(HandshakeValidator validator) {
 		}
@@ -271,7 +386,6 @@ public class HandshakeValidator extends RtlClockedItem {
 		RequestState getNextState(HandshakeValidator validator) {
 			return this;
 		}
-
 
 	}
 
