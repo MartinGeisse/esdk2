@@ -4,17 +4,12 @@
  */
 package name.martingeisse.esdk.examples.ramtest;
 
-import name.martingeisse.esdk.core.model.Design;
 import name.martingeisse.esdk.core.model.items.IntervalItem;
-import name.martingeisse.esdk.core.rtl.RtlBuilder;
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.memory.RtlMemory;
 import name.martingeisse.esdk.core.rtl.memory.RtlSynchronousMemoryPort;
-import name.martingeisse.esdk.core.rtl.signal.*;
-import name.martingeisse.esdk.core.rtl.signal.connector.RtlVectorSignalConnector;
 import name.martingeisse.esdk.core.rtl.simulation.RtlClockGenerator;
-import name.martingeisse.esdk.picoblaze.model.rtl.PicoblazeRtlWithAssociatedProgram;
 
 /**
  *
@@ -43,13 +38,11 @@ public class RamTestControllerSimulationMain {
 		// glue logic
 
 		// 		ramPort.setAddressSignal(ramAddress.select(25, 0));
-		RtlVectorSignal byteSelect = cpu.getPortAddress().select(1, 0);
-		ramPort.setAddressSignal(ramAddress.select(25, 0));
-		ramPort.setWriteDataSignal(ramWriteData);
-		ramPort.setClockEnableSignal(cpu.getWriteStrobe().and(cpu.getPortAddress().select(7)));
-		ramPort.setWriteEnableSignal(cpu.getOutputData().select(0));
-		ramReadData.setConnected(RtlBuilder.vectorRegister(clock, ramPort.getReadDataSignal(),
-			cpu.getWriteStrobe().and(cpu.getPortAddress().select(7)).and(cpu.getOutputData().select(0).not())));
+		ramPort.setAddressSignal(controller.getRamAddress().select(25, 0));
+		ramPort.setWriteDataSignal(controller.getRamWriteData());
+		ramPort.setClockEnableSignal(controller.getRamClockEnable());
+		ramPort.setWriteEnableSignal(controller.getRamWriteEnable());
+		controller.setRamReadData(ramPort.getReadDataSignal());
 
 		// simulation
 		new RtlClockGenerator(clock, 10); // 100 MHz (10 ns) clock

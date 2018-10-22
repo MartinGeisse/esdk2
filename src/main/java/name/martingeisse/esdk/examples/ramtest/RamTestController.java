@@ -94,8 +94,16 @@ public class RamTestController extends Design {
 	}
 
 	public void setRamReadData(RtlVectorSignal readData) {
-		ramReadData.setConnected(RtlBuilder.vectorRegister(clock, ramPort.getReadDataSignal(),
+		ramReadData.setConnected(RtlBuilder.vectorRegister(clock, readData,
 			cpu.getWriteStrobe().and(cpu.getPortAddress().select(7)).and(cpu.getOutputData().select(0).not())));
+	}
+
+	public RtlBitSignal getRamClockEnable() {
+		return ramClockEnable;
+	}
+
+	public RtlBitSignal getRamWriteEnable() {
+		return ramWriteEnable;
 	}
 
 	private RtlVectorSignal cpuWritableWordRegister(int registerBit) {
