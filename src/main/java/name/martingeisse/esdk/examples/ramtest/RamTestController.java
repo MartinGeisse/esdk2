@@ -8,12 +8,16 @@ import name.martingeisse.esdk.core.model.Design;
 import name.martingeisse.esdk.core.rtl.RtlBuilder;
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
+import name.martingeisse.esdk.core.rtl.block.RtlClockedBlock;
+import name.martingeisse.esdk.core.rtl.block.RtlProceduralBitSignal;
+import name.martingeisse.esdk.core.rtl.block.statement.RtlConditionChainStatement;
+import name.martingeisse.esdk.core.rtl.block.statement.RtlStatementSequence;
 import name.martingeisse.esdk.core.rtl.pin.RtlInputPin;
 import name.martingeisse.esdk.core.rtl.pin.RtlOutputPin;
 import name.martingeisse.esdk.core.rtl.signal.*;
-import name.martingeisse.esdk.core.rtl.signal.connector.RtlBitSignalConnector;
 import name.martingeisse.esdk.core.rtl.signal.connector.RtlVectorSignalConnector;
 import name.martingeisse.esdk.library.bus.wishbone.WishboneSimpleMaster;
+import name.martingeisse.esdk.library.bus.wishbone.WishboneSimpleMasterAdapter;
 import name.martingeisse.esdk.picoblaze.model.rtl.PicoblazeRtlWithAssociatedProgram;
 
 /**
@@ -25,17 +29,11 @@ public class RamTestController extends Design {
 	private final RtlClockNetwork clock = realm.createClockNetwork(inPin(realm, "clock"));
 	private final PicoblazeRtlWithAssociatedProgram cpu = new PicoblazeRtlWithAssociatedProgram(clock, RamTestController.class);
 
+	private final WishboneSimpleMasterAdapter wishboneMaster = new WishboneSimpleMasterAdapter(realm);
+
 	private final RtlVectorSignalConnector ramAddressRegister = new RtlVectorSignalConnector(realm, 32);
 	private final RtlVectorSignalConnector ramReadDataRegister = new RtlVectorSignalConnector(realm, 32);
 	private final RtlVectorSignalConnector ramWriteDataRegister = new RtlVectorSignalConnector(realm, 32);
-
-	private final RtlBitSignalConnector wbCycle = new RtlBitSignalConnector(realm);
-	private final RtlBitSignalConnector wbWrite = new RtlBitSignalConnector(realm);
-	private final RtlBitSignalConnector wbAck = new RtlBitSignalConnector(realm);
-	private final RtlVectorSignalConnector wbAddress = new RtlVectorSignalConnector(realm, 32);
-	private final RtlVectorSignalConnector wbReadData = new RtlVectorSignalConnector(realm, 32);
-	private final RtlVectorSignalConnector wbWriteData = new RtlVectorSignalConnector(realm, 32);
-	private final WishboneSimpleMaster wishboneMaster;
 
 	private final RtlVectorSignal leds;
 
@@ -52,10 +50,27 @@ public class RamTestController extends Design {
 		outPin(realm, "led6", leds.select(6));
 		outPin(realm, "led7", leds.select(7));
 
+		// Wishbone interface
+		{
+			RtlClockedBlock block = new RtlClockedBlock(clock);
+			RtlProceduralBitSignal wbCycle = block.createBit();
+			RtlProceduralBitSignal wbWrite = block.createBit();
+			RtlConditionChainStatement chain = block.getStatements().conditionChain();
+			RtlStatementSequence startCycle = chain.when(cpu.getWriteStrobe().and(cpu.getPortAddress().select(7)));
+			startCycle.assign(wbCycle, true);
+			startCycle.assign(wbWrite, cpu.getOutputData().select(0));
+			chain.when(wishboneMaster.getAckSignal()).assign(wbCycle, false);
+			wishboneMaster.setCycleStrobeSignal(wbCycle);
+			wishboneMaster.setWriteEnableSignal(wbWrite);
+		}
+		wishboneMaster.setAddressSignal(ramAddressRegister);
+		wishboneMaster.setWriteDataSignal(ramWriteDataRegister);
+
 		// glue logic
 		ramAddressRegister.setConnected(cpuWritableWordRegister(4));
 		ramWriteDataRegister.setConnected(cpuWritableWordRegister(5));
-		ramReadDataRegister.setConnected(RtlBuilder.vectorRegister(clock, wbReadData, wbAck.and(wbWrite.not())));
+		ramReadDataRegister.setConnected(RtlBuilder.vectorRegister(clock, wishboneMaster.getReadDataSignal(),
+			wishboneMaster.getAckSignal().and(wishboneMaster.getWriteEnableSignal().not())));
 		{
 			RtlConditionChainVectorSignal chain = new RtlConditionChainVectorSignal(realm, 8);
 			chain.when(cpu.getPortAddress().select(4), cpuReadableByteSelect(ramAddressRegister));
@@ -64,51 +79,6 @@ public class RamTestController extends Design {
 			chain.otherwise(RtlVectorConstant.ofUnsigned(realm, 8, 0));
 			cpu.setPortInputDataSignal(chain);
 		}
-
-		// Wishbone interface
-		{
-			// TODO consider an RtlConditionChainBitRegister -- would simplify this case
-			RtlConditionChainBitSignal chain = new RtlConditionChainBitSignal(realm);
-			wbCycle.setConnected(chain);
-			chain.when(cpu.getWriteStrobe().and(cpu.getPortAddress().select(7)), true);
-			chain.when(wbAck, false);
-			chain.otherwise(wbCycle);
-		}
-		wbWrite.setConnected(RtlBuilder.bitRegister(clock, cpu.getOutputData().select(0), cpu.getWriteStrobe().and(cpu.getPortAddress().select(7))));
-		wbAddress.setConnected(ramAddressRegister);
-		wbWriteData.setConnected(ramWriteDataRegister);
-		wishboneMaster = new WishboneSimpleMaster() {
-
-			@Override
-			public RtlBitSignal getCycleStrobeSignal() {
-				return wbCycle;
-			}
-
-			@Override
-			public RtlBitSignal getWriteEnableSignal() {
-				return wbWrite;
-			}
-
-			@Override
-			public RtlVectorSignal getAddressSignal() {
-				return wbAddress;
-			}
-
-			@Override
-			public RtlVectorSignal getWriteDataSignal() {
-				return wbWriteData;
-			}
-
-			@Override
-			public void setReadDataSignal(RtlVectorSignal wbReadDataSignal) {
-				wbReadData.setConnected(wbReadDataSignal);
-			}
-
-			@Override
-			public void setAckSignal(RtlBitSignal wbAckSignal) {
-				wbAck.setConnected(wbAckSignal);
-			}
-		};
 
 	}
 
