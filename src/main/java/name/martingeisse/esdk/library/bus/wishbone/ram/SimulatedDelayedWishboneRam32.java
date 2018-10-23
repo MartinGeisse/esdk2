@@ -19,6 +19,7 @@ import name.martingeisse.esdk.library.bus.wishbone.WishboneSimpleSlave;
 public final class SimulatedDelayedWishboneRam32 extends RtlClockedItem implements WishboneSimpleSlave {
 
 	private final int addressBits;
+	private final int addressMask;
 	private final Matrix matrix;
 	private final int delay;
 	private final RtlBitSignalConnectorSampler cycleStrobeSignal;
@@ -38,11 +39,12 @@ public final class SimulatedDelayedWishboneRam32 extends RtlClockedItem implemen
 			throw new IllegalArgumentException("invalid delay: " + delay);
 		}
 		this.addressBits = addressBits;
+		this.addressMask = (1 << addressBits) - 1;
 		this.matrix = new Matrix(1 << addressBits, 32);
 		this.delay = delay;
 		this.cycleStrobeSignal = new RtlBitSignalConnectorSampler(clock);
 		this.writeEnableSignal = new RtlBitSignalConnectorSampler(clock);
-		this.addressSignal = new RtlVectorSignalConnectorSampler(clock, addressBits);
+		this.addressSignal = new RtlVectorSignalConnectorSampler(clock, 32); // not addressBits, because our WB implementation says 32
 		this.writeDataSignal = new RtlVectorSignalConnectorSampler(clock, 32);
 		this.readDataSignal = new RtlSimulatedSettableVectorSignal(getRealm(), 32);
 		this.ackSignal = RtlSimulatedComputedBitSignal.of(getRealm(), () -> remainingDelay == 1);
@@ -108,12 +110,17 @@ public final class SimulatedDelayedWishboneRam32 extends RtlClockedItem implemen
 		} else {
 			remainingDelay--;
 			if (remainingDelay == 0 && writeEnableSignal.getSample()) {
-				matrix.setRow(addressSignal.getSample().getAsUnsignedInt(), writeDataSignal.getSample());
+				matrix.setRow(getAddress(), writeDataSignal.getSample());
 			}
 		}
 		if (remainingDelay == 1 && !writeEnableSignal.getSample()) {
-			readDataSignal.setValue(matrix.getRow(addressSignal.getSample().getAsUnsignedInt()));
+			readDataSignal.setValue(matrix.getRow(getAddress()));
 		}
+	}
+
+	private int getAddress() {
+		// here we compensate for the address vector being 32 bits (we can handle at most 31 because int is signed)
+		return addressSignal.getSample().getBitsAsInt() & addressMask;
 	}
 
 	// ----------------------------------------------------------------------------------------------------------------
