@@ -53,10 +53,9 @@ public class RamTestController extends Design {
 		outPin(realm, "led7", leds.select(7));
 
 		// glue logic
-		ramClockEnable = cpu.getWriteStrobe().and(cpu.getPortAddress().select(7));
-		ramWriteEnable = cpu.getOutputData().select(0);
 		ramAddressRegister.setConnected(cpuWritableWordRegister(4));
 		ramWriteDataRegister.setConnected(cpuWritableWordRegister(5));
+		ramReadDataRegister.setConnected(RtlBuilder.vectorRegister(clock, wbReadData, wbAck.and(wbWrite.not())));
 		{
 			RtlConditionChainVectorSignal chain = new RtlConditionChainVectorSignal(realm, 8);
 			chain.when(cpu.getPortAddress().select(4), cpuReadableByteSelect(ramAddressRegister));
@@ -67,6 +66,17 @@ public class RamTestController extends Design {
 		}
 
 		// Wishbone interface
+		{
+			// TODO consider an RtlConditionChainBitRegister -- would simplify this case
+			RtlConditionChainBitSignal chain = new RtlConditionChainBitSignal(realm);
+			wbCycle.setConnected(chain);
+			chain.when(cpu.getWriteStrobe().and(cpu.getPortAddress().select(7)), true);
+			chain.when(wbAck, false);
+			chain.otherwise(wbCycle);
+		}
+		wbWrite.setConnected(RtlBuilder.bitRegister(clock, cpu.getOutputData().select(0), cpu.getWriteStrobe().and(cpu.getPortAddress().select(7))));
+		wbAddress.setConnected(ramAddressRegister);
+		wbWriteData.setConnected(ramWriteDataRegister);
 		wishboneMaster = new WishboneSimpleMaster() {
 
 			@Override
@@ -91,9 +101,7 @@ public class RamTestController extends Design {
 
 			@Override
 			public void setReadDataSignal(RtlVectorSignal wbReadDataSignal) {
-				wbReadData.setConnected(readData);
-				ramReadData.setConnected(RtlBuilder.vectorRegister(clock, readData,
-					cpu.getWriteStrobe().and(cpu.getPortAddress().select(7)).and(cpu.getOutputData().select(0).not())));
+				wbReadData.setConnected(wbReadDataSignal);
 			}
 
 			@Override
