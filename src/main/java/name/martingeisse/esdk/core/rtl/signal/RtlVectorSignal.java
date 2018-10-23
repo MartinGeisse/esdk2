@@ -4,6 +4,7 @@
  */
 package name.martingeisse.esdk.core.rtl.signal;
 
+import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 
 /**
@@ -165,6 +166,10 @@ public interface RtlVectorSignal extends RtlSignal {
 
 	default RtlVectorRepetition repeat(int repetitions) {
 		return new RtlVectorRepetition(getRtlItem().getRealm(), this, repetitions);
+	}
+
+	default RtlVectorSampler sampler(RtlClockNetwork clock) {
+		return new RtlVectorSampler(clock, this);
 	}
 
 }

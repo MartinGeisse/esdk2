@@ -4,6 +4,8 @@
  */
 package name.martingeisse.esdk.core.rtl.signal;
 
+import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
+
 /**
  *
  */
@@ -53,6 +55,10 @@ public interface RtlBitSignal extends RtlSignal {
 
 	default RtlBitRepetition repeat(int repetitions) {
 		return new RtlBitRepetition(getRtlItem().getRealm(), this, repetitions);
+	}
+
+	default RtlBitSampler sampler(RtlClockNetwork clock) {
+		return new RtlBitSampler(clock, this);
 	}
 
 }
