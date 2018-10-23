@@ -6,9 +6,11 @@ package name.martingeisse.esdk.examples.ramtest;
 
 import name.martingeisse.esdk.core.model.items.IntervalItem;
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
+import name.martingeisse.esdk.core.rtl.RtlClockedItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.memory.RtlMemory;
 import name.martingeisse.esdk.core.rtl.memory.RtlSynchronousMemoryPort;
+import name.martingeisse.esdk.core.rtl.signal.connector.RtlVectorSignalConnector;
 import name.martingeisse.esdk.core.rtl.simulation.RtlClockGenerator;
 
 /**
@@ -50,5 +52,13 @@ public class RamTestControllerSimulationMain {
 		controller.simulate();
 
 	}
+
+	public static class WishboneRam extends RtlClockedItem {
+
+		private final RtlVectorSignalConnector addressConnector;
+		private final RtlVectorSignalConnector writeDataConnector;
+
+	}
+
 
 }
