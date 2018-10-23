@@ -46,6 +46,7 @@ public final class SimulatedDelayedWishboneRam32 extends RtlClockedItem implemen
 		this.writeDataSignal = new RtlVectorSignalConnectorSampler(clock, 32);
 		this.readDataSignal = new RtlSimulatedSettableVectorSignal(getRealm(), 32);
 		this.ackSignal = RtlSimulatedComputedBitSignal.of(getRealm(), () -> remainingDelay == 1);
+		this.remainingDelay = 0;
 	}
 
 	public int getAddressBits() {
@@ -106,14 +107,12 @@ public final class SimulatedDelayedWishboneRam32 extends RtlClockedItem implemen
 			}
 		} else {
 			remainingDelay--;
-			if (remainingDelay == 0) {
-				int address = addressSignal.getSample().getAsUnsignedInt();
-				if (writeEnableSignal.getSample()) {
-					matrix.setRow(address, writeDataSignal.getSample());
-				} else {
-					readDataSignal.setValue(matrix.getRow(address));
-				}
+			if (remainingDelay == 0 && writeEnableSignal.getSample()) {
+				matrix.setRow(addressSignal.getSample().getAsUnsignedInt(), writeDataSignal.getSample());
 			}
+		}
+		if (remainingDelay == 1 && !writeEnableSignal.getSample()) {
+			readDataSignal.setValue(matrix.getRow(addressSignal.getSample().getAsUnsignedInt()));
 		}
 	}
 

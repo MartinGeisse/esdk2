@@ -6,12 +6,10 @@ package name.martingeisse.esdk.examples.ramtest;
 
 import name.martingeisse.esdk.core.model.items.IntervalItem;
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
-import name.martingeisse.esdk.core.rtl.RtlClockedItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
-import name.martingeisse.esdk.core.rtl.memory.RtlMemory;
-import name.martingeisse.esdk.core.rtl.memory.RtlSynchronousMemoryPort;
-import name.martingeisse.esdk.core.rtl.signal.connector.RtlVectorSignalConnector;
 import name.martingeisse.esdk.core.rtl.simulation.RtlClockGenerator;
+import name.martingeisse.esdk.library.bus.wishbone.WishboneOneToOneConnector;
+import name.martingeisse.esdk.library.bus.wishbone.ram.SimulatedDelayedWishboneRam32;
 
 /**
  *
@@ -26,25 +24,15 @@ public class RamTestControllerSimulationMain {
 		RtlClockNetwork clock = controller.getClock();
 
 		// RAM
-		RtlMemory ram = new RtlMemory(realm, 8 * 1024 * 1024, 32); // actually 16M x 16 DDR -> 8M x 32 SDR
-		RtlSynchronousMemoryPort ramPort = ram.createSynchronousPort(clock,
-			RtlSynchronousMemoryPort.ReadSupport.ASYNCHRONOUS,
-			RtlSynchronousMemoryPort.WriteSupport.SYNCHRONOUS,
-			RtlSynchronousMemoryPort.ReadWriteInteractionMode.READ_FIRST);
+		SimulatedDelayedWishboneRam32 ram = new SimulatedDelayedWishboneRam32(clock, 23, 3);
+		WishboneOneToOneConnector wbConnector = new WishboneOneToOneConnector(realm);
+		wbConnector.connectMaster(controller.getWishboneMaster());
+		wbConnector.connectSlave(ram);
 
 		// display LEDs
 		new IntervalItem(controller, 10, 100_000_000, () -> { // 10 times per simulated second
 			System.out.println(controller.getLeds().getValue());
 		});
-
-		// glue logic
-
-		// 		ramPort.setAddressSignal(ramAddress.select(25, 0));
-		ramPort.setAddressSignal(controller.getRamAddress().select(25, 0));
-		ramPort.setWriteDataSignal(controller.getRamWriteData());
-		ramPort.setClockEnableSignal(controller.getRamClockEnable());
-		ramPort.setWriteEnableSignal(controller.getRamWriteEnable());
-		controller.setRamReadData(ramPort.getReadDataSignal());
 
 		// simulation
 		new RtlClockGenerator(clock, 10); // 100 MHz (10 ns) clock
@@ -52,13 +40,5 @@ public class RamTestControllerSimulationMain {
 		controller.simulate();
 
 	}
-
-	public static class WishboneRam extends RtlClockedItem {
-
-		private final RtlVectorSignalConnector addressConnector;
-		private final RtlVectorSignalConnector writeDataConnector;
-
-	}
-
 
 }
