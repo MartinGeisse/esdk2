@@ -46,12 +46,6 @@ public abstract class RtlClockedItem extends RtlItem {
 	// ----------------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Initializes the simulation run-time state of this item. This method must not access the state of other items
-	 * since the order in which items are initialized is undefined.
-	 */
-	public abstract void initializeSimulation();
-
-	/**
 	 * This method computes the next state of this item based on its current state and the signals provided by other
 	 * items. It must not cause changes to any signals, or to its internal state, or to the state of any other item.
 	 * <p>

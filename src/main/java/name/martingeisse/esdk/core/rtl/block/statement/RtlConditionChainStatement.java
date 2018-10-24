@@ -80,7 +80,7 @@ public final class RtlConditionChainStatement extends RtlStatement {
 	// Verilog generation
 	// ----------------------------------------------------------------------------------------------------------------
 
-	private void materialize() {
+	protected void materialize() {
 		if (materializedChain == null) {
 			RtlStatement result = defaultCase;
 			for (int i = cases.size() - 1; i >= 0; i--) {
@@ -98,13 +98,11 @@ public final class RtlConditionChainStatement extends RtlStatement {
 
 	@Override
 	public void analyzeSignalUsage(SignalUsageConsumer consumer) {
-		materialize();
 		materializedChain.analyzeSignalUsage(consumer);
 	}
 
 	@Override
 	public void printVerilogStatements(VerilogWriter out) {
-		materialize();
 		materializedChain.printVerilogStatements(out);
 	}
 

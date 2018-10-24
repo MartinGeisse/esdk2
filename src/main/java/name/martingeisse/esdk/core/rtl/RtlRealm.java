@@ -112,13 +112,6 @@ public final class RtlRealm extends Item {
 	// simulation
 	// ----------------------------------------------------------------------------------------------------------------
 
-	@Override
-	protected void initializeSimulation() {
-		for (RtlClockedItem item : clockedItems) {
-			item.initializeSimulation();
-		}
-	}
-
 	void onClockEdge(RtlClockNetwork clockNetwork) {
 		for (RtlClockedItem item : clockedItems) {
 			if (item.getClockNetwork() == clockNetwork) {

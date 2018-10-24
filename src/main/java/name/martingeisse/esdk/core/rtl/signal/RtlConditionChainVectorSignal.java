@@ -86,7 +86,7 @@ public final class RtlConditionChainVectorSignal extends RtlItem implements RtlV
 	// Verilog generation
 	// ----------------------------------------------------------------------------------------------------------------
 
-	private void materialize() {
+	protected void materialize() {
 		if (materializedChain == null) {
 			checkDefaultCaseExists();
 			materializedChain = defaultCase;
@@ -99,13 +99,11 @@ public final class RtlConditionChainVectorSignal extends RtlItem implements RtlV
 
 	@Override
 	public VerilogContribution getVerilogContribution() {
-		materialize();
 		return materializedChain.getRtlItem().getVerilogContribution();
 	}
 
 	@Override
 	public void printVerilogImplementationExpression(VerilogExpressionWriter out) {
-		materialize();
 		materializedChain.printVerilogImplementationExpression(out);
 	}
 

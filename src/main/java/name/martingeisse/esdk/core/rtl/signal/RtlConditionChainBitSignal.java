@@ -78,7 +78,7 @@ public final class RtlConditionChainBitSignal extends RtlItem implements RtlBitS
 	// Verilog generation
 	// ----------------------------------------------------------------------------------------------------------------
 
-	private void materialize() {
+	protected void materialize() {
 		if (materializedChain == null) {
 			checkDefaultCaseExists();
 			materializedChain = defaultCase;
@@ -91,13 +91,11 @@ public final class RtlConditionChainBitSignal extends RtlItem implements RtlBitS
 
 	@Override
 	public VerilogContribution getVerilogContribution() {
-		materialize();
 		return materializedChain.getRtlItem().getVerilogContribution();
 	}
 
 	@Override
 	public void printVerilogImplementationExpression(VerilogExpressionWriter out) {
-		materialize();
 		materializedChain.printVerilogImplementationExpression(out);
 	}
 

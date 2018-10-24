@@ -5,7 +5,9 @@
 package name.martingeisse.esdk.core.model;
 
 /**
- *
+ * Materialization: items are asked to materialize before simulation or synthesis. This may produce new items, which
+ * are in turn asked to materialize, and so on. All this may only affect the implementation of an item, NOT the
+ * interaction with other items.
  */
 public abstract class Item {
 
@@ -18,6 +20,9 @@ public abstract class Item {
 
 	public final Design getDesign() {
 		return design;
+	}
+
+	protected void materialize() {
 	}
 
 	protected void initializeSimulation() {
