@@ -1,13 +1,13 @@
 package name.martingeisse.esdk.examples.ramtest;
 
-import name.martingeisse.esdk.core.model.Design;
-import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.AuxiliaryFileFactory;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogGenerator;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
-import java.util.function.Consumer;
 
 /**
  *
@@ -19,29 +19,23 @@ public class RamTestControllerSynthesisMain {
 	public static void main(String[] args) throws Exception {
 
 		// build design
-		Design design = new Design();
-		RtlRealm realm = new RtlRealm(design);
-		// TODO
+		RamTestController controller = new RamTestController();
 
 		// generate output file
-		outputFolder.mkdirs();
+		if (!outputFolder.mkdirs()) {
+			throw new RuntimeException();
+		}
 		AuxiliaryFileFactory auxiliaryFileFactory =
 			filename -> new FileOutputStream(new File(outputFolder, filename));
-		generateFile("RamTestController.v", out -> {
-			new VerilogGenerator(out, realm, "RamTestController", auxiliaryFileFactory).generate();
-		});
-
-	}
-
-	private static void generateFile(String filename, Consumer<PrintWriter> contentGenerator) throws IOException {
-		File file = new File(outputFolder, filename);
+		File file = new File(outputFolder, "RamTestController.v");
 		try (FileOutputStream fileOutputStream = new FileOutputStream(file)) {
 			try (OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, StandardCharsets.US_ASCII)) {
 				try (PrintWriter printWriter = new PrintWriter(outputStreamWriter)) {
-					contentGenerator.accept(printWriter);
+					new VerilogGenerator(printWriter, controller.getRealm(), "RamTestController", auxiliaryFileFactory).generate();
 				}
 			}
 		}
+
 	}
 
 }
