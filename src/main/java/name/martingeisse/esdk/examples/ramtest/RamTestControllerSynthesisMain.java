@@ -22,9 +22,7 @@ public class RamTestControllerSynthesisMain {
 		RamTestController controller = new RamTestController();
 
 		// generate output file
-		if (!outputFolder.mkdirs()) {
-			throw new RuntimeException();
-		}
+		outputFolder.mkdirs();
 		AuxiliaryFileFactory auxiliaryFileFactory =
 			filename -> new FileOutputStream(new File(outputFolder, filename));
 		File file = new File(outputFolder, "RamTestController.v");

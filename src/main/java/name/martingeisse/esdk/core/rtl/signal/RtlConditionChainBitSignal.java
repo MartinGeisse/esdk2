@@ -4,7 +4,6 @@ import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
-import name.martingeisse.esdk.core.util.vector.VectorValue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +15,7 @@ public final class RtlConditionChainBitSignal extends RtlItem implements RtlBitS
 
 	private final List<Case> cases = new ArrayList<>();
 	private RtlBitSignal defaultCase;
+	private RtlBitSignal materializedChain;
 
 	public RtlConditionChainBitSignal(RtlRealm realm) {
 		super(realm);
@@ -49,15 +49,19 @@ public final class RtlConditionChainBitSignal extends RtlItem implements RtlBitS
 
 	}
 
+	private void checkDefaultCaseExists() {
+		if (defaultCase == null) {
+			throw new IllegalStateException("no default case for condition chain signal");
+		}
+	}
+
 	// ----------------------------------------------------------------------------------------------------------------
 	// simulation
 	// ----------------------------------------------------------------------------------------------------------------
 
 	@Override
 	protected void initializeSimulation() {
-		if (defaultCase == null) {
-			throw new IllegalStateException("no default case for condition chain signal");
-		}
+		checkDefaultCaseExists();
 	}
 
 	@Override
@@ -74,46 +78,27 @@ public final class RtlConditionChainBitSignal extends RtlItem implements RtlBitS
 	// Verilog generation
 	// ----------------------------------------------------------------------------------------------------------------
 
-	// TODO materialize cannot work because the generated contributions won't be respected by the verilog generator
-	/*
 	private void materialize() {
 		if (materializedChain == null) {
-			RtlStatement result = defaultCase;
+			checkDefaultCaseExists();
+			materializedChain = defaultCase;
 			for (int i = cases.size() - 1; i >= 0; i--) {
 				Case aCase = cases.get(i);
-				RtlWhenStatement when = new RtlWhenStatement(getRealm(), aCase.condition);
-				when.getThenBranch().addStatement(aCase.signal);
-				if (result != null) {
-					when.getOtherwiseBranch().addStatement(result);
-				}
-				result = when;
+				materializedChain = new RtlConditionalBitOperation(getRealm(), aCase.condition, aCase.signal, materializedChain);
 			}
-			materializedChain = (result == null ? new RtlNopStatement(getRealm()) : result);
 		}
 	}
 
 	@Override
-	public void analyzeSignalUsage(SignalUsageConsumer consumer) {
-		materialize();
-		materializedChain.analyzeSignalUsage(consumer);
-	}
-
-
-	@Override
-	public void printVerilogStatements(VerilogWriter out) {
-		materialize();
-		materializedChain.printVerilogStatements(out);
-	}
-*/
-
-	@Override
 	public VerilogContribution getVerilogContribution() {
-		throw new UnsupportedOperationException();
+		materialize();
+		return materializedChain.getRtlItem().getVerilogContribution();
 	}
 
 	@Override
 	public void printVerilogImplementationExpression(VerilogExpressionWriter out) {
-		throw new UnsupportedOperationException();
+		materialize();
+		materializedChain.printVerilogImplementationExpression(out);
 	}
 
 }
