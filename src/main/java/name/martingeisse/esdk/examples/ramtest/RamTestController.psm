@@ -106,6 +106,10 @@ readLoop:
     OUTPUT s7, 13
     LOAD sA, 00
     OUTPUT sA, 80
+readLoopDelayLoop:
+    INPUT sA, 80
+    COMPARE sA, 00
+    JUMP Z, readLoopDelayLoop
     INPUT sC, 40
     INPUT sD, 41
     INPUT sE, 42

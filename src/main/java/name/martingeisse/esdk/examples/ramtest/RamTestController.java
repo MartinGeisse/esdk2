@@ -76,6 +76,7 @@ public class RamTestController extends Design {
 			chain.when(cpu.getPortAddress().select(4), cpuReadableByteSelect(ramAddressRegister));
 			chain.when(cpu.getPortAddress().select(5), cpuReadableByteSelect(ramWriteDataRegister));
 			chain.when(cpu.getPortAddress().select(6), cpuReadableByteSelect(ramReadDataRegister));
+			chain.when(cpu.getPortAddress().select(7), new RtlConcatenation(realm, RtlVectorConstant.ofUnsigned(realm, 7, 0), wishboneMaster.getCycleStrobeSignal()));
 			chain.otherwise(RtlVectorConstant.ofUnsigned(realm, 8, 0));
 			cpu.setPortInputDataSignal(chain);
 		}
