@@ -38,6 +38,10 @@ writeLoop:
     OUTPUT s3, 23
     LOAD sA, 01
     OUTPUT sA, 80
+writeLoopDelayLoop:
+    INPUT sA, 80
+    COMPARE sA, 00
+    JUMP Z, writeLoopDelayLoop
 
     ; x = 5 * x + 1;
     LOAD sC, s0
