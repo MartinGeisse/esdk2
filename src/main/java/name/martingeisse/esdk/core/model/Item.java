@@ -4,6 +4,8 @@
  */
 package name.martingeisse.esdk.core.model;
 
+import name.martingeisse.esdk.core.model.validation.ValidationContext;
+
 /**
  * Materialization: items are asked to materialize before simulation or synthesis. This may produce new items, which
  * are in turn asked to materialize, and so on. All this may only affect the implementation of an item, NOT the
@@ -20,6 +22,12 @@ public abstract class Item {
 
 	public final Design getDesign() {
 		return design;
+	}
+
+	/**
+	 * Validates this item. Does not have to validate linked items since we use reflection to obtain them.
+	 */
+	public void customValidate(ValidationContext context) {
 	}
 
 	protected void materialize() {

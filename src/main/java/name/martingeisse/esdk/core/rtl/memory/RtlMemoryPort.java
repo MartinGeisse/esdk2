@@ -9,8 +9,6 @@ import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
  */
 public interface RtlMemoryPort {
 
-	void validate();
-
 	void prepareSynthesis(SynthesisPreparationContext context);
 
 	void analyzeSignalUsage(SignalUsageConsumer consumer);

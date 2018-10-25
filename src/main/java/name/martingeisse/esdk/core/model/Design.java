@@ -4,6 +4,8 @@
  */
 package name.martingeisse.esdk.core.model;
 
+import name.martingeisse.esdk.core.model.validation.DesignValidator;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +21,16 @@ public class Design {
 	void register(Item item) {
 		items.add(item);
 		itemsToMaterialize.add(item);
+	}
+
+	public Iterable<Item> getItems() {
+		return items;
+	}
+
+	public void validateOrException() {
+		DesignValidator validator = new DesignValidator(this);
+		validator.validate();
+		// TODO validator.get
 	}
 
 	public void simulate() {

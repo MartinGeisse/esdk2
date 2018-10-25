@@ -1,5 +1,6 @@
 package name.martingeisse.esdk.core.rtl.memory;
 
+import name.martingeisse.esdk.core.model.validation.ValidationContext;
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlClockedItem;
 import name.martingeisse.esdk.core.rtl.RtlItem;
@@ -209,11 +210,6 @@ public final class RtlSynchronousMemoryPort extends RtlClockedItem implements Rt
 	// ----------------------------------------------------------------------------------------------------------------
 
 	@Override
-	public void initializeSimulation() {
-		validate();
-	}
-
-	@Override
 	public void computeNextState() {
 		sampledClockEnable = clockEnableSignal == null || clockEnableSignal.getValue();
 		sampledWriteEnable = writeEnableSignal == null || writeEnableSignal.getValue();
@@ -262,17 +258,18 @@ public final class RtlSynchronousMemoryPort extends RtlClockedItem implements Rt
 	}
 
 	@Override
-	public void validate() {
+	public void customValidate(ValidationContext context) {
 		if (addressSignal == null) {
-			throw new IllegalStateException("no address signal in synchronous memory port");
+			context.reportError("no address signal");
 		}
 		if (writeSupport != WriteSupport.NONE && writeDataSignal == null) {
+			context.reportError("synchronous memory port with write support but no write data signal");
 		}
 		if (writeSupport == WriteSupport.NONE && writeEnableSignal != null) {
-			throw new IllegalStateException("synchronous memory port with write enable signal but no write support");
+			context.reportError("synchronous memory port with write enable signal but no write support");
 		}
 		if (writeSupport == WriteSupport.NONE && writeDataSignal != null) {
-			throw new IllegalStateException("synchronous memory port with write data signal but no write support");
+			context.reportError("synchronous memory port with write data signal but no write support");
 		}
 	}
 

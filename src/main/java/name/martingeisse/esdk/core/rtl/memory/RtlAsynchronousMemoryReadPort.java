@@ -1,5 +1,6 @@
 package name.martingeisse.esdk.core.rtl.memory;
 
+import name.martingeisse.esdk.core.model.validation.ValidationContext;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
@@ -48,9 +49,9 @@ public final class RtlAsynchronousMemoryReadPort extends RtlItem implements RtlM
 	}
 
 	@Override
-	public void validate() {
+	public void customValidate(ValidationContext context) {
 		if (addressSignal == null) {
-			throw new IllegalStateException("no address signal for asynchronous memory port");
+			context.reportError("no address signal");
 		}
 	}
 
