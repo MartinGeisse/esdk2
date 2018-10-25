@@ -258,7 +258,7 @@ public final class RtlSynchronousMemoryPort extends RtlClockedItem implements Rt
 	}
 
 	@Override
-	public void customValidate(ValidationContext context) {
+	public void validate(ValidationContext context) {
 		if (addressSignal == null) {
 			context.reportError("no address signal");
 		}

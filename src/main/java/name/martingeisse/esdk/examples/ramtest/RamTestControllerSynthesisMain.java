@@ -1,5 +1,8 @@
 package name.martingeisse.esdk.examples.ramtest;
 
+import name.martingeisse.esdk.core.model.validation.DesignValidationResult;
+import name.martingeisse.esdk.core.model.validation.DesignValidator;
+import name.martingeisse.esdk.core.model.validation.print.WriterValidationResultPrinter;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.AuxiliaryFileFactory;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogGenerator;
 
@@ -20,6 +23,10 @@ public class RamTestControllerSynthesisMain {
 
 		// build design
 		RamTestController controller = new RamTestController();
+
+		// validate
+		DesignValidationResult validationResult = new DesignValidator(controller).validate();
+		validationResult.format(new WriterValidationResultPrinter(System.out));
 
 		// generate output file
 		outputFolder.mkdirs();

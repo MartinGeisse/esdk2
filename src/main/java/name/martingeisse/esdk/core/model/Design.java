@@ -4,7 +4,9 @@
  */
 package name.martingeisse.esdk.core.model;
 
+import name.martingeisse.esdk.core.model.validation.DesignValidationResult;
 import name.martingeisse.esdk.core.model.validation.DesignValidator;
+import name.martingeisse.esdk.core.model.validation.ItemValidationResult;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,13 +29,21 @@ public class Design {
 		return items;
 	}
 
-	public void validateOrException() {
+	public void validateOrException(boolean failOnWarnings) {
 		DesignValidator validator = new DesignValidator(this);
-		validator.validate();
-		// TODO validator.get
+		DesignValidationResult result = validator.validate();
+		for (ItemValidationResult itemResult : result.getItemResults().values()) {
+			if (!itemResult.getErrors().isEmpty()) {
+				throw new IllegalStateException("validation failed with errors");
+			}
+			if (failOnWarnings && !itemResult.getWarnings().isEmpty()) {
+				throw new IllegalStateException("validation failed with warnings");
+			}
+		}
 	}
 
 	public void simulate() {
+		validateOrException(false);
 		needSimulation();
 		materialize();
 		for (Item item : items) {

@@ -25,9 +25,9 @@ public abstract class Item {
 	}
 
 	/**
-	 * Validates this item. Does not have to validate linked items since we use reflection to obtain them.
+	 * Validates this item. Does not have to validate linked items since we already know them from the {@link Design}.
 	 */
-	public void customValidate(ValidationContext context) {
+	public void validate(ValidationContext context) {
 	}
 
 	protected void materialize() {

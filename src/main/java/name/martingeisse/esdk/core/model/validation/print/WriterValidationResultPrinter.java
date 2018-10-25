@@ -1,5 +1,6 @@
-package name.martingeisse.esdk.core.model.validation;
+package name.martingeisse.esdk.core.model.validation.print;
 
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.Writer;
 
@@ -12,6 +13,10 @@ public final class WriterValidationResultPrinter implements ValidationResultPrin
 	private int indentation;
 
 	public WriterValidationResultPrinter(Writer out) {
+		this(new PrintWriter(out));
+	}
+
+	public WriterValidationResultPrinter(PrintStream out) {
 		this(new PrintWriter(out));
 	}
 
