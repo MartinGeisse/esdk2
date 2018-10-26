@@ -51,17 +51,27 @@ public final class DesignStructureAnalyzer {
 			return;
 		}
 		for (Field field : currentClass.getDeclaredFields()) {
+
+			String propertyName = field.getName();
+			if (subItemCollector.containsKey(propertyName)) {
+				propertyName = currentClass.getSimpleName() + '.' + field.getName();
+				if (subItemCollector.containsKey(propertyName)) {
+					propertyName = currentClass.getName() + '.' + field.getName();
+				}
+			}
+
 			field.setAccessible(true);
 			Object value = field.get(item);
 			if (value instanceof Item) {
-				String propertyName = field.getName();
-				if (subItemCollector.containsKey(propertyName)) {
-					propertyName = currentClass.getSimpleName() + '.' + field.getName();
-					if (subItemCollector.containsKey(propertyName)) {
-						propertyName = currentClass.getName() + '.' + field.getName();
-					}
-				}
 				subItemCollector.put(propertyName, (Item) value);
+			} else if (value instanceof Iterable<?>) {
+				int i = 0;
+				for (Object element : (Iterable<?>)value) {
+					if (element instanceof Item) {
+						subItemCollector.put(propertyName + '[' + i + ']', (Item)element);
+					}
+					i++;
+				}
 			}
 		}
 		collectSubItems(item, currentClass.getSuperclass(), subItemCollector);

@@ -57,13 +57,13 @@ public final class WriterValidationResultPrinter implements ValidationResultPrin
 	@Override
 	public void printError(String message) {
 		indent();
-		System.out.println("ERROR: " + message);
+		out.println("ERROR: " + message);
 	}
 
 	@Override
 	public void printWarning(String message) {
 		indent();
-		System.out.println("WARNING: " + message);
+		out.println("WARNING: " + message);
 	}
 
 	@Override

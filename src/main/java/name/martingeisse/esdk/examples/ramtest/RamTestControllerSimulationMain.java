@@ -4,9 +4,11 @@
  */
 package name.martingeisse.esdk.examples.ramtest;
 
+import name.martingeisse.esdk.core.model.Design;
 import name.martingeisse.esdk.core.model.items.IntervalItem;
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
+import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
 import name.martingeisse.esdk.core.rtl.simulation.RtlClockGenerator;
 import name.martingeisse.esdk.library.bus.wishbone.WishboneOneToOneConnector;
 import name.martingeisse.esdk.library.bus.wishbone.ram.SimulatedDelayedWishboneRam32;
@@ -19,9 +21,10 @@ public class RamTestControllerSimulationMain {
 	public static void main(String[] args) {
 
 		// design
-		RamTestController controller = new RamTestController();
-		RtlRealm realm = controller.getRealm();
-		RtlClockNetwork clock = controller.getClock();
+		Design design = new Design();
+		RtlRealm realm = new RtlRealm(design);
+		RtlClockNetwork clock = realm.createClockNetwork(new RtlBitConstant(realm, false));
+		RamTestController controller = new RamTestController(realm, clock);
 
 		// RAM
 		SimulatedDelayedWishboneRam32 ram = new SimulatedDelayedWishboneRam32(clock, 23, 3);
@@ -30,14 +33,14 @@ public class RamTestControllerSimulationMain {
 		wbConnector.connectSlave(ram);
 
 		// display LEDs
-		new IntervalItem(controller, 10, 100_000_000, () -> { // 10 times per simulated second
+		new IntervalItem(design, 10, 100_000_000, () -> { // 10 times per simulated second
 			System.out.println(controller.getLeds().getValue());
 		});
 
 		// simulation
 		new RtlClockGenerator(clock, 10); // 100 MHz (10 ns) clock
-		controller.fire(controller::stopSimulation, 20_000_000_000L);
-		controller.simulate();
+		design.fire(design::stopSimulation, 20_000_000_000L);
+		design.simulate();
 
 	}
 

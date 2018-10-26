@@ -4,18 +4,18 @@
  */
 package name.martingeisse.esdk.examples.ramtest;
 
-import name.martingeisse.esdk.core.model.Design;
 import name.martingeisse.esdk.core.rtl.RtlBuilder;
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
+import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.block.RtlClockedBlock;
 import name.martingeisse.esdk.core.rtl.block.RtlProceduralBitSignal;
 import name.martingeisse.esdk.core.rtl.block.statement.RtlConditionChainStatement;
 import name.martingeisse.esdk.core.rtl.block.statement.RtlStatementSequence;
-import name.martingeisse.esdk.core.rtl.pin.RtlInputPin;
-import name.martingeisse.esdk.core.rtl.pin.RtlOutputPin;
 import name.martingeisse.esdk.core.rtl.signal.*;
 import name.martingeisse.esdk.core.rtl.signal.connector.RtlVectorSignalConnector;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.EmptyVerilogContribution;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
 import name.martingeisse.esdk.library.bus.wishbone.WishboneSimpleMaster;
 import name.martingeisse.esdk.library.bus.wishbone.WishboneSimpleMasterAdapter;
 import name.martingeisse.esdk.picoblaze.model.rtl.PicoblazeRtlWithAssociatedProgram;
@@ -23,32 +23,32 @@ import name.martingeisse.esdk.picoblaze.model.rtl.PicoblazeRtlWithAssociatedProg
 /**
  *
  */
-public class RamTestController extends Design {
+public class RamTestController extends RtlItem {
 
-	private final RtlRealm realm = new RtlRealm(this);
-	private final RtlClockNetwork clock = realm.createClockNetwork(inPin(realm, "clock"));
-	private final PicoblazeRtlWithAssociatedProgram cpu = new PicoblazeRtlWithAssociatedProgram(clock, RamTestController.class);
+	private final RtlRealm realm;
+	private final RtlClockNetwork clock;
+	private final PicoblazeRtlWithAssociatedProgram cpu;
 
-	private final WishboneSimpleMasterAdapter wishboneMaster = new WishboneSimpleMasterAdapter(realm);
+	private final WishboneSimpleMasterAdapter wishboneMaster;
 
-	private final RtlVectorSignalConnector ramAddressRegister = new RtlVectorSignalConnector(realm, 32);
-	private final RtlVectorSignalConnector ramReadDataRegister = new RtlVectorSignalConnector(realm, 32);
-	private final RtlVectorSignalConnector ramWriteDataRegister = new RtlVectorSignalConnector(realm, 32);
+	private final RtlVectorSignalConnector ramAddressRegister;
+	private final RtlVectorSignalConnector ramReadDataRegister;
+	private final RtlVectorSignalConnector ramWriteDataRegister;
 
 	private final RtlVectorSignal leds;
 
-	public RamTestController() {
+	public RamTestController(RtlRealm realm, RtlClockNetwork clock) {
+		super(realm);
+		this.realm = realm;
+		this.clock = clock;
+		this.cpu = new PicoblazeRtlWithAssociatedProgram(clock, RamTestController.class);
+		this.wishboneMaster = new WishboneSimpleMasterAdapter(realm);
+		this.ramAddressRegister = new RtlVectorSignalConnector(realm, 32);
+		this.ramReadDataRegister = new RtlVectorSignalConnector(realm, 32);
+		this.ramWriteDataRegister = new RtlVectorSignalConnector(realm, 32);
 
 		// LEDs
 		leds = RtlBuilder.vectorRegister(clock, cpu.getOutputData(), cpu.getWriteStrobe().and(cpu.getPortAddress().select(3)));
-		outPin(realm, "led0", leds.select(0));
-		outPin(realm, "led1", leds.select(1));
-		outPin(realm, "led2", leds.select(2));
-		outPin(realm, "led3", leds.select(3));
-		outPin(realm, "led4", leds.select(4));
-		outPin(realm, "led5", leds.select(5));
-		outPin(realm, "led6", leds.select(6));
-		outPin(realm, "led7", leds.select(7));
 
 		// Wishbone interface
 		{
@@ -83,10 +83,6 @@ public class RamTestController extends Design {
 
 	}
 
-	public RtlRealm getRealm() {
-		return realm;
-	}
-
 	public RtlClockNetwork getClock() {
 		return clock;
 	}
@@ -117,16 +113,9 @@ public class RamTestController extends Design {
 		).select(7, 0);
 	}
 
-	private static RtlOutputPin outPin(RtlRealm realm, String id, RtlBitSignal outputSignal) {
-		RtlOutputPin pin = new RtlOutputPin(realm);
-		pin.setId(id);
-		return pin;
-	}
-
-	private static RtlInputPin inPin(RtlRealm realm, String id) {
-		RtlInputPin pin = new RtlInputPin(realm);
-		pin.setId(id);
-		return pin;
+	@Override
+	public VerilogContribution getVerilogContribution() {
+		return new EmptyVerilogContribution();
 	}
 
 }
