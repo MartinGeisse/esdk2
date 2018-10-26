@@ -1,5 +1,6 @@
 package name.martingeisse.esdk.core.model.validation.print;
 
+import java.io.Closeable;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.Writer;
@@ -7,7 +8,7 @@ import java.io.Writer;
 /**
  *
  */
-public final class WriterValidationResultPrinter implements ValidationResultPrinter {
+public final class WriterValidationResultPrinter implements ValidationResultPrinter, Closeable {
 
 	private final PrintWriter out;
 	private int indentation;
@@ -24,15 +25,22 @@ public final class WriterValidationResultPrinter implements ValidationResultPrin
 		this.out = out;
 	}
 
+	public void flush() {
+		out.flush();
+	}
+
+	public void close() {
+		out.close();
+	}
+
 	@Override
 	public void printFoldedSubItem(String propertyName, String className) {
 		indent();
 		if (propertyName == null) {
 			out.println("* " + className + " (--)");
 		} else {
-			out.println(propertyName + ": " + className+ " (--)");
+			out.println(propertyName + ": " + className + " (--)");
 		}
-		indentation++;
 	}
 
 	@Override

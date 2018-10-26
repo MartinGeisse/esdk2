@@ -17,13 +17,15 @@ public final class ValidationResultFormatter {
 
 	private final DesignValidationResult designResult;
 	private final ValidationResultPrinter printer;
+	private final boolean foldValid;
 	private Map<Item, Map<String, Item>> subItemRelation;
 	private Set<Item> rootItems;
 	private Map<Item, String> references;
 
-	public ValidationResultFormatter(DesignValidationResult designResult, ValidationResultPrinter printer) {
+	public ValidationResultFormatter(DesignValidationResult designResult, ValidationResultPrinter printer, boolean foldValid) {
 		this.designResult = designResult;
 		this.printer = printer;
+		this.foldValid = foldValid;
 	}
 
 	public void format() {
@@ -46,7 +48,7 @@ public final class ValidationResultFormatter {
 	private void print(String propertyName, Item item) {
 		String itemClass = item.getClass().getSimpleName();
 		ItemValidationResult itemResult = designResult.getItemResults().get(item);
-		if (hasErrorsOrWarnings(itemResult)) {
+		if (hasErrorsOrWarnings(itemResult) || !foldValid) {
 			printer.beginItem(propertyName, itemClass);
 			printContents(itemResult);
 			printer.endItem();

@@ -26,7 +26,9 @@ public class RamTestControllerSynthesisMain {
 
 		// validate
 		DesignValidationResult validationResult = new DesignValidator(controller).validate();
-		validationResult.format(new WriterValidationResultPrinter(System.out));
+		WriterValidationResultPrinter printer = new WriterValidationResultPrinter(System.out);
+		validationResult.format(printer);
+		printer.flush();
 
 		// generate output file
 		outputFolder.mkdirs();

@@ -28,7 +28,7 @@ public final class DesignValidationResult {
 	}
 
 	public void format(ValidationResultPrinter printer) {
-		new ValidationResultFormatter(this, printer).format();
+		new ValidationResultFormatter(this, printer, false).format();
 	}
 
 }
