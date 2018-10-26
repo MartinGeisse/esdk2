@@ -81,7 +81,7 @@ public class PicoBlinkDesign extends Design {
 		configuration.setDrive(8);
 		RtlOutputPin pin = new RtlOutputPin(realm);
 		pin.setId(id);
-		pin.setConfiguration(new XilinxPinConfiguration());
+		pin.setConfiguration(configuration);
 		return pin;
 	}
 
@@ -90,7 +90,7 @@ public class PicoBlinkDesign extends Design {
 		configuration.setIostandard("LVCMOS33");
 		RtlInputPin pin = new RtlInputPin(realm);
 		pin.setId("C9");
-		pin.setConfiguration(new XilinxPinConfiguration());
+		pin.setConfiguration(configuration);
 		return pin;
 	}
 
@@ -100,7 +100,7 @@ public class PicoBlinkDesign extends Design {
 		configuration.setAdditionalInfo("PULLUP");
 		RtlInputPin pin = new RtlInputPin(realm);
 		pin.setId(id);
-		pin.setConfiguration(new XilinxPinConfiguration());
+		pin.setConfiguration(configuration);
 		return pin;
 	}
 
