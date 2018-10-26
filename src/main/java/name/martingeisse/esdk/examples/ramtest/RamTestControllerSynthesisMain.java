@@ -8,6 +8,8 @@ import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.pin.RtlInputPin;
 import name.martingeisse.esdk.core.rtl.pin.RtlOutputPin;
+import name.martingeisse.esdk.core.rtl.pin.simulation.RtlVectorInputPin;
+import name.martingeisse.esdk.core.rtl.pin.simulation.RtlVectorOutputPin;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.AuxiliaryFileFactory;
@@ -32,28 +34,25 @@ public class RamTestControllerSynthesisMain {
 		// build design
 		Design design = new Design();
 		RtlRealm realm = new RtlRealm(design);
-		RtlClockNetwork clock = realm.createClockNetwork(inPin(realm, "clock"));
+		RtlClockNetwork clock = realm.createClockNetwork(inPin(realm, "Clock"));
 		RamTestController controller = new RamTestController(realm, clock);
 		RtlVectorSignal leds = controller.getLeds();
 
 		// add pins
-		outPin(realm, "led0", leds.select(0));
-		outPin(realm, "led1", leds.select(1));
-		outPin(realm, "led2", leds.select(2));
-		outPin(realm, "led3", leds.select(3));
-		outPin(realm, "led4", leds.select(4));
-		outPin(realm, "led5", leds.select(5));
-		outPin(realm, "led6", leds.select(6));
-		outPin(realm, "led7", leds.select(7));
+		outPin(realm, "Leds", 8, leds);
 		WishboneSimpleMaster wishboneMaster = controller.getWishboneMaster();
-		outPin(realm, "wbCycleStrobe", wishboneMaster.getCycleStrobeSignal());
-		TODO
+		outPin(realm, "WbCycleStrobe", wishboneMaster.getCycleStrobeSignal());
+		outPin(realm, "WbWriteEnable", wishboneMaster.getWriteEnableSignal());
+		outPin(realm, "WbAddress", 32, wishboneMaster.getAddressSignal());
+		outPin(realm, "WbWriteData", 32, wishboneMaster.getWriteDataSignal());
+		wishboneMaster.setReadDataSignal(inPin(realm, "WbReadData", 32));
+		wishboneMaster.setAckSignal(inPin(realm, "WbAck"));
 
 		// validate
-		DesignValidationResult validationResult = new DesignValidator(design).validate();
-		WriterValidationResultPrinter printer = new WriterValidationResultPrinter(System.out);
-		validationResult.format(printer);
-		printer.flush();
+//		DesignValidationResult validationResult = new DesignValidator(design).validate();
+//		WriterValidationResultPrinter printer = new WriterValidationResultPrinter(System.out);
+//		validationResult.format(printer);
+//		printer.flush();
 
 		// generate output file
 		outputFolder.mkdirs();
@@ -73,11 +72,25 @@ public class RamTestControllerSynthesisMain {
 	private static RtlOutputPin outPin(RtlRealm realm, String id, RtlBitSignal outputSignal) {
 		RtlOutputPin pin = new RtlOutputPin(realm);
 		pin.setId(id);
+		pin.setOutputSignal(outputSignal);
+		return pin;
+	}
+
+	private static RtlVectorOutputPin outPin(RtlRealm realm, String id, int width, RtlVectorSignal outputSignal) {
+		RtlVectorOutputPin pin = new RtlVectorOutputPin(realm, width);
+		pin.setId(id);
+		pin.setOutputSignal(outputSignal);
 		return pin;
 	}
 
 	private static RtlInputPin inPin(RtlRealm realm, String id) {
 		RtlInputPin pin = new RtlInputPin(realm);
+		pin.setId(id);
+		return pin;
+	}
+
+	private static RtlVectorInputPin inPin(RtlRealm realm, String id, int width) {
+		RtlVectorInputPin pin = new RtlVectorInputPin(realm, width);
 		pin.setId(id);
 		return pin;
 	}

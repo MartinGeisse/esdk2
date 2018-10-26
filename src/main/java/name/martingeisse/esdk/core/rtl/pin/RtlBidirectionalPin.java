@@ -84,7 +84,7 @@ public final class RtlBidirectionalPin extends RtlPin implements RtlBitSignal {
 
 			@Override
 			public void analyzePins(PinConsumer consumer) {
-				consumer.consumePin("inout", getNetName());
+				consumer.consumePin("inout", getNetName(), null);
 			}
 
 			@Override

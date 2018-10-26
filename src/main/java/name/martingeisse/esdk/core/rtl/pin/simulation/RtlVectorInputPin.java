@@ -2,26 +2,36 @@
  * Copyright (c) 2018 Martin Geisse
  * This file is distributed under the terms of the MIT license.
  */
-package name.martingeisse.esdk.core.rtl.pin;
+package name.martingeisse.esdk.core.rtl.pin.simulation;
 
 import name.martingeisse.esdk.core.rtl.RtlRealm;
-import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
+import name.martingeisse.esdk.core.rtl.pin.RtlPin;
+import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.*;
+import name.martingeisse.esdk.core.util.vector.VectorValue;
 
 /**
- *
+ * This pin type isn't supported by ISE generation but can be used to generate Verilog code for a module with
+ * vector ports.
  */
-public final class RtlInputPin extends RtlPin implements RtlBitSignal {
+public final class RtlVectorInputPin extends RtlPin implements RtlVectorSignal {
 
-	private final PinSimulationSignal settableBitSignal;
+	private final int width;
+	private final VectorPinSimulationSignal simulationSignal;
 
-	public RtlInputPin(RtlRealm realm) {
+	public RtlVectorInputPin(RtlRealm realm, int width) {
 		super(realm);
-		this.settableBitSignal = new PinSimulationSignal(realm);
+		this.simulationSignal = new VectorPinSimulationSignal(realm, width);
+		this.width = width;
 	}
 
-	public PinSimulationSignal getSettableBitSignal() {
-		return settableBitSignal;
+	public VectorPinSimulationSignal getSimulationSignal() {
+		return simulationSignal;
+	}
+
+	@Override
+	public int getWidth() {
+		return width;
 	}
 
 	// ----------------------------------------------------------------------------------------------------------------
@@ -29,8 +39,8 @@ public final class RtlInputPin extends RtlPin implements RtlBitSignal {
 	// ----------------------------------------------------------------------------------------------------------------
 
 	@Override
-	public boolean getValue() {
-		return settableBitSignal.getValue();
+	public VectorValue getValue() {
+		return simulationSignal.getValue();
 	}
 
 	// ----------------------------------------------------------------------------------------------------------------
@@ -53,7 +63,7 @@ public final class RtlInputPin extends RtlPin implements RtlBitSignal {
 
 			@Override
 			public void prepareSynthesis(SynthesisPreparationContext context) {
-				context.declareSignal(RtlInputPin.this, getNetName(), false, null, false);
+				context.declareSignal(RtlVectorInputPin.this, getNetName(), false, null, false);
 			}
 
 			@Override
@@ -62,7 +72,7 @@ public final class RtlInputPin extends RtlPin implements RtlBitSignal {
 
 			@Override
 			public void analyzePins(PinConsumer consumer) {
-				consumer.consumePin("input", getNetName(), null);
+				consumer.consumePin("input", getNetName(), width);
 			}
 
 			@Override

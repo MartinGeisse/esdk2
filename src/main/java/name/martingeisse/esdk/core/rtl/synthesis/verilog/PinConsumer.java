@@ -9,6 +9,6 @@ package name.martingeisse.esdk.core.rtl.synthesis.verilog;
  */
 public interface PinConsumer {
 
-	void consumePin(String direction, String name);
+	void consumePin(String direction, String name, Integer vectorSize);
 
 }

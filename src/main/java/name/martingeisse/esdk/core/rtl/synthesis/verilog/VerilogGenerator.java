@@ -169,9 +169,9 @@ public class VerilogGenerator {
 		}
 
 		// consume pins
-		List<Pair<String, String>> pins = new ArrayList<>();
+		List<PinContribution> pins = new ArrayList<>();
 		for (VerilogContribution contribution : contributions) {
-			contribution.analyzePins((direction, name) -> pins.add(Pair.of(direction, name)));
+			contribution.analyzePins((direction, name, width) -> pins.add(new PinContribution(direction, name, width)));
 		}
 
 		// assemble the toplevel module
@@ -182,14 +182,14 @@ public class VerilogGenerator {
 		if (!pins.isEmpty()) {
 			out.startIndentation();
 			boolean first = true;
-			for (Pair<String, String> pin : pins) {
+			for (PinContribution pin : pins) {
 				if (first) {
 					first = false;
 				} else {
 					out.println(',');
 				}
 				out.indent();
-				out.print(pin.getRight());
+				out.print(pin.name);
 			}
 			out.println();
 			out.endIndentation();
@@ -197,8 +197,12 @@ public class VerilogGenerator {
 		out.println(");");
 		out.println();
 		if (!pins.isEmpty()) {
-			for (Pair<String, String> pin : pins) {
-				out.println(pin.getLeft() + ' ' + pin.getRight() + ';');
+			for (PinContribution pin : pins) {
+				if (pin.width == null) {
+					out.println(pin.direction + ' ' + pin.name + ';');
+				} else {
+					out.println(pin.direction + '[' + (pin.width - 1) + ":0] " + pin.name + ';');
+				}
 			}
 			out.println();
 		}
@@ -294,6 +298,20 @@ public class VerilogGenerator {
 			this.explicitDeclaration = explicitDeclaration;
 			this.kind = kind;
 			this.assignment = assignment;
+		}
+
+	}
+
+	static class PinContribution {
+
+		final String direction;
+		final String name;
+		final Integer width;
+
+		public PinContribution(String direction, String name, Integer width) {
+			this.direction = direction;
+			this.name = name;
+			this.width = width;
 		}
 
 	}

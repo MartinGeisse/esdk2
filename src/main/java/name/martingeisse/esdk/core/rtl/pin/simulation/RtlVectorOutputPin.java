@@ -2,28 +2,36 @@
  * Copyright (c) 2018 Martin Geisse
  * This file is distributed under the terms of the MIT license.
  */
-package name.martingeisse.esdk.core.rtl.pin;
+package name.martingeisse.esdk.core.rtl.pin.simulation;
 
 import name.martingeisse.esdk.core.rtl.RtlRealm;
+import name.martingeisse.esdk.core.rtl.pin.RtlPin;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
+import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.*;
 
 /**
- *
+ * This pin type isn't supported by ISE generation but can be used to generate Verilog code for a module with
+ * vector ports.
  */
-public final class RtlOutputPin extends RtlPin {
+public final class RtlVectorOutputPin extends RtlPin {
 
-	private RtlBitSignal outputSignal;
+	private final int width;
+	private RtlVectorSignal outputSignal;
 
-	public RtlOutputPin(RtlRealm realm) {
+	public RtlVectorOutputPin(RtlRealm realm, int width) {
 		super(realm);
+		this.width = width;
 	}
 
-	public RtlBitSignal getOutputSignal() {
+	public RtlVectorSignal getOutputSignal() {
 		return outputSignal;
 	}
 
-	public void setOutputSignal(RtlBitSignal outputSignal) {
+	public void setOutputSignal(RtlVectorSignal outputSignal) {
+		if (outputSignal.getWidth() != width) {
+			throw new IllegalArgumentException("trying to set signal with wrong width " + outputSignal.getWidth() + ", expected " + width);
+		}
 		this.outputSignal = checkSameRealm(outputSignal);
 	}
 
@@ -46,7 +54,7 @@ public final class RtlOutputPin extends RtlPin {
 
 			@Override
 			public void analyzePins(PinConsumer consumer) {
-				consumer.consumePin("output", getNetName(), null);
+				consumer.consumePin("output", getNetName(), width);
 			}
 
 			@Override
