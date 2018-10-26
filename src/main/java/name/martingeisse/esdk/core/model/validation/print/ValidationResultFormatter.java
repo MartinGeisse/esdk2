@@ -81,7 +81,14 @@ public final class ValidationResultFormatter {
 			printer.printWarning(warning);
 		}
 		for (Map.Entry<String, Item> itemEntry : subItemRelation.get(itemResult.getItem()).entrySet()) {
-			print(itemEntry.getKey(), itemEntry.getValue());
+			String propertyName = itemEntry.getKey();
+			Item subItem = itemEntry.getValue();
+			String reference = references.get(subItem);
+			if (reference == null) {
+				print(propertyName, subItem);
+			} else {
+				printer.printReference(propertyName, reference);
+			}
 		}
 	}
 

@@ -4,6 +4,7 @@
  */
 package name.martingeisse.esdk.core.rtl.signal.connector;
 
+import name.martingeisse.esdk.core.model.validation.ValidationContext;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
@@ -26,6 +27,13 @@ public abstract class RtlSignalConnector extends RtlItem implements RtlSignal {
 	}
 
 	public abstract RtlSignal getConnected();
+
+	@Override
+	public void validate(ValidationContext context) {
+		if (getConnected() == null) {
+			context.reportError("no signal connected");
+		}
+	}
 
 	// ----------------------------------------------------------------------------------------------------------------
 	// Verilog generation
