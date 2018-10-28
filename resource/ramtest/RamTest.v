@@ -25,7 +25,7 @@ output led5;
 output led6;
 output led7;
 
-wire clock, clock90, clock180, clock270, reset;
+wire clock, clock90, clock180, clock270, reset, clockOk;
 
 wire[7:0] leds;
 assign led0 = leds[0];
