@@ -2,7 +2,8 @@
 `timescale 1ns / 1ps
 
 module RamTest(
-	clock,
+	clockIn,
+	resetIn,
 	led0,
 	led1,
 	led2,
@@ -13,7 +14,8 @@ module RamTest(
 	led7
 );
 
-input clock;
+input clockIn;
+input resetIn;
 output led0;
 output led1;
 output led2;
@@ -22,6 +24,8 @@ output led4;
 output led5;
 output led6;
 output led7;
+
+wire clock, clock90, clock180, clock270, reset;
 
 wire[7:0] leds;
 assign led0 = leds[0];
@@ -51,6 +55,20 @@ RamTestController ramTestController1(
     .pinWbAck(wbAck)
 );
 
+
+// clock / reset
+clk_reset clk_reset1(
+	.clk_in(clockIn),
+	.reset_in(resetIn),
+	.ddr_clk_0(clock),
+	.ddr_clk_90(clock90),
+	.ddr_clk_180(clock180),
+	.ddr_clk_270(clock270),
+	.ddr_clk_ok(clockOk),
+	// .clk(clk), TODO remove
+	.reset(reset)
+);
+
 // test
 reg ackReg;
 initial ackReg = 0;
@@ -59,6 +77,7 @@ always @(posedge clock) begin
         ackReg <= ~ackReg;
     end
 end
+assign wbAck = ackReg;
 reg[31:0] ram[255:0];
 reg[31:0] ramReadData;
 always @(posedge clock) begin
