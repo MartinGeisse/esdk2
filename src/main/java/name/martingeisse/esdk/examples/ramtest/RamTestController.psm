@@ -16,7 +16,7 @@
 
     ; while (i < 8M)
 writeLoop:
-    COMPARE s6, 80
+    COMPARE s5, 01
     JUMP Z, writePhaseFinished
 
     ; show i >> 20 on LEDs
@@ -92,7 +92,7 @@ writePhaseFinished:
 
     ; while (i < 8M)
 readLoop:
-    COMPARE s6, 80
+    COMPARE s5, 01
     JUMP Z, success
 
     ; show i >> 20 on LEDs
