@@ -27,6 +27,7 @@ public class RamTestController extends RtlItem {
 
 	private final RtlRealm realm;
 	private final RtlClockNetwork clock;
+	private final RtlBitSignal reset;
 	private final PicoblazeRtlWithAssociatedProgram cpu;
 
 	private final WishboneSimpleMasterAdapter wishboneMaster;
@@ -37,11 +38,13 @@ public class RamTestController extends RtlItem {
 
 	private final RtlVectorSignal leds;
 
-	public RamTestController(RtlRealm realm, RtlClockNetwork clock) {
+	public RamTestController(RtlRealm realm, RtlClockNetwork clock, RtlBitSignal reset) {
 		super(realm);
 		this.realm = realm;
 		this.clock = clock;
+		this.reset = reset;
 		this.cpu = new PicoblazeRtlWithAssociatedProgram(clock, RamTestController.class);
+		cpu.setResetSignal(reset);
 		this.wishboneMaster = new WishboneSimpleMasterAdapter(realm);
 		this.ramAddressRegister = new RtlVectorSignalConnector(realm, 32);
 		this.ramReadDataRegister = new RtlVectorSignalConnector(realm, 32);

@@ -46,6 +46,7 @@ wire wbAck;
 
 RamTestController ramTestController1(
     .pinClock(clock),
+    .pinReset(reset),
     .pinLeds(leds),
     .pinWbCycleStrobe(wbCycleStrobe),
     .pinWbWriteEnable(wbWriteEnable),
@@ -73,7 +74,9 @@ clk_reset clk_reset1(
 reg ackReg;
 initial ackReg = 0;
 always @(posedge clock) begin
-    if (wbCycleStrobe) begin
+	if (reset) begin
+		ackReg <= 0;
+	end else if (wbCycleStrobe) begin
         ackReg <= ~ackReg;
     end
 end

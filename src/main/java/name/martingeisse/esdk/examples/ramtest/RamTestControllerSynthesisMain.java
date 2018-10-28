@@ -35,7 +35,7 @@ public class RamTestControllerSynthesisMain {
 		Design design = new Design();
 		RtlRealm realm = new RtlRealm(design);
 		RtlClockNetwork clock = realm.createClockNetwork(inPin(realm, "Clock"));
-		RamTestController controller = new RamTestController(realm, clock);
+		RamTestController controller = new RamTestController(realm, clock, inPin(realm, "Reset"));
 		RtlVectorSignal leds = controller.getLeds();
 
 		// add pins

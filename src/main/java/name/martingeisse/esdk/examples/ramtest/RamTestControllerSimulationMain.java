@@ -27,7 +27,7 @@ public class RamTestControllerSimulationMain {
 		Design design = new Design();
 		RtlRealm realm = new RtlRealm(design);
 		RtlClockNetwork clock = realm.createClockNetwork(new RtlBitConstant(realm, false));
-		RamTestController controller = new RamTestController(realm, clock);
+		RamTestController controller = new RamTestController(realm, clock, new RtlBitConstant(realm, false));
 
 		// RAM
 		SimulatedDelayedWishboneRam32 ram = new SimulatedDelayedWishboneRam32(clock, 23, 3);

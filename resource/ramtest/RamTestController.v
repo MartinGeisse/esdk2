@@ -3,6 +3,7 @@
 
 module RamTestController(
 	pinClock,
+	pinReset,
 	pinLeds,
 	pinWbCycleStrobe,
 	pinWbWriteEnable,
@@ -13,6 +14,7 @@ module RamTestController(
 );
 
 input pinClock;
+input pinReset;
 output[7:0] pinLeds;
 output pinWbCycleStrobe;
 output pinWbWriteEnable;
@@ -22,100 +24,98 @@ input[31:0] pinWbReadData;
 input pinWbAck;
 
 
-wire s24;
-wire mp4;
-wire mp0;
-wire s17;
-wire s19;
-wire s18;
 wire s32;
-reg[7:0] r6;
-wire s35;
-reg[7:0] r0;
-wire s23;
-reg[17:0] s0;
-wire mp2;
-reg[7:0] r5;
-wire s31;
-wire[4:0] s14;
-wire[31:0] s8;
-wire s1;
-wire s20;
-wire[7:0] mp5;
-wire[7:0] s3;
-wire[31:0] s9;
-wire[7:0] s15;
-wire s30;
-reg[7:0] r4;
-reg r2;
-wire[31:0] s4;
-wire s33;
 wire s26;
 reg[7:0] r3;
-wire s25;
-wire[7:0] s7;
-wire[7:0] mp3;
-wire s27;
-wire s28;
-wire[4:0] s10;
-wire s2;
-wire[7:0] s11;
-wire s21;
-wire[4:0] s6;
-wire[31:0] s12;
-wire[9:0] mp1;
-reg r1;
-reg[31:0] r11;
-wire s36;
-wire s29;
-wire[31:0] s5;
-wire s22;
 reg[7:0] r7;
-wire s34;
-wire[7:0] s16;
-reg[7:0] r10;
+wire s24;
 reg[7:0] r9;
-wire[31:0] s13;
+wire s35;
+wire s19;
+reg[7:0] r6;
+wire[7:0] mp3;
+wire[31:0] s4;
+wire[7:0] s15;
+wire[7:0] s6;
+wire[4:0] s13;
+wire s27;
+wire[7:0] s10;
+wire[31:0] s11;
+wire mp2;
+wire s34;
+reg[31:0] r11;
+wire[31:0] s8;
+wire mp0;
+wire s28;
+wire s30;
+reg[7:0] r0;
+reg[17:0] s0;
+wire s16;
+wire[31:0] s3;
+wire s29;
+wire s33;
+reg[7:0] r4;
+wire s21;
+reg r1;
+wire s20;
+wire s31;
+wire s23;
+wire[7:0] s2;
+reg[7:0] r10;
+wire s17;
+wire s18;
+reg[7:0] r5;
+wire[4:0] s5;
+wire[31:0] s12;
+wire[7:0] s14;
+wire[7:0] mp5;
+wire[31:0] s7;
+wire s25;
+wire mp4;
+wire s1;
+wire[9:0] mp1;
+wire[4:0] s9;
+wire s22;
+reg r2;
 reg[7:0] r8;
 
 reg [17:0] mem0 [1023:0];
 
-assign s24 = mp3[4] & s25;
-assign s17 = r1;
-assign s19 = mp3[1:0] == 2'h3;
-assign s18 = mp3[4] & s19;
-assign s32 = mp3[5] & s33;
-assign s35 = ~s36;
-assign s23 = mp3[1:0] == 2'h1;
-assign s31 = mp3[1:0] == 2'h1;
-assign s14 = {mp3[1:0], 3'h0};
-assign s8 = s9 >> s10;
+assign s32 = mp3[1:0] == 2'h0;
+assign s26 = mp3[1:0] == 2'h3;
+assign s24 = mp3[1:0] == 2'h0;
+assign s35 = r2;
+assign s19 = mp3[4] & s20;
+assign s4 = {r3, r4, r5, r6};
+assign s15 = {7'h00, s16};
+assign s6 = mp3[5] ? s7[7:0] : s10;
+assign s13 = {mp3[1:0], 3'h0};
+assign s27 = mp3[5] & s28;
+assign s10 = mp3[6] ? s11[7:0] : s14;
+assign s11 = s12 >> s13;
+assign s34 = ~s35;
+assign s8 = {r7, r8, r9, r10};
+assign s28 = mp3[1:0] == 2'h2;
+assign s30 = mp3[1:0] == 2'h1;
+assign s16 = r1;
+assign s3 = s4 >> s5;
+assign s29 = mp3[5] & s30;
+assign s33 = pinWbAck;
+assign s21 = mp3[4] & s22;
+assign s20 = mp3[1:0] == 2'h2;
+assign s31 = mp3[5] & s32;
+assign s23 = mp3[4] & s24;
+assign s2 = mp3[4] ? s3[7:0] : s6;
+assign s17 = mp3[4] & s18;
+assign s18 = mp3[1:0] == 2'h3;
+assign s5 = {mp3[1:0], 3'h0};
+assign s12 = r11;
+assign s14 = mp3[7] ? s15 : 8'h00;
+assign s7 = s8 >> s9;
+assign s25 = mp3[5] & s26;
 assign s1 = 1'b0;
-assign s20 = mp3[4] & s21;
-assign s3 = mp3[4] ? s4[7:0] : s7;
-assign s9 = {r7, r8, r9, r10};
-assign s15 = mp3[7] ? s16 : 8'h00;
-assign s30 = mp3[5] & s31;
-assign s4 = s5 >> s6;
-assign s33 = mp3[1:0] == 2'h0;
-assign s26 = mp3[5] & s27;
-assign s25 = mp3[1:0] == 2'h0;
-assign s7 = mp3[5] ? s8[7:0] : s11;
-assign s27 = mp3[1:0] == 2'h3;
-assign s28 = mp3[5] & s29;
-assign s10 = {mp3[1:0], 3'h0};
-assign s2 = 1'b0;
-assign s11 = mp3[6] ? s12[7:0] : s15;
-assign s21 = mp3[1:0] == 2'h2;
-assign s6 = {mp3[1:0], 3'h0};
-assign s12 = s13 >> s14;
-assign s36 = r2;
-assign s29 = mp3[1:0] == 2'h2;
-assign s5 = {r3, r4, r5, r6};
-assign s22 = mp3[4] & s23;
-assign s34 = pinWbAck;
-assign s16 = {7'h00, s17};
-assign s13 = r11;
+assign s9 = {mp3[1:0], 3'h0};
+assign s22 = mp3[1:0] == 2'h1;
 
 kcpsm3 m0(
 	.read_strobe(mp0),
@@ -124,9 +124,9 @@ kcpsm3 m0(
 	.instruction(s0),
 	.write_strobe(mp2),
 	.interrupt(s1),
-	.reset(s2),
+	.reset(pinReset),
 	.port_id(mp3),
-	.in_port(s3),
+	.in_port(s2),
 	.interrupt_ack(mp4),
 	.out_port(mp5)
 );
@@ -149,7 +149,7 @@ always @(posedge pinClock) begin
 		r1 <= 1'b1;
 		r2 <= mp5[0];
 	end else begin
-		if (s34) begin
+		if (s33) begin
 			r1 <= 1'b0;
 		end
 	end
@@ -157,71 +157,71 @@ end
 initial begin
 end
 always @(posedge pinClock) begin
-	if (mp2 & s18) begin
+	if (mp2 & s17) begin
 		r3 <= mp5;
 	end
 end
 initial begin
 end
 always @(posedge pinClock) begin
-	if (mp2 & s20) begin
+	if (mp2 & s19) begin
 		r4 <= mp5;
 	end
 end
 initial begin
 end
 always @(posedge pinClock) begin
-	if (mp2 & s22) begin
+	if (mp2 & s21) begin
 		r5 <= mp5;
 	end
 end
 initial begin
 end
 always @(posedge pinClock) begin
-	if (mp2 & s24) begin
+	if (mp2 & s23) begin
 		r6 <= mp5;
 	end
 end
 initial begin
 end
 always @(posedge pinClock) begin
-	if (mp2 & s26) begin
+	if (mp2 & s25) begin
 		r7 <= mp5;
 	end
 end
 initial begin
 end
 always @(posedge pinClock) begin
-	if (mp2 & s28) begin
+	if (mp2 & s27) begin
 		r8 <= mp5;
 	end
 end
 initial begin
 end
 always @(posedge pinClock) begin
-	if (mp2 & s30) begin
+	if (mp2 & s29) begin
 		r9 <= mp5;
 	end
 end
 initial begin
 end
 always @(posedge pinClock) begin
-	if (mp2 & s32) begin
+	if (mp2 & s31) begin
 		r10 <= mp5;
 	end
 end
 initial begin
 end
 always @(posedge pinClock) begin
-	if (s34 & s35) begin
+	if (s33 & s34) begin
 		r11 <= pinWbReadData;
 	end
 end
 assign pinLeds = r0;
-assign pinWbCycleStrobe = s17;
-assign pinWbWriteEnable = s36;
-assign pinWbAddress = s5;
-assign pinWbWriteData = s9;
+assign pinWbCycleStrobe = s16;
+assign pinWbWriteEnable = s35;
+assign pinWbAddress = s4;
+assign pinWbWriteData = s8;
 
 endmodule
 

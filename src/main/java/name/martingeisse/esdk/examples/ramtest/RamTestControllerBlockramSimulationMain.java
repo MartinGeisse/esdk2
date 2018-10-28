@@ -32,7 +32,7 @@ public class RamTestControllerBlockramSimulationMain {
 		Design design = new Design();
 		RtlRealm realm = new RtlRealm(design);
 		RtlClockNetwork clock = realm.createClockNetwork(new RtlBitConstant(realm, false));
-		RamTestController controller = new RamTestController(realm, clock);
+		RamTestController controller = new RamTestController(realm, clock, new RtlBitConstant(realm, false));
 
 		// BlockRAM test
 		RtlClockedBlock block = new RtlClockedBlock(clock);
