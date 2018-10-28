@@ -27,6 +27,18 @@ public final class DesignValidationResult {
 		return itemResults;
 	}
 
+	public boolean isValid(boolean failOnWarnings) {
+		for (ItemValidationResult itemResult : itemResults.values()) {
+			if (!itemResult.getErrors().isEmpty()) {
+				return false;
+			}
+			if (failOnWarnings && !itemResult.getWarnings().isEmpty()) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	public void format(ValidationResultPrinter printer) {
 		new ValidationResultFormatter(this, printer, false).format();
 	}

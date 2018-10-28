@@ -165,54 +165,34 @@ success:
 successLoop:
     OUTPUT s0, 08
     RL s0
-
-    LOAD s1, 00
-successWait1:
-	SUB s1, 01
-	JUMP Z, successLoop
-
-	LOAD s2, 00
-successWait2:
-	SUB s2, 01
-	JUMP Z, successWait1
-
-	LOAD s3, 10
-	INPUT s4, 00
-	TEST s4, FF
-	JUMP Z, successWait3
-	LOAD s3, 03
-successWait3:
-	SUB s3, 01
-	JUMP Z, successWait2
-	JUMP successWait3
-
-; ---------------------------------------------------------------------------------------------------------------------
+    CALL finalWait
+    JUMP successLoop
 
 failure:
     LOAD s0, 00
 failureLoop:
+    OUTPUT s0, 08
     LOAD s1, s0
     LOAD s0, FF
     SUB s0, s1
-    OUTPUT s0, 08
-    RL s0
+    CALL finalWait
+    JUMP failureLoop
 
+finalWait:
     LOAD s1, 00
-failureWait1:
+finalWait1:
 	SUB s1, 01
-	JUMP Z, failureLoop
-
+	RETURN Z
 	LOAD s2, 00
-failureWait2:
+finalWait2:
 	SUB s2, 01
-	JUMP Z, failureWait1
-
+	JUMP Z, finalWait1
 	LOAD s3, 10
 	INPUT s4, 00
 	TEST s4, FF
-	JUMP Z, failureWait3
+	JUMP Z, finalWait3
 	LOAD s3, 03
-failureWait3:
+finalWait3:
 	SUB s3, 01
-	JUMP Z, failureWait2
-	JUMP failureWait3
+	JUMP Z, finalWait2
+	JUMP finalWait3

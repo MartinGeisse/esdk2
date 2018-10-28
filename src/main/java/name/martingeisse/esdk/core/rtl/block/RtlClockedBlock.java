@@ -9,6 +9,7 @@ import name.martingeisse.esdk.core.rtl.RtlClockedItem;
 import name.martingeisse.esdk.core.rtl.block.statement.RtlStatementSequence;
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.*;
+import name.martingeisse.esdk.core.util.vector.VectorValue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,8 +59,20 @@ public final class RtlClockedBlock extends RtlClockedItem {
 		return new RtlProceduralBitSignal(getRealm(), this);
 	}
 
+	public RtlProceduralBitSignal createBit(boolean initialValue) {
+		RtlProceduralBitSignal signal = createBit();
+		initializerStatements.assign(signal, initialValue);
+		return signal;
+	}
+
 	public RtlProceduralVectorSignal createVector(int width) {
 		return new RtlProceduralVectorSignal(getRealm(), this, width);
+	}
+
+	public RtlProceduralVectorSignal createVector(int width, VectorValue initialValue) {
+		RtlProceduralVectorSignal signal = createVector(width);
+		initializerStatements.assign(signal, initialValue);
+		return signal;
 	}
 
 	// ----------------------------------------------------------------------------------------------------------------
