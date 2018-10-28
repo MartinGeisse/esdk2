@@ -13,7 +13,7 @@ module RamTest(
 	led7
 );
 
-input pinClock;
+input clock;
 output led0;
 output led1;
 output led2;
@@ -59,7 +59,7 @@ always @(posedge clock) begin
         ackReg <= ~ackReg;
     end
 end
-reg[31:0] ram[255:0]
+reg[31:0] ram[255:0];
 reg[31:0] ramReadData;
 always @(posedge clock) begin
     if (wbCycleStrobe) begin
