@@ -1,0 +1,1125 @@
+martin: ~/git-repos/esdk2/resource/ramtest > ./build.sh
+.DS_Store                                                                                                                                                                                          100% 6148     6.0KB/s   00:00
+build.prj                                                                                                                                                                                          100%  128     0.1KB/s   00:00
+build.sh                                                                                                                                                                                           100%  120     0.1KB/s   00:00
+build.ucf                                                                                                                                                                                          100% 3162     3.1KB/s   00:00
+build.xst                                                                                                                                                                                          100%  149     0.2KB/s   00:00
+clk_reset.v                                                                                                                                                                                        100% 3221     3.2KB/s   00:00
+ddr_sdram.v                                                                                                                                                                                        100%   19KB  18.6KB/s   00:00
+environment.sh                                                                                                                                                                                     100%   67     0.1KB/s   00:00
+kcpsm3.v                                                                                                                                                                                           100%   93KB  92.9KB/s   00:00
+mem0.mif                                                                                                                                                                                           100% 6144     6.0KB/s   00:00
+RamTest.v                                                                                                                                                                                          100% 2410     2.4KB/s   00:00
+RamTestController.v                                                                                                                                                                                100% 3655     3.6KB/s   00:00
+upload.sh                                                                                                                                                                                          100%   36     0.0KB/s   00:00
+XST script file: build.xst
+constraints: build.ucf
+Release 9.2i - xst J.36
+Copyright (c) 1995-2007 Xilinx, Inc.  All rights reserved.
+-->
+Parameter TMPDIR set to build/xst_temp
+CPU : 0.00 / 0.08 s | Elapsed : 0.00 / 0.00 s
+
+-->
+
+TABLE OF CONTENTS
+  1) Synthesis Options Summary
+  2) HDL Compilation
+  3) Design Hierarchy Analysis
+  4) HDL Analysis
+  5) HDL Synthesis
+     5.1) HDL Synthesis Report
+  6) Advanced HDL Synthesis
+     6.1) Advanced HDL Synthesis Report
+  7) Low Level Synthesis
+  8) Partition Report
+  9) Final Report
+     9.1) Device utilization summary
+     9.2) Partition Resource Summary
+     9.3) TIMING REPORT
+
+
+=========================================================================
+*                      Synthesis Options Summary                        *
+=========================================================================
+---- Source Parameters
+Input File Name                    : "src/build.prj"
+
+---- Target Parameters
+Output Format                      : NGC
+Output File Name                   : "build/synthesized.ngc"
+Target Device                      : XC3S500E-FG320-4
+
+---- Source Options
+Top Module Name                    : RamTest
+
+---- General Options
+Optimization Effort                : 1
+Optimization Goal                  : SPEED
+
+=========================================================================
+
+
+=========================================================================
+*                          HDL Compilation                              *
+=========================================================================
+Compiling verilog file "src/RamTest.v" in library work
+Compiling verilog file "src/RamTestController.v" in library work
+Module <RamTest> compiled
+Compiling verilog file "src/kcpsm3.v" in library work
+Module <RamTestController> compiled
+Compiling verilog file "src/clk_reset.v" in library work
+Module <kcpsm3> compiled
+Compiling verilog file "src/ddr_sdram.v" in library work
+Module <clk_reset> compiled
+Module <ddr_sdram> compiled
+No errors in compilation
+Analysis of file <"src/build.prj"> succeeded.
+
+
+=========================================================================
+*                     Design Hierarchy Analysis                         *
+=========================================================================
+Analyzing hierarchy for module <RamTest> in library <work>.
+
+Analyzing hierarchy for module <clk_reset> in library <work>.
+
+Analyzing hierarchy for module <ddr_sdram> in library <work> with parameters.
+	ACCESS_WAIT = "011111"
+	AVG_REFRESH_DUR = "1010111100"
+	CAS_WAIT = "011101"
+	INIT_CLK_EN_WAIT = "000000000010000"
+	INIT_WAIT = "011000000000000"
+	REFRESH_WAIT = "011001"
+	SD_AUTO_REF = "00000000000000000000000000000101"
+	SD_AUTO_REF1 = "00000000000000000000000000000110"
+	SD_AUTO_REF_ACK = "00000000000000000000000000000111"
+	SD_IDLE = "00000000000000000000000000000000"
+	SD_INIT = "00000000000000000000000000000001"
+	SD_INIT_WAIT = "00000000000000000000000000000010"
+	SD_LD_MODE = "00000000000000000000000000001000"
+	SD_LD_MODE1 = "00000000000000000000000000001001"
+	SD_PRECHG_ALL = "00000000000000000000000000000011"
+	SD_PRECHG_ALL1 = "00000000000000000000000000000100"
+	SD_RD_CAS_WAIT = "00000000000000000000000000001100"
+	SD_RD_COL = "00000000000000000000000000001011"
+	SD_RD_DONE = "00000000000000000000000000001111"
+	SD_RD_DONE_1 = "00000000000000000000000000010110"
+	SD_RD_LATCH = "00000000000000000000000000001101"
+	SD_RD_LATCH1 = "00000000000000000000000000001110"
+	SD_RD_START = "00000000000000000000000000001010"
+	SD_WR_CAS_WAIT = "00000000000000000000000000010010"
+	SD_WR_COL = "00000000000000000000000000010001"
+	SD_WR_DONE = "00000000000000000000000000010101"
+	SD_WR_DONE_1 = "00000000000000000000000000010111"
+	SD_WR_LATCH = "00000000000000000000000000010011"
+	SD_WR_LATCH1 = "00000000000000000000000000010100"
+	SD_WR_START = "00000000000000000000000000010000"
+	SI_AUTO_REF = "00000000000000000000000000000110"
+	SI_AUTO_REF2 = "00000000000000000000000000000111"
+	SI_DONE = "00000000000000000000000000001000"
+	SI_LOAD_EX_MODE = "00000000000000000000000000000010"
+	SI_LOAD_MODE = "00000000000000000000000000000011"
+	SI_LOAD_MODE2 = "00000000000000000000000000000100"
+	SI_PRECHG = "00000000000000000000000000000001"
+	SI_PRECHG2 = "00000000000000000000000000000101"
+	SI_START = "00000000000000000000000000000000"
+	WAIT_CMD_MAX = "100000"
+	WAIT_TIME = "00101"
+
+Analyzing hierarchy for module <RamTestController> in library <work>.
+
+Analyzing hierarchy for module <kcpsm3> in library <work>.
+
+
+=========================================================================
+*                            HDL Analysis                               *
+=========================================================================
+Analyzing top module <RamTest>.
+Module <RamTest> is correct for synthesis.
+
+Analyzing module <clk_reset> in library <work>.
+Module <clk_reset> is correct for synthesis.
+
+Analyzing module <ddr_sdram> in library <work>.
+	ACCESS_WAIT = 6'b011111
+	AVG_REFRESH_DUR = 10'b1010111100
+	CAS_WAIT = 6'b011101
+	INIT_CLK_EN_WAIT = 15'b000000000010000
+	INIT_WAIT = 15'b011000000000000
+	REFRESH_WAIT = 6'b011001
+	SD_AUTO_REF = 32'sb00000000000000000000000000000101
+	SD_AUTO_REF1 = 32'sb00000000000000000000000000000110
+	SD_AUTO_REF_ACK = 32'sb00000000000000000000000000000111
+	SD_IDLE = 32'sb00000000000000000000000000000000
+	SD_INIT = 32'sb00000000000000000000000000000001
+	SD_INIT_WAIT = 32'sb00000000000000000000000000000010
+	SD_LD_MODE = 32'sb00000000000000000000000000001000
+	SD_LD_MODE1 = 32'sb00000000000000000000000000001001
+	SD_PRECHG_ALL = 32'sb00000000000000000000000000000011
+	SD_PRECHG_ALL1 = 32'sb00000000000000000000000000000100
+	SD_RD_CAS_WAIT = 32'sb00000000000000000000000000001100
+	SD_RD_COL = 32'sb00000000000000000000000000001011
+	SD_RD_DONE = 32'sb00000000000000000000000000001111
+	SD_RD_DONE_1 = 32'sb00000000000000000000000000010110
+	SD_RD_LATCH = 32'sb00000000000000000000000000001101
+	SD_RD_LATCH1 = 32'sb00000000000000000000000000001110
+	SD_RD_START = 32'sb00000000000000000000000000001010
+	SD_WR_CAS_WAIT = 32'sb00000000000000000000000000010010
+	SD_WR_COL = 32'sb00000000000000000000000000010001
+	SD_WR_DONE = 32'sb00000000000000000000000000010101
+	SD_WR_DONE_1 = 32'sb00000000000000000000000000010111
+	SD_WR_LATCH = 32'sb00000000000000000000000000010011
+	SD_WR_LATCH1 = 32'sb00000000000000000000000000010100
+	SD_WR_START = 32'sb00000000000000000000000000010000
+	SI_AUTO_REF = 32'sb00000000000000000000000000000110
+	SI_AUTO_REF2 = 32'sb00000000000000000000000000000111
+	SI_DONE = 32'sb00000000000000000000000000001000
+	SI_LOAD_EX_MODE = 32'sb00000000000000000000000000000010
+	SI_LOAD_MODE = 32'sb00000000000000000000000000000011
+	SI_LOAD_MODE2 = 32'sb00000000000000000000000000000100
+	SI_PRECHG = 32'sb00000000000000000000000000000001
+	SI_PRECHG2 = 32'sb00000000000000000000000000000101
+	SI_START = 32'sb00000000000000000000000000000000
+	WAIT_CMD_MAX = 6'b100000
+	WAIT_TIME = 5'b00101
+Module <ddr_sdram> is correct for synthesis.
+
+Analyzing module <RamTestController> in library <work>.
+INFO:Xst:2546 - "src/RamTestController.v" line 133: reading initialization file "mem0.mif".
+Module <RamTestController> is correct for synthesis.
+
+Analyzing module <kcpsm3> in library <work>.
+Module <kcpsm3> is correct for synthesis.
+
+
+=========================================================================
+*                           HDL Synthesis                               *
+=========================================================================
+
+Performing bidirectional port resolution...
+
+Synthesizing Unit <clk_reset>.
+    Related source file is "src/clk_reset.v".
+    Found 24-bit up counter for signal <reset_counter>.
+    Found 1-bit register for signal <reset_p>.
+    Found 1-bit register for signal <reset_s>.
+    Summary:
+	inferred   1 Counter(s).
+	inferred   2 D-type flip-flop(s).
+Unit <clk_reset> synthesized.
+
+
+Synthesizing Unit <ddr_sdram>.
+    Related source file is "src/ddr_sdram.v".
+    Found finite state machine <FSM_0> for signal <sd_state>.
+    -----------------------------------------------------------------------
+    | States             | 23                                             |
+    | Transitions        | 41                                             |
+    | Inputs             | 15                                             |
+    | Outputs            | 26                                             |
+    | Clock              | clk0 (rising_edge)                             |
+    | Reset              | reset (positive)                               |
+    | Reset type         | synchronous                                    |
+    | Reset State        | 000001                                         |
+    | Encoding           | automatic                                      |
+    | Implementation     | automatic                                      |
+    -----------------------------------------------------------------------
+WARNING:Xst:2734 - Property "use_dsp48" is not applicable for this technology.
+WARNING:Xst:2734 - Property "use_dsp48" is not applicable for this technology.
+    Found 1-bit register for signal <wACK_O>.
+    Found 1-bit register for signal <sd_CS_O>.
+    Found 2-bit register for signal <sd_BA_O>.
+    Found 1-bit register for signal <sd_WE_O>.
+    Found 1-bit register for signal <sd_RAS_O>.
+    Found 1-bit register for signal <sd_CKE_O>.
+    Found 1-bit register for signal <sd_CAS_O>.
+    Found 13-bit register for signal <sd_A_O>.
+    Found 4-bit register for signal <D_mask_reg>.
+    Found 1-bit register for signal <D_oe>.
+    Found 32-bit register for signal <D_rd_reg>.
+    Found 32-bit register for signal <D_wr_reg>.
+    Found 32-bit register for signal <data_mux_latch>.
+    Found 1-bit register for signal <DQS_oe>.
+    Found 1-bit register for signal <DQS_state>.
+    Found 4-bit register for signal <init_state>.
+    Found 15-bit register for signal <init_wait_count>.
+    Found 15-bit adder for signal <init_wait_count$addsub0000> created at line 493.
+    Found 13-bit register for signal <mode_reg>.
+    Found 1-bit register for signal <refresh_ack>.
+    Found 10-bit up counter for signal <refresh_counter>.
+    Found 1-bit register for signal <refresh_now>.
+    Found 4-bit updown counter for signal <refresh_queue>.
+    Found 6-bit register for signal <wait_count>.
+    Found 6-bit adder for signal <wait_count$share0000> created at line 422.
+    Summary:
+	inferred   1 Finite State Machine(s).
+	inferred   2 Counter(s).
+	inferred 164 D-type flip-flop(s).
+	inferred   2 Adder/Subtractor(s).
+Unit <ddr_sdram> synthesized.
+
+
+Synthesizing Unit <kcpsm3>.
+    Related source file is "src/kcpsm3.v".
+Unit <kcpsm3> synthesized.
+
+
+Synthesizing Unit <RamTestController>.
+    Related source file is "src/RamTestController.v".
+WARNING:Xst:1781 - Signal <mem0> is used but never assigned. Tied to default value.
+WARNING:Xst:646 - Signal <s11<31:8>> is assigned but never used.
+WARNING:Xst:646 - Signal <mp0> is assigned but never used.
+WARNING:Xst:646 - Signal <mp3<2>> is assigned but never used.
+WARNING:Xst:646 - Signal <mp4> is assigned but never used.
+WARNING:Xst:646 - Signal <s3<31:8>> is assigned but never used.
+WARNING:Xst:646 - Signal <s7<31:8>> is assigned but never used.
+    Found 1024x18-bit ROM for signal <$varindex0000> created at line 136.
+    Found 8-bit register for signal <r0>.
+    Found 1-bit register for signal <r1>.
+    Found 8-bit register for signal <r10>.
+    Found 32-bit register for signal <r11>.
+    Found 1-bit register for signal <r2>.
+    Found 8-bit register for signal <r3>.
+    Found 8-bit register for signal <r4>.
+    Found 8-bit register for signal <r5>.
+    Found 8-bit register for signal <r6>.
+    Found 8-bit register for signal <r7>.
+    Found 8-bit register for signal <r8>.
+    Found 8-bit register for signal <r9>.
+    Found 18-bit register for signal <s0>.
+    Found 32-bit shifter logical right for signal <s11>.
+    Found 32-bit shifter logical right for signal <s3>.
+    Found 32-bit shifter logical right for signal <s7>.
+    Summary:
+	inferred   1 ROM(s).
+	inferred 124 D-type flip-flop(s).
+	inferred   3 Combinational logic shifter(s).
+Unit <RamTestController> synthesized.
+
+
+Synthesizing Unit <RamTest>.
+    Related source file is "src/RamTest.v".
+WARNING:Xst:646 - Signal <wbAddress<31:26>> is assigned but never used.
+WARNING:Xst:646 - Signal <wbAddress<1:0>> is assigned but never used.
+Unit <RamTest> synthesized.
+
+INFO:Xst:1767 - HDL ADVISOR - Resource sharing has identified that some arithmetic operations in this design can share the same physical resources for reduced device utilization. For improved clock frequency you may try to disable resource sharing.
+
+=========================================================================
+HDL Synthesis Report
+
+Macro Statistics
+# ROMs                                                 : 1
+ 1024x18-bit ROM                                       : 1
+# Adders/Subtractors                                   : 2
+ 15-bit adder                                          : 1
+ 6-bit adder                                           : 1
+# Counters                                             : 3
+ 10-bit up counter                                     : 1
+ 24-bit up counter                                     : 1
+ 4-bit updown counter                                  : 1
+# Registers                                            : 48
+ 1-bit register                                        : 28
+ 13-bit register                                       : 1
+ 15-bit register                                       : 1
+ 18-bit register                                       : 1
+ 2-bit register                                        : 1
+ 32-bit register                                       : 4
+ 4-bit register                                        : 2
+ 6-bit register                                        : 1
+ 8-bit register                                        : 9
+# Logic shifters                                       : 3
+ 32-bit shifter logical right                          : 3
+
+=========================================================================
+
+=========================================================================
+*                       Advanced HDL Synthesis                          *
+=========================================================================
+
+Analyzing FSM <FSM_0> for best encoding.
+Optimizing FSM <ddr_sdram1/sd_state> on signal <sd_state[1:23]> with one-hot encoding.
+-----------------------------------
+ State  | Encoding
+-----------------------------------
+ 000000 | 00000000000000000100000
+ 000001 | 00000000000000000000001
+ 000010 | 00000000000000000000010
+ 000011 | 00000000000000000000100
+ 000100 | 00000000000000001000000
+ 000101 | 00000000000000000010000
+ 000110 | 00000000000000100000000
+ 000111 | 00000000000001000000000
+ 001000 | 00000000000000000001000
+ 001001 | 00000000000000010000000
+ 001010 | 00000000000100000000000
+ 001011 | 00000000000010000000000
+ 001100 | 00000000001000000000000
+ 001101 | 00000000010000000000000
+ 001111 | 00000000100000000000000
+ 010000 | 00000100000000000000000
+ 010001 | 00000010000000000000000
+ 010010 | 00001000000000000000000
+ 010011 | 00010000000000000000000
+ 010100 | 00100000000000000000000
+ 010101 | 01000000000000000000000
+ 010110 | 00000001000000000000000
+ 010111 | 10000000000000000000000
+-----------------------------------
+Loading device for application Rf_Device from file '3s500e.nph' in environment /home/martin/Xilinx92i.
+INFO:Xst:2694 - Unit <RamTestController> : The ROM <Mrom__varindex0000> will be implemented as a read-only BLOCK RAM, absorbing the register: <s0>.
+    -----------------------------------------------------------------------
+    | ram_type           | Block                               |          |
+    -----------------------------------------------------------------------
+    | Port A                                                              |
+    |     aspect ratio   | 1024-word x 18-bit                  |          |
+    |     mode           | write-first                         |          |
+    |     clkA           | connected to signal <pinClock>      | rise     |
+    |     weA            | connected to signal <s1>            | high     |
+    |     addrA          | connected to signal <mp1>           |          |
+    |     diA            | connected to signal <s1>            |          |
+    |     doA            | connected to signal <s0>            |          |
+    -----------------------------------------------------------------------
+    | optimisation       | speed                               |          |
+    -----------------------------------------------------------------------
+
+=========================================================================
+Advanced HDL Synthesis Report
+
+Macro Statistics
+# FSMs                                                 : 1
+# RAMs                                                 : 1
+ 1024x18-bit single-port block RAM                     : 1
+# Adders/Subtractors                                   : 2
+ 15-bit adder                                          : 1
+ 6-bit adder                                           : 1
+# Counters                                             : 3
+ 10-bit up counter                                     : 1
+ 24-bit up counter                                     : 1
+ 4-bit updown counter                                  : 1
+# Registers                                            : 371
+ Flip-Flops                                            : 371
+# Logic shifters                                       : 3
+ 32-bit shifter logical right                          : 3
+
+=========================================================================
+
+=========================================================================
+*                         Low Level Synthesis                           *
+=========================================================================
+WARNING:Xst:1710 - FF/Latch  <mode_reg_1> (without init value) has a constant value of 0 in block <ddr_sdram>.
+WARNING:Xst:1895 - Due to other FF/Latch trimming, FF/Latch  <mode_reg_2> (without init value) has a constant value of 0 in block <ddr_sdram>.
+WARNING:Xst:1895 - Due to other FF/Latch trimming, FF/Latch  <mode_reg_3> (without init value) has a constant value of 0 in block <ddr_sdram>.
+WARNING:Xst:1895 - Due to other FF/Latch trimming, FF/Latch  <mode_reg_4> (without init value) has a constant value of 0 in block <ddr_sdram>.
+WARNING:Xst:1895 - Due to other FF/Latch trimming, FF/Latch  <mode_reg_6> (without init value) has a constant value of 0 in block <ddr_sdram>.
+WARNING:Xst:1895 - Due to other FF/Latch trimming, FF/Latch  <mode_reg_7> (without init value) has a constant value of 0 in block <ddr_sdram>.
+WARNING:Xst:1895 - Due to other FF/Latch trimming, FF/Latch  <mode_reg_9> (without init value) has a constant value of 0 in block <ddr_sdram>.
+WARNING:Xst:1895 - Due to other FF/Latch trimming, FF/Latch  <mode_reg_10> (without init value) has a constant value of 0 in block <ddr_sdram>.
+WARNING:Xst:1895 - Due to other FF/Latch trimming, FF/Latch  <mode_reg_11> (without init value) has a constant value of 0 in block <ddr_sdram>.
+WARNING:Xst:1895 - Due to other FF/Latch trimming, FF/Latch  <mode_reg_12> (without init value) has a constant value of 0 in block <ddr_sdram>.
+WARNING:Xst:1895 - Due to other FF/Latch trimming, FF/Latch  <D_mask_reg_0> (without init value) has a constant value of 1 in block <ddr_sdram>.
+WARNING:Xst:1895 - Due to other FF/Latch trimming, FF/Latch  <D_mask_reg_1> (without init value) has a constant value of 1 in block <ddr_sdram>.
+WARNING:Xst:1895 - Due to other FF/Latch trimming, FF/Latch  <D_mask_reg_2> (without init value) has a constant value of 1 in block <ddr_sdram>.
+WARNING:Xst:1895 - Due to other FF/Latch trimming, FF/Latch  <D_mask_reg_3> (without init value) has a constant value of 1 in block <ddr_sdram>.
+
+Optimizing unit <RamTest> ...
+
+Optimizing unit <ddr_sdram> ...
+
+Optimizing unit <kcpsm3> ...
+
+Optimizing unit <RamTestController> ...
+
+Mapping all equations...
+Building and optimizing final netlist ...
+
+Final Macro Processing ...
+
+Processing Unit <RamTest> :
+	Found 2-bit shift register for signal <clk_reset1/reset_s>.
+Unit <RamTest> processed.
+
+=========================================================================
+Final Register Report
+
+Macro Statistics
+# Registers                                            : 393
+ Flip-Flops                                            : 393
+# Shift Registers                                      : 1
+ 2-bit shift register                                  : 1
+
+=========================================================================
+
+=========================================================================
+*                          Partition Report                             *
+=========================================================================
+
+Partition Implementation Status
+-------------------------------
+
+  No Partitions were found in this design.
+
+-------------------------------
+
+=========================================================================
+*                            Final Report                               *
+=========================================================================
+Final Results
+Top Level Output File Name         : build/synthesized.ngc
+Output Format                      : NGC
+Optimization Goal                  : SPEED
+Keep Hierarchy                     : no
+
+Design Statistics
+# IOs                              : 52
+
+Cell Usage :
+# BELS                             : 607
+#      GND                         : 1
+#      INV                         : 13
+#      LUT1                        : 48
+#      LUT2                        : 23
+#      LUT2_L                      : 1
+#      LUT3                        : 91
+#      LUT4                        : 214
+#      LUT4_L                      : 14
+#      MUXCY                       : 91
+#      MUXF5                       : 27
+#      VCC                         : 1
+#      XORCY                       : 83
+# FlipFlops/Latches                : 432
+#      FD                          : 57
+#      FDE                         : 220
+#      FDR                         : 47
+#      FDRE                        : 52
+#      FDRS                        : 1
+#      FDRSE                       : 13
+#      FDS                         : 3
+#      FDSE                        : 1
+#      IDDR2                       : 16
+#      ODDR2                       : 22
+# RAMS                             : 27
+#      RAM16X1D                    : 8
+#      RAM32X1S                    : 10
+#      RAM64X1S                    : 8
+#      RAMB16_S18                  : 1
+# Shift Registers                  : 1
+#      SRL16                       : 1
+# Clock Buffers                    : 6
+#      BUFG                        : 6
+# IO Buffers                       : 52
+#      IBUF                        : 1
+#      IBUFG                       : 1
+#      IOBUF                       : 20
+#      OBUF                        : 30
+# DCMs                             : 2
+#      DCM_SP                      : 2
+=========================================================================
+
+Device utilization summary:
+---------------------------
+
+Selected Device : 3s500efg320-4
+
+ Number of Slices:                     316  out of   4656     6%
+ Number of Slice Flip Flops:           432  out of   9312     4%
+ Number of 4 input LUTs:               473  out of   9312     5%
+    Number used as logic:              404
+    Number used as Shift registers:      1
+    Number used as RAMs:                68
+ Number of IOs:                         52
+ Number of bonded IOBs:                 52  out of    232    22%
+ Number of BRAMs:                        1  out of     20     5%
+ Number of GCLKs:                        6  out of     24    25%
+ Number of DCMs:                         2  out of      4    50%
+
+---------------------------
+Partition Resource Summary:
+---------------------------
+
+  No Partitions were found in this design.
+
+---------------------------
+
+
+=========================================================================
+TIMING REPORT
+
+NOTE: THESE TIMING NUMBERS ARE ONLY A SYNTHESIS ESTIMATE.
+      FOR ACCURATE TIMING INFORMATION PLEASE REFER TO THE TRACE REPORT
+      GENERATED AFTER PLACE-and-ROUTE.
+
+Clock Information:
+------------------
+-----------------------------------+------------------------+-------+
+Clock Signal                       | Clock buffer(FF name)  | Load  |
+-----------------------------------+------------------------+-------+
+clk_reset1/clk50_out               | BUFG                   | 26    |
+clk_reset1/clk100_0                | BUFG                   | 383   |
+clk_reset1/clk100_90               | BUFG                   | 18    |
+clk_reset1/clk100_270              | BUFG                   | 18    |
+clk_reset1/clk100_180              | BUFG                   | 52    |
+-----------------------------------+------------------------+-------+
+
+Asynchronous Control Signals Information:
+----------------------------------------
+No asynchronous control signals found in this design
+
+Timing Summary:
+---------------
+Speed Grade: -4
+
+   Minimum period: 12.480ns (Maximum Frequency: 80.128MHz)
+   Minimum input arrival time before clock: 4.215ns
+   Maximum output required time after clock: 6.048ns
+   Maximum combinational path delay: 3.244ns
+
+Timing Detail:
+--------------
+All values displayed in nanoseconds (ns)
+
+=========================================================================
+Timing constraint: Default period analysis for Clock 'clk_reset1/clk50_out'
+  Clock period: 4.763ns (frequency: 209.938MHz)
+  Total number of paths / destination ports: 901 / 73
+-------------------------------------------------------------------------
+Delay:               4.763ns (Levels of Logic = 7)
+  Source:            clk_reset1/reset_counter_10 (FF)
+  Destination:       clk_reset1/reset_counter_0 (FF)
+  Source Clock:      clk_reset1/clk50_out rising
+  Destination Clock: clk_reset1/clk50_out rising
+
+  Data Path: clk_reset1/reset_counter_10 to clk_reset1/reset_counter_0
+                                Gate     Net
+    Cell:in->out      fanout   Delay   Delay  Logical Name (Net Name)
+    ----------------------------------------  ------------
+     FDRE:C->Q             2   0.591   0.622  clk_reset1/reset_counter_10 (clk_reset1/reset_counter_10)
+     LUT4:I0->O            1   0.704   0.000  clk_reset1/reset_counting_wg_lut<0> (N01)
+     MUXCY:S->O            1   0.464   0.000  clk_reset1/reset_counting_wg_cy<0> (clk_reset1/reset_counting_wg_cy<0>)
+     MUXCY:CI->O           1   0.059   0.000  clk_reset1/reset_counting_wg_cy<1> (clk_reset1/reset_counting_wg_cy<1>)
+     MUXCY:CI->O           1   0.059   0.000  clk_reset1/reset_counting_wg_cy<2> (clk_reset1/reset_counting_wg_cy<2>)
+     MUXCY:CI->O           1   0.059   0.000  clk_reset1/reset_counting_wg_cy<3> (clk_reset1/reset_counting_wg_cy<3>)
+     MUXCY:CI->O           1   0.059   0.000  clk_reset1/reset_counting_wg_cy<4> (clk_reset1/reset_counting_wg_cy<4>)
+     MUXCY:CI->O          26   0.331   1.260  clk_reset1/reset_counting_wg_cy<5> (reset)
+     FDRE:CE                   0.555          clk_reset1/reset_counter_0
+    ----------------------------------------
+    Total                      4.763ns (2.881ns logic, 1.882ns route)
+                                       (60.5% logic, 39.5% route)
+
+=========================================================================
+Timing constraint: Default period analysis for Clock 'clk_reset1/clk100_0'
+  Clock period: 12.480ns (frequency: 80.128MHz)
+  Total number of paths / destination ports: 3268 / 715
+-------------------------------------------------------------------------
+Delay:               12.480ns (Levels of Logic = 13)
+  Source:            ramTestController1/m0/reg_loop_register_bit_7 (RAM)
+  Destination:       ramTestController1/m0/zero_flag_flop (FF)
+  Source Clock:      clk_reset1/clk100_0 rising
+  Destination Clock: clk_reset1/clk100_0 rising
+
+  Data Path: ramTestController1/m0/reg_loop_register_bit_7 to ramTestController1/m0/zero_flag_flop
+                                Gate     Net
+    Cell:in->out      fanout   Delay   Delay  Logical Name (Net Name)
+    ----------------------------------------  ------------
+     RAM16X1D:WCLK->DPO    1   1.901   0.455  ramTestController1/m0/reg_loop_register_bit_7 (ramTestController1/m0/sy<7>)
+     LUT3:I2->O            7   0.704   0.787  ramTestController1/m0/operand_select_mux_7 (ramTestController1/mp3<7>)
+     LUT2_L:I1->LO         1   0.704   0.104  ramTestController1/s2<0>41 (ramTestController1/s2<0>_bdd5)
+     LUT4:I3->O            1   0.704   0.424  ramTestController1/s2<0>1167 (ramTestController1/s2<0>1_map40)
+     LUT4:I3->O            1   0.704   0.000  ramTestController1/s2<0>1239_G (N1617)
+     MUXF5:I1->O           1   0.321   0.424  ramTestController1/s2<0>1239 (ramTestController1/s2<0>1_map55)
+     LUT4:I3->O            1   0.704   0.499  ramTestController1/s2<0>1286 (ramTestController1/s2<0>)
+     LUT3:I1->O            1   0.704   0.000  ramTestController1/m0/mux_lut_0 (ramTestController1/m0/input_group<0>)
+     MUXF5:I1->O           2   0.321   0.622  ramTestController1/m0/shift_in_muxf5_0 (ramTestController1/m0/alu_result<0>)
+     LUT4:I0->O            1   0.704   0.000  ramTestController1/m0/low_zero_lut (ramTestController1/m0/low_zero)
+     MUXCY:S->O            1   0.464   0.000  ramTestController1/m0/low_zero_muxcy (ramTestController1/m0/low_zero_carry)
+     MUXCY:CI->O           1   0.059   0.000  ramTestController1/m0/high_zero_cymux (ramTestController1/m0/high_zero_carry)
+     MUXCY:CI->O           0   0.059   0.000  ramTestController1/m0/zero_cymux (ramTestController1/m0/zero_carry)
+     XORCY:CI->O           1   0.804   0.000  ramTestController1/m0/zero_xor (ramTestController1/m0/zero_fast_route)
+     FDRE:D                    0.308          ramTestController1/m0/zero_flag_flop
+    ----------------------------------------
+    Total                     12.480ns (9.165ns logic, 3.315ns route)
+                                       (73.4% logic, 26.6% route)
+
+=========================================================================
+Timing constraint: Default period analysis for Clock 'clk_reset1/clk100_180'
+  Clock period: 1.236ns (frequency: 809.062MHz)
+  Total number of paths / destination ports: 16 / 16
+-------------------------------------------------------------------------
+Delay:               1.236ns (Levels of Logic = 0)
+  Source:            ddr_sdram1/iou[15].IDDR2_inst (FF)
+  Destination:       ddr_sdram1/data_mux_latch_15 (FF)
+  Source Clock:      clk_reset1/clk100_180 rising
+  Destination Clock: clk_reset1/clk100_180 rising
+
+  Data Path: ddr_sdram1/iou[15].IDDR2_inst to ddr_sdram1/data_mux_latch_15
+                                Gate     Net
+    Cell:in->out      fanout   Delay   Delay  Logical Name (Net Name)
+    ----------------------------------------  ------------
+     IDDR2:C0->Q0          1   0.508   0.420  ddr_sdram1/iou[15].IDDR2_inst (ddr_sdram1/data_mux_out<15>)
+     FD:D                      0.308          ddr_sdram1/data_mux_latch_15
+    ----------------------------------------
+    Total                      1.236ns (0.816ns logic, 0.420ns route)
+                                       (66.0% logic, 34.0% route)
+
+=========================================================================
+Timing constraint: Default OFFSET IN BEFORE for Clock 'clk_reset1/clk50_out'
+  Total number of paths / destination ports: 49 / 25
+-------------------------------------------------------------------------
+Offset:              4.215ns (Levels of Logic = 1)
+  Source:            clk_reset1/dcm100:LOCKED (PAD)
+  Destination:       clk_reset1/reset_counter_0 (FF)
+  Destination Clock: clk_reset1/clk50_out rising
+
+  Data Path: clk_reset1/dcm100:LOCKED to clk_reset1/reset_counter_0
+                                Gate     Net
+    Cell:in->out      fanout   Delay   Delay  Logical Name (Net Name)
+    ----------------------------------------  ------------
+    DCM_SP:LOCKED         55   0.000   1.348  clk_reset1/dcm100 (clockOk)
+     LUT3:I1->O           24   0.704   1.252  clk_reset1/reset_counter_or00001 (clk_reset1/reset_counter_or0000)
+     FDRE:R                    0.911          clk_reset1/reset_counter_0
+    ----------------------------------------
+    Total                      4.215ns (1.615ns logic, 2.600ns route)
+                                       (38.3% logic, 61.7% route)
+
+=========================================================================
+Timing constraint: Default OFFSET IN BEFORE for Clock 'clk_reset1/clk100_0'
+  Total number of paths / destination ports: 156 / 155
+-------------------------------------------------------------------------
+Offset:              4.145ns (Levels of Logic = 1)
+  Source:            clk_reset1/dcm100:LOCKED (PAD)
+  Destination:       ddr_sdram1/sd_state_FFd6 (FF)
+  Destination Clock: clk_reset1/clk100_0 rising
+
+  Data Path: clk_reset1/dcm100:LOCKED to ddr_sdram1/sd_state_FFd6
+                                Gate     Net
+    Cell:in->out      fanout   Delay   Delay  Logical Name (Net Name)
+    ----------------------------------------  ------------
+    DCM_SP:LOCKED         55   0.000   1.269  clk_reset1/dcm100 (clockOk)
+     INV:I->O             27   0.704   1.261  ddr_sdram1_not00001_INV_0 (ddr_sdram1_not0000)
+     FDRE:R                    0.911          ddr_sdram1/init_state_0
+    ----------------------------------------
+    Total                      4.145ns (1.615ns logic, 2.530ns route)
+                                       (39.0% logic, 61.0% route)
+
+=========================================================================
+Timing constraint: Default OFFSET IN BEFORE for Clock 'clk_reset1/clk100_180'
+  Total number of paths / destination ports: 16 / 16
+-------------------------------------------------------------------------
+Offset:              3.752ns (Levels of Logic = 1)
+  Source:            sdram_dq<15> (PAD)
+  Destination:       ddr_sdram1/iou[15].IDDR2_inst (FF)
+  Destination Clock: clk_reset1/clk100_180 rising
+
+  Data Path: sdram_dq<15> to ddr_sdram1/iou[15].IDDR2_inst
+                                Gate     Net
+    Cell:in->out      fanout   Delay   Delay  Logical Name (Net Name)
+    ----------------------------------------  ------------
+     IOBUF:IO->O           1   1.218   0.420  ddr_sdram1/iou[15].IOBUF_inst (ddr_sdram1/iddr_conn<15>)
+     IDDR2:D                   2.114          ddr_sdram1/iou[15].IDDR2_inst
+    ----------------------------------------
+    Total                      3.752ns (3.332ns logic, 0.420ns route)
+                                       (88.8% logic, 11.2% route)
+
+=========================================================================
+Timing constraint: Default OFFSET OUT AFTER for Clock 'clk_reset1/clk100_0'
+  Total number of paths / destination ports: 46 / 46
+-------------------------------------------------------------------------
+Offset:              6.048ns (Levels of Logic = 2)
+  Source:            ddr_sdram1/D_oe (FF)
+  Destination:       sdram_dq<15> (PAD)
+  Source Clock:      clk_reset1/clk100_0 rising
+
+  Data Path: ddr_sdram1/D_oe to sdram_dq<15>
+                                Gate     Net
+    Cell:in->out      fanout   Delay   Delay  Logical Name (Net Name)
+    ----------------------------------------  ------------
+     FDE:C->Q              2   0.591   0.447  ddr_sdram1/D_oe (ddr_sdram1/D_oe)
+     INV:I->O             16   0.704   1.034  ddr_sdram1/iou[0]_IOBUF_inst_not00001_INV_0 (ddr_sdram1/iou[0]_IOBUF_inst_not0000)
+     IOBUF:T->IO               3.272          ddr_sdram1/iou[15].IOBUF_inst (sdram_dq<15>)
+    ----------------------------------------
+    Total                      6.048ns (4.567ns logic, 1.481ns route)
+                                       (75.5% logic, 24.5% route)
+
+=========================================================================
+Timing constraint: Default path analysis
+  Total number of paths / destination ports: 5 / 5
+-------------------------------------------------------------------------
+Delay:               3.244ns (Levels of Logic = 1)
+  Source:            clk_reset1/dcm100:CLK0 (PAD)
+  Destination:       clk_reset1/dcm100:CLKFB (PAD)
+
+  Data Path: clk_reset1/dcm100:CLK0 to clk_reset1/dcm100:CLKFB
+                                Gate     Net
+    Cell:in->out      fanout   Delay   Delay  Logical Name (Net Name)
+    ----------------------------------------  ------------
+    DCM_SP:CLK0            1   0.000   0.420  clk_reset1/dcm100 (clk_reset1/clk100_0)
+     BUFG:I->O           364   1.457   1.367  clk_reset1/clk100_0_buffer (clock)
+    DCM_SP:CLKFB               0.000          clk_reset1/dcm100
+    ----------------------------------------
+    Total                      3.244ns (1.457ns logic, 1.787ns route)
+                                       (44.9% logic, 55.1% route)
+
+=========================================================================
+CPU : 14.12 / 14.21 s | Elapsed : 15.00 / 15.00 s
+
+-->
+
+
+Total memory usage is 353516 kilobytes
+
+Number of errors   :    0 (   0 filtered)
+Number of warnings :  295 (   0 filtered)
+Number of infos    :    3 (   0 filtered)
+
+
+Release 9.2i - ngdbuild J.36
+Copyright (c) 1995-2007 Xilinx, Inc.  All rights reserved.
+
+Command Line: ngdbuild -dd build/ngdbuild_temp -nt timestamp -uc src/build.ucf
+-p XC3S500E-FG320-4 build/synthesized.ngc build/synthesized.ngd
+
+Reading NGO file "/home/martin/auto-ise/build/synthesized.ngc" ...
+
+Applying constraints in "src/build.ucf" to the design...
+
+Checking timing specifications ...
+Checking expanded design ...
+WARNING:NgdBuild:443 - SFF primitive 'ramTestController1/m0/read_strobe_flop'
+   has unconnected output pin
+
+Partition Implementation Status
+-------------------------------
+
+  No Partitions were found in this design.
+
+-------------------------------
+
+NGDBUILD Design Results Summary:
+  Number of errors:     0
+  Number of warnings:   1
+
+Writing NGD file "build/synthesized.ngd" ...
+
+Writing NGDBUILD log file "build/synthesized.bld"...
+
+NGDBUILD done.
+Release 9.2i - Map J.36
+Copyright (c) 1995-2007 Xilinx, Inc.  All rights reserved.
+Using target part "3s500efg320-4".
+Mapping design into LUTs...
+Writing file build/mapped.ngm...
+Running directed packing...
+Running delay-based LUT packing...
+Running related packing...
+Writing design file "build/mapped.ncd"...
+
+Design Summary:
+Number of errors:      0
+Number of warnings:    3
+Logic Utilization:
+  Number of Slice Flip Flops:         387 out of   9,312    4%
+  Number of 4 input LUTs:             340 out of   9,312    3%
+Logic Distribution:
+  Number of occupied Slices:                          347 out of   4,656    7%
+    Number of Slices containing only related logic:     347 out of     347  100%
+    Number of Slices containing unrelated logic:          0 out of     347    0%
+      *See NOTES below for an explanation of the effects of unrelated logic
+Total Number of 4 input LUTs:            458 out of   9,312    4%
+  Number used as logic:                340
+  Number used as a route-thru:          49
+  Number used for Dual Port RAMs:       16
+    (Two LUTs used per Dual Port RAM)
+  Number used for 32x1 RAMs:            52
+    (Two LUTs used per 32x1 RAM)
+  Number used as Shift registers:        1
+  Number of bonded IOBs:               52 out of     232   22%
+  Number of IDDR2s used:               16
+    Number of DDR_ALIGNMENT = NONE     16
+  Number of ODDR2s used:               22
+    Number of DDR_ALIGNMENT = NONE     22
+  Number of Block RAMs:                1 out of      20    5%
+  Number of GCLKs:                     6 out of      24   25%
+  Number of DCMs:                      2 out of       4   50%
+
+Total equivalent gate count for design:  93,870
+Additional JTAG gate count for IOBs:  2,496
+Peak Memory Usage:  392 MB
+Total REAL time to MAP completion:  4 secs
+Total CPU time to MAP completion:   4 secs
+
+NOTES:
+
+   Related logic is defined as being logic that shares connectivity - e.g. two
+   LUTs are "related" if they share common inputs.  When assembling slices,
+   Map gives priority to combine logic that is related.  Doing so results in
+   the best timing performance.
+
+   Unrelated logic shares no connectivity.  Map will only begin packing
+   unrelated logic into a slice once 99% of the slices are occupied through
+   related logic packing.
+
+   Note that once logic distribution reaches the 99% level through related
+   logic packing, this does not mean the device is completely utilized.
+   Unrelated logic packing will then begin, continuing until all usable LUTs
+   and FFs are occupied.  Depending on your timing budget, increased levels of
+   unrelated logic packing may adversely affect the overall timing performance
+   of your design.
+
+Mapping completed.
+See MAP report file "build/mapped.mrp" for details.
+Release 9.2i - par J.36
+Copyright (c) 1995-2007 Xilinx, Inc.  All rights reserved.
+
+
+
+Constraints file: build/mapped.pcf.
+Loading device for application Rf_Device from file '3s500e.nph' in environment /home/martin/Xilinx92i.
+   "RamTest" is an NCD, version 3.1, device xc3s500e, package fg320, speed -4
+
+Initializing temperature to 85.000 Celsius. (default - Range: -40.000 to 100.000 Celsius)
+Initializing voltage to 1.140 Volts. (default - Range: 1.140 to 1.320 Volts)
+
+
+Device speed data version:  "PRODUCTION 1.26 2007-04-13".
+
+
+Design Summary Report:
+
+ Number of External IOBs                          52 out of 232    22%
+
+   Number of External Input IOBs                  2
+
+      Number of External Input IBUFs              2
+        Number of LOCed External Input IBUFs      2 out of 2     100%
+
+
+   Number of External Output IOBs                34
+
+      Number of External Output IOBs             34
+        Number of LOCed External Output IOBs     34 out of 34    100%
+
+
+   Number of External Bidir IOBs                 16
+
+      Number of External Bidir IOBs              16
+        Number of LOCed External Bidir IOBs      16 out of 16    100%
+
+
+   Number of BUFGMUXs                        6 out of 24     25%
+   Number of DCMs                            2 out of 4      50%
+   Number of RAMB16s                         1 out of 20      5%
+   Number of Slices                        347 out of 4656    7%
+      Number of SLICEMs                     35 out of 2328    1%
+
+
+
+Overall effort level (-ol):   High
+Placer effort level (-pl):    High
+Placer cost table entry (-t): 1
+Router effort level (-rl):    High
+
+Starting initial Timing Analysis.  REAL time: 2 secs
+ERROR:Par:228 - At least one timing constraint is impossible to meet because component delays alone exceed the
+   constraint.  A physical timing constraint summary follows. This summary will show a MINIMUM net delay for the paths.
+   The "Actual" delays listed in this summary are the UNROUTED delays with a 100 ps timing budget for each route, NOT
+   the achieved timing.  Any constraint in the summary showing a failure ("*" in the first column) has a constraint that
+   is too tight.  These constraints must be relaxed before PAR can continue.
+     Please use the Timing Analyzer (GUI) or TRCE (command line) with the Mapped NCD and PCF files to identify the
+   problem paths.  For more information about the Timing Analyzer, consult the Xilinx Timing Analyzer Reference manual;
+   for more information on TRCE, consult the Xilinx Development System Reference Guide "TRACE" chapter.
+
+INFO:Timing:3284 - This timing report was generated using estimated delay
+   information.  For accurate numbers, please refer to the post Place and Route
+   timing report.
+Number of Timing Constraints that were not applied: 2
+
+Asterisk (*) preceding a constraint indicates it was not met.
+   This may be due to a setup or hold violation.
+
+------------------------------------------------------------------------------------------------------
+  Constraint                                |  Check  | Worst Case |  Best Case | Timing |   Timing
+                                            |         |    Slack   | Achievable | Errors |    Score
+------------------------------------------------------------------------------------------------------
+* PERIOD analysis for net "clk_reset1/clk10 | SETUP   |    -1.501ns|    11.501ns|       1|        1501
+  0_0" derived from  NET "clk_reset1/clk50_ | HOLD    |     0.439ns|            |       0|           0
+  in" PERIOD = 20 ns HIGH 40%               |         |            |            |        |
+------------------------------------------------------------------------------------------------------
+  PERIOD analysis for net "clk_reset1/clk10 | SETUP   |     1.125ns|     1.375ns|       0|           0
+  0_90" derived from  NET "clk_reset1/clk50 | HOLD    |     3.353ns|            |       0|           0
+  _in" PERIOD = 20 ns HIGH 40%              |         |            |            |        |
+------------------------------------------------------------------------------------------------------
+  PERIOD analysis for net "clk_reset1/clk10 | SETUP   |     3.625ns|     1.375ns|       0|           0
+  0_180" derived from  NET "clk_reset1/clk5 | HOLD    |     0.599ns|            |       0|           0
+  0_in" PERIOD = 20 ns HIGH 40%             |         |            |            |        |
+------------------------------------------------------------------------------------------------------
+  PERIOD analysis for net "clk_reset1/clk10 | SETUP   |     6.159ns|     1.341ns|       0|           0
+  0_270" derived from  NET "clk_reset1/clk5 | HOLD    |     8.325ns|            |       0|           0
+  0_in" PERIOD = 20 ns HIGH 40%             |         |            |            |        |
+------------------------------------------------------------------------------------------------------
+  PERIOD analysis for net "clk_reset1/clk50 | SETUP   |    14.865ns|     5.135ns|       0|           0
+  _out" derived from  NET "clk_reset1/clk50 | HOLD    |     1.089ns|            |       0|           0
+  _in" PERIOD = 20 ns HIGH 40%              |         |            |            |        |
+------------------------------------------------------------------------------------------------------
+  NET "clk_reset1/clk50_in" PERIOD = 20 ns  | N/A     |         N/A|         N/A|     N/A|         N/A
+  HIGH 40%                                  |         |            |            |        |
+------------------------------------------------------------------------------------------------------
+  PERIOD analysis for net "clk_reset1/clk10 | N/A     |         N/A|         N/A|     N/A|         N/A
+  0_out" derived from  NET "clk_reset1/clk5 |         |            |            |        |
+  0_in" PERIOD = 20 ns HIGH 40%             |         |            |            |        |
+------------------------------------------------------------------------------------------------------
+
+
+1 constraint not met.
+INFO:Timing:2761 - N/A entries in the Constraints list may indicate that the
+   constraint does not cover any paths or that it has no requested value.
+
+
+
+Generating "PAR" statistics.
+
+**************************
+Generating Clock Report
+**************************
+
++---------------------+--------------+------+------+------------+-------------+
+|        Clock Net    |   Resource   |Locked|Fanout|Net Skew(ns)|Max Delay(ns)|
++---------------------+--------------+------+------+------------+-------------+
+|              clock* |        Global| No   |  242 |  0.000     |             |
++---------------------+--------------+------+------+------------+-------------+
+|     clk_reset1/clk* |        Global| No   |   14 |  0.000     |             |
++---------------------+--------------+------+------+------------+-------------+
+|           clock270* |        Global| No   |   18 |  0.000     |             |
++---------------------+--------------+------+------+------------+-------------+
+|            clock90* |        Global| No   |   18 |  0.000     |             |
++---------------------+--------------+------+------+------------+-------------+
+|           clock180* |        Global| No   |   36 |  0.000     |             |
++---------------------+--------------+------+------+------------+-------------+
+* Some of the Clock networks are NOT completely routed
+
+* Net Skew is the difference between the minimum and maximum routing
+only delays for the net. Note this is different from Clock Skew which
+is reported in TRCE timing report. Clock Skew is the difference between
+the minimum and maximum path delays which includes logic delays.
+
+Timing Score: 1501
+
+WARNING:Par:62 - Your design did not meet timing.  The following are some suggestions to assist you to meet timing in
+   your design.
+
+      Review the timing report using Timing Analyzer (In ISE select "Post-Place &
+      Route Static Timing Report").  Go to the failing constraint(s) and select
+      the "Timing Improvement Wizard" link for suggestions to correct each problem.
+
+   Rerun Map with "-timing" (ISE process "Perform Timing -Driven
+   Packing and Placement"
+
+   Run Multi-Pass Place and Route in PAR using at least 5 "PAR Iterations"
+   (ISE process "Multi Pass Place & Route").
+
+   Use the Xilinx "xplorer" script to try special combinations of
+   options known to produce very good results.
+   See http://www.xilinx.com/ise/implementation/Xplorer.htm for details.
+
+   Visit the Xilinx technical support web at http://support.xilinx.com and go to
+   either "Troubleshoot->Tech Tips->Timing & Constraints" or "
+   TechXclusives->Timing Closure" for tips and suggestions for meeting timing
+   in your design.
+
+Generating Pad Report.
+
+756 signals are not completely routed.
+
+WARNING:Par:100 - Design is not completely routed.
+
+Total REAL time to PAR completion: 3 secs
+Total CPU time to PAR completion: 3 secs
+
+Peak Memory Usage:  276 MB
+
+Placement: Completed - errors found.
+Routing: Completed - errors found.
+Timing: Completed - 1 errors found.
+
+Number of error messages: 1
+Number of warning messages: 3
+Number of info messages: 0
+
+Writing design to file build/routed.ncd
+
+
+
+PAR done!
+Release 9.2i - Bitgen J.36
+Copyright (c) 1995-2007 Xilinx, Inc.  All rights reserved.
+Loading device for application Rf_Device from file '3s500e.nph' in environment
+/home/martin/Xilinx92i.
+   "RamTest" is an NCD, version 3.1, device xc3s500e, package fg320, speed -4
+Opened constraints file build/mapped.pcf.
+
+Sun Oct 28 14:29:25 2018
+
+Running DRC.
+ERROR:PhysDesignRules:794 - Component ramTestController1/m0/store_data<2> is not
+   placed.
+ERROR:PhysDesignRules:794 - Component ramTestController1/m0/memory_bit_2/F5.S1
+   is not placed.
+ERROR:PhysDesignRules:794 - Component ramTestController1/m0/store_data<3> is not
+   placed.
+ERROR:PhysDesignRules:794 - Component ramTestController1/m0/memory_bit_3/F5.S1
+   is not placed.
+ERROR:PhysDesignRules:794 - Component ramTestController1/m0/store_data<4> is not
+   placed.
+ERROR:PhysDesignRules:794 - Component ramTestController1/m0/memory_bit_4/F5.S1
+   is not placed.
+ERROR:PhysDesignRules:794 - Component ramTestController1/m0/store_data<5> is not
+   placed.
+ERROR:PhysDesignRules:794 - Component ramTestController1/m0/memory_bit_5/F5.S1
+   is not placed.
+ERROR:PhysDesignRules:794 - Component ramTestController1/m0/store_data<6> is not
+   placed.
+ERROR:PhysDesignRules:794 - Component ramTestController1/m0/memory_bit_6/F5.S1
+   is not placed.
+ERROR:PhysDesignRules:794 - Component ramTestController1/m0/store_data<7> is not
+   placed.
+ERROR:PhysDesignRules:794 - Component ramTestController1/m0/memory_bit_7/F5.S1
+   is not placed.
+ERROR:PhysDesignRules:794 - Component ramTestController1/m0/store_data<0> is not
+   placed.
+ERROR:PhysDesignRules:794 - Component ramTestController1/m0/memory_bit_0/F5.S1
+   is not placed.
+ERROR:PhysDesignRules:794 - Component ramTestController1/m0/stack_pop_data<0> is
+   not placed.
+ERROR:PhysDesignRules:794 - Component ramTestController1/m0/stack_pop_data<8> is
+   not placed.
+ERROR:PhysDesignRules:794 - Component ramTestController1/m0/stack_pop_data<1> is
+   not placed.
+ERROR:PhysDesignRules:794 - Component ramTestController1/m0/stack_pop_data<9> is
+   not placed.
+ERROR:PhysDesignRules:794 - Component ramTestController1/m0/store_data<1> is not
+   placed.
+ERROR:PhysDesignRules:794 - Component ramTestController1/m0/stack_pop_data<2> is
+   not placed.
+ERROR:PhysDesignRules:794 - Component ramTestController1/m0/memory_bit_1/F5.S1
+   is not placed.
+ERROR:PhysDesignRules:794 - Component ramTestController1/m0/stack_pop_data<3> is
+   not placed.
+ERROR:PhysDesignRules:794 - Component ramTestController1/m0/stack_pop_data<4> is
+   not placed.
+ERROR:PhysDesignRules:794 - Component ramTestController1/m0/stack_pop_data<5> is
+   not placed.
+ERROR:PhysDesignRules:794 - Component ramTestController1/m0/stack_pop_data<6> is
+   not placed.
+ERROR:PhysDesignRules:794 - Component ramTestController1/m0/stack_pop_data<7> is
+   not placed.
+ERROR:PhysDesignRules:794 - Component ramTestController1/m0/inc_pc_vector<0> is
+   not placed.
+ERROR:PhysDesignRules:794 - Component ramTestController1/m0/inc_pc_vector<2> is
+   not placed.
+ERROR:PhysDesignRules:794 - Component ramTestController1/m0/inc_pc_vector<4> is
+   not placed.
+ERROR:PhysDesignRules:794 - Component ramTestController1/m0/inc_pc_vector<6> is
+   not placed.
+ERROR:PhysDesignRules - <378> unplaced comp messages were not reported.
+ERROR:Bitgen:25 - DRC detected 408 errors and 0 warnings.
+martin: ~/git-repos/esdk2/resource/ramtest >

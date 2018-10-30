@@ -1,0 +1,1 @@
+grep -v 'overrides generic/parameter on entity. It is possible that simulator will not take this attribute into account' buildlog.txt | grep -v 'Set user-defined property' | grep -v 'WARNING:Xst:616 - Invalid property "XC_PROPS INIT": Did not attach to ' > buildlog-filtered.txt

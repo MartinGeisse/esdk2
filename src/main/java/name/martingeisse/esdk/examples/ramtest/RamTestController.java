@@ -66,7 +66,7 @@ public class RamTestController extends RtlItem {
 			wishboneMaster.setCycleStrobeSignal(wbCycle);
 			wishboneMaster.setWriteEnableSignal(wbWrite);
 		}
-		wishboneMaster.setAddressSignal(ramAddressRegister);
+		wishboneMaster.setAddressSignal(new RtlConcatenation(realm, ramAddressRegister.select(29, 0), RtlVectorConstant.ofUnsigned(realm, 2, 0)));
 		wishboneMaster.setWriteDataSignal(ramWriteDataRegister);
 
 		// glue logic
