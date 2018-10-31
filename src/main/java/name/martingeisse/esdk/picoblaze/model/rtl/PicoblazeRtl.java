@@ -149,11 +149,12 @@ public class PicoblazeRtl extends RtlClockedItem {
 	public void updateState() {
 		if (sampledResetValue) {
 			state.reset();
-			// State state object will initialize the instruction to a NOP and here we jump right to execution
+			// the state object will initialize the instruction to a NOP and here we jump right to execution
 			// (second cycle). This will have no effect other than immediately loading the first instruction.
 			secondCycle = true;
 		} else if (secondCycle) {
 			state.performSecondCycle();
+			// TODO state.setInstruction(sampledInstructionValue.getAsUnsignedInt());
 			secondCycle = false;
 		} else {
 			state.setInstruction(sampledInstructionValue.getAsUnsignedInt());

@@ -81,6 +81,7 @@ public class RamTestController extends RtlItem {
 			chain.when(cpu.getPortAddress().select(6), cpuReadableByteSelect(ramReadDataRegister));
 			chain.when(cpu.getPortAddress().select(7), new RtlConcatenation(realm, RtlVectorConstant.ofUnsigned(realm, 7, 0), wishboneMaster.getCycleStrobeSignal()));
 			chain.otherwise(RtlVectorConstant.ofUnsigned(realm, 8, 0));
+			// TODO cpu.setPortInputDataSignal(RtlBuilder.vectorRegister(clock, chain));
 			cpu.setPortInputDataSignal(chain);
 		}
 

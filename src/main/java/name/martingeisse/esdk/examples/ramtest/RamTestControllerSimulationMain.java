@@ -36,7 +36,7 @@ public class RamTestControllerSimulationMain {
 		wbConnector.connectSlave(ram);
 
 		// display LEDs
-		new IntervalItem(design, 10, 100_000_000, () -> { // 10 times per simulated second
+		new IntervalItem(design, 10, 1_000_000, () -> { // 10 times per simulated second
 			System.out.println(controller.getLeds().getValue());
 		});
 

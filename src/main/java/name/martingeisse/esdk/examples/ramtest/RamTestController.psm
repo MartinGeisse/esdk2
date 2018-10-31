@@ -179,7 +179,7 @@ failureLoop:
     JUMP failureLoop
 
 finalWait:
-    LOAD s1, 00
+    LOAD s1, 02
 finalWait1:
 	SUB s1, 01
 	RETURN Z
