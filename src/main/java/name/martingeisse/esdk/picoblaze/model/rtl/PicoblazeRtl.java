@@ -46,12 +46,15 @@ public class PicoblazeRtl extends RtlClockedItem {
 	private VectorValue sampledInstructionValue;
 	private VectorValue sampledPortInputDataValue;
 
+	private boolean delayInstructionStabilityCheck;
+
 	public PicoblazeRtl(RtlClockNetwork clockNetwork) {
 		super(clockNetwork);
 		state = new PicoblazeState() {
 
 			@Override
 			protected int handleInput(int address) {
+				// TODO this is probably also wrong WRT exact timing
 				return sampledPortInputDataValue.getAsUnsignedInt();
 			}
 
@@ -61,6 +64,7 @@ public class PicoblazeRtl extends RtlClockedItem {
 
 		};
 		secondCycle = true;
+		delayInstructionStabilityCheck = true;
 
 		moduleInstance = new RtlModuleInstance(clockNetwork.getRealm(), "kcpsm3");
 		clockPort = moduleInstance.createBitInputPort("clk");
@@ -141,7 +145,13 @@ public class PicoblazeRtl extends RtlClockedItem {
 	@Override
 	public void computeNextState() {
 		sampledResetValue = resetPort.getAssignedSignal().getValue();
-		sampledInstructionValue = instructionPort.getAssignedSignal().getValue();
+		if (sampledResetValue || delayInstructionStabilityCheck || !secondCycle) {
+			state.setInstruction(instructionPort.getAssignedSignal().getValue().getAsUnsignedInt());
+		} else {
+			if (state.getInstruction() != instructionPort.getAssignedSignal().getValue().getAsUnsignedInt()) {
+				throw new RuntimeException("Picoblaze instruction changed from second to first cycle");
+			}
+		}
 		sampledPortInputDataValue = dataInputPort.getAssignedSignal().getValue();
 	}
 
@@ -152,14 +162,15 @@ public class PicoblazeRtl extends RtlClockedItem {
 			// the state object will initialize the instruction to a NOP and here we jump right to execution
 			// (second cycle). This will have no effect other than immediately loading the first instruction.
 			secondCycle = true;
+			delayInstructionStabilityCheck = true;
 		} else if (secondCycle) {
 			state.performSecondCycle();
-			// TODO state.setInstruction(sampledInstructionValue.getAsUnsignedInt());
 			secondCycle = false;
+			delayInstructionStabilityCheck = false;
 		} else {
-			state.setInstruction(sampledInstructionValue.getAsUnsignedInt());
 			state.performFirstCycle();
 			secondCycle = true;
+			delayInstructionStabilityCheck = false;
 		}
 	}
 
