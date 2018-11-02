@@ -40,7 +40,7 @@ writeLoop:
     OUTPUT sA, 80
 writeLoopDelayLoop:
     INPUT sA, 80
-    COMPARE sA, 00
+    COMPARE sA, 01
     JUMP Z, writeLoopDelayLoop
 
     ; x = 5 * x + 1;
@@ -112,7 +112,7 @@ readLoop:
     OUTPUT sA, 80
 readLoopDelayLoop:
     INPUT sA, 80
-    COMPARE sA, 00
+    COMPARE sA, 01
     JUMP Z, readLoopDelayLoop
     INPUT sC, 40
     INPUT sD, 41
@@ -188,6 +188,7 @@ finalWait2:
 	SUB s2, 01
 	JUMP Z, finalWait1
 	LOAD s3, 10
+	TODO
 	INPUT s4, 00
 	TEST s4, FF
 	JUMP Z, finalWait3

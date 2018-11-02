@@ -21,7 +21,9 @@ import name.martingeisse.esdk.library.bus.wishbone.WishboneSimpleMasterAdapter;
 import name.martingeisse.esdk.picoblaze.model.rtl.PicoblazeRtlWithAssociatedProgram;
 
 /**
- *
+ * TODO only the first RAM location gets written
+ * TODO reading produces totally wrong results
+ * TODO reading should be delayed by one clock (just add a register) to meet timing constraints
  */
 public class RamTestController extends RtlItem {
 

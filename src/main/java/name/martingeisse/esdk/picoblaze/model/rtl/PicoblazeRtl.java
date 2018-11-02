@@ -55,11 +55,17 @@ public class PicoblazeRtl extends RtlClockedItem {
 			@Override
 			protected int handleInput(int address) {
 				// TODO this is probably also wrong WRT exact timing
+//				if ((address & 64) != 0) {
+					System.out.println("in: " + address + ": " + sampledPortInputDataValue.getAsUnsignedInt());
+//				}
 				return sampledPortInputDataValue.getAsUnsignedInt();
 			}
 
 			@Override
 			protected void handleOutput(int address, int value) {
+//				if ((address & 32) != 0) {
+					System.out.println("out: " + address + ": " + value);
+//				}
 			}
 
 		};
