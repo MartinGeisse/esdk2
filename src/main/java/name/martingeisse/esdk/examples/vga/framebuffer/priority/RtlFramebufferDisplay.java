@@ -1,4 +1,4 @@
-package name.martingeisse.esdk.examples.vga.test_renderer;
+package name.martingeisse.esdk.examples.vga.framebuffer.priority;
 
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlItem;
