@@ -60,14 +60,18 @@ public class RtlRamdacDesign extends Design {
 			RtlSynchronousMemoryPort.ReadWriteInteractionMode.READ_FIRST);
 		this.addressSelector = new RtlBitSignalConnector(getRealm());
 
-		setWriteAddressSignal(testRenderer.getFramebufferWriteAddress());
-		setWriteStrobeSignal(testRenderer.getFramebufferWriteStrobe());
-		setWriteDataSignal(testRenderer.getFramebufferWriteData());
 
+		//
 		vgaTimer = new VgaTimer(clock);
-		setDacAddressSignal(new RtlConcatenation(realm, vgaTimer.getY().select(7, 1), vgaTimer.getX().select(7, 1)));
+		writeAddressSignal = testRenderer.getFramebufferWriteAddress();
+		dacAddressSignal = new RtlConcatenation(realm, vgaTimer.getY().select(7, 1), vgaTimer.getX().select(7, 1));
+		addressSelector.setConnected(testRenderer.getFramebufferWriteStrobe());
+		framebufferPort.setWriteEnableSignal(testRenderer.getFramebufferWriteStrobe());
+		framebufferPort.setAddressSignal(new RtlConditionalVectorOperation(getRealm(),
+			addressSelector, writeAddressSignal, dacAddressSignal));
+		framebufferPort.setWriteDataSignal(testRenderer.getFramebufferWriteData());
 
-		RtlVectorSignal dacReadData = getDacReadDataSignal();
+		RtlVectorSignal dacReadData = framebufferPort.getReadDataSignal();
 		RtlBitSignal blank = vgaTimer.getBlank().or(vgaTimer.getX().select(8)).or(vgaTimer.getX().select(9))
 			.or(vgaTimer.getY().select(8)).or(vgaTimer.getY().select(9));
 		RtlBitSignal active = blank.not();
@@ -127,49 +131,6 @@ public class RtlRamdacDesign extends Design {
 		pin.setConfiguration(new XilinxPinConfiguration());
 		pin.setOutputSignal(outputSignal);
 		return pin;
-	}
-
-	public void setWriteStrobeSignal(RtlBitSignal writeStrobeSignal) {
-		framebufferPort.setWriteEnableSignal(writeStrobeSignal);
-		addressSelector.setConnected(writeStrobeSignal);
-		updateFramebufferAddressSignal();
-	}
-
-	public void setWriteAddressSignal(RtlVectorSignal writeAddressSignal) {
-		this.writeAddressSignal = writeAddressSignal;
-		updateFramebufferAddressSignal();
-	}
-
-	public void setDacAddressSignal(RtlVectorSignal dacAddressSignal) {
-		this.dacAddressSignal = dacAddressSignal;
-		updateFramebufferAddressSignal();
-	}
-
-	private void updateFramebufferAddressSignal() {
-		if (writeAddressSignal != null) {
-			if (dacAddressSignal != null) {
-				framebufferPort.setAddressSignal(new RtlConditionalVectorOperation(getRealm(),
-					addressSelector, writeAddressSignal, dacAddressSignal));
-			} else {
-				framebufferPort.setAddressSignal(writeAddressSignal);
-			}
-		} else {
-			if (dacAddressSignal != null) {
-				framebufferPort.setAddressSignal(dacAddressSignal);
-			}
-		}
-	}
-
-	public void setWriteDataSignal(RtlVectorSignal writeDataSignal) {
-		framebufferPort.setWriteDataSignal(writeDataSignal);
-	}
-
-	public RtlMemory getFramebuffer() {
-		return framebuffer;
-	}
-
-	public RtlVectorSignal getDacReadDataSignal() {
-		return framebufferPort.getReadDataSignal();
 	}
 
 }
