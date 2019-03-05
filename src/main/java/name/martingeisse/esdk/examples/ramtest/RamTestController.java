@@ -18,6 +18,7 @@ import name.martingeisse.esdk.core.rtl.synthesis.verilog.EmptyVerilogContributio
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
 import name.martingeisse.esdk.library.bus.wishbone.WishboneSimpleMaster;
 import name.martingeisse.esdk.library.bus.wishbone.WishboneSimpleMasterAdapter;
+import name.martingeisse.esdk.library.util.DebugOutput;
 import name.martingeisse.esdk.picoblaze.model.rtl.PicoblazeRtlWithAssociatedProgram;
 
 /**
@@ -86,6 +87,15 @@ public class RamTestController extends RtlItem {
 			// TODO cpu.setPortInputDataSignal(RtlBuilder.vectorRegister(clock, chain));
 			cpu.setPortInputDataSignal(chain);
 		}
+
+		// debug output
+		new DebugOutput(clock, cpu.getOutputData(), cpu.getWriteStrobe().and(cpu.getPortAddress().select(2)), value -> {
+			if (value < 16) {
+				System.out.println("DEBUG: 0" + Integer.toHexString(value));
+			} else {
+				System.out.println("DEBUG: " + Integer.toHexString(value));
+			}
+		});
 
 	}
 
