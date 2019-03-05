@@ -6,9 +6,7 @@ import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.block.RtlClockedBlock;
 import name.martingeisse.esdk.core.rtl.block.RtlProceduralVectorSignal;
 import name.martingeisse.esdk.core.rtl.block.statement.RtlStatementBuilder;
-import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
-import name.martingeisse.esdk.core.rtl.signal.RtlConcatenation;
-import name.martingeisse.esdk.core.rtl.signal.RtlVectorConstant;
+import name.martingeisse.esdk.core.rtl.signal.*;
 import name.martingeisse.esdk.core.rtl.signal.connector.RtlBitSignalConnector;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.EmptyVerilogContribution;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
@@ -22,15 +20,16 @@ public final class TestRenderer extends RtlItem {
 
 	private final RtlClockNetwork clock;
 	private final PicoblazeRtlWithAssociatedProgram cpu;
-	private final RtlBitSignalConnector displayReady;
 	private final RtlProceduralVectorSignal columnRegister;
 	private final RtlProceduralVectorSignal rowRegister;
+	private final RtlBitSignal framebufferWriteStrobe;
+	private final RtlVectorSignal framebufferWriteAddress;
+	private final RtlVectorSignal framebufferWriteData;
 
 	public TestRenderer(RtlRealm realm, RtlClockNetwork clock, int widthBits, int heightBits) {
 		super(realm);
 		this.clock = clock;
 		cpu = new PicoblazeRtlWithAssociatedProgram(clock, getClass());
-		displayReady = new RtlBitSignalConnector(realm);
 
 		{
 			RtlClockedBlock block = new RtlClockedBlock(clock);
@@ -84,18 +83,24 @@ public final class TestRenderer extends RtlItem {
 			builder.endWhen();
 		}
 
-		cpu.setPortInputDataSignal(new RtlConcatenation(realm,
-			new RtlVectorConstant(realm, VectorValue.ofUnsigned(7, 0)),
-			displayReady));
+		cpu.setPortInputDataSignal(new RtlVectorConstant(realm, VectorValue.ofUnsigned(8, 0)));
 		cpu.setResetSignal(new RtlBitConstant(realm, false));
 
+		framebufferWriteStrobe = cpu.getWriteStrobe().and(cpu.getPortAddress().select(0));
+		framebufferWriteAddress = new RtlConcatenation(getRealm(), rowRegister, columnRegister);
+		framebufferWriteData = cpu.getOutputData().select(2, 0);
 	}
 
-	public void connectDisplay(RtlRamdacDesign display) {
-		display.setWriteAddressSignal(new RtlConcatenation(getRealm(), rowRegister, columnRegister));
-		display.setWriteStrobeSignal(cpu.getWriteStrobe().and(cpu.getPortAddress().select(0)));
-		display.setWriteDataSignal(cpu.getOutputData().select(2, 0));
-		displayReady.setConnected(display.getReadySignal());
+	public RtlBitSignal getFramebufferWriteStrobe() {
+		return framebufferWriteStrobe;
+	}
+
+	public RtlVectorSignal getFramebufferWriteAddress() {
+		return framebufferWriteAddress;
+	}
+
+	public RtlVectorSignal getFramebufferWriteData() {
+		return framebufferWriteData;
 	}
 
 	@Override

@@ -11,7 +11,10 @@ import name.martingeisse.esdk.core.rtl.memory.RtlMemory;
 import name.martingeisse.esdk.core.rtl.memory.RtlSynchronousMemoryPort;
 import name.martingeisse.esdk.core.rtl.pin.RtlInputPin;
 import name.martingeisse.esdk.core.rtl.pin.RtlOutputPin;
-import name.martingeisse.esdk.core.rtl.signal.*;
+import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
+import name.martingeisse.esdk.core.rtl.signal.RtlConcatenation;
+import name.martingeisse.esdk.core.rtl.signal.RtlConditionalVectorOperation;
+import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.signal.connector.RtlBitSignalConnector;
 import name.martingeisse.esdk.core.rtl.synthesis.xilinx.XilinxPinConfiguration;
 import name.martingeisse.esdk.examples.vga.VgaTimer;
@@ -34,7 +37,6 @@ public class RtlRamdacDesign extends Design {
 
 	private final RtlMemory framebuffer;
 	private final RtlSynchronousMemoryPort framebufferPort;
-	private final RtlBitSignal readySignal;
 	private RtlVectorSignal writeAddressSignal;
 	private RtlVectorSignal dacAddressSignal;
 	private RtlBitSignalConnector addressSelector;
@@ -56,9 +58,11 @@ public class RtlRamdacDesign extends Design {
 			RtlSynchronousMemoryPort.ReadSupport.SYNCHRONOUS,
 			RtlSynchronousMemoryPort.WriteSupport.SYNCHRONOUS,
 			RtlSynchronousMemoryPort.ReadWriteInteractionMode.READ_FIRST);
-		this.readySignal = new RtlBitConstant(clock.getRealm(), true);
 		this.addressSelector = new RtlBitSignalConnector(getRealm());
-		testRenderer.connectDisplay(this);
+
+		setWriteAddressSignal(testRenderer.getFramebufferWriteAddress());
+		setWriteStrobeSignal(testRenderer.getFramebufferWriteStrobe());
+		setWriteDataSignal(testRenderer.getFramebufferWriteData());
 
 		vgaTimer = new VgaTimer(clock);
 		setDacAddressSignal(new RtlConcatenation(realm, vgaTimer.getY().select(7, 1), vgaTimer.getX().select(7, 1)));
@@ -158,10 +162,6 @@ public class RtlRamdacDesign extends Design {
 
 	public void setWriteDataSignal(RtlVectorSignal writeDataSignal) {
 		framebufferPort.setWriteDataSignal(writeDataSignal);
-	}
-
-	public RtlBitSignal getReadySignal() {
-		return readySignal;
 	}
 
 	public RtlMemory getFramebuffer() {
