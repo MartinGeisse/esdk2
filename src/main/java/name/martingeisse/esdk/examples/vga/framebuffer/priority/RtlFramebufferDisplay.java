@@ -16,7 +16,7 @@ import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
  * Simple but wrong implementation that won't delay a write when reading pixels, instead writing correctly and
  * reading that pixel instead of the one that should actually be read.
  */
-public final class RtlFramebufferDisplay extends RtlItem implements FramebufferDisplay {
+public final class RtlFramebufferDisplay extends RtlItem {
 
 	private final int widthBits;
 	private final int heightBits;
@@ -77,7 +77,6 @@ public final class RtlFramebufferDisplay extends RtlItem implements FramebufferD
 		framebufferPort.setWriteDataSignal(writeDataSignal);
 	}
 
-	@Override
 	public RtlBitSignal getReadySignal() {
 		return readySignal;
 	}
