@@ -14,12 +14,9 @@ import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.block.RtlClockedBlock;
 import name.martingeisse.esdk.core.rtl.block.RtlProceduralBitSignal;
 import name.martingeisse.esdk.core.rtl.memory.RtlMemory;
-import name.martingeisse.esdk.core.rtl.memory.RtlMemoryPort;
 import name.martingeisse.esdk.core.rtl.memory.RtlSynchronousMemoryPort;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
 import name.martingeisse.esdk.core.rtl.simulation.RtlClockGenerator;
-import name.martingeisse.esdk.library.bus.wishbone.WishboneOneToOneConnector;
-import name.martingeisse.esdk.library.bus.wishbone.ram.SimulatedDelayedWishboneRam32;
 
 /**
  *
@@ -37,19 +34,19 @@ public class RamTestControllerBlockramSimulationMain {
 		// BlockRAM test
 		RtlClockedBlock block = new RtlClockedBlock(clock);
 		RtlProceduralBitSignal ackReg = block.createBit(false);
-		block.getStatements().when(controller.getWishboneMaster().getCycleStrobeSignal()).getThenBranch()
+		block.getStatements().when(controller.getMybusMaster().getCycleStrobeSignal()).getThenBranch()
 			.assign(ackReg, ackReg.not());
-		controller.getWishboneMaster().setAckSignal(ackReg);
+		controller.getMybusMaster().setAckSignal(ackReg);
 		RtlMemory ram = new RtlMemory(realm, 256, 32);
 		RtlSynchronousMemoryPort ramPort = ram.createSynchronousPort(clock,
 			RtlSynchronousMemoryPort.ReadSupport.SYNCHRONOUS,
 			RtlSynchronousMemoryPort.WriteSupport.SYNCHRONOUS,
 			RtlSynchronousMemoryPort.ReadWriteInteractionMode.READ_FIRST);
-		ramPort.setClockEnableSignal(controller.getWishboneMaster().getCycleStrobeSignal());
-		ramPort.setWriteEnableSignal(controller.getWishboneMaster().getWriteEnableSignal());
-		ramPort.setAddressSignal(controller.getWishboneMaster().getAddressSignal().select(9, 2));
-		ramPort.setWriteDataSignal(controller.getWishboneMaster().getWriteDataSignal());
-		controller.getWishboneMaster().setReadDataSignal(ramPort.getReadDataSignal());
+		ramPort.setClockEnableSignal(controller.getMybusMaster().getCycleStrobeSignal());
+		ramPort.setWriteEnableSignal(controller.getMybusMaster().getWriteEnableSignal());
+		ramPort.setAddressSignal(controller.getMybusMaster().getAddressSignal().select(9, 2));
+		ramPort.setWriteDataSignal(controller.getMybusMaster().getWriteDataSignal());
+		controller.getMybusMaster().setReadDataSignal(ramPort.getReadDataSignal());
 
 		// display LEDs
 		new IntervalItem(design, 10, 1_000_000, () -> { // 10 times per simulated second

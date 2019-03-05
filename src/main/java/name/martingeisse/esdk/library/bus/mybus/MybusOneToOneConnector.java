@@ -1,4 +1,4 @@
-package name.martingeisse.esdk.library.bus.wishbone;
+package name.martingeisse.esdk.library.bus.mybus;
 
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
@@ -10,7 +10,7 @@ import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
 /**
  * Directly connects a single master to a single slave.
  */
-public final class WishboneOneToOneConnector extends RtlItem {
+public final class MybusOneToOneConnector extends RtlItem {
 
 	private final RtlBitSignalConnector cycleStrobeSignal;
 	private final RtlBitSignalConnector writeEnableSignal;
@@ -19,7 +19,7 @@ public final class WishboneOneToOneConnector extends RtlItem {
 	private final RtlVectorSignalConnector readDataSignal;
 	private final RtlBitSignalConnector ackSignal;
 
-	public WishboneOneToOneConnector(RtlRealm realm) {
+	public MybusOneToOneConnector(RtlRealm realm) {
 		super(realm);
 		cycleStrobeSignal = new RtlBitSignalConnector(realm);
 		writeEnableSignal = new RtlBitSignalConnector(realm);
@@ -29,7 +29,7 @@ public final class WishboneOneToOneConnector extends RtlItem {
 		ackSignal = new RtlBitSignalConnector(realm);
 	}
 
-	public void connectMaster(WishboneSimpleMaster master) {
+	public void connectMaster(MybusSimpleMaster master) {
 		cycleStrobeSignal.setConnected(master.getCycleStrobeSignal());
 		writeEnableSignal.setConnected(master.getWriteEnableSignal());
 		addressSignal.setConnected(master.getAddressSignal());
@@ -38,7 +38,7 @@ public final class WishboneOneToOneConnector extends RtlItem {
 		master.setAckSignal(ackSignal);
 	}
 
-	public void connectSlave(WishboneSimpleSlave slave) {
+	public void connectSlave(MybusSimpleSlave slave) {
 		slave.setCycleStrobeSignal(cycleStrobeSignal);
 		slave.setWriteEnableSignal(writeEnableSignal);
 		slave.setAddressSignal(addressSignal);

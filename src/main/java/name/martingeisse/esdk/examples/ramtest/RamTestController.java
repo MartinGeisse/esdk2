@@ -16,8 +16,8 @@ import name.martingeisse.esdk.core.rtl.signal.*;
 import name.martingeisse.esdk.core.rtl.signal.connector.RtlVectorSignalConnector;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.EmptyVerilogContribution;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
-import name.martingeisse.esdk.library.bus.wishbone.WishboneSimpleMaster;
-import name.martingeisse.esdk.library.bus.wishbone.WishboneSimpleMasterAdapter;
+import name.martingeisse.esdk.library.bus.mybus.MybusSimpleMaster;
+import name.martingeisse.esdk.library.bus.mybus.MybusSimpleMasterAdapter;
 import name.martingeisse.esdk.library.util.DebugOutput;
 import name.martingeisse.esdk.picoblaze.model.rtl.PicoblazeRtlWithAssociatedProgram;
 
@@ -33,7 +33,7 @@ public class RamTestController extends RtlItem {
 	private final RtlBitSignal reset;
 	private final PicoblazeRtlWithAssociatedProgram cpu;
 
-	private final WishboneSimpleMasterAdapter wishboneMaster;
+	private final MybusSimpleMasterAdapter mybusMaster;
 
 	private final RtlVectorSignalConnector ramAddressRegister;
 	private final RtlVectorSignalConnector ramReadDataRegister;
@@ -48,7 +48,7 @@ public class RamTestController extends RtlItem {
 		this.reset = reset;
 		this.cpu = new PicoblazeRtlWithAssociatedProgram(clock, RamTestController.class);
 		cpu.setResetSignal(reset);
-		this.wishboneMaster = new WishboneSimpleMasterAdapter(realm);
+		this.mybusMaster = new MybusSimpleMasterAdapter(realm);
 		this.ramAddressRegister = new RtlVectorSignalConnector(realm, 32);
 		this.ramReadDataRegister = new RtlVectorSignalConnector(realm, 32);
 		this.ramWriteDataRegister = new RtlVectorSignalConnector(realm, 32);
@@ -56,7 +56,7 @@ public class RamTestController extends RtlItem {
 		// LEDs
 		leds = RtlBuilder.vectorRegister(clock, cpu.getOutputData(), cpu.getWriteStrobe().and(cpu.getPortAddress().select(3)));
 
-		// Wishbone interface
+		// Mybus interface
 		{
 			RtlClockedBlock block = new RtlClockedBlock(clock);
 			RtlProceduralBitSignal wbCycle = block.createBit();
@@ -65,24 +65,24 @@ public class RamTestController extends RtlItem {
 			RtlStatementSequence startCycle = chain.when(cpu.getWriteStrobe().and(cpu.getPortAddress().select(7)));
 			startCycle.assign(wbCycle, true);
 			startCycle.assign(wbWrite, cpu.getOutputData().select(0));
-			chain.when(wishboneMaster.getAckSignal()).assign(wbCycle, false);
-			wishboneMaster.setCycleStrobeSignal(wbCycle);
-			wishboneMaster.setWriteEnableSignal(wbWrite);
+			chain.when(mybusMaster.getAckSignal()).assign(wbCycle, false);
+			mybusMaster.setCycleStrobeSignal(wbCycle);
+			mybusMaster.setWriteEnableSignal(wbWrite);
 		}
-		wishboneMaster.setAddressSignal(new RtlConcatenation(realm, ramAddressRegister.select(29, 0), RtlVectorConstant.ofUnsigned(realm, 2, 0)));
-		wishboneMaster.setWriteDataSignal(ramWriteDataRegister);
+		mybusMaster.setAddressSignal(new RtlConcatenation(realm, ramAddressRegister.select(29, 0), RtlVectorConstant.ofUnsigned(realm, 2, 0)));
+		mybusMaster.setWriteDataSignal(ramWriteDataRegister);
 
 		// glue logic
 		ramAddressRegister.setConnected(cpuWritableWordRegister(4));
 		ramWriteDataRegister.setConnected(cpuWritableWordRegister(5));
-		ramReadDataRegister.setConnected(RtlBuilder.vectorRegister(clock, wishboneMaster.getReadDataSignal(),
-			wishboneMaster.getAckSignal().and(wishboneMaster.getWriteEnableSignal().not())));
+		ramReadDataRegister.setConnected(RtlBuilder.vectorRegister(clock, mybusMaster.getReadDataSignal(),
+			mybusMaster.getAckSignal().and(mybusMaster.getWriteEnableSignal().not())));
 		{
 			RtlConditionChainVectorSignal chain = new RtlConditionChainVectorSignal(realm, 8);
 			chain.when(cpu.getPortAddress().select(4), cpuReadableByteSelect(ramAddressRegister));
 			chain.when(cpu.getPortAddress().select(5), cpuReadableByteSelect(ramWriteDataRegister));
 			chain.when(cpu.getPortAddress().select(6), cpuReadableByteSelect(ramReadDataRegister));
-			chain.when(cpu.getPortAddress().select(7), new RtlConcatenation(realm, RtlVectorConstant.ofUnsigned(realm, 7, 0), wishboneMaster.getCycleStrobeSignal()));
+			chain.when(cpu.getPortAddress().select(7), new RtlConcatenation(realm, RtlVectorConstant.ofUnsigned(realm, 7, 0), mybusMaster.getCycleStrobeSignal()));
 			chain.otherwise(RtlVectorConstant.ofUnsigned(realm, 8, 0));
 			// TODO cpu.setPortInputDataSignal(RtlBuilder.vectorRegister(clock, chain));
 			cpu.setPortInputDataSignal(chain);
@@ -107,8 +107,8 @@ public class RamTestController extends RtlItem {
 		return leds;
 	}
 
-	public WishboneSimpleMaster getWishboneMaster() {
-		return wishboneMaster;
+	public MybusSimpleMasterAdapter getMybusMaster() {
+		return mybusMaster;
 	}
 
 	private RtlVectorSignal cpuWritableWordRegister(int registerBit) {

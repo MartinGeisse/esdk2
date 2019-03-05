@@ -1,4 +1,4 @@
-package name.martingeisse.esdk.library.bus.wishbone.ram;
+package name.martingeisse.esdk.library.bus.mybus.ram;
 
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlClockedItem;
@@ -10,13 +10,13 @@ import name.martingeisse.esdk.core.rtl.simulation.RtlSimulatedComputedBitSignal;
 import name.martingeisse.esdk.core.rtl.simulation.RtlSimulatedSettableVectorSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
 import name.martingeisse.esdk.core.util.Matrix;
-import name.martingeisse.esdk.library.bus.wishbone.WishboneSimpleSlave;
+import name.martingeisse.esdk.library.bus.mybus.MybusSimpleSlave;
 
 /**
  * Simulation-only WB-compatible RAM. The purpose of this is to simulate RAMs with long delays, so single-clock
  * bus cycles are not supported to simplify the code.
  */
-public final class SimulatedDelayedWishboneRam32 extends RtlClockedItem implements WishboneSimpleSlave {
+public final class SimulatedDelayedMybusRam32 extends RtlClockedItem implements MybusSimpleSlave {
 
 	private final int addressBits;
 	private final int addressMask;
@@ -30,7 +30,7 @@ public final class SimulatedDelayedWishboneRam32 extends RtlClockedItem implemen
 	private final RtlSimulatedComputedBitSignal ackSignal;
 	private int remainingDelay;
 
-	public SimulatedDelayedWishboneRam32(RtlClockNetwork clock, int addressBits, int delay) {
+	public SimulatedDelayedMybusRam32(RtlClockNetwork clock, int addressBits, int delay) {
 		super(clock);
 		if (addressBits < 0 || addressBits > 31) {
 			throw new IllegalArgumentException("invalid address width: " + addressBits);

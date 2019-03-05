@@ -13,8 +13,8 @@ import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
 import name.martingeisse.esdk.core.rtl.simulation.RtlClockGenerator;
-import name.martingeisse.esdk.library.bus.wishbone.WishboneOneToOneConnector;
-import name.martingeisse.esdk.library.bus.wishbone.ram.SimulatedDelayedWishboneRam32;
+import name.martingeisse.esdk.library.bus.mybus.MybusOneToOneConnector;
+import name.martingeisse.esdk.library.bus.mybus.ram.SimulatedDelayedMybusRam32;
 
 /**
  * TODO make RamTestControllerBlockramSimulationMain work first -- it's simpler and with a small size should be synth'able.
@@ -30,9 +30,9 @@ public class RamTestControllerSimulationMain {
 		RamTestController controller = new RamTestController(realm, clock, new RtlBitConstant(realm, false));
 
 		// RAM
-		SimulatedDelayedWishboneRam32 ram = new SimulatedDelayedWishboneRam32(clock, 23, 3);
-		WishboneOneToOneConnector wbConnector = new WishboneOneToOneConnector(realm);
-		wbConnector.connectMaster(controller.getWishboneMaster());
+		SimulatedDelayedMybusRam32 ram = new SimulatedDelayedMybusRam32(clock, 23, 3);
+		MybusOneToOneConnector wbConnector = new MybusOneToOneConnector(realm);
+		wbConnector.connectMaster(controller.getMybusMaster());
 		wbConnector.connectSlave(ram);
 
 		// display LEDs

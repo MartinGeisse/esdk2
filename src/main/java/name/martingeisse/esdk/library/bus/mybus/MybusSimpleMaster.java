@@ -1,4 +1,4 @@
-package name.martingeisse.esdk.library.bus.wishbone;
+package name.martingeisse.esdk.library.bus.mybus;
 
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
@@ -9,7 +9,7 @@ import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
  * For single-transfer bus cycles without extra delaying clock cycles, the CYC and STB signals are identical and are
  * called "cycle strobe" here.
  */
-public interface WishboneSimpleMaster {
+public interface MybusSimpleMaster {
 
 	RtlBitSignal getCycleStrobeSignal();
 

@@ -1,4 +1,4 @@
-package name.martingeisse.esdk.library.bus.wishbone;
+package name.martingeisse.esdk.library.bus.mybus;
 
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
@@ -12,7 +12,7 @@ import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
 /**
  *
  */
-public class WishboneSimpleSlaveAdapter extends RtlItem implements WishboneSimpleSlave {
+public class MybusSimpleSlaveAdapter extends RtlItem implements MybusSimpleSlave {
 
 	private final RtlBitSignalConnector cycleStrobeSignal;
 	private final RtlBitSignalConnector writeEnableSignal;
@@ -21,7 +21,7 @@ public class WishboneSimpleSlaveAdapter extends RtlItem implements WishboneSimpl
 	private final RtlVectorSignalConnector readDataSignal;
 	private final RtlBitSignalConnector ackSignal;
 
-	public WishboneSimpleSlaveAdapter(RtlRealm realm) {
+	public MybusSimpleSlaveAdapter(RtlRealm realm) {
 		super(realm);
 		cycleStrobeSignal = new RtlBitSignalConnector(realm);
 		writeEnableSignal = new RtlBitSignalConnector(realm);
