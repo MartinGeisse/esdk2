@@ -47,7 +47,7 @@ public class RamTestControllerBlockramSimulationMain {
 			RtlSynchronousMemoryPort.ReadWriteInteractionMode.READ_FIRST);
 		ramPort.setClockEnableSignal(controller.getWishboneMaster().getCycleStrobeSignal());
 		ramPort.setWriteEnableSignal(controller.getWishboneMaster().getWriteEnableSignal());
-		ramPort.setAddressSignal(controller.getWishboneMaster().getAddressSignal().select(7, 0));
+		ramPort.setAddressSignal(controller.getWishboneMaster().getAddressSignal().select(9, 2));
 		ramPort.setWriteDataSignal(controller.getWishboneMaster().getWriteDataSignal());
 		controller.getWishboneMaster().setReadDataSignal(ramPort.getReadDataSignal());
 
