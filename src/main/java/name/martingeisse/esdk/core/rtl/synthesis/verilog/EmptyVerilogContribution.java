@@ -9,6 +9,8 @@ package name.martingeisse.esdk.core.rtl.synthesis.verilog;
  */
 public final class EmptyVerilogContribution implements VerilogContribution {
 
+	public static final EmptyVerilogContribution INSTANCE = new EmptyVerilogContribution();
+
 	@Override
 	public void prepareSynthesis(SynthesisPreparationContext context) {
 	}

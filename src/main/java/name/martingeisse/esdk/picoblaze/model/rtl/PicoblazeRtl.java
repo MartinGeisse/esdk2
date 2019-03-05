@@ -56,7 +56,7 @@ public class PicoblazeRtl extends RtlClockedItem {
 			protected int handleInput(int address) {
 				// TODO this is probably also wrong WRT exact timing
 //				if ((address & 64) != 0) {
-					System.out.println("in: " + address + ": " + sampledPortInputDataValue.getAsUnsignedInt());
+					// System.out.println("in: " + address + ": " + sampledPortInputDataValue.getAsUnsignedInt());
 //				}
 				return sampledPortInputDataValue.getAsUnsignedInt();
 			}
@@ -64,7 +64,7 @@ public class PicoblazeRtl extends RtlClockedItem {
 			@Override
 			protected void handleOutput(int address, int value) {
 //				if ((address & 32) != 0) {
-					System.out.println("out: " + address + ": " + value);
+					// System.out.println("out: " + address + ": " + value);
 //				}
 			}
 

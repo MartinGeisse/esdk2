@@ -188,8 +188,7 @@ finalWait2:
 	SUB s2, 01
 	JUMP Z, finalWait1
 	LOAD s3, 10
-	TODO
-	INPUT s4, 00
+    INPUT s4, 00
 	TEST s4, FF
 	JUMP Z, finalWait3
 	LOAD s3, 03

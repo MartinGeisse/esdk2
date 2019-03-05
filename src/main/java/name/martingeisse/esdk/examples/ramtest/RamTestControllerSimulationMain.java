@@ -17,7 +17,7 @@ import name.martingeisse.esdk.library.bus.wishbone.WishboneOneToOneConnector;
 import name.martingeisse.esdk.library.bus.wishbone.ram.SimulatedDelayedWishboneRam32;
 
 /**
- *
+ * TODO make RamTestControllerBlockramSimulationMain work first -- it's simpler and with a small size should be synth'able.
  */
 public class RamTestControllerSimulationMain {
 
