@@ -1,0 +1,2 @@
+Mybus uses an address space of 2^32 words, each with a size of 2^32. Bytes cannot be addressed directly, but masters
+and slaves may optionally support a four-bit write mask to write individual bytes. Reading always reads a full word.

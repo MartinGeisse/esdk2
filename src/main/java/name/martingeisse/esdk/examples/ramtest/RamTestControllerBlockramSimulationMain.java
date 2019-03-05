@@ -44,7 +44,7 @@ public class RamTestControllerBlockramSimulationMain {
 			RtlSynchronousMemoryPort.ReadWriteInteractionMode.READ_FIRST);
 		ramPort.setClockEnableSignal(controller.getMybusMaster().getStrobeSignal());
 		ramPort.setWriteEnableSignal(controller.getMybusMaster().getWriteEnableSignal());
-		ramPort.setAddressSignal(controller.getMybusMaster().getAddressSignal().select(9, 2));
+		ramPort.setAddressSignal(controller.getMybusMaster().getAddressSignal().select(7, 0));
 		ramPort.setWriteDataSignal(controller.getMybusMaster().getWriteDataSignal());
 		controller.getMybusMaster().setReadDataSignal(ramPort.getReadDataSignal());
 

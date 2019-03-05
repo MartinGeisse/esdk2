@@ -68,7 +68,7 @@ public class RamTestController extends RtlItem {
 			mybusMaster.setStrobeSignal(mbCycle);
 			mybusMaster.setWriteEnableSignal(mbWrite);
 		}
-		mybusMaster.setAddressSignal(new RtlConcatenation(realm, ramAddressRegister.select(29, 0), RtlVectorConstant.ofUnsigned(realm, 2, 0)));
+		mybusMaster.setAddressSignal(new RtlConcatenation(realm, ramAddressRegister));
 		mybusMaster.setWriteDataSignal(ramWriteDataRegister);
 
 		// glue logic
