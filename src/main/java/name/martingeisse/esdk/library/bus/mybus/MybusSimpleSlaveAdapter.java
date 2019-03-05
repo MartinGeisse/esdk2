@@ -12,9 +12,9 @@ import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
 /**
  *
  */
-public class MybusSimpleSlaveAdapter extends RtlItem implements MybusSimpleSlave {
+public class MybusSimpleSlaveAdapter extends RtlItem implements MybusSlave {
 
-	private final RtlBitSignalConnector cycleStrobeSignal;
+	private final RtlBitSignalConnector strobeSignal;
 	private final RtlBitSignalConnector writeEnableSignal;
 	private final RtlVectorSignalConnector addressSignal;
 	private final RtlVectorSignalConnector writeDataSignal;
@@ -23,7 +23,7 @@ public class MybusSimpleSlaveAdapter extends RtlItem implements MybusSimpleSlave
 
 	public MybusSimpleSlaveAdapter(RtlRealm realm) {
 		super(realm);
-		cycleStrobeSignal = new RtlBitSignalConnector(realm);
+		strobeSignal = new RtlBitSignalConnector(realm);
 		writeEnableSignal = new RtlBitSignalConnector(realm);
 		addressSignal = new RtlVectorSignalConnector(realm, 32);
 		writeDataSignal = new RtlVectorSignalConnector(realm, 32);
@@ -31,13 +31,13 @@ public class MybusSimpleSlaveAdapter extends RtlItem implements MybusSimpleSlave
 		ackSignal = new RtlBitSignalConnector(realm);
 	}
 
-	public RtlBitSignal getCycleStrobeSignal() {
-		return cycleStrobeSignal;
+	public RtlBitSignal getStrobeSignal() {
+		return strobeSignal;
 	}
 
 	@Override
-	public void setCycleStrobeSignal(RtlBitSignal cycleStrobeSignal) {
-		this.cycleStrobeSignal.setConnected(cycleStrobeSignal);
+	public void setStrobeSignal(RtlBitSignal strobeSignal) {
+		this.strobeSignal.setConnected(strobeSignal);
 	}
 
 	public RtlBitSignal getWriteEnableSignal() {

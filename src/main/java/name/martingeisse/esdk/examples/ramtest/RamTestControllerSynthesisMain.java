@@ -11,7 +11,7 @@ import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.AuxiliaryFileFactory;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogGenerator;
-import name.martingeisse.esdk.library.bus.mybus.MybusSimpleMaster;
+import name.martingeisse.esdk.library.bus.mybus.MybusMaster;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -37,13 +37,13 @@ public class RamTestControllerSynthesisMain {
 
 		// add pins
 		outPin(realm, "Leds", 8, leds);
-		MybusSimpleMaster mybusMaster = controller.getMybusMaster();
-		outPin(realm, "WbCycleStrobe", mybusMaster.getCycleStrobeSignal());
-		outPin(realm, "WbWriteEnable", mybusMaster.getWriteEnableSignal());
-		outPin(realm, "WbAddress", 32, mybusMaster.getAddressSignal());
-		outPin(realm, "WbWriteData", 32, mybusMaster.getWriteDataSignal());
-		mybusMaster.setReadDataSignal(inPin(realm, "WbReadData", 32));
-		mybusMaster.setAckSignal(inPin(realm, "WbAck"));
+		MybusMaster mybusMaster = controller.getMybusMaster();
+		outPin(realm, "MbCycleStrobe", mybusMaster.getStrobeSignal());
+		outPin(realm, "MbWriteEnable", mybusMaster.getWriteEnableSignal());
+		outPin(realm, "MbAddress", 32, mybusMaster.getAddressSignal());
+		outPin(realm, "MbWriteData", 32, mybusMaster.getWriteDataSignal());
+		mybusMaster.setReadDataSignal(inPin(realm, "MbReadData", 32));
+		mybusMaster.setAckSignal(inPin(realm, "MbAck"));
 
 		// validate
 //		DesignValidationResult validationResult = new DesignValidator(design).validate();

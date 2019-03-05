@@ -4,14 +4,11 @@ import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 
 /**
- * Non-pipelined, single-transfer cycle slave.
  *
- * For single-transfer bus cycles without extra delaying clock cycles, the CYC and STB signals are identical and are
- * called "cycle strobe" here.
  */
-public interface MybusSimpleSlave {
+public interface MybusSlave {
 
-	void setCycleStrobeSignal(RtlBitSignal cycleStrobeSignal);
+	void setStrobeSignal(RtlBitSignal strobeSignal);
 
 	void setWriteEnableSignal(RtlBitSignal writeEnableSignal);
 

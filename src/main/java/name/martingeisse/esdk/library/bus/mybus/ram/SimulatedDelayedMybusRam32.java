@@ -10,19 +10,19 @@ import name.martingeisse.esdk.core.rtl.simulation.RtlSimulatedComputedBitSignal;
 import name.martingeisse.esdk.core.rtl.simulation.RtlSimulatedSettableVectorSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
 import name.martingeisse.esdk.core.util.Matrix;
-import name.martingeisse.esdk.library.bus.mybus.MybusSimpleSlave;
+import name.martingeisse.esdk.library.bus.mybus.MybusSlave;
 
 /**
- * Simulation-only WB-compatible RAM. The purpose of this is to simulate RAMs with long delays, so single-clock
+ * Simulation-only MB-compatible RAM. The purpose of this is to simulate RAMs with long delays, so single-clock
  * bus cycles are not supported to simplify the code.
  */
-public final class SimulatedDelayedMybusRam32 extends RtlClockedItem implements MybusSimpleSlave {
+public final class SimulatedDelayedMybusRam32 extends RtlClockedItem implements MybusSlave {
 
 	private final int addressBits;
 	private final int addressMask;
 	private final Matrix matrix;
 	private final int delay;
-	private final RtlBitSignalConnectorSampler cycleStrobeSignal;
+	private final RtlBitSignalConnectorSampler strobeSignal;
 	private final RtlBitSignalConnectorSampler writeEnableSignal;
 	private final RtlVectorSignalConnectorSampler addressSignal;
 	private final RtlVectorSignalConnectorSampler writeDataSignal;
@@ -42,9 +42,9 @@ public final class SimulatedDelayedMybusRam32 extends RtlClockedItem implements 
 		this.addressMask = (1 << addressBits) - 1;
 		this.matrix = new Matrix(1 << addressBits, 32);
 		this.delay = delay;
-		this.cycleStrobeSignal = new RtlBitSignalConnectorSampler(clock);
+		this.strobeSignal = new RtlBitSignalConnectorSampler(clock);
 		this.writeEnableSignal = new RtlBitSignalConnectorSampler(clock);
-		this.addressSignal = new RtlVectorSignalConnectorSampler(clock, 32); // not addressBits, because our WB implementation says 32
+		this.addressSignal = new RtlVectorSignalConnectorSampler(clock, 32);
 		this.writeDataSignal = new RtlVectorSignalConnectorSampler(clock, 32);
 		this.readDataSignal = new RtlSimulatedSettableVectorSignal(getRealm(), 32);
 		this.ackSignal = RtlSimulatedComputedBitSignal.of(getRealm(), () -> remainingDelay == 1);
@@ -60,8 +60,8 @@ public final class SimulatedDelayedMybusRam32 extends RtlClockedItem implements 
 	}
 
 	@Override
-	public void setCycleStrobeSignal(RtlBitSignal cycleStrobeSignal) {
-		this.cycleStrobeSignal.setConnected(cycleStrobeSignal);
+	public void setStrobeSignal(RtlBitSignal strobeSignal) {
+		this.strobeSignal.setConnected(strobeSignal);
 	}
 
 	@Override
@@ -104,7 +104,7 @@ public final class SimulatedDelayedMybusRam32 extends RtlClockedItem implements 
 	@Override
 	public void updateState() {
 		if (remainingDelay == 0) {
-			if (cycleStrobeSignal.getSample()) {
+			if (strobeSignal.getSample()) {
 				remainingDelay = delay;
 			}
 		} else {

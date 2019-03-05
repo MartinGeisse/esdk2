@@ -31,9 +31,9 @@ public class RamTestControllerSimulationMain {
 
 		// RAM
 		SimulatedDelayedMybusRam32 ram = new SimulatedDelayedMybusRam32(clock, 23, 3);
-		MybusOneToOneConnector wbConnector = new MybusOneToOneConnector(realm);
-		wbConnector.connectMaster(controller.getMybusMaster());
-		wbConnector.connectSlave(ram);
+		MybusOneToOneConnector mbConnector = new MybusOneToOneConnector(realm);
+		mbConnector.connectMaster(controller.getMybusMaster());
+		mbConnector.connectSlave(ram);
 
 		// display LEDs
 		new IntervalItem(design, 10, 1_000_000, () -> { // 10 times per simulated second

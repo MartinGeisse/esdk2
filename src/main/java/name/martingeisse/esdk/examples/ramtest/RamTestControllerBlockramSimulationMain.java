@@ -34,7 +34,7 @@ public class RamTestControllerBlockramSimulationMain {
 		// BlockRAM test
 		RtlClockedBlock block = new RtlClockedBlock(clock);
 		RtlProceduralBitSignal ackReg = block.createBit(false);
-		block.getStatements().when(controller.getMybusMaster().getCycleStrobeSignal()).getThenBranch()
+		block.getStatements().when(controller.getMybusMaster().getStrobeSignal()).getThenBranch()
 			.assign(ackReg, ackReg.not());
 		controller.getMybusMaster().setAckSignal(ackReg);
 		RtlMemory ram = new RtlMemory(realm, 256, 32);
@@ -42,7 +42,7 @@ public class RamTestControllerBlockramSimulationMain {
 			RtlSynchronousMemoryPort.ReadSupport.SYNCHRONOUS,
 			RtlSynchronousMemoryPort.WriteSupport.SYNCHRONOUS,
 			RtlSynchronousMemoryPort.ReadWriteInteractionMode.READ_FIRST);
-		ramPort.setClockEnableSignal(controller.getMybusMaster().getCycleStrobeSignal());
+		ramPort.setClockEnableSignal(controller.getMybusMaster().getStrobeSignal());
 		ramPort.setWriteEnableSignal(controller.getMybusMaster().getWriteEnableSignal());
 		ramPort.setAddressSignal(controller.getMybusMaster().getAddressSignal().select(9, 2));
 		ramPort.setWriteDataSignal(controller.getMybusMaster().getWriteDataSignal());

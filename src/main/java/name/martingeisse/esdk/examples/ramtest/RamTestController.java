@@ -16,7 +16,6 @@ import name.martingeisse.esdk.core.rtl.signal.*;
 import name.martingeisse.esdk.core.rtl.signal.connector.RtlVectorSignalConnector;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.EmptyVerilogContribution;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
-import name.martingeisse.esdk.library.bus.mybus.MybusSimpleMaster;
 import name.martingeisse.esdk.library.bus.mybus.MybusSimpleMasterAdapter;
 import name.martingeisse.esdk.library.util.DebugOutput;
 import name.martingeisse.esdk.picoblaze.model.rtl.PicoblazeRtlWithAssociatedProgram;
@@ -59,15 +58,15 @@ public class RamTestController extends RtlItem {
 		// Mybus interface
 		{
 			RtlClockedBlock block = new RtlClockedBlock(clock);
-			RtlProceduralBitSignal wbCycle = block.createBit();
-			RtlProceduralBitSignal wbWrite = block.createBit();
+			RtlProceduralBitSignal mbCycle = block.createBit();
+			RtlProceduralBitSignal mbWrite = block.createBit();
 			RtlConditionChainStatement chain = block.getStatements().conditionChain();
 			RtlStatementSequence startCycle = chain.when(cpu.getWriteStrobe().and(cpu.getPortAddress().select(7)));
-			startCycle.assign(wbCycle, true);
-			startCycle.assign(wbWrite, cpu.getOutputData().select(0));
-			chain.when(mybusMaster.getAckSignal()).assign(wbCycle, false);
-			mybusMaster.setCycleStrobeSignal(wbCycle);
-			mybusMaster.setWriteEnableSignal(wbWrite);
+			startCycle.assign(mbCycle, true);
+			startCycle.assign(mbWrite, cpu.getOutputData().select(0));
+			chain.when(mybusMaster.getAckSignal()).assign(mbCycle, false);
+			mybusMaster.setStrobeSignal(mbCycle);
+			mybusMaster.setWriteEnableSignal(mbWrite);
 		}
 		mybusMaster.setAddressSignal(new RtlConcatenation(realm, ramAddressRegister.select(29, 0), RtlVectorConstant.ofUnsigned(realm, 2, 0)));
 		mybusMaster.setWriteDataSignal(ramWriteDataRegister);
@@ -82,7 +81,7 @@ public class RamTestController extends RtlItem {
 			chain.when(cpu.getPortAddress().select(4), cpuReadableByteSelect(ramAddressRegister));
 			chain.when(cpu.getPortAddress().select(5), cpuReadableByteSelect(ramWriteDataRegister));
 			chain.when(cpu.getPortAddress().select(6), cpuReadableByteSelect(ramReadDataRegister));
-			chain.when(cpu.getPortAddress().select(7), new RtlConcatenation(realm, RtlVectorConstant.ofUnsigned(realm, 7, 0), mybusMaster.getCycleStrobeSignal()));
+			chain.when(cpu.getPortAddress().select(7), new RtlConcatenation(realm, RtlVectorConstant.ofUnsigned(realm, 7, 0), mybusMaster.getStrobeSignal()));
 			chain.otherwise(RtlVectorConstant.ofUnsigned(realm, 8, 0));
 			// TODO cpu.setPortInputDataSignal(RtlBuilder.vectorRegister(clock, chain));
 			cpu.setPortInputDataSignal(chain);

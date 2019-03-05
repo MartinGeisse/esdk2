@@ -12,7 +12,7 @@ import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
  */
 public final class MybusOneToOneConnector extends RtlItem {
 
-	private final RtlBitSignalConnector cycleStrobeSignal;
+	private final RtlBitSignalConnector strobeSignal;
 	private final RtlBitSignalConnector writeEnableSignal;
 	private final RtlVectorSignalConnector addressSignal;
 	private final RtlVectorSignalConnector writeDataSignal;
@@ -21,7 +21,7 @@ public final class MybusOneToOneConnector extends RtlItem {
 
 	public MybusOneToOneConnector(RtlRealm realm) {
 		super(realm);
-		cycleStrobeSignal = new RtlBitSignalConnector(realm);
+		strobeSignal = new RtlBitSignalConnector(realm);
 		writeEnableSignal = new RtlBitSignalConnector(realm);
 		addressSignal = new RtlVectorSignalConnector(realm, 32);
 		writeDataSignal = new RtlVectorSignalConnector(realm, 32);
@@ -29,8 +29,8 @@ public final class MybusOneToOneConnector extends RtlItem {
 		ackSignal = new RtlBitSignalConnector(realm);
 	}
 
-	public void connectMaster(MybusSimpleMaster master) {
-		cycleStrobeSignal.setConnected(master.getCycleStrobeSignal());
+	public void connectMaster(MybusMaster master) {
+		strobeSignal.setConnected(master.getStrobeSignal());
 		writeEnableSignal.setConnected(master.getWriteEnableSignal());
 		addressSignal.setConnected(master.getAddressSignal());
 		writeDataSignal.setConnected(master.getWriteDataSignal());
@@ -38,8 +38,8 @@ public final class MybusOneToOneConnector extends RtlItem {
 		master.setAckSignal(ackSignal);
 	}
 
-	public void connectSlave(MybusSimpleSlave slave) {
-		slave.setCycleStrobeSignal(cycleStrobeSignal);
+	public void connectSlave(MybusSlave slave) {
+		slave.setStrobeSignal(strobeSignal);
 		slave.setWriteEnableSignal(writeEnableSignal);
 		slave.setAddressSignal(addressSignal);
 		slave.setWriteDataSignal(writeDataSignal);
