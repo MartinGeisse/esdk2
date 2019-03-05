@@ -24,10 +24,16 @@ import name.martingeisse.esdk.examples.vga.VgaTimer;
  */
 public class RtlRamdacDesign extends Design {
 
+	public static final int WIDTH_BITS = 7;
+	public static final int HEIGHT_BITS = 7;
+
 	private final RtlRealm realm;
 	private final RtlClockNetwork clock;
 	private final TestRenderer testRenderer;
 	private final VgaTimer vgaTimer;
+
+	private final RtlMemory framebuffer;
+	private final RtlSynchronousMemoryPort framebufferPort;
 
 	private final RtlOutputPin r;
 	private final RtlOutputPin g;
@@ -35,8 +41,6 @@ public class RtlRamdacDesign extends Design {
 	private final RtlOutputPin hsync;
 	private final RtlOutputPin vsync;
 
-	private final RtlMemory framebuffer;
-	private final RtlSynchronousMemoryPort framebufferPort;
 	private RtlVectorSignal writeAddressSignal;
 	private RtlVectorSignal dacAddressSignal;
 	private RtlBitSignalConnector addressSelector;
@@ -44,16 +48,14 @@ public class RtlRamdacDesign extends Design {
 
 	public RtlRamdacDesign() {
 
-		int widthBits = 7;
-		int heightBits = 7;
-
 		realm = new RtlRealm(this);
 		clock = realm.createClockNetwork(clockPin(realm));
-		testRenderer = new TestRenderer(realm, clock, widthBits, heightBits);
+		testRenderer = new TestRenderer(realm, clock, WIDTH_BITS, HEIGHT_BITS);
+		vgaTimer = new VgaTimer(clock);
 
 		// Note: rows and columns of the frame are not rows and columns of the RAM. Instead, the RAM
 		// has one row per pixel and 3 columns (bits) for the 3 color channels.
-		this.framebuffer = new RtlMemory(getRealm(), 1 << (widthBits + heightBits), 3);
+		this.framebuffer = new RtlMemory(getRealm(), 1 << (WIDTH_BITS + HEIGHT_BITS), 3);
 		this.framebufferPort = framebuffer.createSynchronousPort(clock,
 			RtlSynchronousMemoryPort.ReadSupport.SYNCHRONOUS,
 			RtlSynchronousMemoryPort.WriteSupport.SYNCHRONOUS,
@@ -62,7 +64,6 @@ public class RtlRamdacDesign extends Design {
 
 
 		//
-		vgaTimer = new VgaTimer(clock);
 		writeAddressSignal = testRenderer.getFramebufferWriteAddress();
 		dacAddressSignal = new RtlConcatenation(realm, vgaTimer.getY().select(7, 1), vgaTimer.getX().select(7, 1));
 		addressSelector.setConnected(testRenderer.getFramebufferWriteStrobe());
@@ -76,6 +77,7 @@ public class RtlRamdacDesign extends Design {
 			.or(vgaTimer.getY().select(8)).or(vgaTimer.getY().select(9));
 		RtlBitSignal active = blank.not();
 
+		// VGA interface
 		r = vgaPin(realm, "H14", active.and(dacReadData.select(2)));
 		g = vgaPin(realm, "H15", active.and(dacReadData.select(1)));
 		b = vgaPin(realm, "G15", active.and(dacReadData.select(0)));
