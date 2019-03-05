@@ -91,7 +91,7 @@ public final class TestRenderer extends RtlItem {
 
 	}
 
-	public void connectDisplay(RtlFramebufferDisplay display) {
+	public void connectDisplay(RtlRamdacDesign display) {
 		display.setWriteAddressSignal(new RtlConcatenation(getRealm(), rowRegister, columnRegister));
 		display.setWriteStrobeSignal(cpu.getWriteStrobe().and(cpu.getPortAddress().select(0)));
 		display.setWriteDataSignal(cpu.getOutputData().select(2, 0));
