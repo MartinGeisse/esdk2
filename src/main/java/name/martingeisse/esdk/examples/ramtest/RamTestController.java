@@ -18,7 +18,7 @@ import name.martingeisse.esdk.core.rtl.synthesis.verilog.EmptyVerilogContributio
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
 import name.martingeisse.esdk.library.bus.mybus.MybusSimpleMasterAdapter;
 import name.martingeisse.esdk.library.util.DebugOutput;
-import name.martingeisse.esdk.picoblaze.model.rtl.PicoblazeRtlWithAssociatedProgram;
+import name.martingeisse.esdk.library.picoblaze.model.rtl.PicoblazeRtlWithAssociatedProgram;
 
 /**
  * TODO only the first RAM location gets written

@@ -11,7 +11,7 @@ import name.martingeisse.esdk.core.rtl.signal.*;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.EmptyVerilogContribution;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
-import name.martingeisse.esdk.picoblaze.model.rtl.PicoblazeRtlWithAssociatedProgram;
+import name.martingeisse.esdk.library.picoblaze.model.rtl.PicoblazeRtlWithAssociatedProgram;
 
 /**
  *

@@ -14,7 +14,7 @@ import name.martingeisse.esdk.core.rtl.memory.RtlSynchronousMemoryPort;
 import name.martingeisse.esdk.core.rtl.signal.*;
 import name.martingeisse.esdk.core.rtl.signal.connector.RtlVectorSignalConnector;
 import name.martingeisse.esdk.core.rtl.simulation.RtlClockGenerator;
-import name.martingeisse.esdk.picoblaze.model.rtl.PicoblazeRtlWithAssociatedProgram;
+import name.martingeisse.esdk.library.picoblaze.model.rtl.PicoblazeRtlWithAssociatedProgram;
 
 /**
  *

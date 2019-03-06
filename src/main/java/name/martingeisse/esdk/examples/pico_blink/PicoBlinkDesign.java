@@ -16,7 +16,7 @@ import name.martingeisse.esdk.core.rtl.signal.RtlVectorConstant;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.xilinx.XilinxPinConfiguration;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
-import name.martingeisse.esdk.picoblaze.model.rtl.PicoblazeRtlWithAssociatedProgram;
+import name.martingeisse.esdk.library.picoblaze.model.rtl.PicoblazeRtlWithAssociatedProgram;
 
 /**
  *
