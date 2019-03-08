@@ -3,4 +3,5 @@ Ways in which this implementation deviates from the specification:
 - the fact that register 0 always contains the value 0 is by convention only. The hardware implements a normal
     register at index 0. Security-critical code should set that register to 0 to be sure, e.g. on interrupt
     routine entry. Since the register is 0 by convention, overwriting it with 0 is legal at any time.
+    -> WRONG. Many things like jumps won't work correctly (implemented as JAL with x0 as return address dest)
 - v1: all CSRs are read-only. Trying to write to a CSR has no effect, i.e. will fail silently instead of trapping.
