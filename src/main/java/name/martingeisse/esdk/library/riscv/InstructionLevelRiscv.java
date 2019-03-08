@@ -20,7 +20,125 @@ public abstract class InstructionLevelRiscv {
 	 */
 	public void step() {
 		int instruction = fetchInstruction(pcInWords);
-		switch (instruction) {
+		if ((instruction & 3) != 3) {
+			onExtendedInstruction(instruction);
+			return;
+		}
+		switch ((instruction >> 2) & 31) {
+
+			case 0: // LOAD
+				throw new UnsupportedOperationException("not yet implemented"); // TODO
+
+			case 1: // LOAD-FP
+				onFloatingPointInstruction(instruction);
+				break;
+
+			case 2: // custopm-0
+				onExtendedInstruction(instruction);
+				break;
+
+			case 3: // MISC-MEM, i.e. FENCE and FENCE.I -- implemented as NOPs
+				break;
+
+			case 4: // OP-IMM
+				throw new UnsupportedOperationException("not yet implemented"); // TODO
+
+			case 5: // AUIPC
+				throw new UnsupportedOperationException("not yet implemented"); // TODO
+
+			case 6: // OP-IMM-32
+				throw new UnsupportedOperationException("this is a 32-bit implementation -- 32-on-64-bit operations are not supported");
+
+			case 7: // reserved for 48-bit instructions, but we only use 32-bit instructions, so this is free for custom instructions
+				onExtendedInstruction(instruction);
+				break;
+
+			case 8: // STORE
+				throw new UnsupportedOperationException("not yet implemented"); // TODO
+
+			case 9: // STORE-FP
+				onFloatingPointInstruction(instruction);
+				break;
+
+			case 10: // custom-1
+				onExtendedInstruction(instruction);
+				break;
+
+			case 11: // AMO (atomic memory operation)
+				throw new UnsupportedOperationException("AMO not supported by this implementation");
+
+			case 12: // OP
+				throw new UnsupportedOperationException("not yet implemented"); // TODO
+
+			case 13: // LUI
+				throw new UnsupportedOperationException("not yet implemented"); // TODO
+
+			case 14: // OP-32
+				throw new UnsupportedOperationException("this is a 32-bit implementation -- 32-on-64-bit operations are not supported");
+
+			case 15: // reserved for 64-bit instructions, but we only use 32-bit instructions, so this is free for custom instructions
+				onExtendedInstruction(instruction);
+				break;
+
+			case 16: // MADD
+				onFloatingPointInstruction(instruction);
+				break;
+
+			case 17: // MSUB
+				onFloatingPointInstruction(instruction);
+				break;
+
+			case 18: // NMSUB
+				onFloatingPointInstruction(instruction);
+				break;
+
+			case 19: // NMADD
+				onFloatingPointInstruction(instruction);
+				break;
+
+			case 20: // OP-FP
+				onFloatingPointInstruction(instruction);
+				break;
+
+			case 21: // reserved
+				onException(ExceptionType.ILLEGAL_INSTRUCTION);
+				break;
+
+			case 22: // custom-2
+				onExtendedInstruction(instruction);
+				break;
+
+			case 23: // reserved for 48-bit instructions, but we only use 32-bit instructions, so this is free for custom instructions
+				onExtendedInstruction(instruction);
+				break;
+
+			case 24: // BRANCH
+				throw new UnsupportedOperationException("not yet implemented"); // TODO
+
+			case 25: // JALR
+				throw new UnsupportedOperationException("not yet implemented"); // TODO
+
+			case 26: // reserved
+				onException(ExceptionType.ILLEGAL_INSTRUCTION);
+				break;
+
+			case 27: // JAL
+				throw new UnsupportedOperationException("not yet implemented"); // TODO
+
+			case 28: // SYSTEM
+				throw new UnsupportedOperationException("not yet implemented"); // TODO
+
+			case 29: // reserved
+				onException(ExceptionType.ILLEGAL_INSTRUCTION);
+				break;
+
+			case 30: // custom-3
+				onExtendedInstruction(instruction);
+				break;
+
+			case 31: // reserved for 80-bit+ instructions, but we only use 32-bit instructions, so this is free for custom instructions
+				onExtendedInstruction(instruction);
+				break;
 
 		}
 	}
@@ -83,12 +201,21 @@ public abstract class InstructionLevelRiscv {
 		throw new RuntimeException("RISC-V cpu exception: " + type);
 	}
 
+	protected void onExtendedInstruction(int instruction) {
+		onException(ExceptionType.ILLEGAL_INSTRUCTION);
+	}
+
+	protected void onFloatingPointInstruction(int instruction) {
+		onException(ExceptionType.ILLEGAL_INSTRUCTION);
+	}
+
 	// ----------------------------------------------------------------------------------------------------------------
 	// helper classes
 	// ----------------------------------------------------------------------------------------------------------------
 
 	public enum ExceptionType {
-		INSTRUCTION_ADDRESS_MISALIGNED
+		INSTRUCTION_ADDRESS_MISALIGNED,
+		ILLEGAL_INSTRUCTION,
 	}
 
 }
