@@ -2,6 +2,8 @@ package name.martingeisse.esdk.library.riscv;
 
 /**
  * Note: Interrupts are not supported for now.
+ *
+ * TODO is "pcInWords" really a good idea? Might be slightly faster but it'S really hard to understand while reading the code
  */
 public abstract class InstructionLevelRiscv {
 
@@ -20,6 +22,7 @@ public abstract class InstructionLevelRiscv {
 	 */
 	public void step() {
 		int instruction = fetchInstruction(pcInWords);
+		pcInWords++;
 		if ((instruction & 3) != 3) {
 			onExtendedInstruction(instruction);
 			return;
@@ -41,7 +44,8 @@ public abstract class InstructionLevelRiscv {
 				break;
 
 			case 4: // OP-IMM
-				throw new UnsupportedOperationException("not yet implemented"); // TODO
+				performOperation(instruction, instruction >> 20); // TODO
+				break;
 
 			case 5: // AUIPC
 				throw new UnsupportedOperationException("not yet implemented"); // TODO
@@ -68,7 +72,8 @@ public abstract class InstructionLevelRiscv {
 				throw new UnsupportedOperationException("AMO not supported by this implementation");
 
 			case 12: // OP
-				throw new UnsupportedOperationException("not yet implemented"); // TODO
+				performOperation(instruction, getRegister(instruction >> 20)); // TODO
+				break;
 
 			case 13: // LUI
 				throw new UnsupportedOperationException("not yet implemented"); // TODO
@@ -116,14 +121,27 @@ public abstract class InstructionLevelRiscv {
 				throw new UnsupportedOperationException("not yet implemented"); // TODO
 
 			case 25: // JALR
-				throw new UnsupportedOperationException("not yet implemented"); // TODO
+				int baseRegisterValue = getRegister(instruction >> 15);
+				setRegister(instruction >> 7, getPc());
+				if ((instruction & (1 << 21)) != 0) {
+					onException(ExceptionType.INSTRUCTION_ADDRESS_MISALIGNED);
+					break;
+				}
+				pcInWords = (baseRegisterValue >> 2) + (instruction >> 22);
+				break;
 
 			case 26: // reserved
 				onException(ExceptionType.ILLEGAL_INSTRUCTION);
 				break;
 
 			case 27: // JAL
-				throw new UnsupportedOperationException("not yet implemented"); // TODO
+				setRegister(instruction >> 7, getPc());
+				if ((instruction & (1 << 12)) != 0) {
+					onException(ExceptionType.INSTRUCTION_ADDRESS_MISALIGNED);
+					break;
+				}
+				pcInWords = pcInWords - 1 + (instruction >> 13);
+				break;
 
 			case 28: // SYSTEM
 				throw new UnsupportedOperationException("not yet implemented"); // TODO
@@ -141,6 +159,10 @@ public abstract class InstructionLevelRiscv {
 				break;
 
 		}
+	}
+
+	private void performOperation(int instruction, int rightOperand) {
+		// TODO
 	}
 
 	// ----------------------------------------------------------------------------------------------------------------
