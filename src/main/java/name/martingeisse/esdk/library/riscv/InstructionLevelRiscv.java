@@ -2,7 +2,7 @@ package name.martingeisse.esdk.library.riscv;
 
 /**
  * Note: Interrupts are not supported for now.
- *
+ * <p>
  * TODO is "pcInWords" really a good idea? Might be slightly faster but it'S really hard to understand while reading the code
  */
 public abstract class InstructionLevelRiscv {
@@ -27,10 +27,46 @@ public abstract class InstructionLevelRiscv {
 			onExtendedInstruction(instruction);
 			return;
 		}
-		mainOpcodeSwitch: switch ((instruction >> 2) & 31) {
+		mainOpcodeSwitch:
+		switch ((instruction >> 2) & 31) {
 
-			case 0: // LOAD
-				throw new UnsupportedOperationException("not yet implemented"); // TODO
+			case 0: { // LOAD
+				int widthCode = (instruction >> 12) & 3;
+				boolean unsigned = ((instruction >> 12) & 4) != 0;
+				int address = getRegister(instruction >> 15) + (instruction >> 20);
+				int convertedData;
+				switch (widthCode) {
+
+					case 0: // byte TODO little endian!
+						convertedData = read(address >> 2) >> ((address & 3) * 8);
+						convertedData = (unsigned ? (convertedData & 0xff) : (byte) convertedData);
+						break;
+
+					case 1: // half-word TODO little endian!
+						if ((address & 1) != 0) {
+							onException(ExceptionType.DATA_ADDRESS_MISALIGNED);
+							break mainOpcodeSwitch;
+						}
+						convertedData = read(address >> 2) >> ((address & 1) * 8);
+						convertedData = (unsigned ? (convertedData & 0xffff) : (short) convertedData);
+						break;
+
+					case 2: // word
+						if ((address & 3) != 0) {
+							onException(ExceptionType.DATA_ADDRESS_MISALIGNED);
+							break mainOpcodeSwitch;
+						}
+						convertedData = read(address >> 2);
+						break;
+
+					default:
+						onException(ExceptionType.ILLEGAL_INSTRUCTION);
+						break mainOpcodeSwitch;
+
+				}
+				setRegister(instruction >> 7, convertedData);
+				break;
+			}
 
 			case 1: // LOAD-FP
 				onFloatingPointInstruction(instruction);
@@ -59,8 +95,40 @@ public abstract class InstructionLevelRiscv {
 				onExtendedInstruction(instruction);
 				break;
 
-			case 8: // STORE
-				throw new UnsupportedOperationException("not yet implemented"); // TODO
+			case 8: { // STORE
+				int widthCode = (instruction >> 12) & 7;
+				int address = getRegister(instruction >> 15) + ((instruction >> 7) & 31) + ((instruction & 0xfe000000) >> 20);
+				int wordAddress = address >> 2;
+				int data = getRegister(instruction >> 20);
+				switch (widthCode) {
+
+					case 0: // byte TODO little endian!
+						write(wordAddress, data, 1 << (address & 3));
+						break;
+
+					case 1: // half-word TODO little endian!
+						if ((address & 1) != 0) {
+							onException(ExceptionType.DATA_ADDRESS_MISALIGNED);
+							break mainOpcodeSwitch;
+						}
+						write(wordAddress, data, 3 << (address & 2));
+						break;
+
+					case 2: // word
+						if ((address & 3) != 0) {
+							onException(ExceptionType.DATA_ADDRESS_MISALIGNED);
+							break mainOpcodeSwitch;
+						}
+						write(wordAddress, data, 15);
+						break;
+
+					default:
+						onException(ExceptionType.ILLEGAL_INSTRUCTION);
+						break mainOpcodeSwitch;
+
+				}
+				break;
+			}
 
 			case 9: // STORE-FP
 				onFloatingPointInstruction(instruction);
@@ -160,9 +228,9 @@ public abstract class InstructionLevelRiscv {
 				if (condition) {
 					int offset =
 						((instruction >> 6) & (2 + 4 + 8 + 16)) +
-						((instruction >> 20) & (32 + 64 + 128 + 256 + 512 + 1024)) +
-						(instruction & 2048) +
-						((instruction >> 19) & 4096);
+							((instruction >> 20) & (32 + 64 + 128 + 256 + 512 + 1024)) +
+							(instruction & 2048) +
+							((instruction >> 19) & 4096);
 					setPc(getPc() + offset);
 				}
 				break;
@@ -192,7 +260,8 @@ public abstract class InstructionLevelRiscv {
 				break;
 
 			case 28: // SYSTEM
-				throw new UnsupportedOperationException("not yet implemented"); // TODO
+				onException(ExceptionType.SYSTEM_INSTRUCTION);
+				break;
 
 			case 29: // reserved
 				onException(ExceptionType.ILLEGAL_INSTRUCTION);
@@ -264,7 +333,9 @@ public abstract class InstructionLevelRiscv {
 	// ----------------------------------------------------------------------------------------------------------------
 
 	protected abstract int fetchInstruction(int wordAddress);
+
 	protected abstract int read(int wordAddress);
+
 	protected abstract void write(int wordAddress, int data, int mask);
 
 	protected void onException(ExceptionType type) {
@@ -286,7 +357,8 @@ public abstract class InstructionLevelRiscv {
 	public enum ExceptionType {
 		INSTRUCTION_ADDRESS_MISALIGNED,
 		ILLEGAL_INSTRUCTION,
-		DATA_ADDRESS_MISALIGNED
+		DATA_ADDRESS_MISALIGNED,
+		SYSTEM_INSTRUCTION
 	}
 
 }
