@@ -27,7 +27,7 @@ public abstract class InstructionLevelRiscv {
 			onExtendedInstruction(instruction);
 			return;
 		}
-		switch ((instruction >> 2) & 31) {
+		mainOpcodeSwitch: switch ((instruction >> 2) & 31) {
 
 			case 0: // LOAD
 				throw new UnsupportedOperationException("not yet implemented"); // TODO
@@ -48,7 +48,9 @@ public abstract class InstructionLevelRiscv {
 				break;
 
 			case 5: // AUIPC
-				throw new UnsupportedOperationException("not yet implemented"); // TODO
+				// TODO old or new pc?
+				setRegister(instruction >> 7, (instruction & 0xfffff000) + getPc());
+				break;
 
 			case 6: // OP-IMM-32
 				throw new UnsupportedOperationException("this is a 32-bit implementation -- 32-on-64-bit operations are not supported");
@@ -76,7 +78,8 @@ public abstract class InstructionLevelRiscv {
 				break;
 
 			case 13: // LUI
-				throw new UnsupportedOperationException("not yet implemented"); // TODO
+				setRegister(instruction >> 7, instruction & 0xfffff000);
+				break;
 
 			case 14: // OP-32
 				throw new UnsupportedOperationException("this is a 32-bit implementation -- 32-on-64-bit operations are not supported");
@@ -117,8 +120,53 @@ public abstract class InstructionLevelRiscv {
 				onExtendedInstruction(instruction);
 				break;
 
-			case 24: // BRANCH
-				throw new UnsupportedOperationException("not yet implemented"); // TODO
+			case 24: { // BRANCH
+				int operand1 = getRegister(instruction >> 15);
+				int operand2 = getRegister(instruction >> 20);
+				boolean condition;
+				switch ((instruction >> 12) & 7) {
+
+					case 0: // BEQ
+						condition = (operand1 == operand2);
+						break;
+
+					case 1: // BNE
+						condition = (operand1 != operand2);
+						break;
+
+					case 4: // BLT
+						condition = (operand1 < operand2);
+						break;
+
+					case 5: // BGE
+						condition = (operand1 >= operand2);
+						break;
+
+					case 6: // BLTU
+						condition = Integer.compareUnsigned(operand1, operand2) < 0;
+						break;
+
+					case 7: // BGEU
+						condition = Integer.compareUnsigned(operand1, operand2) >= 0;
+						break;
+
+					case 2: // unused
+					case 3: // unused
+					default:
+						onException(ExceptionType.ILLEGAL_INSTRUCTION);
+						break mainOpcodeSwitch;
+
+				}
+				if (condition) {
+					int offset =
+						((instruction >> 6) & (2 + 4 + 8 + 16)) +
+						((instruction >> 20) & (32 + 64 + 128 + 256 + 512 + 1024)) +
+						(instruction & 2048) +
+						((instruction >> 19) & 4096);
+					setPc(getPc() + offset);
+				}
+				break;
+			}
 
 			case 25: // JALR
 				int baseRegisterValue = getRegister(instruction >> 15);
@@ -238,6 +286,7 @@ public abstract class InstructionLevelRiscv {
 	public enum ExceptionType {
 		INSTRUCTION_ADDRESS_MISALIGNED,
 		ILLEGAL_INSTRUCTION,
+		DATA_ADDRESS_MISALIGNED
 	}
 
 }
