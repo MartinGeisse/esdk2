@@ -16,7 +16,7 @@ import name.martingeisse.esdk.core.rtl.signal.*;
 import name.martingeisse.esdk.core.rtl.signal.connector.RtlVectorSignalConnector;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.EmptyVerilogContribution;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
-import name.martingeisse.esdk.library.bus.mybus.MybusSimpleMasterAdapter;
+import name.martingeisse.esdk.library.mybus.rtl.RtlMybusSimpleMasterAdapter;
 import name.martingeisse.esdk.library.util.DebugOutput;
 import name.martingeisse.esdk.library.picoblaze.model.rtl.PicoblazeRtlWithAssociatedProgram;
 
@@ -32,7 +32,7 @@ public class RamTestController extends RtlItem {
 	private final RtlBitSignal reset;
 	private final PicoblazeRtlWithAssociatedProgram cpu;
 
-	private final MybusSimpleMasterAdapter mybusMaster;
+	private final RtlMybusSimpleMasterAdapter mybusMaster;
 
 	private final RtlVectorSignalConnector ramAddressRegister;
 	private final RtlVectorSignalConnector ramReadDataRegister;
@@ -47,7 +47,7 @@ public class RamTestController extends RtlItem {
 		this.reset = reset;
 		this.cpu = new PicoblazeRtlWithAssociatedProgram(clock, RamTestController.class);
 		cpu.setResetSignal(reset);
-		this.mybusMaster = new MybusSimpleMasterAdapter(realm);
+		this.mybusMaster = new RtlMybusSimpleMasterAdapter(realm);
 		this.ramAddressRegister = new RtlVectorSignalConnector(realm, 32);
 		this.ramReadDataRegister = new RtlVectorSignalConnector(realm, 32);
 		this.ramWriteDataRegister = new RtlVectorSignalConnector(realm, 32);
@@ -106,7 +106,7 @@ public class RamTestController extends RtlItem {
 		return leds;
 	}
 
-	public MybusSimpleMasterAdapter getMybusMaster() {
+	public RtlMybusSimpleMasterAdapter getMybusMaster() {
 		return mybusMaster;
 	}
 

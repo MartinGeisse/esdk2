@@ -1,4 +1,4 @@
-package name.martingeisse.esdk.library.bus.mybus;
+package name.martingeisse.esdk.library.mybus.rtl;
 
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
@@ -12,7 +12,7 @@ import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
 /**
  *
  */
-public class MybusSimpleMasterAdapter extends RtlItem implements MybusMaster {
+public class RtlMybusSimpleMasterAdapter extends RtlItem implements RtlMybusMaster {
 
 	private final RtlBitSignalConnector strobeSignal;
 	private final RtlBitSignalConnector writeEnableSignal;
@@ -21,7 +21,7 @@ public class MybusSimpleMasterAdapter extends RtlItem implements MybusMaster {
 	private final RtlVectorSignalConnector readDataSignal;
 	private final RtlBitSignalConnector ackSignal;
 
-	public MybusSimpleMasterAdapter(RtlRealm realm) {
+	public RtlMybusSimpleMasterAdapter(RtlRealm realm) {
 		super(realm);
 		strobeSignal = new RtlBitSignalConnector(realm);
 		writeEnableSignal = new RtlBitSignalConnector(realm);

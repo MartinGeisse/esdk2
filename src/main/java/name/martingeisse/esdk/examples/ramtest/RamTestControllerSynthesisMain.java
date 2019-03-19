@@ -11,7 +11,7 @@ import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.AuxiliaryFileFactory;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogGenerator;
-import name.martingeisse.esdk.library.bus.mybus.MybusMaster;
+import name.martingeisse.esdk.library.mybus.rtl.RtlMybusMaster;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -37,7 +37,7 @@ public class RamTestControllerSynthesisMain {
 
 		// add pins
 		outPin(realm, "Leds", 8, leds);
-		MybusMaster mybusMaster = controller.getMybusMaster();
+		RtlMybusMaster mybusMaster = controller.getMybusMaster();
 		outPin(realm, "MbCycleStrobe", mybusMaster.getStrobeSignal());
 		outPin(realm, "MbWriteEnable", mybusMaster.getWriteEnableSignal());
 		outPin(realm, "MbAddress", 32, mybusMaster.getAddressSignal());

@@ -60,3 +60,72 @@ read-only counter CSRs are accessible.
 
 Implement division (possibly even multiplication) in software instruction emulation in v1.
 
+-----------------------------------------------------------------------------------------------------------------------
+
+Kinds of simulation:
+
+(A) instruction translation
+
+1. single-threaded high-performance user-mode, instruction pre-translation. Useful to test applications and user-mode
+	system programs.
+	- peripherals simulated at syscall level.
+
+2. multi-process instruction pre-translation. May be useful to test interaction of applications. May be based on multiple
+	instances of (1) for multiple single-threaded user-mode applications.
+	- peripherals simulated at syscall level.
+
+3. General instruction pre-translation. Probably (1) with shared memory and system-mode support, but cannot simulate
+	preemption correctly. May be able to support synchronous user-to-kernel switching (syscalls).
+	- peripherals simulated at syscall or I/O instruction or super-syscall level.
+
+(B) instruction-level simulation
+
+1. user-mode instruction-level simulator
+	- peripherals simulated at syscall level.
+
+2. kernel-mode instruction-level simulator
+	- peripherals simulated at I/O instruction or super-syscall level.
+
+3. kernel-mode instruction-level simulator with RTL bridge
+	- peripherals simulated at RTL or transaction or I/O instruction or super-syscall level.
+
+(C) RTL simulation
+
+1. cycle, multi-cycle, pipeline simulation without sample/update separation
+	- peripherals simulated at RTL or transaction level
+
+2. (1) with RTL bridge. Needs sample/update separation only at the bridge.
+	- peripherals simulated at RTL or transaction level
+
+3. structural RTL implementation; sample/update separation at the parts.
+	(different levels possible, down to full RTL which is synthesizable)
+	- peripherals simulated at RTL or transaction level
+
+---
+
+Implement the above with few components that can be combined:
+- blockwise instruction translation component
+	- raw (non-blockwise) instruction translation as an option for the translator (non-composable) -- little use?
+	- block size / boundaries could be configurable
+	- configurable handling for syscall (incl. super-syscall), IO and unknown instruction
+	- implements Item for composability / concurrency -- allows multiple instances
+- instruction-level simulator
+	- configurable handling for syscall (incl. super-syscall), IO and unknown instruction
+	- implements Item for composability / concurrency -- allows multiple instances
+	- TODO: RTL bridge
+- TODO: RTL implementations
+	- multiple implementations might be necessary for single-cycle, multi-cycle, pipeline design A, pipeline design B, ...
+	- multiple implementations might be necessary for cycle-level vs. RTL
+
+Adapters:
+- RTL-to-transaction signal bridge (generic, not related to RISC-V)
+
+- transaction-to-RTL signal bridge (generic, not related to RISC-V)
+
+- RTL-to-transaction bus master bridge (generic, not related to RISC-V)
+
+- transaction-to-RTL bus master bridge (generic, not related to RISC-V)
+
+- RTL-to-transaction bus slave bridge (generic, not related to RISC-V)
+
+- transaction-to-RTL bus slave bridge (generic, not related to RISC-V)

@@ -1,4 +1,4 @@
-package name.martingeisse.esdk.library.bus.mybus;
+package name.martingeisse.esdk.library.mybus.rtl;
 
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
@@ -6,7 +6,7 @@ import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 /**
  *
  */
-public interface MybusMaster {
+public interface RtlMybusMaster {
 
 	RtlBitSignal getStrobeSignal();
 
