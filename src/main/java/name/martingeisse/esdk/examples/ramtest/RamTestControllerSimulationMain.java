@@ -14,7 +14,7 @@ import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
 import name.martingeisse.esdk.core.rtl.simulation.RtlClockGenerator;
 import name.martingeisse.esdk.library.mybus.rtl.RtlMybusOneToOneConnector;
-import name.martingeisse.esdk.library.mybus.rtl.ram.RtlSimulatedDelayedMybusRam32;
+import name.martingeisse.esdk.library.mybus.rtl.slave.RtlSimulatedMybusRam;
 
 /**
  * TODO make RamTestControllerBlockramSimulationMain work first -- it's simpler and with a small size should be synth'able.
@@ -30,7 +30,7 @@ public class RamTestControllerSimulationMain {
 		RamTestController controller = new RamTestController(realm, clock, new RtlBitConstant(realm, false));
 
 		// RAM
-		RtlSimulatedDelayedMybusRam32 ram = new RtlSimulatedDelayedMybusRam32(clock, 23, 3);
+		RtlSimulatedMybusRam ram = new RtlSimulatedMybusRam(clock, 23, 3);
 		RtlMybusOneToOneConnector mbConnector = new RtlMybusOneToOneConnector(realm);
 		mbConnector.connectMaster(controller.getMybusMaster());
 		mbConnector.connectSlave(ram);

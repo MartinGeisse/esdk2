@@ -1,4 +1,4 @@
-package name.martingeisse.esdk.library.bus.bus32;
+package name.martingeisse.esdk.library.mybus.transaction;
 
 import name.martingeisse.esdk.core.model.Design;
 import name.martingeisse.esdk.core.model.Item;
@@ -7,23 +7,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A simple bus using 32-bit address and data units.
+ * No-delay transaction-level Mybus implementation.
  */
-public class Bus32 extends Item {
+public class TransactionMybus extends Item {
 
-	private BusMaster master;
 	private final List<SlaveEntry> slaveEntries = new ArrayList<>();
 
-	public Bus32(Design design) {
+	public TransactionMybus(Design design) {
 		super(design);
-	}
-
-	public BusMaster getMaster() {
-		return master;
-	}
-
-	public void setMaster(BusMaster master) {
-		this.master = master;
 	}
 
 	public List<SlaveEntry> getSlaveEntries() {
@@ -34,7 +25,7 @@ public class Bus32 extends Item {
 		slaveEntries.add(entry);
 	}
 
-	public void addSlave(int address, int addressMask, BusSlave slave) {
+	public void addSlave(int address, int addressMask, TransactionMybusSlave slave) {
 		addSlave(new SlaveEntry(address, addressMask, slave));
 	}
 
@@ -47,25 +38,24 @@ public class Bus32 extends Item {
 		return null;
 	}
 
-	public void read(int address, ReadCallback callback) {
+	public int read(int address) {
 		// no delay for now
 		// for now, reads 0 if no matching slave was found
 		SlaveEntry slaveEntry = getMatchingEntry(address);
 		if (slaveEntry == null) {
-			fire(() -> callback.onReadFinished(0), 0);
+			return 0;
 		} else {
-			slaveEntry.read(address, callback);
+			return slaveEntry.read(address);
 		}
 	}
 
-	public void write(int address, int data, WriteCallback callback) {
-		// no delay for now
-		// for now, does nothing (just calls the callback) if no matching slave was found
+	public void write(int address, int data, int byteMask) {
+		if ((byteMask & ~15) != 0) {
+			throw new IllegalArgumentException("invalid byte mask: " + byteMask);
+		}
 		SlaveEntry slaveEntry = getMatchingEntry(address);
-		if (slaveEntry == null) {
-			fire(callback::onWriteFinished, 0);
-		} else {
-			slaveEntry.write(address, data, callback);
+		if (slaveEntry != null) {
+			slaveEntry.write(address, data, byteMask);
 		}
 	}
 

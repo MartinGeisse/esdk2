@@ -1,4 +1,4 @@
-package name.martingeisse.esdk.library.bus.bus32;
+package name.martingeisse.esdk.library.mybus.transaction;
 
 /**
  *
@@ -9,9 +9,9 @@ public class SlaveEntry {
 	private final int localAddressBits;
 	private final int upperAddressMask;
 	private final int lowerAddressMask;
-	private final BusSlave slave;
+	private final TransactionMybusSlave slave;
 
-	public SlaveEntry(int address, int localAddressBits, BusSlave slave) {
+	public SlaveEntry(int address, int localAddressBits, TransactionMybusSlave slave) {
 		this.address = address;
 		this.localAddressBits = localAddressBits;
 		this.lowerAddressMask = (1 << localAddressBits) - 1;
@@ -38,7 +38,7 @@ public class SlaveEntry {
 		return lowerAddressMask;
 	}
 
-	public BusSlave getSlave() {
+	public TransactionMybusSlave getSlave() {
 		return slave;
 	}
 
@@ -47,13 +47,13 @@ public class SlaveEntry {
 	}
 
 	// ignores upper address bits
-	void read(int address, ReadCallback callback) {
-		slave.read(address & lowerAddressMask, callback);
+	int read(int address) {
+		return slave.read(address & lowerAddressMask);
 	}
 
 	// ignores upper address bits
-	void write(int address, int data, WriteCallback callback) {
-		slave.write(address & lowerAddressMask, data, callback);
+	void write(int address, int data, int byteMask) {
+		slave.write(address & lowerAddressMask, data, byteMask);
 	}
 
 }

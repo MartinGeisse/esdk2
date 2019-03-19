@@ -1,4 +1,4 @@
-package name.martingeisse.esdk.library.mybus.rtl.ram;
+package name.martingeisse.esdk.library.mybus.rtl.slave;
 
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlClockedItem;
@@ -16,7 +16,7 @@ import name.martingeisse.esdk.library.mybus.rtl.RtlMybusSlave;
  * Simulation-only MB-compatible RAM. The purpose of this is to simulate RAMs with long delays, so single-clock
  * bus cycles are not supported to simplify the code.
  */
-public final class RtlSimulatedDelayedMybusRam32 extends RtlClockedItem implements RtlMybusSlave {
+public final class RtlSimulatedMybusRam extends RtlClockedItem implements RtlMybusSlave {
 
 	private final int addressBits;
 	private final int addressMask;
@@ -30,7 +30,7 @@ public final class RtlSimulatedDelayedMybusRam32 extends RtlClockedItem implemen
 	private final RtlSimulatedComputedBitSignal ackSignal;
 	private int remainingDelay;
 
-	public RtlSimulatedDelayedMybusRam32(RtlClockNetwork clock, int addressBits, int delay) {
+	public RtlSimulatedMybusRam(RtlClockNetwork clock, int addressBits, int delay) {
 		super(clock);
 		if (addressBits < 0 || addressBits > 31) {
 			throw new IllegalArgumentException("invalid address width: " + addressBits);
