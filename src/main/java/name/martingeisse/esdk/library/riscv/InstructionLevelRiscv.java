@@ -2,27 +2,29 @@ package name.martingeisse.esdk.library.riscv;
 
 /**
  * Note: Interrupts are not supported for now.
- * <p>
- * TODO is "pcInWords" really a good idea? Might be slightly faster but it'S really hard to understand while reading the code
  */
 public abstract class InstructionLevelRiscv {
 
 	private final int[] registers = new int[32];
-	private int pcInWords;
+	private int pc;
 
 	/**
 	 * Resets the CPU.
 	 */
 	public void reset() {
-		pcInWords = 0;
+		pc = 0;
 	}
 
 	/**
 	 * Executes a single instruction.
 	 */
 	public void step() {
-		int instruction = fetchInstruction(pcInWords);
-		pcInWords++;
+		if ((pc & 3) != 0) {
+			onException(ExceptionType.INSTRUCTION_ADDRESS_MISALIGNED);
+			return;
+		}
+		int instruction = fetchInstruction(pc >> 2);
+		pc += 4;
 		if ((instruction & 3) != 3) {
 			onExtendedInstruction(instruction);
 			return;
@@ -85,7 +87,7 @@ public abstract class InstructionLevelRiscv {
 
 			case 5: // AUIPC
 				// TODO old or new pc?
-				setRegister(instruction >> 7, (instruction & 0xfffff000) + getPc());
+				setRegister(instruction >> 7, (instruction & 0xfffff000) + pc);
 				break;
 
 			case 6: // OP-IMM-32
@@ -227,23 +229,23 @@ public abstract class InstructionLevelRiscv {
 				}
 				if (condition) {
 					int offset =
-						((instruction >> 6) & (2 + 4 + 8 + 16)) +
+						((instruction >> 7) & (2 + 4 + 8 + 16)) +
 							((instruction >> 20) & (32 + 64 + 128 + 256 + 512 + 1024)) +
-							(instruction & 2048) +
+							((instruction << 4) & 2048) +
 							((instruction >> 19) & 4096);
-					setPc(getPc() + offset);
+					pc += offset;
 				}
 				break;
 			}
 
 			case 25: // JALR
 				int baseRegisterValue = getRegister(instruction >> 15);
-				setRegister(instruction >> 7, getPc());
+				setRegister(instruction >> 7, pc);
 				if ((instruction & (1 << 21)) != 0) {
 					onException(ExceptionType.INSTRUCTION_ADDRESS_MISALIGNED);
 					break;
 				}
-				pcInWords = (baseRegisterValue >> 2) + (instruction >> 22);
+				pc = (baseRegisterValue + (instruction >> 20)) & -2;
 				break;
 
 			case 26: // reserved
@@ -251,12 +253,12 @@ public abstract class InstructionLevelRiscv {
 				break;
 
 			case 27: // JAL
-				setRegister(instruction >> 7, getPc());
+				setRegister(instruction >> 7, pc);
 				if ((instruction & (1 << 12)) != 0) {
 					onException(ExceptionType.INSTRUCTION_ADDRESS_MISALIGNED);
 					break;
 				}
-				pcInWords = pcInWords - 1 + (instruction >> 13);
+				pc = pc - 4 + (instruction >> 13 << 2);
 				break;
 
 			case 28: // SYSTEM
@@ -286,23 +288,15 @@ public abstract class InstructionLevelRiscv {
 	// PC
 	// ----------------------------------------------------------------------------------------------------------------
 
-	public final int getPcInWords() {
-		return pcInWords;
-	}
-
-	public final void setPcInWords(int pcInWords) {
-		this.pcInWords = pcInWords;
-	}
-
 	public final int getPc() {
-		return pcInWords << 2;
+		return pc;
 	}
 
 	public final void setPc(int pc) {
 		if ((pc & 3) != 0) {
 			onException(ExceptionType.INSTRUCTION_ADDRESS_MISALIGNED);
 		} else {
-			this.pcInWords = pc >> 2;
+			this.pc = pc;
 		}
 	}
 
