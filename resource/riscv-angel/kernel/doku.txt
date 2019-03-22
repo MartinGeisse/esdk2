@@ -1,0 +1,31 @@
+
+Is virtual memory mapping (MMU) enabled?
+
+	load / store:
+		var vmOn = ((this.priv_reg[PCR["CSR_STATUS"]["num"]] & SR["SR_VM"]) != 0x0);
+
+	instruction fetch:
+        var vmOn = ((this.priv_reg[0x50A] & 0x80)); // is the same as the above, just not using symbolic constants
+
+
+MMU needs access type (read, write, execute) to work. Corresponds to load, store, instruction fetch.
+But instruction fetch also uses insttranslate() instead of translate().
+
+MMU returns a 32-bit number for the physical address, not a Long instance.
+
+Without MMU, the physical address is just the low 32 bits of the virtual address: addr = addr.getLowBitsUnsigned();
+
+Misaligned load/store causes a trap (software implementation may be used).
+
+The _raw functions ignore the MMU.
+
+
+
+CPU.js:
+    // vals[0] is loaded into 0x0000, vals[1] is program, loaded into 0x2000
+    function load_to_mem(vals) {
+        prog = vals[1];
+        for (var i = 0; i < prog.length*4; i+=4) {
+            this.store_word_to_mem(i+0x2000, prog[i/4]);
+        } 
+    }
