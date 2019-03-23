@@ -12,7 +12,7 @@ public abstract class InstructionLevelRiscv {
 	 * Resets the CPU.
 	 */
 	public void reset() {
-		pc = 0;
+		pc = 0; // TODO RISCV-Angel says 0x2000 !?
 	}
 
 	/**

@@ -1274,22 +1274,22 @@ function runInstruction(raw) { //, RISCV) {
 
 
         /* NOTE ABOUT FP: ALL FP INSTRUCTIONS IN THIS IMPLEMENTATION WILL ALWAYS
-         * THROW THE "Floating-Point Disabled" TRAP.
+         * THROW THE "Floating-Point Disabled" TRAP. (copied)
          */
 
         // Floating-Point Memory Insts, FLW, FLD
-        case 0x7:
-        case 0x27:
-        case 0x43:
-        case 0x47:
-        case 0x4B:
-        case 0x4F:
-        case 0x53:
+        case 0x7:  // copied
+        case 0x27: // copied
+        case 0x43: // copied
+        case 0x47: // copied
+        case 0x4B: // copied
+        case 0x4F: // copied
+        case 0x53: // copied
             RISCV.excpTrigg = new RISCVTrap("Floating-Point Disabled");
             return;
             break;
 
-        default:
+        default: // copied
             //throw new RISCVError("Unknown instruction at: 0x" + RISCV.pc.toString(16));
             //don't throw error for completely unknown inst (i.e. unknown opcode)
             throw new RISCVTrap("Illegal Instruction OCCURRED HERE 2");

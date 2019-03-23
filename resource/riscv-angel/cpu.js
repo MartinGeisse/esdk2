@@ -12,14 +12,13 @@ function CPU(memamt) {
 
     // PC, defaults to 0x2000 according to the ISA, documented in processor.cc
     // Even in RV64, this must remain as a Number (not a Long) because of Array indexing requirements.
-    this.pc = 0x2000;
+    // copied: this.pc = 0x2000;
 
     // general-purpose registers, gen_reg[0] is x0, etc.
-    this.gen_reg = [];
-    
-    for (var i = 0; i < 32; i++) {
-        this.gen_reg[i] = new Long(0x0, 0x0);
-    }
+    // copied: this.gen_reg = [];
+    // copied: for (var i = 0; i < 32; i++) {
+	// copied: this.gen_reg[i] = new Long(0x0, 0x0);
+    // copied: }
 
     // privileged control registers
     this.priv_reg = new Array(3075);
@@ -74,13 +73,6 @@ function CPU(memamt) {
                 // "hardwired" values that need to be forced every time status reg is modified
                 // force EF to zero here (no FP insts); force U64 to 1 here; force S64 to 1 here
                 this.priv_reg[num] = (val & (~SR["SR_EF"])) | SR["SR_U64"] | SR["SR_S64"];
-                break;
-
-            // need to fill in all cases here (i.e. when implementing interrupts)
-            case PCR["CSR_TOHOST"]["num"]:
-                if (this.priv_reg[num].isZero()) {
-                    this.priv_reg[num] = val;
-                }
                 break;
 
             default:
