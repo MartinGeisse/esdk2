@@ -54,6 +54,10 @@ public abstract class InstructionLevelRiscv {
 						break;
 
 					case 2: // word
+						if (unsigned) {
+							onException(ExceptionType.ILLEGAL_INSTRUCTION);
+							break mainOpcodeSwitch;
+						}
 						if ((address & 3) != 0) {
 							onException(ExceptionType.DATA_ADDRESS_MISALIGNED);
 							break mainOpcodeSwitch;
@@ -82,11 +86,14 @@ public abstract class InstructionLevelRiscv {
 				break;
 
 			case 4: // OP-IMM
-				performOperation(instruction, instruction >> 20); // TODO
+				performOperation(instruction, true);
 				break;
 
 			case 5: // AUIPC
-				// TODO old or new pc?
+				// TODO old or new pc? Angel uses the old PC but also clears the low bits of it before using it, just
+				// like for the immediate value. I couldn't find anything about that in the spec. Also, its 64-bit
+				// implementation sign-extends to 64 bits, except when bits 31..24 are "01010101" (0x55) -- then, the
+				// top 32 bits are set to 0x155.
 				setRegister(instruction >> 7, (instruction & 0xfffff000) + pc);
 				break;
 
@@ -144,7 +151,7 @@ public abstract class InstructionLevelRiscv {
 				throw new UnsupportedOperationException("AMO not supported by this implementation");
 
 			case 12: // OP
-				performOperation(instruction, getRegister(instruction >> 20)); // TODO
+				performOperation(instruction, false);
 				break;
 
 			case 13: // LUI
@@ -228,12 +235,15 @@ public abstract class InstructionLevelRiscv {
 
 				}
 				if (condition) {
+					// TODO: Angel increments the PC by 4 OR adds the immediate (copied below). Check immediate:
+					// RISCV.pc = (RISCV.pc|0) + (((((raw >> 20) & 0xFFFFFFE0) | ((raw >>> 7) & 0x0000001F)) & 0xFFFFF7FE) | ((   (((raw >> 20) & 0xFFFFFFE0) | ((raw >>> 7) & 0x0000001F))           & 0x00000001) << 11));
+
 					int offset =
 						((instruction >> 7) & (2 + 4 + 8 + 16)) +
 							((instruction >> 20) & (32 + 64 + 128 + 256 + 512 + 1024)) +
 							((instruction << 4) & 2048) +
 							((instruction >> 19) & 4096);
-					pc += offset;
+					pc = pc - 4 + offset;
 				}
 				break;
 			}
@@ -258,7 +268,7 @@ public abstract class InstructionLevelRiscv {
 					onException(ExceptionType.INSTRUCTION_ADDRESS_MISALIGNED);
 					break;
 				}
-				pc = pc - 4 + (instruction >> 13 << 2);
+				pc = pc - 4 + ((instruction >> 11) & -2);
 				break;
 
 			case 28: // SYSTEM
@@ -280,8 +290,71 @@ public abstract class InstructionLevelRiscv {
 		}
 	}
 
-	private void performOperation(int instruction, int rightOperand) {
-		// TODO
+	private void performOperation(int instruction, boolean immediate) {
+
+		// decode
+		int x = getRegister(instruction >> 15);
+		int y = instruction >> 20;
+		int func = (instruction >> 12) & 7;
+		boolean checkUpperBits, allowExtraBit;
+		if (immediate) {
+			checkUpperBits = (func == 1 || func == 5);
+			allowExtraBit = (func == 5);
+		} else {
+			y = getRegister(y);
+			checkUpperBits = true;
+			allowExtraBit = (func == 0 || func == 5);
+		}
+		if (checkUpperBits) {
+			int upperBits = instruction >>> 25;
+			if (upperBits != 0 && (upperBits != 32 || !allowExtraBit)) {
+				onException(ExceptionType.ILLEGAL_INSTRUCTION);
+				return;
+			}
+		}
+		boolean extraBit = allowExtraBit && ((instruction & 0x4000_0000) != 0);
+
+		// execute
+		int result;
+		switch (func) {
+
+			case 0: // ADD, SUB
+				result = extraBit ? (x - y) : (x + y);
+				break;
+
+			case 1: // SLL
+				result = (x << y);
+				break;
+
+			case 2: // SLT
+				result = (x < y ? 1 : 0);
+				break;
+
+			case 3: // SLTU TODO is this correct?
+				result = (x + Integer.MIN_VALUE < y + Integer.MIN_VALUE ? 1 : 0);
+				break;
+
+			case 4: // XOR
+				result = (x ^ y);
+				break;
+
+			case 5: // SRL, SRA
+				result = extraBit ? (x >> y) : (x >>> y);
+				break;
+
+			case 6: // OR
+				result = (x | y);
+				break;
+
+			case 7: // AND
+				result = (x & y);
+				break;
+
+			default:
+				throw new RuntimeException("this should not happen");
+
+		}
+		setRegister(instruction >> 7, result);
 	}
 
 	// ----------------------------------------------------------------------------------------------------------------
@@ -293,11 +366,7 @@ public abstract class InstructionLevelRiscv {
 	}
 
 	public final void setPc(int pc) {
-		if ((pc & 3) != 0) {
-			onException(ExceptionType.INSTRUCTION_ADDRESS_MISALIGNED);
-		} else {
-			this.pc = pc;
-		}
+		this.pc = pc;
 	}
 
 	// ----------------------------------------------------------------------------------------------------------------
@@ -305,20 +374,14 @@ public abstract class InstructionLevelRiscv {
 	// ----------------------------------------------------------------------------------------------------------------
 
 	public final int getRegister(int index) {
-		checkRegisterIndex(index);
+		index = index & 31;
 		return registers[index];
 	}
 
 	public final void setRegister(int index, int value) {
-		checkRegisterIndex(index);
+		index = index & 31;
 		if (index != 0) {
 			registers[index] = value;
-		}
-	}
-
-	private void checkRegisterIndex(int index) {
-		if (index < 0 || index >= 32) {
-			throw new RuntimeException("invalid register index: " + index);
 		}
 	}
 
