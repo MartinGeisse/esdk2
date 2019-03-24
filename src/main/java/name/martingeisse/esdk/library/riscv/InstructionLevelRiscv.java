@@ -2,7 +2,7 @@ package name.martingeisse.esdk.library.riscv;
 
 /**
  * Note: Interrupts are not supported for now.
- *
+ * <p>
  * This implementation is little-endian only, which in a word-based addressing scheme means: For an aligned 4-byte block
  * (i.e. one addressing word), accessing the lowest byte accesses the 8 bits with lowest significance in the 32-bit value.
  */
@@ -239,14 +239,17 @@ public abstract class InstructionLevelRiscv {
 				}
 				if (condition) {
 					// TODO: Angel increments the PC by 4 OR adds the immediate (copied below). Check immediate:
-					// RISCV.pc = (RISCV.pc|0) + (((((raw >> 20) & 0xFFFFFFE0) | ((raw >>> 7) & 0x0000001F)) & 0xFFFFF7FE) | ((   (((raw >> 20) & 0xFFFFFFE0) | ((raw >>> 7) & 0x0000001F))           & 0x00000001) << 11));
+					int x = (((instruction >> 20) & 0xFFFFFFE0) | ((instruction >>> 7) & 0x0000001F)) & 0xFFFFF7FE;
+					int y = ((((instruction >> 20) & 0xFFFFFFE0) | ((instruction >>> 7) & 0x0000001F)) & 0x00000001) << 11;
+					int offset = x | y;
 
 					int offset =
 						((instruction >> 7) & (2 + 4 + 8 + 16)) +
 							((instruction >> 20) & (32 + 64 + 128 + 256 + 512 + 1024)) +
 							((instruction << 4) & 2048) +
 							((instruction >> 19) & 4096);
-					pc = pc - 4 + offset;
+
+					pc = pc - 4 + offset; // based on old PC
 				}
 				break;
 			}
