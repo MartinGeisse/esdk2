@@ -2,6 +2,9 @@ package name.martingeisse.esdk.library.riscv;
 
 /**
  * Note: Interrupts are not supported for now.
+ *
+ * This implementation is little-endian only, which in a word-based addressing scheme means: For an aligned 4-byte block
+ * (i.e. one addressing word), accessing the lowest byte accesses the 8 bits with lowest significance in the 32-bit value.
  */
 public abstract class InstructionLevelRiscv {
 
@@ -12,7 +15,7 @@ public abstract class InstructionLevelRiscv {
 	 * Resets the CPU.
 	 */
 	public void reset() {
-		pc = 0; // TODO RISCV-Angel says 0x2000 !?
+		pc = 0;
 	}
 
 	/**
@@ -39,12 +42,12 @@ public abstract class InstructionLevelRiscv {
 				int convertedData;
 				switch (widthCode) {
 
-					case 0: // byte TODO little endian!
+					case 0: // byte
 						convertedData = read(address >> 2) >> ((address & 3) * 8);
 						convertedData = (unsigned ? (convertedData & 0xff) : (byte) convertedData);
 						break;
 
-					case 1: // half-word TODO little endian!
+					case 1: // half-word
 						if ((address & 1) != 0) {
 							onException(ExceptionType.DATA_ADDRESS_MISALIGNED);
 							break mainOpcodeSwitch;
@@ -111,11 +114,11 @@ public abstract class InstructionLevelRiscv {
 				int data = getRegister(instruction >> 20);
 				switch (widthCode) {
 
-					case 0: // byte TODO little endian!
+					case 0: // byte
 						write(wordAddress, data, 1 << (address & 3));
 						break;
 
-					case 1: // half-word TODO little endian!
+					case 1: // half-word
 						if ((address & 1) != 0) {
 							onException(ExceptionType.DATA_ADDRESS_MISALIGNED);
 							break mainOpcodeSwitch;
@@ -220,11 +223,11 @@ public abstract class InstructionLevelRiscv {
 						break;
 
 					case 6: // BLTU
-						condition = Integer.compareUnsigned(operand1, operand2) < 0;
+						condition = (operand1 + Integer.MIN_VALUE < operand2 + Integer.MIN_VALUE);
 						break;
 
 					case 7: // BGEU
-						condition = Integer.compareUnsigned(operand1, operand2) >= 0;
+						condition = (operand1 + Integer.MIN_VALUE >= operand2 + Integer.MIN_VALUE);
 						break;
 
 					case 2: // unused
@@ -330,7 +333,12 @@ public abstract class InstructionLevelRiscv {
 				result = (x < y ? 1 : 0);
 				break;
 
-			case 3: // SLTU TODO is this correct?
+			case 3: // SLTU
+				// Explanation why this is correct: Adding MIN_VALUE flips the highest bit. If the highest bits of x
+				// and y are equal before flipping, then they are equal afterwards, and the comparison is not changed,
+				// so it is a comparison in the lower 31 bits only, which is the same for signed / unsigned.
+				// If the highest bits of x and y differ, one of them is greater based on that bit alone, and flipping
+				// followed by signed comparison can easily be shown to result in unsigned comparison.
 				result = (x + Integer.MIN_VALUE < y + Integer.MIN_VALUE ? 1 : 0);
 				break;
 
