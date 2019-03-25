@@ -235,17 +235,13 @@ public abstract class InstructionLevelRiscv {
 
 				}
 				if (condition) {
-					// TODO: Angel increments the PC by 4 OR adds the immediate (copied below). Check immediate:
-					int x = (((instruction >> 20) & 0xFFFFFFE0) | ((instruction >>> 7) & 0x0000001F)) & 0xFFFFF7FE;
-					int y = ((((instruction >> 20) & 0xFFFFFFE0) | ((instruction >>> 7) & 0x0000001F)) & 0x00000001) << 11;
-					int offset = x | y;
-
+					// optimization note: Angel shifts the last component by 20, not 19, then masks out that extra copy
+					// of the sign bit. It uses this to merge this shift with the other shift-by-20.
 					int offset =
-						((instruction >> 7) & (2 + 4 + 8 + 16)) +
-							((instruction >> 20) & (32 + 64 + 128 + 256 + 512 + 1024)) +
-							((instruction << 4) & 2048) +
-							((instruction >> 19) & 4096);
-
+						((instruction >> 7) & 0x0000001e) +
+							((instruction >> 20) & 0x000007e0) +
+							((instruction << 4) & 0x00000800) +
+							((instruction >> 19) & 0xfffff000);
 					pc = oldPc + offset;
 				}
 				break;
