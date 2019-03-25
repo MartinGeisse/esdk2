@@ -27,6 +27,7 @@ public abstract class InstructionLevelRiscv {
 			return;
 		}
 		int instruction = fetchInstruction(pc >> 2);
+		int oldPc = pc;
 		pc += 4;
 		if ((instruction & 3) != 3) {
 			onExtendedInstruction(instruction);
@@ -93,11 +94,7 @@ public abstract class InstructionLevelRiscv {
 				break;
 
 			case 5: // AUIPC
-				// TODO old or new pc? Angel uses the old PC but also clears the low bits of it before using it, just
-				// like for the immediate value. I couldn't find anything about that in the spec. Also, its 64-bit
-				// implementation sign-extends to 64 bits, except when bits 31..24 are "01010101" (0x55) -- then, the
-				// top 32 bits are set to 0x155.
-				setRegister(instruction >> 7, (instruction & 0xfffff000) + pc);
+				setRegister(instruction >> 7, (instruction & 0xfffff000) + oldPc);
 				break;
 
 			case 6: // OP-IMM-32
@@ -249,7 +246,7 @@ public abstract class InstructionLevelRiscv {
 							((instruction << 4) & 2048) +
 							((instruction >> 19) & 4096);
 
-					pc = pc - 4 + offset; // based on old PC
+					pc = oldPc + offset;
 				}
 				break;
 			}
@@ -274,7 +271,7 @@ public abstract class InstructionLevelRiscv {
 					onException(ExceptionType.INSTRUCTION_ADDRESS_MISALIGNED);
 					break;
 				}
-				pc = pc - 4 + ((instruction >> 11) & -2);
+				pc = oldPc + ((instruction >> 11) & -2);
 				break;
 
 			case 28: // SYSTEM
