@@ -28,4 +28,7 @@ dependencies {
 	compile 'commons-beanutils:commons-beanutils:1.9.2'
 	compile 'commons-codec:commons-codec:1.9'
 
+	// testing
+	testCompile 'junit:junit:4.12'
+
 }
