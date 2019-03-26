@@ -35,20 +35,6 @@ XLEN = 32
 
 Registers: zero, 31 x general purpose, pc
 
-the program counter pc holds the address of the current instruction.
-
-v1: FENCE = NOP
-
-The FENCE.I instruction is used to synchronize the instruction and data streams. RISC-V does not guarantee that stores
-to instruction memory will be made visible to instruction fetches on the same RISC-V hart until a FENCE.I instruction
-is executed. A FENCE.I instruction only ensures that a subsequent instruction fetch on a RISC-V hart will see any
-previous data stores already visible to the same RISC-V hart. FENCE.I does not ensure that other RISC-V harts’
-instruction fetches will observe the local hart’s stores in a multiprocessor system. To make a store to instruction
-memory visible to all RISC-V harts, the writing hart has to execute a data FENCE before requesting that all remote
-RISC-V harts execute a FENCE.I.
-
-v1: FENCE.I = NOP
-
 CSR = control / status register
 
 CSR*, ECALL, EBREAK -> single SYSTEM instruction + software emu (?)
