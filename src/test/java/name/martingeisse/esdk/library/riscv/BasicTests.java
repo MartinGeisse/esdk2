@@ -42,4 +42,20 @@ public class BasicTests {
 		cpu.assertTrace(0, 1, 2, 3, 4);
 	}
 
+	@Test
+	public void testAddiWithDestinationZero() {
+		NoBusInstructionLevelRiscv cpu = new NoBusInstructionLevelRiscv(
+			InstructionEncoder.addi(2, 0, 99),
+			InstructionEncoder.addi(1, 0, 55),
+			InstructionEncoder.addi(0, 0, 42)
+		);
+		cpu.step();
+		cpu.step();
+		cpu.step();
+		cpu.assertTrace(0, 1, 2);
+		Assert.assertEquals(0, cpu.getRegister(0));
+		Assert.assertEquals(55, cpu.getRegister(1));
+		Assert.assertEquals(99, cpu.getRegister(2));
+	}
+
 }
