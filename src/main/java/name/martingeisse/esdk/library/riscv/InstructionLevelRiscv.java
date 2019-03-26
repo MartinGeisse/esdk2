@@ -82,7 +82,7 @@ public abstract class InstructionLevelRiscv {
 				onFloatingPointInstruction(instruction);
 				break;
 
-			case 2: // custopm-0
+			case 2: // custom-0
 				onExtendedInstruction(instruction);
 				break;
 
