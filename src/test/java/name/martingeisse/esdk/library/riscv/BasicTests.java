@@ -1,5 +1,6 @@
 package name.martingeisse.esdk.library.riscv;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -17,6 +18,28 @@ public class BasicTests {
 		cpu.step();
 		cpu.step();
 		cpu.assertTrace(0, 1, 2);
+	}
+
+	@Test
+	public void testAddi() {
+		NoBusInstructionLevelRiscv cpu = new NoBusInstructionLevelRiscv(
+			InstructionEncoder.addi(1, 0, 0),
+			InstructionEncoder.addi(1, 1, 0),
+			InstructionEncoder.addi(1, 1, 1),
+			InstructionEncoder.addi(1, 1, 2),
+			InstructionEncoder.addi(1, 1, 3)
+		);
+		cpu.step();
+		Assert.assertEquals(0, cpu.getRegister(1));
+		cpu.step();
+		Assert.assertEquals(0, cpu.getRegister(1));
+		cpu.step();
+		Assert.assertEquals(1, cpu.getRegister(1));
+		cpu.step();
+		Assert.assertEquals(3, cpu.getRegister(1));
+		cpu.step();
+		Assert.assertEquals(6, cpu.getRegister(1));
+		cpu.assertTrace(0, 1, 2, 3, 4);
 	}
 
 }
