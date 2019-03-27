@@ -400,7 +400,7 @@ public abstract class InstructionLevelRiscv {
 	protected abstract void write(int wordAddress, int data, int byteMask);
 
 	protected void onException(ExceptionType type) {
-		throw new RuntimeException("RISC-V cpu exception: " + type);
+		throw new RuntimeException("RISC-V cpu exception: " + type + " at pc = " + pc);
 	}
 
 	protected void onExtendedInstruction(int instruction) {
