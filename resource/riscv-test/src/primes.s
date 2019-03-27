@@ -7,7 +7,7 @@ primeCandidateLoop:
 
     addi x1, x1, 1
     beq x1, x31, finish
-    mv x2, 1
+    li x2, 1
 
 # x2 is the divisor candidate
 divisorCandidateLoop:
@@ -20,7 +20,7 @@ divisorCandidateLoop:
 divisionLoop:
     sub x3, x3, x1
     bgtz x3, divisionLoop
-    bez x3, primeCandidateLoop
+    beqz x3, primeCandidateLoop
     j divisorCandidateLoop
 
 foundPrime:
