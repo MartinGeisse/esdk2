@@ -16,20 +16,20 @@ public class NoBusInstructionLevelRiscv extends InstructionLevelRiscv {
 	}
 
 	@Override
-	protected int fetchInstruction(int wordAddress) {
+	public int fetchInstruction(int wordAddress) {
 		Assert.assertTrue("instruction address is out of bounds", wordAddress >= 0 && wordAddress < instructions.length);
 		trace.append(wordAddress);
 		return instructions[wordAddress];
 	}
 
 	@Override
-	protected int read(int wordAddress) {
+	public int read(int wordAddress) {
 		Assert.fail("test code tries to read from memory");
 		return 0;
 	}
 
 	@Override
-	protected void write(int wordAddress, int data, int byteMask) {
+	public void write(int wordAddress, int data, int byteMask) {
 		Assert.fail("test code tries to write to memory");
 	}
 
