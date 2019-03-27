@@ -7,7 +7,7 @@ import java.io.File;
  */
 public class StdoutProgramTestMain {
 
-	private static final String TEXT_SEGMENT_FILENAME = "addi.bin";
+	private static final String TEXT_SEGMENT_FILENAME = "primes.bin";
 
 	public static void main(String[] args) throws Exception {
 		File buildFolder = new File("resource/riscv-test/build");
