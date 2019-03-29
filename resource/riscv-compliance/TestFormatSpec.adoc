@@ -1,0 +1,40 @@
+
+=== The compliance test framework
+The compliance test framework is a master engine which selects, builds and executes <<The RISC-V compliance test suite,_compliance test suite_>> from the <<The RISC-V compliance test pool,_compliance test pool_>> for the selected <<The test target,_test target_>>. It is expected that compliance test framework also  evaluates obtained test results and summarizes them in the RISC-V compliance report.
+
+
+
+----
+//
+// User defined macros
+//
+RV_COMPLIANCE_HALT         //  defines halt mechanism of DUT
+RV_COMPLIANCE_CODE_BEGIN   //  start of code (test) section = startup routine
+RV_COMPLIANCE_CODE_END     //  end of code (test) section
+RV_COMPLIANCE_DATA_BEGIN   //  start of output data (signature) section
+RV_COMPLIANCE_DATA_END     //  end of output data (signature) section
+----
+
+The test structure of a compliance test is described as follows:
+
+.  Header + license (including a specification link and a brief test description)
+.  Includes of header files (see Common Header Files section)
+.  TVM specification
+.  Test code between “RV_COMPLIANCE_CODE_BEGIN” and “RV_COMPLIANCE_CODE_END”
+.  Input data section
+.  Output data section between “RV_COMPLIANCE_DATA_BEGIN” and “RV_COMPLIANCE_DATA_END”
+
+===== _To Be Discussed_
+
+. We recommend to add macros for input data (“RV_COMPLIANCE_INDATA_BEGIN”) to support Harvard architectures. This would require renaming “RV_COMPLIANCE_DATA_BEGIN“ to “RV_COMPLIANCE_SIGNATURE_BEGIN“.
+
+==== Common header files
+
+Each test shall include only the following header files:
+. _compliance_test.h_ – defines target-specific macros: RV_COMPLIANCE_HALT, RV_COMPLIANCE_CODE_BEGIN, etc.
+. _compliance_io.h_ – defines target-specific debug propose macros (RVTEST_IO_ASSERT_GPR_EQ, RVTEST_IO_WRITE_STR, etc.). Empty definition by default.
+. _test_macros.h_ – defines common test macros used in all tests.
+
+Adding new header files is forbidden. It may lead to macros redefinition and compilation issues.
+
+Note that there are other header files (riscv_test.h, encoding.h, ..) that are already included and should not be modified for testing purposes.
