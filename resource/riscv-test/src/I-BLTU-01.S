@@ -1,4 +1,4 @@
-# RISC-V Compliance Test I-BNE-01
+# RISC-V Compliance Test I-BLTU-01
 #
 # Copyright (c) 2017, Codasip Ltd.
 # Copyright (c) 2018, Imperas Software Ltd. Additions
@@ -27,7 +27,7 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 # Specification: RV32I Base Integer Instruction Set, Version 2.0
-# Description: Testing instruction BNE.
+# Description: Testing instruction BLTU.
 
 #include "compliance_test.h"
 #include "compliance_io.h"
@@ -40,7 +40,6 @@ RV_COMPLIANCE_RV32M
 RV_COMPLIANCE_CODE_BEGIN
 
     RVTEST_IO_INIT
-    RVTEST_IO_ASSERT_GPR_EQ(x31, x0, 0x00000000)
     RVTEST_IO_WRITE_STR(x31, "# Test Begin\n")
 
     # ---------------------------------------------------------------------------------------------
@@ -62,19 +61,19 @@ RV_COMPLIANCE_CODE_BEGIN
     li      x31, 0
 
     # Test
-    bne     x3, x4, 1f
+    bltu    x3, x4, 1f
     ori     x31, x31, 0x1
 1:
-    bne     x3, x5, 1f
+    bltu    x3, x5, 1f
     ori     x31, x31, 0x2
 1:
-    bne     x3, x6, 1f
+    bltu    x3, x6, 1f
     ori     x31, x31, 0x4
 1:
-    bne     x3, x7, 1f
+    bltu    x3, x7, 1f
     ori     x31, x31, 0x8
 1:
-    bne     x3, x8, 1f
+    bltu    x3, x8, 1f
     ori     x31, x31, 0x10
 1:
 
@@ -120,19 +119,19 @@ RV_COMPLIANCE_CODE_BEGIN
     li      x31, 0
 
     # Test
-    bne     x6, x7, 1f
+    bltu    x6, x7, 1f
     ori     x31, x31, 0x1
 1:
-    bne     x6, x8, 1f
+    bltu    x6, x8, 1f
     ori     x31, x31, 0x2
 1:
-    bne     x6, x9, 1f
+    bltu    x6, x9, 1f
     ori     x31, x31, 0x4
 1:
-    bne     x6, x10, 1f
+    bltu    x6, x10, 1f
     ori     x31, x31, 0x8
 1:
-    bne     x6, x11, 1f
+    bltu    x6, x11, 1f
     ori     x31, x31, 0x10
 1:
 
@@ -145,13 +144,13 @@ RV_COMPLIANCE_CODE_BEGIN
     sw      x11, 20(x2)
     sw      x31, 24(x2)
 
-    RVTEST_IO_ASSERT_GPR_EQ(x2, x6 , 0x00000001)
-    RVTEST_IO_ASSERT_GPR_EQ(x2, x7,  0x00000000)
-    RVTEST_IO_ASSERT_GPR_EQ(x2, x8,  0x00000001)
-    RVTEST_IO_ASSERT_GPR_EQ(x2, x9,  0xFFFFFFFF)
+    RVTEST_IO_ASSERT_GPR_EQ(x2, x6, 0x00000001)
+    RVTEST_IO_ASSERT_GPR_EQ(x2, x7, 0x00000000)
+    RVTEST_IO_ASSERT_GPR_EQ(x2, x8, 0x00000001)
+    RVTEST_IO_ASSERT_GPR_EQ(x2, x9, 0xFFFFFFFF)
     RVTEST_IO_ASSERT_GPR_EQ(x2, x10, 0x7FFFFFFF)
     RVTEST_IO_ASSERT_GPR_EQ(x2, x11, 0x80000000)
-    RVTEST_IO_ASSERT_GPR_EQ(x2, x31, 0x00000002)
+    RVTEST_IO_ASSERT_GPR_EQ(x2, x31, 0x00000003)
 
     RVTEST_IO_WRITE_STR(x31, "# Test part A2  - Complete\n");
 
@@ -174,19 +173,19 @@ RV_COMPLIANCE_CODE_BEGIN
     li      x31, 0
 
     # Test
-    bne     x12, x13, 1f
+    bltu    x12, x13, 1f
     ori     x31, x31, 0x1
 1:
-    bne     x12, x14, 1f
+    bltu    x12, x14, 1f
     ori     x31, x31, 0x2
 1:
-    bne     x12, x15, 1f
+    bltu    x12, x15, 1f
     ori     x31, x31, 0x4
 1:
-    bne     x12, x16, 1f
+    bltu    x12, x16, 1f
     ori     x31, x31, 0x8
 1:
-    bne     x12, x17, 1f
+    bltu    x12, x17, 1f
     ori     x31, x31, 0x10
 1:
 
@@ -205,7 +204,7 @@ RV_COMPLIANCE_CODE_BEGIN
     RVTEST_IO_ASSERT_GPR_EQ(x2, x15, 0xFFFFFFFF)
     RVTEST_IO_ASSERT_GPR_EQ(x2, x16, 0x7FFFFFFF)
     RVTEST_IO_ASSERT_GPR_EQ(x2, x17, 0x80000000)
-    RVTEST_IO_ASSERT_GPR_EQ(x2, x31, 0x00000004)
+    RVTEST_IO_ASSERT_GPR_EQ(x2, x31, 0x0000001F)
 
     RVTEST_IO_WRITE_STR(x31, "# Test part A3  - Complete\n");
 
@@ -228,19 +227,19 @@ RV_COMPLIANCE_CODE_BEGIN
     li      x31, 0
 
     # Test
-    bne     x18, x19, 1f
+    bltu    x18, x19, 1f
     ori     x31, x31, 0x1
 1:
-    bne     x18, x20, 1f
+    bltu    x18, x20, 1f
     ori     x31, x31, 0x2
 1:
-    bne     x18, x21, 1f
+    bltu    x18, x21, 1f
     ori     x31, x31, 0x4
 1:
-    bne     x18, x22, 1f
+    bltu    x18, x22, 1f
     ori     x31, x31, 0x8
 1:
-    bne     x18, x23, 1f
+    bltu    x18, x23, 1f
     ori     x31, x31, 0x10
 1:
 
@@ -259,7 +258,7 @@ RV_COMPLIANCE_CODE_BEGIN
     RVTEST_IO_ASSERT_GPR_EQ(x2, x21, 0xFFFFFFFF)
     RVTEST_IO_ASSERT_GPR_EQ(x2, x22, 0x7FFFFFFF)
     RVTEST_IO_ASSERT_GPR_EQ(x2, x23, 0x80000000)
-    RVTEST_IO_ASSERT_GPR_EQ(x2, x31, 0x00000008)
+    RVTEST_IO_ASSERT_GPR_EQ(x2, x31, 0x0000000B)
 
     RVTEST_IO_WRITE_STR(x31, "# Test part A4  - Complete\n");
 
@@ -282,19 +281,19 @@ RV_COMPLIANCE_CODE_BEGIN
     li      x31, 0
 
     # Test
-    bne     x24, x25, 1f
+    bltu    x24, x25, 1f
     ori     x31, x31, 0x1
 1:
-    bne     x24, x26, 1f
+    bltu    x24, x26, 1f
     ori     x31, x31, 0x2
 1:
-    bne     x24, x27, 1f
+    bltu    x24, x27, 1f
     ori     x31, x31, 0x4
 1:
-    bne     x24, x28, 1f
+    bltu    x24, x28, 1f
     ori     x31, x31, 0x8
 1:
-    bne     x24, x29, 1f
+    bltu    x24, x29, 1f
     ori     x31, x31, 0x10
 1:
 
@@ -313,7 +312,7 @@ RV_COMPLIANCE_CODE_BEGIN
     RVTEST_IO_ASSERT_GPR_EQ(x2, x27, 0xFFFFFFFF)
     RVTEST_IO_ASSERT_GPR_EQ(x2, x28, 0x7FFFFFFF)
     RVTEST_IO_ASSERT_GPR_EQ(x2, x29, 0x80000000)
-    RVTEST_IO_ASSERT_GPR_EQ(x2, x31, 0x00000010)
+    RVTEST_IO_ASSERT_GPR_EQ(x2, x31, 0x0000001B)
 
     RVTEST_IO_WRITE_STR(x31, "# Test part A5  - Complete\n");
 
@@ -332,41 +331,41 @@ RV_COMPLIANCE_CODE_BEGIN
     li      x31, 0
 
     # Test
-    bne     x1, x0, 1f
+    bltu    x1, x0, 1f
     ori     x31, x31, 0x1
 1:
-    bne     x2, x0, 1f
+    bltu    x2, x0, 1f
     ori     x31, x31, 0x2
 1:
-    bne     x3, x0, 1f
+    bltu    x3, x0, 1f
     ori     x31, x31, 0x4
 1:
-    bne     x4, x0, 1f
+    bltu    x4, x0, 1f
     ori     x31, x31, 0x8
 1:
-    bne     x5, x0, 1f
+    bltu    x5, x0, 1f
     ori     x31, x31, 0x10
 1:
-    bne     x0, x1, 1f
+    bltu    x0, x1, 1f
     ori     x31, x31, 0x20
 1:
-    bne     x0, x2, 1f
+    bltu    x0, x2, 1f
     ori     x31, x31, 0x40
 1:
-    bne     x0, x3, 1f
+    bltu    x0, x3, 1f
     ori     x31, x31, 0x80
 1:
-    bne     x0, x4, 1f
+    bltu    x0, x4, 1f
     ori     x31, x31, 0x100
 1:
-    bne     x0, x5, 1f
+    bltu    x0, x5, 1f
     ori     x31, x31, 0x200
 1:
 
     # Store results
     sw      x31, 0(x27)
 
-    RVTEST_IO_ASSERT_GPR_EQ(x27, x31, 0x00000021)
+    RVTEST_IO_ASSERT_GPR_EQ(x27, x31, 0x0000003F)
 
     RVTEST_IO_WRITE_STR(x31, "# Test part B  - Complete\n");
 
@@ -386,21 +385,21 @@ RV_COMPLIANCE_CODE_BEGIN
     li      x4, 0x0FEDCBA9
 
     # Test
-    bne     x31, x0, 2f
+    bltu    x0, x31, 2f
     li      x2, 0
     li      x3, 0
     li      x4, 0
 
 1:
     li      x3, 0x87654321
-    bne     x31, x0, 3f
+    bltu    x0, x31, 3f
     li      x2, 0
     li      x3, 0
     li      x4, 0
 
 2:
     li      x2, 0x9ABCDEF0
-    bne     x31, x0, 1b
+    bltu    x0, x31, 1b
     li      x2, 0
     li      x3, 0
     li      x4, 0
@@ -429,7 +428,6 @@ RV_COMPLIANCE_CODE_BEGIN
 RV_COMPLIANCE_CODE_END
 
 # Input data section.
-    .data
     .align 4
 test_A1_data:
     .word 0
@@ -442,7 +440,7 @@ test_A4_data:
 test_A5_data:
     .word 0x80000000
 test_C_data:
-    .word -1
+    .word 1
 
 # Output data section.
 RV_COMPLIANCE_DATA_BEGIN

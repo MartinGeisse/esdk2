@@ -40,7 +40,6 @@ RV_COMPLIANCE_RV32M
 RV_COMPLIANCE_CODE_BEGIN
 
     RVTEST_IO_INIT
-    RVTEST_IO_ASSERT_GPR_EQ(x31, x0, 0x00000000)
     RVTEST_IO_WRITE_STR(x31, "# Test Begin\n")
 
     # ---------------------------------------------------------------------------------------------
@@ -216,7 +215,6 @@ test_C3:
 RV_COMPLIANCE_CODE_END
 
 # Input data section.
-    .data
     .align 4
 
 test_A_data:

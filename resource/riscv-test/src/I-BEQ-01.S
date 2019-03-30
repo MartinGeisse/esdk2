@@ -1,4 +1,4 @@
-# RISC-V Compliance Test I-BGEU-01
+# RISC-V Compliance Test I-BEQ-01
 #
 # Copyright (c) 2017, Codasip Ltd.
 # Copyright (c) 2018, Imperas Software Ltd. Additions
@@ -27,7 +27,7 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 # Specification: RV32I Base Integer Instruction Set, Version 2.0
-# Description: Testing instruction BGEU.
+# Description: Testing instruction BEQ.
 
 #include "compliance_test.h"
 #include "compliance_io.h"
@@ -40,7 +40,6 @@ RV_COMPLIANCE_RV32M
 RV_COMPLIANCE_CODE_BEGIN
 
     RVTEST_IO_INIT
-    RVTEST_IO_ASSERT_GPR_EQ(x31, x0, 0x00000000)
     RVTEST_IO_WRITE_STR(x31, "# Test Begin\n")
 
     # ---------------------------------------------------------------------------------------------
@@ -62,19 +61,19 @@ RV_COMPLIANCE_CODE_BEGIN
     li      x31, 0
 
     # Test
-    bgeu    x3, x4, 1f
+    beq     x3, x4, 1f
     ori     x31, x31, 0x1
 1:
-    bgeu    x3, x5, 1f
+    beq     x3, x5, 1f
     ori     x31, x31, 0x2
 1:
-    bgeu    x3, x6, 1f
+    beq     x3, x6, 1f
     ori     x31, x31, 0x4
 1:
-    bgeu    x3, x7, 1f
+    beq     x3, x7, 1f
     ori     x31, x31, 0x8
 1:
-    bgeu    x3, x8, 1f
+    beq     x3, x8, 1f
     ori     x31, x31, 0x10
 1:
 
@@ -120,19 +119,19 @@ RV_COMPLIANCE_CODE_BEGIN
     li      x31, 0
 
     # Test
-    bgeu    x6, x7, 1f
+    beq     x6, x7, 1f
     ori     x31, x31, 0x1
 1:
-    bgeu    x6, x8, 1f
+    beq     x6, x8, 1f
     ori     x31, x31, 0x2
 1:
-    bgeu    x6, x9, 1f
+    beq     x6, x9, 1f
     ori     x31, x31, 0x4
 1:
-    bgeu    x6, x10, 1f
+    beq     x6, x10, 1f
     ori     x31, x31, 0x8
 1:
-    bgeu    x6, x11, 1f
+    beq     x6, x11, 1f
     ori     x31, x31, 0x10
 1:
 
@@ -151,7 +150,7 @@ RV_COMPLIANCE_CODE_BEGIN
     RVTEST_IO_ASSERT_GPR_EQ(x2, x9,  0xFFFFFFFF)
     RVTEST_IO_ASSERT_GPR_EQ(x2, x10, 0x7FFFFFFF)
     RVTEST_IO_ASSERT_GPR_EQ(x2, x11, 0x80000000)
-    RVTEST_IO_ASSERT_GPR_EQ(x2, x31, 0x0000001C)
+    RVTEST_IO_ASSERT_GPR_EQ(x2, x31, 0x0000001D)
 
     RVTEST_IO_WRITE_STR(x31, "# Test part A2  - Complete\n");
 
@@ -174,19 +173,19 @@ RV_COMPLIANCE_CODE_BEGIN
     li      x31, 0
 
     # Test
-    bgeu    x12, x13, 1f
+    beq     x12, x13, 1f
     ori     x31, x31, 0x1
 1:
-    bgeu    x12, x14, 1f
+    beq     x12, x14, 1f
     ori     x31, x31, 0x2
 1:
-    bgeu    x12, x15, 1f
+    beq     x12, x15, 1f
     ori     x31, x31, 0x4
 1:
-    bgeu    x12, x16, 1f
+    beq     x12, x16, 1f
     ori     x31, x31, 0x8
 1:
-    bgeu    x12, x17, 1f
+    beq     x12, x17, 1f
     ori     x31, x31, 0x10
 1:
 
@@ -205,7 +204,7 @@ RV_COMPLIANCE_CODE_BEGIN
     RVTEST_IO_ASSERT_GPR_EQ(x2, x15, 0xFFFFFFFF)
     RVTEST_IO_ASSERT_GPR_EQ(x2, x16, 0x7FFFFFFF)
     RVTEST_IO_ASSERT_GPR_EQ(x2, x17, 0x80000000)
-    RVTEST_IO_ASSERT_GPR_EQ(x2, x31, 0x00000000)
+    RVTEST_IO_ASSERT_GPR_EQ(x2, x31, 0x0000001B)
 
     RVTEST_IO_WRITE_STR(x31, "# Test part A3  - Complete\n");
 
@@ -228,19 +227,19 @@ RV_COMPLIANCE_CODE_BEGIN
     li      x31, 0
 
     # Test
-    bgeu    x18, x19, 1f
+    beq     x18, x19, 1f
     ori     x31, x31, 0x1
 1:
-    bgeu    x18, x20, 1f
+    beq     x18, x20, 1f
     ori     x31, x31, 0x2
 1:
-    bgeu    x18, x21, 1f
+    beq     x18, x21, 1f
     ori     x31, x31, 0x4
 1:
-    bgeu    x18, x22, 1f
+    beq     x18, x22, 1f
     ori     x31, x31, 0x8
 1:
-    bgeu    x18, x23, 1f
+    beq     x18, x23, 1f
     ori     x31, x31, 0x10
 1:
 
@@ -259,7 +258,7 @@ RV_COMPLIANCE_CODE_BEGIN
     RVTEST_IO_ASSERT_GPR_EQ(x2, x21, 0xFFFFFFFF)
     RVTEST_IO_ASSERT_GPR_EQ(x2, x22, 0x7FFFFFFF)
     RVTEST_IO_ASSERT_GPR_EQ(x2, x23, 0x80000000)
-    RVTEST_IO_ASSERT_GPR_EQ(x2, x31, 0x00000014)
+    RVTEST_IO_ASSERT_GPR_EQ(x2, x31, 0x00000017)
 
     RVTEST_IO_WRITE_STR(x31, "# Test part A4  - Complete\n");
 
@@ -282,19 +281,19 @@ RV_COMPLIANCE_CODE_BEGIN
     li      x31, 0
 
     # Test
-    bgeu    x24, x25, 1f
+    beq     x24, x25, 1f
     ori     x31, x31, 0x1
 1:
-    bgeu    x24, x26, 1f
+    beq     x24, x26, 1f
     ori     x31, x31, 0x2
 1:
-    bgeu    x24, x27, 1f
+    beq     x24, x27, 1f
     ori     x31, x31, 0x4
 1:
-    bgeu    x24, x28, 1f
+    beq     x24, x28, 1f
     ori     x31, x31, 0x8
 1:
-    bgeu    x24, x29, 1f
+    beq     x24, x29, 1f
     ori     x31, x31, 0x10
 1:
 
@@ -313,7 +312,7 @@ RV_COMPLIANCE_CODE_BEGIN
     RVTEST_IO_ASSERT_GPR_EQ(x2, x27, 0xFFFFFFFF)
     RVTEST_IO_ASSERT_GPR_EQ(x2, x28, 0x7FFFFFFF)
     RVTEST_IO_ASSERT_GPR_EQ(x2, x29, 0x80000000)
-    RVTEST_IO_ASSERT_GPR_EQ(x2, x31, 0x00000004)
+    RVTEST_IO_ASSERT_GPR_EQ(x2, x31, 0x0000000F)
 
     RVTEST_IO_WRITE_STR(x31, "# Test part A5  - Complete\n");
 
@@ -332,41 +331,41 @@ RV_COMPLIANCE_CODE_BEGIN
     li      x31, 0
 
     # Test
-    bgeu    x1, x0, 1f
+    beq     x1, x0, 1f
     ori     x31, x31, 0x1
 1:
-    bgeu    x2, x0, 1f
+    beq     x2, x0, 1f
     ori     x31, x31, 0x2
 1:
-    bgeu    x3, x0, 1f
+    beq     x3, x0, 1f
     ori     x31, x31, 0x4
 1:
-    bgeu    x4, x0, 1f
+    beq     x4, x0, 1f
     ori     x31, x31, 0x8
 1:
-    bgeu    x5, x0, 1f
+    beq     x5, x0, 1f
     ori     x31, x31, 0x10
 1:
-    bgeu    x0, x1, 1f
+    beq     x0, x1, 1f
     ori     x31, x31, 0x20
 1:
-    bgeu    x0, x2, 1f
+    beq     x0, x2, 1f
     ori     x31, x31, 0x40
 1:
-    bgeu    x0, x3, 1f
+    beq     x0, x3, 1f
     ori     x31, x31, 0x80
 1:
-    bgeu    x0, x4, 1f
+    beq     x0, x4, 1f
     ori     x31, x31, 0x100
 1:
-    bgeu    x0, x5, 1f
+    beq     x0, x5, 1f
     ori     x31, x31, 0x200
 1:
 
     # Store results
     sw      x31, 0(x27)
 
-    RVTEST_IO_ASSERT_GPR_EQ(x27, x31, 0x000003C0)
+    RVTEST_IO_ASSERT_GPR_EQ(x27, x31, 0x000003DE)
 
     RVTEST_IO_WRITE_STR(x31, "# Test part B  - Complete\n");
 
@@ -386,21 +385,21 @@ RV_COMPLIANCE_CODE_BEGIN
     li      x4, 0x0FEDCBA9
 
     # Test
-    bgeu    x31, x0, 2f
+    beq     x31, x0, 2f
     li      x2, 0
     li      x3, 0
     li      x4, 0
 
 1:
     li      x3, 0x87654321
-    bgeu    x31, x0, 3f
+    beq     x31, x0, 3f
     li      x2, 0
     li      x3, 0
     li      x4, 0
 
 2:
     li      x2, 0x9ABCDEF0
-    bgeu    x31, x0, 1b
+    beq     x31, x0, 1b
     li      x2, 0
     li      x3, 0
     li      x4, 0
@@ -429,7 +428,6 @@ RV_COMPLIANCE_CODE_BEGIN
 RV_COMPLIANCE_CODE_END
 
 # Input data section.
-    .data
     .align 4
 test_A1_data:
     .word 0
@@ -442,7 +440,7 @@ test_A4_data:
 test_A5_data:
     .word 0x80000000
 test_C_data:
-    .word 1
+    .word 0
 
 # Output data section.
 RV_COMPLIANCE_DATA_BEGIN
