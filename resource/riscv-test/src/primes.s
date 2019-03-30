@@ -1,3 +1,4 @@
+.option norvc
 
     li x1, 1
     li x31, 100
