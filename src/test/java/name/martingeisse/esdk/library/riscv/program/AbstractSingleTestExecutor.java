@@ -64,7 +64,7 @@ public abstract class AbstractSingleTestExecutor {
 	private class MyCpu extends InstructionLevelRiscv {
 
 		@Override
-		protected int fetchInstruction(int wordAddress) {
+		public int fetchInstruction(int wordAddress) {
 			if (wordAddress < 0 || wordAddress >= memory.length) {
 				throw new IllegalArgumentException("illegal address for instruction fetch: " + wordAddress);
 			}
@@ -72,7 +72,7 @@ public abstract class AbstractSingleTestExecutor {
 		}
 
 		@Override
-		protected int read(int wordAddress) {
+		public int read(int wordAddress) {
 			if (wordAddress < 0 || wordAddress >= memory.length) {
 				throw new IllegalArgumentException("illegal address for reading: " + wordAddress);
 			}
@@ -80,7 +80,7 @@ public abstract class AbstractSingleTestExecutor {
 		}
 
 		@Override
-		protected void write(int wordAddress, int data, int byteMask) {
+		public void write(int wordAddress, int data, int byteMask) {
 			if (byteMask != (byteMask & 15)) {
 				throw new IllegalArgumentException("illegal byte mask for writing: " + wordAddress);
 			}
