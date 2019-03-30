@@ -6,3 +6,6 @@ The simulator generates test outputs in RVTEST_IO_ASSERT_GPR_EQ which mostly cor
 test output, but the tests seem to have an additional assertion at the beginning to check that x0 is 0. I
 removed that assertion in all tests.
 
+TODO:
+converting the build script to PHP seems to make GCC not use the preprocessor anymore, causing errors.
+UPDATE: no, it's not the build script but the fact that the assembler file was named .s and not .S
