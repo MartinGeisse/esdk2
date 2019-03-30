@@ -18,7 +18,7 @@ divisorCandidateLoop:
 
 # x3 is the current remainder
 divisionLoop:
-    sub x3, x3, x1
+    sub x3, x3, x2
     bgtz x3, divisionLoop
     beqz x3, primeCandidateLoop
     j divisorCandidateLoop

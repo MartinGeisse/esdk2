@@ -269,8 +269,8 @@ public abstract class InstructionLevelRiscv {
 					((instruction >> 9) & 0x00000800) |
 					((instruction >> 20) & 0x7fe);
 				pc = oldPc + offset;
-					break;
-				}
+				break;
+			}
 
 			case 28: // SYSTEM
 				onException(ExceptionType.SYSTEM_INSTRUCTION);
