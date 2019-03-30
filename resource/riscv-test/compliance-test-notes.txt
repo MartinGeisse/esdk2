@@ -7,5 +7,7 @@ test output, but the tests seem to have an additional assertion at the beginning
 removed that assertion in all tests.
 
 TODO:
-converting the build script to PHP seems to make GCC not use the preprocessor anymore, causing errors.
-UPDATE: no, it's not the build script but the fact that the assembler file was named .s and not .S
+Using RVTEST_IO_ASSERT_GPR_EQ to generate test output fails in I-SB-01 again...
+- generate test output in the _END macro (must be a multiline macro)
+- use the preprocessor to eliminate the .data directive automatically
+	- unfortunately, this does not work. The preprocessor doesn't like dots in macro names.

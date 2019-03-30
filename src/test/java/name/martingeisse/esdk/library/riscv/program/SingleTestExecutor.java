@@ -62,7 +62,7 @@ public class SingleTestExecutor extends AbstractSingleTestExecutor {
 			if (expectedValue == null) {
 				throw new RuntimeException("program generated more result values than expected");
 			} else if (expectedValue.intValue() != value) {
-				throw new RuntimeException("program generated wrong result values (" + value + " should be " + expectedValue.intValue() + ")");
+				throw new RuntimeException("program generated wrong result values (" + Integer.toHexString(value) + " should be " + Integer.toHexString(expectedValue.intValue()) + ")");
 			}
 		} catch (IOException e) {
 			throw new RuntimeException(e);
