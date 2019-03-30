@@ -261,14 +261,16 @@ public abstract class InstructionLevelRiscv {
 				onException(ExceptionType.ILLEGAL_INSTRUCTION);
 				break;
 
-			case 27: // JAL
+			case 27: { // JAL
+				// instruction = imm[20], imm[10:1], imm[11], imm[19:12], rd[4:0], opcode[6:0]; implicitly imm[0] = 0
 				setRegister(instruction >> 7, pc);
-				if ((instruction & (1 << 12)) != 0) {
-					onException(ExceptionType.INSTRUCTION_ADDRESS_MISALIGNED);
+				int offset = ((instruction >> 11) & 0xfff00000) |
+					(instruction & 0x000ff000) |
+					((instruction >> 9) & 0x00000800) |
+					((instruction >> 20) & 0x7fe);
+				pc = oldPc + offset;
 					break;
 				}
-				pc = oldPc + ((instruction >> 11) & -2);
-				break;
 
 			case 28: // SYSTEM
 				onException(ExceptionType.SYSTEM_INSTRUCTION);
@@ -393,14 +395,14 @@ public abstract class InstructionLevelRiscv {
 	// abstract behavior
 	// ----------------------------------------------------------------------------------------------------------------
 
-	protected abstract int fetchInstruction(int wordAddress);
+	public abstract int fetchInstruction(int wordAddress);
 
-	protected abstract int read(int wordAddress);
+	public abstract int read(int wordAddress);
 
-	protected abstract void write(int wordAddress, int data, int byteMask);
+	public abstract void write(int wordAddress, int data, int byteMask);
 
 	protected void onException(ExceptionType type) {
-		throw new RuntimeException("RISC-V cpu exception: " + type);
+		throw new RuntimeException("RISC-V cpu exception: " + type + " at pc = " + pc);
 	}
 
 	protected void onExtendedInstruction(int instruction) {

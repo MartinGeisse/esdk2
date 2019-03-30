@@ -14,17 +14,17 @@ public class MybusInstructionLevelRiscv extends InstructionLevelRiscv {
 	}
 
 	@Override
-	protected int fetchInstruction(int wordAddress) {
+	public int fetchInstruction(int wordAddress) {
 		return bus.read(wordAddress);
 	}
 
 	@Override
-	protected int read(int wordAddress) {
+	public int read(int wordAddress) {
 		return bus.read(wordAddress);
 	}
 
 	@Override
-	protected void write(int wordAddress, int data, int byteMask) {
+	public void write(int wordAddress, int data, int byteMask) {
 		bus.write(wordAddress, data, byteMask);
 	}
 
