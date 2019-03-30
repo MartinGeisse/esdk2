@@ -1,0 +1,8 @@
+
+Removed .data directive since my build system cannot handle it. The text section is mapped to writable memory, so
+I don't expect any problems to be caused by that.
+
+I generate test outputs in RVTEST_IO_ASSERT_GPR_EQ which mostly corresponds to what the test thinks is test output,
+but for example for the ADDI test there was one additional assertion at the beginning, so I had to add that value to
+the expected output too.
+

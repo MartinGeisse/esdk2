@@ -25,7 +25,7 @@ public class InteractiveSimulator {
 
 	public static void main(String[] args) throws Exception {
 		InteractiveSimulator simulator = new InteractiveSimulator();
-		simulator.loadProgram(new File("resource/riscv-test/build/primes.bin"));
+		simulator.loadProgram(new File("resource/riscv-test/build/I-ADDI-01.bin"));
 		simulator.loop();
 	}
 

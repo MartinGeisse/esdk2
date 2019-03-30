@@ -44,10 +44,12 @@ public class SingleTestExecutor extends AbstractSingleTestExecutor {
 			}
 			line = line.trim();
 			if (!line.isEmpty()) {
-				if (line.startsWith("0x")) {
-					return Integer.parseInt(line.substring(2), 16);
+				// I wanted to indicate binary numbers by a 0x prefix, but the official compliance tests use binary
+				// numbers without a prefix. So now I indicate decimal numbers by an underscore prefix.
+				if (line.startsWith("_")) {
+					return (int)Long.parseLong(line.substring(1));
 				} else {
-					return Integer.parseInt(line);
+					return (int)Long.parseLong(line, 16);
 				}
 			}
 		}
@@ -60,7 +62,7 @@ public class SingleTestExecutor extends AbstractSingleTestExecutor {
 			if (expectedValue == null) {
 				throw new RuntimeException("program generated more result values than expected");
 			} else if (expectedValue.intValue() != value) {
-				throw new RuntimeException("program generated wrong result values");
+				throw new RuntimeException("program generated wrong result values (" + value + " should be " + expectedValue.intValue() + ")");
 			}
 		} catch (IOException e) {
 			throw new RuntimeException(e);

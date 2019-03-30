@@ -1,2 +1,0 @@
-Removed .data directive since my build system cannot handle it. The text section is mapped to writable memory, so
-I don't expect any problems to be caused by that.
