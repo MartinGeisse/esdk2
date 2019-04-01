@@ -15,7 +15,7 @@ Using RVTEST_IO_ASSERT_GPR_EQ to generate test output fails in I-SB-01 again...
 
 The doc says: .word aligns to word boundary automatically
 
-Tested: ".align N" aligns to (2^N) half-words (= 2^(N+1) bytes). It uses 0 in .data and 0x13 (NOP) in .text section.
+Tested: ".align N" aligns to (2^N) bytes. It uses 0 in .data and 0x13 (NOP) in .text section.
     .align 1        # align to half-word
     .align 2        # align to word
     .align 3        # align to double-word
