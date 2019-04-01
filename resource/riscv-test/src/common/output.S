@@ -4,7 +4,16 @@
 .global outputLoopStart
 
 outputLoopStart:
+
+    # load output data start label
 	la x1, rvComplianceDataBegin
+
+	# simulate the ".align 4" that the tests contain *after* that label (align to (2^4) half-words = 4 words)
+	# TODO something is wrong in that calculation!
+
+    andi x2, x1, 15
+    beq x2, x1, outputLoop
+    addi x1, x2, 16
 outputLoop:
 	la x2, rvComplianceDataEnd
 	beq x1, x2, outputLoopEnd

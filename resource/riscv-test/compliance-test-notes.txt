@@ -19,3 +19,5 @@ Tested: ".align N" aligns to (2^N) half-words (= 2^(N+1) bytes). It uses 0 in .d
     .align 1        # align to half-word
     .align 2        # align to word
     .align 3        # align to double-word
+    .align 4        # align to 4 words (one line in objdump output)
+
