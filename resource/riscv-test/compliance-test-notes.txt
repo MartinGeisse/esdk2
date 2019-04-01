@@ -11,3 +11,11 @@ Using RVTEST_IO_ASSERT_GPR_EQ to generate test output fails in I-SB-01 again...
 - generate test output in the _END macro (must be a multiline macro)
 - use the preprocessor to eliminate the .data directive automatically
 	- unfortunately, this does not work. The preprocessor doesn't like dots in macro names.
+
+
+The doc says: .word aligns to word boundary automatically
+
+Tested: ".align N" aligns to (2^N) half-words (= 2^(N+1) bytes). It uses 0 in .data and 0x13 (NOP) in .text section.
+    .align 1        # align to half-word
+    .align 2        # align to word
+    .align 3        # align to double-word

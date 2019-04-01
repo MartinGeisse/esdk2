@@ -18,7 +18,18 @@ public class TestDisassembleMain {
 		0xffffffff, 0x00000000, 0x97000000, 0x9380c0fe,
 		0x17010000, 0x130141ff, 0x638a2000, 0x03a10000,
 		0x232020fe, 0x93804000, 0x6ff09ffe, 0x232e00fc
-	};
+
+//		0x97000000, 0x93800000, 0x17010000, 0x13010100,
+//		0x83a10000, 0x23203100, 0x6ff09ffe, 0x13000000,
+//		0x13000000, 0x13000000, 0x00000000, 0x13000000,
+//		0x13000000, 0x13000000, 0xffffffff, 0x00000000
+
+
+//								0x97000000, 0x93800000,
+//		0x17010000, 0x13010100, 0x638a2000, 0x03a10000,
+//		0x232020fe, 0x93804000, 0x6ff09ffe, 0x232e00fc
+
+};
 
 	public static void main(String[] args) {
 		for (int wordAddress = 0; wordAddress < values.length; wordAddress++) {
@@ -29,7 +40,9 @@ public class TestDisassembleMain {
 					((wrongOrderInstruction >> 8) & 0x0000ff00) |
 					((wrongOrderInstruction << 8) & 0x00ff0000) |
 					((wrongOrderInstruction << 24) & 0xff000000);
-			System.out.println(StringUtil.toHexString32(byteAddress) + ": " + InstructionDisassembler.disassemble(instruction));
+			System.out.println(StringUtil.toHexString32(byteAddress) + ": " +
+				StringUtil.toHexString32(wrongOrderInstruction) + " -> " +
+				InstructionDisassembler.disassemble(instruction));
 		}
 	}
 
