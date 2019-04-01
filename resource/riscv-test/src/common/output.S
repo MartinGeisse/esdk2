@@ -9,10 +9,10 @@ outputLoopStart:
 	la x1, rvComplianceDataBegin
 
 	# simulate the ".align 4" that the tests contain *after* that label (align to (2^4 bytes) = 4 words)
-    andi x2, x1, 15
+    andi x2, x1, 0xfffffff0
     beq x2, x1, outputLoop
     addi x1, x2, 16
-    
+
 outputLoop:
 	la x2, rvComplianceDataEnd
 	beq x1, x2, outputLoopEnd
