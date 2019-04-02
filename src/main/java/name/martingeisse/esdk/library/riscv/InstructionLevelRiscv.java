@@ -111,17 +111,21 @@ public abstract class InstructionLevelRiscv {
 				int data = getRegister(instruction >> 20);
 				switch (widthCode) {
 
-					case 0: // byte
-						write(wordAddress, data, 1 << (address & 3));
+					case 0: { // byte
+						int byteOffset = (address & 3);
+						write(wordAddress, data << (byteOffset * 8), 1 << byteOffset);
 						break;
+					}
 
-					case 1: // half-word
+					case 1: { // half-word
 						if ((address & 1) != 0) {
 							onException(ExceptionType.DATA_ADDRESS_MISALIGNED);
 							break mainOpcodeSwitch;
 						}
-						write(wordAddress, data, 3 << (address & 2));
+						int halfwordOffset = (address & 2);
+						write(wordAddress, data << (halfwordOffset * 8), 3 << halfwordOffset);
 						break;
+					}
 
 					case 2: // word
 						if ((address & 3) != 0) {
