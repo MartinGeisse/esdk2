@@ -1,15 +1,15 @@
-package name.martingeisse.esdk.library.riscv;
+package name.martingeisse.esdk.library.riscv.io;
 
 import name.martingeisse.esdk.library.mybus.transaction.TransactionMybus;
 
 /**
  *
  */
-public class MybusInstructionLevelRiscv extends InstructionLevelRiscv {
+public final class MybusIoUnit implements IoUnit {
 
 	private final TransactionMybus bus;
 
-	public MybusInstructionLevelRiscv(TransactionMybus bus) {
+	public MybusIoUnit(TransactionMybus bus) {
 		this.bus = bus;
 	}
 

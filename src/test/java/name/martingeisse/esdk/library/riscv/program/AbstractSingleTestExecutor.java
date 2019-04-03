@@ -1,6 +1,7 @@
 package name.martingeisse.esdk.library.riscv.program;
 
 import name.martingeisse.esdk.library.riscv.InstructionLevelRiscv;
+import name.martingeisse.esdk.library.riscv.io.IoUnit;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -63,46 +64,52 @@ public abstract class AbstractSingleTestExecutor {
 
 	private class MyCpu extends InstructionLevelRiscv {
 
-		@Override
-		public int fetchInstruction(int wordAddress) {
-			if (wordAddress < 0 || wordAddress >= memory.length) {
-				throw new IllegalArgumentException("illegal address for instruction fetch: " + wordAddress);
-			}
-			return memory[wordAddress];
-		}
+		public MyCpu() {
+			setIoUnit(new IoUnit() {
 
-		@Override
-		public int read(int wordAddress) {
-			if (wordAddress < 0 || wordAddress >= memory.length) {
-				throw new IllegalArgumentException("illegal address for reading: " + wordAddress);
-			}
-			return memory[wordAddress];
-		}
+				@Override
+				public int fetchInstruction(int wordAddress) {
+					if (wordAddress < 0 || wordAddress >= memory.length) {
+						throw new IllegalArgumentException("illegal address for instruction fetch: " + wordAddress);
+					}
+					return memory[wordAddress];
+				}
 
-		@Override
-		public void write(int wordAddress, int data, int byteMask) {
-			if (byteMask != (byteMask & 15)) {
-				throw new IllegalArgumentException("illegal byte mask for writing: " + wordAddress);
-			}
-			if (wordAddress == -8) {
-				handleOutputValue(data);
-				return;
-			}
-			if (wordAddress == -9) {
-				stopped = true;
-				return;
-			}
-			if (wordAddress < 0 || wordAddress >= memory.length) {
-				throw new IllegalArgumentException("illegal address for writing: " + wordAddress);
-			}
-			if (byteMask == 15) {
-				memory[wordAddress] = data;
-				return;
-			}
-			writeHelper(wordAddress, data, byteMask & 1, 0x000000ff);
-			writeHelper(wordAddress, data, byteMask & 2, 0x0000ff00);
-			writeHelper(wordAddress, data, byteMask & 4, 0x00ff0000);
-			writeHelper(wordAddress, data, byteMask & 8, 0xff000000);
+				@Override
+				public int read(int wordAddress) {
+					if (wordAddress < 0 || wordAddress >= memory.length) {
+						throw new IllegalArgumentException("illegal address for reading: " + wordAddress);
+					}
+					return memory[wordAddress];
+				}
+
+				@Override
+				public void write(int wordAddress, int data, int byteMask) {
+					if (byteMask != (byteMask & 15)) {
+						throw new IllegalArgumentException("illegal byte mask for writing: " + wordAddress);
+					}
+					if (wordAddress == -8) {
+						handleOutputValue(data);
+						return;
+					}
+					if (wordAddress == -9) {
+						stopped = true;
+						return;
+					}
+					if (wordAddress < 0 || wordAddress >= memory.length) {
+						throw new IllegalArgumentException("illegal address for writing: " + wordAddress);
+					}
+					if (byteMask == 15) {
+						memory[wordAddress] = data;
+						return;
+					}
+					writeHelper(wordAddress, data, byteMask & 1, 0x000000ff);
+					writeHelper(wordAddress, data, byteMask & 2, 0x0000ff00);
+					writeHelper(wordAddress, data, byteMask & 4, 0x00ff0000);
+					writeHelper(wordAddress, data, byteMask & 8, 0xff000000);
+				}
+
+			});
 		}
 
 		private void writeHelper(int wordAddress, int data, int selectedByteMask, int bitMask) {

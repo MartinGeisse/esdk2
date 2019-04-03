@@ -180,7 +180,7 @@ public final class InstructionDisassembler {
 					case 2: // unused
 					case 3: // unused
 					default:
-						onException(ExceptionType.ILLEGAL_INSTRUCTION);
+						triggerException(ExceptionType.ILLEGAL_INSTRUCTION);
 						break mainOpcodeSwitch;
 
 				}
@@ -204,7 +204,7 @@ public final class InstructionDisassembler {
 				int baseRegisterValue = getRegister(instruction >> 15);
 				setRegister(instruction >> 7, pc);
 				if ((instruction & (1 << 21)) != 0) {
-					onException(ExceptionType.INSTRUCTION_ADDRESS_MISALIGNED);
+					triggerException(ExceptionType.INSTRUCTION_ADDRESS_MISALIGNED);
 					break;
 				}
 				pc = (baseRegisterValue + (instruction >> 20)) & -2;

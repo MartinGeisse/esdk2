@@ -1,5 +1,12 @@
 package name.martingeisse.esdk.library.riscv;
 
+import name.martingeisse.esdk.library.riscv.extended.ExceptionExtendedInstructionUnit;
+import name.martingeisse.esdk.library.riscv.extended.ExtendedInstructionUnit;
+import name.martingeisse.esdk.library.riscv.floating.ExceptionFloatingPointUnit;
+import name.martingeisse.esdk.library.riscv.floating.FloatingPointUnit;
+import name.martingeisse.esdk.library.riscv.io.BrokenIoUnit;
+import name.martingeisse.esdk.library.riscv.io.IoUnit;
+
 /**
  * Note: Interrupts are not supported for now.
  * <p>
@@ -8,8 +15,60 @@ package name.martingeisse.esdk.library.riscv;
  */
 public abstract class InstructionLevelRiscv {
 
+	private IoUnit ioUnit;
+	private FloatingPointUnit floatingPointUnit;
+	private ExtendedInstructionUnit extendedInstructionUnit;
+	private boolean supportsMisalignedIo;
+
 	private final int[] registers = new int[32];
 	private int pc;
+
+	public InstructionLevelRiscv() {
+		setIoUnit(null);
+		setFloatingPointUnit(null);
+		setExtendedInstructionUnit(null);
+		setSupportsMisalignedIo(false);
+	}
+
+	// ----------------------------------------------------------------------------------------------------------------
+	// configuration
+	// ----------------------------------------------------------------------------------------------------------------
+
+	public IoUnit getIoUnit() {
+		return ioUnit;
+	}
+
+	public void setIoUnit(IoUnit ioUnit) {
+		this.ioUnit = (ioUnit == null ? BrokenIoUnit.INSTANCE : ioUnit);
+	}
+
+	public FloatingPointUnit getFloatingPointUnit() {
+		return floatingPointUnit;
+	}
+
+	public void setFloatingPointUnit(FloatingPointUnit floatingPointUnit) {
+		this.floatingPointUnit = (floatingPointUnit == null ? new ExceptionFloatingPointUnit(this) : floatingPointUnit);
+	}
+
+	public ExtendedInstructionUnit getExtendedInstructionUnit() {
+		return extendedInstructionUnit;
+	}
+
+	public void setExtendedInstructionUnit(ExtendedInstructionUnit extendedInstructionUnit) {
+		this.extendedInstructionUnit = (extendedInstructionUnit == null ? new ExceptionExtendedInstructionUnit(this) : extendedInstructionUnit);
+	}
+
+	public boolean isSupportsMisalignedIo() {
+		return supportsMisalignedIo;
+	}
+
+	public void setSupportsMisalignedIo(boolean supportsMisalignedIo) {
+		this.supportsMisalignedIo = supportsMisalignedIo;
+	}
+
+	// ----------------------------------------------------------------------------------------------------------------
+	// operation
+	// ----------------------------------------------------------------------------------------------------------------
 
 	/**
 	 * Resets the CPU.
@@ -23,14 +82,14 @@ public abstract class InstructionLevelRiscv {
 	 */
 	public void step() {
 		if ((pc & 3) != 0) {
-			onException(ExceptionType.INSTRUCTION_ADDRESS_MISALIGNED);
+			triggerException(ExceptionType.INSTRUCTION_ADDRESS_MISALIGNED);
 			return;
 		}
-		int instruction = fetchInstruction(pc >> 2);
+		int instruction = ioUnit.fetchInstruction(pc >> 2);
 		int oldPc = pc;
 		pc += 4;
 		if ((instruction & 3) != 3) {
-			onExtendedInstruction(instruction);
+			extendedInstructionUnit.handleExtendedInstruction(instruction);
 			return;
 		}
 		mainOpcodeSwitch:
@@ -40,37 +99,76 @@ public abstract class InstructionLevelRiscv {
 				int widthCode = (instruction >> 12) & 3;
 				boolean unsigned = ((instruction >> 12) & 4) != 0;
 				int address = getRegister(instruction >> 15) + (instruction >> 20);
+				int wordAddress = (address >> 2);
 				int convertedData;
 				switch (widthCode) {
 
 					case 0: // byte
-						convertedData = read(address >> 2) >> ((address & 3) * 8);
+						convertedData = ioUnit.read(wordAddress) >> ((address & 3) * 8);
 						convertedData = (unsigned ? (convertedData & 0xff) : (byte) convertedData);
 						break;
 
-					case 1: // half-word
-						if ((address & 1) != 0) {
-							onException(ExceptionType.DATA_ADDRESS_MISALIGNED);
-							break mainOpcodeSwitch;
-						}
-						convertedData = read(address >> 2) >> ((address & 2) * 8);
-						convertedData = (unsigned ? (convertedData & 0xffff) : (short) convertedData);
-						break;
+					case 1: { // half-word
+						int word = ioUnit.read(wordAddress);
+						int shiftedData;
+						switch (address & 3) {
 
-					case 2: // word
-						if (unsigned) {
-							onException(ExceptionType.ILLEGAL_INSTRUCTION);
-							break mainOpcodeSwitch;
+							case 0:
+								shiftedData = word;
+								break;
+
+							case 1:
+								if (supportsMisalignedIo) {
+									shiftedData = word >> 8;
+								} else {
+									triggerException(ExceptionType.DATA_ADDRESS_MISALIGNED);
+									break mainOpcodeSwitch;
+								}
+								break;
+
+							case 2:
+								shiftedData = word >> 16;
+								break;
+
+							case 3:
+								if (supportsMisalignedIo) {
+									shiftedData = (word >>> 24) | (ioUnit.read(wordAddress + 1) << 8);
+								} else {
+									triggerException(ExceptionType.DATA_ADDRESS_MISALIGNED);
+									break mainOpcodeSwitch;
+								}
+								break;
+
+							default:
+								throw new RuntimeException("wtf");
+
 						}
-						if ((address & 3) != 0) {
-							onException(ExceptionType.DATA_ADDRESS_MISALIGNED);
-							break mainOpcodeSwitch;
-						}
-						convertedData = read(address >> 2);
+						convertedData = (unsigned ? (shiftedData & 0xffff) : (short) shiftedData);
 						break;
+					}
+
+					case 2: { // word
+						if (unsigned) {
+							triggerException(ExceptionType.ILLEGAL_INSTRUCTION);
+							break mainOpcodeSwitch;
+						}
+						int lowBits = (address & 3);
+						if (lowBits == 0) {
+							convertedData = ioUnit.read(wordAddress);
+						} else if (supportsMisalignedIo) {
+							int shift = lowBits << 3;
+							int part1 = ioUnit.read(wordAddress) >>> shift;
+							int part2 = ioUnit.read(wordAddress + 1) << (32 - shift);
+							convertedData = part1 | part2;
+						} else {
+							triggerException(ExceptionType.DATA_ADDRESS_MISALIGNED);
+							break mainOpcodeSwitch;
+						}
+						break;
+					}
 
 					default:
-						onException(ExceptionType.ILLEGAL_INSTRUCTION);
+						triggerException(ExceptionType.ILLEGAL_INSTRUCTION);
 						break mainOpcodeSwitch;
 
 				}
@@ -79,11 +177,11 @@ public abstract class InstructionLevelRiscv {
 			}
 
 			case 1: // LOAD-FP
-				onFloatingPointInstruction(instruction);
+				floatingPointUnit.handleFloatingPointInstruction(instruction);
 				break;
 
 			case 2: // custom-0
-				onExtendedInstruction(instruction);
+				extendedInstructionUnit.handleExtendedInstruction(instruction);
 				break;
 
 			case 3: // MISC-MEM, i.e. FENCE and FENCE.I -- implemented as NOPs
@@ -101,7 +199,7 @@ public abstract class InstructionLevelRiscv {
 				throw new UnsupportedOperationException("this is a 32-bit implementation -- 32-on-64-bit operations are not supported");
 
 			case 7: // reserved for 48-bit instructions, but we only use 32-bit instructions, so this is free for custom instructions
-				onExtendedInstruction(instruction);
+				extendedInstructionUnit.handleExtendedInstruction(instruction);
 				break;
 
 			case 8: { // STORE
@@ -113,30 +211,82 @@ public abstract class InstructionLevelRiscv {
 
 					case 0: { // byte
 						int byteOffset = (address & 3);
-						write(wordAddress, data << (byteOffset * 8), 1 << byteOffset);
+						ioUnit.write(wordAddress, data << (byteOffset * 8), 1 << byteOffset);
 						break;
 					}
 
 					case 1: { // half-word
-						if ((address & 1) != 0) {
-							onException(ExceptionType.DATA_ADDRESS_MISALIGNED);
-							break mainOpcodeSwitch;
+						switch (address & 3) {
+
+							case 0:
+								ioUnit.write(wordAddress, data, 3);
+								break;
+
+							case 1:
+								if (supportsMisalignedIo) {
+									ioUnit.write(wordAddress, data, 6);
+								} else {
+									triggerException(ExceptionType.DATA_ADDRESS_MISALIGNED);
+									break mainOpcodeSwitch;
+								}
+								break;
+
+							case 2:
+								ioUnit.write(wordAddress, data << 16, 12);
+								break;
+
+							case 3:
+								if (supportsMisalignedIo) {
+									ioUnit.write(wordAddress, data << 24, 8);
+									ioUnit.write(wordAddress + 1, data >> 8, 1);
+								} else {
+									triggerException(ExceptionType.DATA_ADDRESS_MISALIGNED);
+									break mainOpcodeSwitch;
+								}
+								break;
+
+							default:
+								throw new RuntimeException("wtf");
+
 						}
-						int halfwordOffset = (address & 2);
-						write(wordAddress, data << (halfwordOffset * 8), 3 << halfwordOffset);
 						break;
 					}
 
-					case 2: // word
-						if ((address & 3) != 0) {
-							onException(ExceptionType.DATA_ADDRESS_MISALIGNED);
+					case 2: { // word
+						int lowBits = (address & 3);
+						if (lowBits != 0 && !supportsMisalignedIo) {
+							triggerException(ExceptionType.DATA_ADDRESS_MISALIGNED);
 							break mainOpcodeSwitch;
 						}
-						write(wordAddress, data, 15);
+						switch (lowBits) {
+
+							case 0:
+								ioUnit.write(wordAddress, data, 15);
+								break;
+
+							case 1:
+								ioUnit.write(wordAddress, data << 8, 14);
+								ioUnit.write(wordAddress + 1, data >>> 24, 1);
+								break;
+
+							case 2:
+								ioUnit.write(wordAddress, data << 16, 12);
+								ioUnit.write(wordAddress + 1, data >>> 16, 3);
+								break;
+
+							case 3:
+								ioUnit.write(wordAddress, data << 24, 8);
+								ioUnit.write(wordAddress + 1, data >>> 8, 7);
+
+							default:
+								throw new RuntimeException("wtf");
+
+						}
 						break;
+					}
 
 					default:
-						onException(ExceptionType.ILLEGAL_INSTRUCTION);
+						triggerException(ExceptionType.ILLEGAL_INSTRUCTION);
 						break mainOpcodeSwitch;
 
 				}
@@ -144,11 +294,11 @@ public abstract class InstructionLevelRiscv {
 			}
 
 			case 9: // STORE-FP
-				onFloatingPointInstruction(instruction);
+				floatingPointUnit.handleFloatingPointInstruction(instruction);
 				break;
 
 			case 10: // custom-1
-				onExtendedInstruction(instruction);
+				extendedInstructionUnit.handleExtendedInstruction(instruction);
 				break;
 
 			case 11: // AMO (atomic memory operation)
@@ -166,39 +316,39 @@ public abstract class InstructionLevelRiscv {
 				throw new UnsupportedOperationException("this is a 32-bit implementation -- 32-on-64-bit operations are not supported");
 
 			case 15: // reserved for 64-bit instructions, but we only use 32-bit instructions, so this is free for custom instructions
-				onExtendedInstruction(instruction);
+				extendedInstructionUnit.handleExtendedInstruction(instruction);
 				break;
 
 			case 16: // MADD
-				onFloatingPointInstruction(instruction);
+				floatingPointUnit.handleFloatingPointInstruction(instruction);
 				break;
 
 			case 17: // MSUB
-				onFloatingPointInstruction(instruction);
+				floatingPointUnit.handleFloatingPointInstruction(instruction);
 				break;
 
 			case 18: // NMSUB
-				onFloatingPointInstruction(instruction);
+				floatingPointUnit.handleFloatingPointInstruction(instruction);
 				break;
 
 			case 19: // NMADD
-				onFloatingPointInstruction(instruction);
+				floatingPointUnit.handleFloatingPointInstruction(instruction);
 				break;
 
 			case 20: // OP-FP
-				onFloatingPointInstruction(instruction);
+				floatingPointUnit.handleFloatingPointInstruction(instruction);
 				break;
 
 			case 21: // reserved
-				onException(ExceptionType.ILLEGAL_INSTRUCTION);
+				triggerException(ExceptionType.ILLEGAL_INSTRUCTION);
 				break;
 
 			case 22: // custom-2
-				onExtendedInstruction(instruction);
+				extendedInstructionUnit.handleExtendedInstruction(instruction);
 				break;
 
 			case 23: // reserved for 48-bit instructions, but we only use 32-bit instructions, so this is free for custom instructions
-				onExtendedInstruction(instruction);
+				extendedInstructionUnit.handleExtendedInstruction(instruction);
 				break;
 
 			case 24: { // BRANCH
@@ -234,7 +384,7 @@ public abstract class InstructionLevelRiscv {
 					case 2: // unused
 					case 3: // unused
 					default:
-						onException(ExceptionType.ILLEGAL_INSTRUCTION);
+						triggerException(ExceptionType.ILLEGAL_INSTRUCTION);
 						break mainOpcodeSwitch;
 
 				}
@@ -258,7 +408,7 @@ public abstract class InstructionLevelRiscv {
 				break;
 
 			case 26: // reserved
-				onException(ExceptionType.ILLEGAL_INSTRUCTION);
+				triggerException(ExceptionType.ILLEGAL_INSTRUCTION);
 				break;
 
 			case 27: { // JAL
@@ -273,19 +423,19 @@ public abstract class InstructionLevelRiscv {
 			}
 
 			case 28: // SYSTEM
-				onException(ExceptionType.SYSTEM_INSTRUCTION);
+				triggerException(ExceptionType.SYSTEM_INSTRUCTION);
 				break;
 
 			case 29: // reserved
-				onException(ExceptionType.ILLEGAL_INSTRUCTION);
+				triggerException(ExceptionType.ILLEGAL_INSTRUCTION);
 				break;
 
 			case 30: // custom-3
-				onExtendedInstruction(instruction);
+				extendedInstructionUnit.handleExtendedInstruction(instruction);
 				break;
 
 			case 31: // reserved for 80-bit+ instructions, but we only use 32-bit instructions, so this is free for custom instructions
-				onExtendedInstruction(instruction);
+				extendedInstructionUnit.handleExtendedInstruction(instruction);
 				break;
 
 		}
@@ -309,7 +459,7 @@ public abstract class InstructionLevelRiscv {
 		if (checkUpperBits) {
 			int upperBits = instruction >>> 25;
 			if (upperBits != 0 && (upperBits != 32 || !allowExtraBit)) {
-				onException(ExceptionType.ILLEGAL_INSTRUCTION);
+				triggerException(ExceptionType.ILLEGAL_INSTRUCTION);
 				return;
 			}
 		}
@@ -392,25 +542,11 @@ public abstract class InstructionLevelRiscv {
 	}
 
 	// ----------------------------------------------------------------------------------------------------------------
-	// abstract behavior
+	// misc. behavior
 	// ----------------------------------------------------------------------------------------------------------------
 
-	public abstract int fetchInstruction(int wordAddress);
-
-	public abstract int read(int wordAddress);
-
-	public abstract void write(int wordAddress, int data, int byteMask);
-
-	protected void onException(ExceptionType type) {
+	public void triggerException(ExceptionType type) {
 		throw new RuntimeException("RISC-V cpu exception: " + type + " at pc = " + pc);
-	}
-
-	protected void onExtendedInstruction(int instruction) {
-		onException(ExceptionType.ILLEGAL_INSTRUCTION);
-	}
-
-	protected void onFloatingPointInstruction(int instruction) {
-		onException(ExceptionType.ILLEGAL_INSTRUCTION);
 	}
 
 	// ----------------------------------------------------------------------------------------------------------------
