@@ -6,6 +6,8 @@ import name.martingeisse.esdk.library.riscv.floating.ExceptionFloatingPointUnit;
 import name.martingeisse.esdk.library.riscv.floating.FloatingPointUnit;
 import name.martingeisse.esdk.library.riscv.io.BrokenIoUnit;
 import name.martingeisse.esdk.library.riscv.io.IoUnit;
+import name.martingeisse.esdk.library.riscv.muldiv.ExceptionMultiplyDivideUnit;
+import name.martingeisse.esdk.library.riscv.muldiv.MultiplyDivideUnit;
 
 /**
  * Note: Interrupts are not supported for now.
@@ -16,6 +18,7 @@ import name.martingeisse.esdk.library.riscv.io.IoUnit;
 public abstract class InstructionLevelRiscv {
 
 	private IoUnit ioUnit;
+	private MultiplyDivideUnit multiplyDivideUnit;
 	private FloatingPointUnit floatingPointUnit;
 	private ExtendedInstructionUnit extendedInstructionUnit;
 	private boolean supportsMisalignedIo;
@@ -25,6 +28,7 @@ public abstract class InstructionLevelRiscv {
 
 	public InstructionLevelRiscv() {
 		setIoUnit(null);
+		setMultiplyDivideUnit(null);
 		setFloatingPointUnit(null);
 		setExtendedInstructionUnit(null);
 		setSupportsMisalignedIo(false);
@@ -40,6 +44,14 @@ public abstract class InstructionLevelRiscv {
 
 	public void setIoUnit(IoUnit ioUnit) {
 		this.ioUnit = (ioUnit == null ? BrokenIoUnit.INSTANCE : ioUnit);
+	}
+
+	public MultiplyDivideUnit getMultiplyDivideUnit() {
+		return multiplyDivideUnit;
+	}
+
+	public void setMultiplyDivideUnit(MultiplyDivideUnit multiplyDivideUnit) {
+		this.multiplyDivideUnit = (multiplyDivideUnit == null ? new ExceptionMultiplyDivideUnit(this) : multiplyDivideUnit);
 	}
 
 	public FloatingPointUnit getFloatingPointUnit() {
@@ -305,7 +317,11 @@ public abstract class InstructionLevelRiscv {
 				throw new UnsupportedOperationException("AMO not supported by this implementation");
 
 			case 12: // OP
-				performOperation(instruction, false);
+				if (instruction >>> 25 == 1) {
+					multiplyDivideUnit.performMultiplayDivideInstruction(instruction);
+				} else {
+					performOperation(instruction, false);
+				}
 				break;
 
 			case 13: // LUI
