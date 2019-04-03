@@ -94,7 +94,6 @@ RV_COMPLIANCE_CODE_BEGIN
 RV_COMPLIANCE_CODE_END
 
 # Input data section.
-    .data
     .align 4
     .word 0x89ABCDEF
 test_A_data:
