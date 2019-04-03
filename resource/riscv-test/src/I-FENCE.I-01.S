@@ -91,7 +91,6 @@ instr_A_dst:
 RV_COMPLIANCE_CODE_END
 
 # Input data section.
-    .data
     .align 4
 
 instr_A_src:
