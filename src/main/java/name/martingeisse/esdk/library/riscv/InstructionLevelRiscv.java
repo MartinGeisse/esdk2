@@ -53,7 +53,7 @@ public abstract class InstructionLevelRiscv {
 							onException(ExceptionType.DATA_ADDRESS_MISALIGNED);
 							break mainOpcodeSwitch;
 						}
-						convertedData = read(address >> 2) >> ((address & 1) * 8);
+						convertedData = read(address >> 2) >> ((address & 2) * 8);
 						convertedData = (unsigned ? (convertedData & 0xffff) : (short) convertedData);
 						break;
 
