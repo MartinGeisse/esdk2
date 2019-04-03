@@ -254,10 +254,6 @@ public abstract class InstructionLevelRiscv {
 			case 25: // JALR
 				int baseRegisterValue = getRegister(instruction >> 15);
 				setRegister(instruction >> 7, pc);
-				if ((instruction & (1 << 21)) != 0) {
-					onException(ExceptionType.INSTRUCTION_ADDRESS_MISALIGNED);
-					break;
-				}
 				pc = (baseRegisterValue + (instruction >> 20)) & -2;
 				break;
 

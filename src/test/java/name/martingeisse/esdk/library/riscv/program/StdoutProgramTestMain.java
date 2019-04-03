@@ -7,7 +7,7 @@ import java.io.File;
  */
 public class StdoutProgramTestMain {
 
-	private static final String TEXT_SEGMENT_FILENAME = "I-ENDIANESS-01.bin";
+	private static final String TEXT_SEGMENT_FILENAME = "I-JALR-01.bin";
 
 	public static void main(String[] args) throws Exception {
 		File buildFolder = new File("resource/riscv-test/build");
