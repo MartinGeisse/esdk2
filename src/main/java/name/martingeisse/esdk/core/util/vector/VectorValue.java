@@ -129,6 +129,11 @@ public abstract class VectorValue {
 	public abstract VectorValue not();
 
 	/**
+	 * Returns the 2's complement negation of this vector.
+	 */
+	public abstract VectorValue negate();
+
+	/**
 	 * Expects this vector and the argument vector to be of the same size and bitwise-ANDs them.
 	 */
 	public abstract VectorValue and(VectorValue other);

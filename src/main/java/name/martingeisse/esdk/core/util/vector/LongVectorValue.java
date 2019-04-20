@@ -151,6 +151,11 @@ public final class LongVectorValue extends VectorValue {
 	}
 
 	@Override
+	public VectorValue negate() {
+		return truncate(-value);
+	}
+
+	@Override
 	public VectorValue and(VectorValue other) {
 		return new LongVectorValue(getWidth(), value & expectSameWidth(other));
 	}
