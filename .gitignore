@@ -1,3 +1,6 @@
 .DS_Store
 *~
 kcpsm3.v
+*.iml
+.gradle
+.idea
