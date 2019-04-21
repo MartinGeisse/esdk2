@@ -38,6 +38,10 @@ public final class RtlSwitchSignal extends RtlStatement {
 		return defaultSignal;
 	}
 
+	public void setDefaultSignal(RtlVectorSignal defaultSignal) {
+		this.defaultSignal = defaultSignal;
+	}
+
 	public void addCase(VectorValue selectorValue, RtlVectorSignal branch) {
 		addCase(ImmutableList.of(selectorValue), branch);
 	}

@@ -85,6 +85,12 @@ public class RtlStatementSequence extends RtlStatement {
 		return chain;
 	}
 
+	public final RtlSwitchStatement switchOn(RtlVectorSignal selector) {
+		RtlSwitchStatement switchStatement = new RtlSwitchStatement(getRealm(), selector);
+		addStatement(switchStatement);
+		return switchStatement;
+	}
+
 	// ----------------------------------------------------------------------------------------------------------------
 	// simulation
 	// ----------------------------------------------------------------------------------------------------------------
