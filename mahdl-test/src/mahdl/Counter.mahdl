@@ -1,0 +1,10 @@
+module Counter;
+
+interface {
+    in clock clk;
+    out vector[8] output;
+}
+
+register vector[8] counter = 0;
+do(clk) counter = counter + 1;
+do(*) output = counter;
