@@ -43,13 +43,17 @@ public class Design {
 	}
 
 	public void simulate() {
+		prepareSimulation();
+		continueSimulation();
+	}
+
+	public void prepareSimulation() {
 		validateOrException(false);
-		needSimulation();
 		materialize();
+		needSimulation();
 		for (Item item : items) {
 			item.initializeSimulation();
 		}
-		simulation.run();
 	}
 
 	public void materialize() {
@@ -62,6 +66,10 @@ public class Design {
 				item.materialize();
 			}
 		}
+	}
+
+	public void continueSimulation() {
+		simulation.run();
 	}
 
 	public void stopSimulation() {

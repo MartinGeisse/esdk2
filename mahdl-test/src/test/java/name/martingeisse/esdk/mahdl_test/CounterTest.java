@@ -1,9 +1,9 @@
 package name.martingeisse.esdk.mahdl_test;
 
 import name.martingeisse.esdk.core.model.Design;
-import name.martingeisse.esdk.core.model.Item;
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
+import org.junit.Assert;
 import org.junit.Test;
 import tests.Counter;
 
@@ -16,30 +16,18 @@ public class CounterTest {
 	public void testCounter() {
 		Design design = new Design();
 		RtlRealm realm = new RtlRealm(design);
-		RtlClockNetwork clk = new RtlClockNetwork(realm);
-		Counter counter = new Counter(realm, clk);
-		new Item(design) {
+		RtlClockNetwork clock = new RtlClockNetwork(realm);
+		Counter counter = new Counter(realm, clock);
+		Stepper stepper = new Stepper(clock, 10);
+		design.prepareSimulation();
 
-			private int timer = 0;
-
-			@Override
-			protected void initializeSimulation() {
-				fire(this::callback, 0);
-			}
-
-			private void callback() {
-				System.out.println("* " + counter.getOutput().getValue());
-				clk.simulateClockEdge();
-				timer++;
-				if (timer == 10) {
-					getDesign().stopSimulation();
-				} else {
-					fire(this::callback, 10);
-				}
-			}
-
-		};
-		design.simulate();
+		for (int i = 0; i < 8; i++) {
+			Assert.assertEquals(i, counter.getOutput().getValue().getAsUnsignedInt());
+			stepper.step();
+		}
+		Assert.assertEquals(0, counter.getOutput().getValue().getAsUnsignedInt());
+		stepper.step();
+		Assert.assertEquals(1, counter.getOutput().getValue().getAsUnsignedInt());
 	}
 
 }

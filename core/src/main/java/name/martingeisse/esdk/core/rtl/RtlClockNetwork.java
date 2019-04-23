@@ -46,8 +46,8 @@ public final class RtlClockNetwork extends RtlItem {
 	}
 
 	/**
-	 * This class is used to ensure that {@link RtlRealm#registerPin(RtlPin.RealmRegistrationKey, RtlPin)} isn't called except through the
-	 * {@link RtlPin} constructor.
+	 * This class is used to ensure that {@link RtlRealm#registerPin(RtlPin.RealmRegistrationKey, RtlPin)}
+	 * isn't called except through the {@link RtlPin} constructor.
 	 */
 	public static final class RealmRegistrationKey {
 

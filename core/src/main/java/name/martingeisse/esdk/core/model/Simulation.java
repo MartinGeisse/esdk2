@@ -36,6 +36,7 @@ final class Simulation {
 	}
 
 	public void run() {
+		stopped = false;
 		List<ScheduledEvent> batch = new ArrayList<>();
 		while (!stopped && !eventQueue.isEmpty()) {
 			now = eventQueue.peek().when;
