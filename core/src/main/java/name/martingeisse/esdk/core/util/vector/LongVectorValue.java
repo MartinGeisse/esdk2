@@ -135,6 +135,11 @@ public final class LongVectorValue extends VectorValue {
 	}
 
 	@Override
+	public VectorValue prepend(boolean bit) {
+		return new LongVectorValue(getWidth() + 1, (bit ? (1 << getWidth()) : 0) | value);
+	}
+
+	@Override
 	public VectorValue concat(boolean bit) {
 		return new LongVectorValue(getWidth() + 1, (value << 1) | (bit ? 1 : 0));
 	}

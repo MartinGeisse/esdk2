@@ -5,7 +5,7 @@
 package name.martingeisse.esdk.core.rtl.block;
 
 import name.martingeisse.esdk.core.rtl.RtlRealm;
-import name.martingeisse.esdk.core.rtl.block.statement.RtlVectorAssignmentTarget;
+import name.martingeisse.esdk.core.rtl.block.statement.target.RtlVectorAssignmentTarget;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 
@@ -39,6 +39,12 @@ public final class RtlProceduralVectorSignal extends RtlProceduralSignal impleme
 		return value;
 	}
 
+	@Override
+	public VectorValue getNextValue() {
+		return nextValue;
+	}
+
+	@Override
 	public void setNextValue(VectorValue nextValue) {
 		if (nextValue == null) {
 			throw new IllegalArgumentException("value cannot be null");

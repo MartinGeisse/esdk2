@@ -114,6 +114,11 @@ public abstract class VectorValue {
 	public abstract VectorValue select(int from, int to);
 
 	/**
+	 * Concatenates the specified bit (left operand) and this vector (right operand).
+	 */
+	public abstract VectorValue prepend(boolean bit);
+
+	/**
 	 * Concatenates this vector (left operand) and the specified bit (right operand).
 	 */
 	public abstract VectorValue concat(boolean bit);

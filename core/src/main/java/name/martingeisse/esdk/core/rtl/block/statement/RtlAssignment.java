@@ -5,6 +5,7 @@
 package name.martingeisse.esdk.core.rtl.block.statement;
 
 import name.martingeisse.esdk.core.rtl.RtlRealm;
+import name.martingeisse.esdk.core.rtl.block.statement.target.RtlAssignmentTarget;
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.SignalUsageConsumer;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionNesting;
@@ -28,8 +29,7 @@ public abstract class RtlAssignment extends RtlStatement {
 
 	@Override
 	public void analyzeSignalUsage(SignalUsageConsumer consumer) {
-		// TODO what if the destination is a selection with a complex index? Shouldn't this dry-run-print the
-		// destination too?
+		getDestination().analyzeSignalUsage(consumer);
 		consumer.consumeSignalUsage(getSource(), VerilogExpressionNesting.ALL);
 	}
 

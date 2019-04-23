@@ -5,7 +5,7 @@
 package name.martingeisse.esdk.core.rtl.block;
 
 import name.martingeisse.esdk.core.rtl.RtlRealm;
-import name.martingeisse.esdk.core.rtl.block.statement.RtlBitAssignmentTarget;
+import name.martingeisse.esdk.core.rtl.block.statement.target.RtlBitAssignmentTarget;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 
 /**
@@ -29,6 +29,12 @@ public final class RtlProceduralBitSignal extends RtlProceduralSignal implements
 		return value;
 	}
 
+	@Override
+	public boolean getNextValue() {
+		return nextValue;
+	}
+
+	@Override
 	public void setNextValue(boolean nextValue) {
 		this.nextValue = nextValue;
 	}
