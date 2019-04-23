@@ -17,7 +17,6 @@ public interface RtlVectorAssignmentTarget extends RtlAssignmentTarget {
 	// simulation
 	// ----------------------------------------------------------------------------------------------------------------
 
-	VectorValue getNextValue();
 	void setNextValue(VectorValue nextValue);
 
 }

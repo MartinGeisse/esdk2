@@ -13,7 +13,6 @@ public interface RtlBitAssignmentTarget extends RtlAssignmentTarget {
 	// simulation
 	// ----------------------------------------------------------------------------------------------------------------
 
-	boolean getNextValue();
 	void setNextValue(boolean nextValue);
 
 }

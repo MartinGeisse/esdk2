@@ -6,6 +6,7 @@ package name.martingeisse.esdk.core.rtl.block.statement.target;
 
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
+import name.martingeisse.esdk.core.rtl.block.RtlProceduralMemory;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.*;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
@@ -13,28 +14,32 @@ import name.martingeisse.esdk.core.util.vector.VectorValue;
 /**
  *
  */
-public final class RtlMatrixTargetIndexSelection extends RtlItem implements RtlBitAssignmentTarget {
+public final class RtlMemoryTargetIndexSelection extends RtlItem implements RtlVectorAssignmentTarget {
 
-	TODO
-
-	private final RtlVectorAssignmentTarget containerTarget;
+	private final RtlProceduralMemory memory;
 	private final RtlVectorSignal indexSignal;
 
-	public RtlMatrixTargetIndexSelection(RtlRealm realm, RtlVectorAssignmentTarget containerTarget, RtlVectorSignal indexSignal) {
+	public RtlMemoryTargetIndexSelection(RtlRealm realm, RtlProceduralMemory memory, RtlVectorSignal indexSignal) {
 		super(realm);
-		if (containerTarget.getWidth() < (1 << indexSignal.getWidth())) {
-			throw new IllegalArgumentException("container of width " + containerTarget.getWidth() + " is too small for index of width " + indexSignal.getWidth());
+		int rowCount = memory.getMatrix().getRowCount();
+		if (rowCount < (1 << indexSignal.getWidth())) {
+			throw new IllegalArgumentException("memory with " + rowCount + " rows is too small for index of width " + indexSignal.getWidth());
 		}
-		this.containerTarget = checkSameRealm(containerTarget);
+		this.memory = checkSameRealm(memory);
 		this.indexSignal = checkSameRealm(indexSignal);
 	}
 
-	public RtlVectorAssignmentTarget getContainerTarget() {
-		return containerTarget;
+	public RtlProceduralMemory getMemory() {
+		return memory;
 	}
 
 	public RtlVectorSignal getIndexSignal() {
 		return indexSignal;
+	}
+
+	@Override
+	public int getWidth() {
+		return memory.getMatrix().getColumnCount();
 	}
 
 	// ----------------------------------------------------------------------------------------------------------------
@@ -42,31 +47,9 @@ public final class RtlMatrixTargetIndexSelection extends RtlItem implements RtlB
 	// ----------------------------------------------------------------------------------------------------------------
 
 	@Override
-	public boolean getNextValue() {
-		return containerTarget.getNextValue().select(indexSignal.getValue().getAsUnsignedInt());
-	}
-
-	@Override
-	public void setNextValue(boolean nextValue) {
+	public void setNextValue(VectorValue nextValue) {
 		int index = indexSignal.getValue().getAsUnsignedInt();
-		VectorValue nextContainerValue = containerTarget.getNextValue();
-		VectorValue updatedValue;
-		if (index < nextContainerValue.getWidth()) {
-			if (index == 0) {
-				VectorValue upper = nextContainerValue.select(nextContainerValue.getWidth() - 1, 1);
-				updatedValue = upper.concat(nextValue);
-			} else if (index == nextContainerValue.getWidth() - 1) {
-				VectorValue lower = nextContainerValue.select(index - 1, 0);
-				updatedValue = lower.prepend(nextValue);
-			} else {
-				VectorValue upper = nextContainerValue.select(nextContainerValue.getWidth() - 1, index + 1);
-				VectorValue lower = nextContainerValue.select(index - 1, 0);
-				updatedValue = upper.concat(nextValue).concat(lower);
-			}
-		} else {
-			updatedValue = nextContainerValue;
-		}
-		containerTarget.setNextValue(updatedValue);
+		memory.requestUpdate(index, nextValue);
 	}
 
 	// ----------------------------------------------------------------------------------------------------------------
@@ -81,7 +64,7 @@ public final class RtlMatrixTargetIndexSelection extends RtlItem implements RtlB
 
 	@Override
 	public final void printVerilogAssignmentTarget(VerilogWriter out) {
-		containerTarget.printVerilogAssignmentTarget(out);
+		memory.printVerilogAssignmentTarget(out);
 		out.print('[');
 		out.print(indexSignal);
 		out.print(']');
@@ -89,7 +72,6 @@ public final class RtlMatrixTargetIndexSelection extends RtlItem implements RtlB
 
 	@Override
 	public void analyzeSignalUsage(SignalUsageConsumer consumer) {
-		containerTarget.analyzeSignalUsage(consumer);
 		consumer.consumeSignalUsage(indexSignal, VerilogExpressionNesting.SIGNALS_AND_CONSTANTS);
 	}
 

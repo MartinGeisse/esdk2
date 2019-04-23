@@ -39,7 +39,6 @@ public final class RtlProceduralVectorSignal extends RtlProceduralSignal impleme
 		return value;
 	}
 
-	@Override
 	public VectorValue getNextValue() {
 		return nextValue;
 	}

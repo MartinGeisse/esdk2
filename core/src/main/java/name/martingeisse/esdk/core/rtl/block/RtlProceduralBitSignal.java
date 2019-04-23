@@ -29,7 +29,6 @@ public final class RtlProceduralBitSignal extends RtlProceduralSignal implements
 		return value;
 	}
 
-	@Override
 	public boolean getNextValue() {
 		return nextValue;
 	}
