@@ -6,6 +6,7 @@ package name.martingeisse.esdk.core.rtl;
 
 import name.martingeisse.esdk.core.rtl.block.RtlClockedBlock;
 import name.martingeisse.esdk.core.rtl.pin.RtlPin;
+import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.EmptyVerilogContribution;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
@@ -21,6 +22,16 @@ public final class RtlClockNetwork extends RtlItem {
 
 	private final RtlBitSignal clockSignal;
 
+	/**
+	 * Simulation-only constructor.
+	 */
+	public RtlClockNetwork(RtlRealm realm) {
+		this(realm, new RtlBitConstant(realm, false));
+	}
+
+	/**
+	 * Simulation and synthesis constructor. The supplied input signal is used for synthesis only.
+	 */
 	public RtlClockNetwork(RtlRealm realm, RtlBitSignal clockSignal) {
 		super(realm);
 		this.clockSignal = checkSameRealm(clockSignal);
