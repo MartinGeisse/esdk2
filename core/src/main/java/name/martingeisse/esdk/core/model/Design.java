@@ -48,9 +48,12 @@ public class Design {
 	}
 
 	public void prepareSimulation() {
+		if (simulation != null) {
+			throw new IllegalStateException("simulation already prepared");
+		}
 		validateOrException(false);
 		materialize();
-		needSimulation();
+		simulation = new Simulation();
 		for (Item item : items) {
 			item.initializeSimulation();
 		}
@@ -69,6 +72,7 @@ public class Design {
 	}
 
 	public void continueSimulation() {
+		needSimulation();
 		simulation.run();
 	}
 
@@ -84,7 +88,7 @@ public class Design {
 
 	private void needSimulation() {
 		if (simulation == null) {
-			simulation = new Simulation();
+			throw new IllegalStateException("simulation not prepared");
 		}
 	}
 
