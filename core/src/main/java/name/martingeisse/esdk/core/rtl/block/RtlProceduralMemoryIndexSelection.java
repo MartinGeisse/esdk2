@@ -70,7 +70,7 @@ public final class RtlProceduralMemoryIndexSelection extends RtlItem implements 
 
 	@Override
 	public void printVerilogImplementationExpression(VerilogExpressionWriter out) {
-		out.print(memory, VerilogExpressionNesting.SIGNALS_AND_CONSTANTS);
+		out.print(memory);
 		out.print('[');
 		out.print(indexSignal, VerilogExpressionNesting.SIGNALS_AND_CONSTANTS);
 		out.print(']');

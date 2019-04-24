@@ -4,6 +4,7 @@
  */
 package name.martingeisse.esdk.core.rtl.synthesis.verilog;
 
+import name.martingeisse.esdk.core.rtl.block.RtlProceduralMemory;
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
 
 import java.io.PrintWriter;
@@ -81,6 +82,12 @@ public abstract class VerilogWriter extends PrintWriter {
 			public VerilogExpressionWriter print(RtlSignal signal, VerilogExpressionNesting nesting) {
 				VerilogWriter.this.print(signal);
 				return this;
+			}
+
+			@Override
+			public VerilogExpressionWriter print(RtlProceduralMemory memory) {
+				// TODO
+				throw new UnsupportedOperationException("not yet implemented");
 			}
 
 		});
