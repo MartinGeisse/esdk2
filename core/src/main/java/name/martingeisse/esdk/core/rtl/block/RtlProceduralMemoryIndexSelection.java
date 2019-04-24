@@ -40,6 +40,11 @@ public final class RtlProceduralMemoryIndexSelection extends RtlItem implements 
 		return indexSignal;
 	}
 
+	@Override
+	public int getWidth() {
+		return memory.getMatrix().getColumnCount();
+	}
+
 	// ----------------------------------------------------------------------------------------------------------------
 	// simulation
 	// ----------------------------------------------------------------------------------------------------------------

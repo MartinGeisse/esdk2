@@ -4,6 +4,7 @@
  */
 package name.martingeisse.esdk.core.rtl.synthesis.verilog;
 
+import name.martingeisse.esdk.core.rtl.block.RtlProceduralMemory;
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
 
 /**
@@ -23,4 +24,5 @@ public interface VerilogExpressionWriter {
 	VerilogExpressionWriter print(int i);
 	VerilogExpressionWriter print(char c);
 	VerilogExpressionWriter print(RtlSignal signal, VerilogExpressionNesting nesting);
+	VerilogExpressionWriter print(RtlProceduralMemory memory);
 }

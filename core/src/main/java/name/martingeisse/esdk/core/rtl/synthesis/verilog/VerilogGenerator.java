@@ -6,6 +6,7 @@ package name.martingeisse.esdk.core.rtl.synthesis.verilog;
 
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
+import name.martingeisse.esdk.core.rtl.block.RtlProceduralMemory;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
@@ -122,6 +123,10 @@ public class VerilogGenerator {
 						return this;
 					}
 
+					@Override
+					public VerilogExpressionWriter print(RtlProceduralMemory memory) {
+						return this;
+					}
 				};
 
 				@Override
