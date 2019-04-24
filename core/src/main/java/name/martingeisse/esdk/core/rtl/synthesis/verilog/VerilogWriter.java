@@ -36,6 +36,7 @@ public abstract class VerilogWriter extends PrintWriter {
 	}
 
 	protected abstract String getSignalName(RtlSignal signal);
+	protected abstract String getMemoryName(RtlProceduralMemory memory);
 
 	/**
 	 * Prints the expression to use for a signal at a point where the signal gets used.
@@ -50,6 +51,20 @@ public abstract class VerilogWriter extends PrintWriter {
 		} else {
 			print(name);
 		}
+	}
+
+	/**
+	 * Prints the expression to use for a procedural memory at a point where the memory gets used.
+	 */
+	public void print(RtlProceduralMemory memory) {
+		if (memory == null) {
+			throw new IllegalArgumentException("memory argument is null");
+		}
+		String name = getMemoryName(memory);
+		if (name == null) {
+			throw new RuntimeException("could not determine name for memory");
+		}
+		print(name);
 	}
 
 	/**
@@ -86,8 +101,8 @@ public abstract class VerilogWriter extends PrintWriter {
 
 			@Override
 			public VerilogExpressionWriter print(RtlProceduralMemory memory) {
-				// TODO
-				throw new UnsupportedOperationException("not yet implemented");
+				VerilogWriter.this.print(memory);
+				return this;
 			}
 
 		});

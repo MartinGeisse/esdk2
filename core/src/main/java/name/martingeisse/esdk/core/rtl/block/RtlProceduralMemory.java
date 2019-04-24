@@ -79,11 +79,6 @@ public final class RtlProceduralMemory extends RtlItem {
 		updates.clear();
 	}
 
-	public final void printVerilogAssignmentTarget(VerilogWriter out) {
-		// TODO
-		throw new UnsupportedOperationException("not yet implemented");
-	}
-
 	private static class Update {
 		private int index;
 		private VectorValue value;

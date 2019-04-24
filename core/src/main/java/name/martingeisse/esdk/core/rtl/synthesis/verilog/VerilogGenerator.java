@@ -30,14 +30,22 @@ public class VerilogGenerator {
 	private final Set<String> fixedNames = new HashSet<>();
 	private final Map<String, MutableInt> prefixNameCounters = new HashMap<>();
 	private final Map<RtlSignal, NamedSignal> namedSignals = new HashMap<>();
+	private final Map<RtlProceduralMemory, String> memoryNames = new HashMap<>();
 
 	public VerilogGenerator(Writer out, RtlRealm realm, String toplevelModuleName, AuxiliaryFileFactory auxiliaryFileFactory) {
 		this.out = new VerilogWriter(out) {
+
 			@Override
 			protected String getSignalName(RtlSignal signal) {
 				NamedSignal namedSignal = namedSignals.get(signal);
 				return (namedSignal == null) ? null : namedSignal.name;
 			}
+
+			@Override
+			protected String getMemoryName(RtlProceduralMemory memory) {
+				return memoryNames.computeIfAbsent(memory, ignored -> "memory" + memoryNames.size());
+			}
+
 		};
 		this.realm = realm;
 		this.toplevelModuleName = toplevelModuleName;
