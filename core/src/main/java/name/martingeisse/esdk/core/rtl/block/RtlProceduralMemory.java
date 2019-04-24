@@ -1,6 +1,8 @@
 package name.martingeisse.esdk.core.rtl.block;
 
 import name.martingeisse.esdk.core.rtl.RtlItem;
+import name.martingeisse.esdk.core.rtl.signal.RtlVectorConstant;
+import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.EmptyVerilogContribution;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
@@ -35,6 +37,19 @@ public final class RtlProceduralMemory extends RtlItem {
 
 	public Matrix getMatrix() {
 		return matrix;
+	}
+
+	// ----------------------------------------------------------------------------------------------------------------
+	// factory methods
+	// ----------------------------------------------------------------------------------------------------------------
+
+	public RtlVectorSignal select(RtlVectorSignal index) {
+		return new RtlProceduralMemoryIndexSelection(getRtlItem().getRealm(), this, index);
+	}
+
+	public RtlVectorSignal select(int index) {
+		int indexWidth = VectorValue.getMinimumWidthForUnsigned(index);
+		return select(new RtlVectorConstant(getRealm(), VectorValue.ofUnsigned(indexWidth, index)));
 	}
 
 	// ----------------------------------------------------------------------------------------------------------------

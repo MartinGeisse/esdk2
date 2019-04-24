@@ -35,6 +35,21 @@ public abstract class VectorValue {
 		return new LongVectorValue(width, value);
 	}
 
+	/**
+	 * Returns the minimum width to represent the specified value -- which must be non-negative -- as a vector.
+	 */
+	public static int getMinimumWidthForUnsigned(int value) {
+		if (value < 0) {
+			throw new IllegalArgumentException("value cannot be negative");
+		}
+		int width = 0;
+		while (value > 0) {
+			value = (value >> 1);
+			width++;
+		}
+		return width;
+	}
+
 	VectorValue(int width) {
 		if (width < 0) {
 			throw new IllegalArgumentException("width cannot be negative");
