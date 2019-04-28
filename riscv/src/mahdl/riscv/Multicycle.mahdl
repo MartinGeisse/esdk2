@@ -1,0 +1,54 @@
+module riscv.Multicycle;
+
+interface {
+
+	// system signals
+	in clock clk;
+
+	// instruction fetching interface
+	out vector[32] instructionAddress;
+	out bit instructionReadEnable;
+	in vector[32] instruction;
+	in bit instructionReadAcknowledge;
+
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+// definitions
+// --------------------------------------------------------------------------------------------------------------------
+
+// state machine
+constant integer STATE_FETCH = 0;
+constant integer STATE_DECODE = 1;
+
+// CPU state
+vector[4] state = STATE_FETCH;
+vector[32] pc = 0;
+
+// --------------------------------------------------------------------------------------------------------------------
+// derived signals
+// --------------------------------------------------------------------------------------------------------------------
+
+// instruction fetching
+do (*) {
+	instructionReadEnable = (state == STATE_FETCH);
+	instructionAddress = pc;
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+// state machine
+// --------------------------------------------------------------------------------------------------------------------
+
+do (clk) {
+	switch (state) {
+
+	case STATE_FETCH:
+		if (instructionReadAcknowledge) {
+			state = STATE_DECODE;
+		}
+
+	case STATE_DECODE:
+		state = STATE_FETCH; // TODO
+
+	}
+}
