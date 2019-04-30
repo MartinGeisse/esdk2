@@ -9,16 +9,3 @@ interface {
 register vector[3] counter = 0;
 do(clk) counter = counter + 1;
 do(*) output = counter;
-
-
-signal vector[8] x;
-signal vector[8] y;
-do (*) {
-    x = 5;
-    if (selector) {
-        x = 5;
-    } else {
-        x[1] = 1;
-        y = 0;
-    }
-}
