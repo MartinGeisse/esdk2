@@ -8,7 +8,7 @@ interface {
 	// instruction fetching interface
 	out vector[32] instructionAddress;
 	out bit instructionReadEnable;
-	in vector[32] instruction;
+	in vector[32] instructionPort;
 	in bit instructionReadAcknowledge;
 
 }
@@ -19,11 +19,26 @@ interface {
 
 // state machine
 constant integer STATE_FETCH = 0;
-constant integer STATE_DECODE = 1;
+constant integer STATE_DECODE_AND_READ1 = 1;
+constant integer STATE_DECODE_AND_READ2 = 2;
+constant integer STATE_EXEC_OP = 3;
+constant integer STATE_EXEC_BRANCH = 4;
+constant integer STATE_EXEC_LUI = 5;
+constant integer STATE_EXEC_AUIPC = 6;
+constant integer STATE_EXEC_JAL = 7;
+constant integer STATE_EXEC_JALR = 8;
+constant integer STATE_MEM_COMPUTE_ADDRESS = 9;
+constant integer STATE_MEM_ACCESS = 10;
+constant integer STATE_MEM_EXTEND = 11;
 
 // CPU state
 register vector[4] state = STATE_FETCH;
 register vector[32] pc = 0;
+register matrix[32][32] registers;
+register vector[32] instruction;
+register vector[32] oldPc = 0;
+register vector[32] sourceRegister1;
+register vector[32] sourceRegister2;
 
 // --------------------------------------------------------------------------------------------------------------------
 // derived signals
@@ -35,6 +50,13 @@ do (*) {
 	instructionAddress = pc;
 }
 
+// decoding
+signal vector[5] opcode = instruction[6:2];
+signal vector[5] sourceRegisterIndex1 = instruction[19:15];
+signal vector[5] sourceRegisterIndex2 = instruction[24:20];
+signal vector[5] destinationRegisterIndex = instruction[11:7];
+
+
 // --------------------------------------------------------------------------------------------------------------------
 // state machine
 // --------------------------------------------------------------------------------------------------------------------
@@ -44,11 +66,87 @@ do (clk) {
 
 	case STATE_FETCH:
 		if (instructionReadAcknowledge) {
-			state = STATE_DECODE;
+			state = STATE_DECODE_AND_READ1;
+			instruction = instructionPort;
 		}
 
-	case STATE_DECODE:
-		state = STATE_FETCH; // TODO
+	case STATE_DECODE_AND_READ1:
+        oldPc = pc;
+        pc = pc + 4;
+        sourceRegister1 = registers[sourceRegisterIndex1];
+		switch (opcode) {
+
+			case 0: // LOAD
+                state = STATE_MEM_COMPUTE_ADDRESS;
+
+			case 4: // OP-IMM
+                state = STATE_EXEC_OP;
+
+			case 5: // AUIPC
+                state = STATE_EXEC_AUIPC;
+
+			case 8: // STORE
+                state = STATE_MEM_COMPUTE_ADDRESS;
+
+			case 12: // OP
+                state = STATE_DECODE_AND_READ2;
+
+			case 13: // LUI
+                state = STATE_EXEC_LUI;
+
+			case 24: // BRANCH
+                state = STATE_DECODE_AND_READ2;
+
+			case 25: // JALR
+                state = STATE_EXEC_JALR;
+
+			case 27: // JAL
+                state = STATE_EXEC_JAL;
+
+			default: // includes MISC-MEM (=NOP) and SYSTEM
+				state = STATE_FETCH;
+
+		}
+
+    case STATE_DECODE_AND_READ2:
+		sourceRegister2 = registers[sourceRegisterIndex2];
+		state = (opcode[2] ? STATE_EXEC_OP : STATE_EXEC_BRANCH);
+
+	case STATE_EXEC_OP:
+		// switch(instruction[14:12]) {
+		//
+		// }
+		state = STATE_FETCH;
+
+	case STATE_EXEC_BRANCH:
+		state = STATE_FETCH;
+
+	case STATE_EXEC_LUI:
+		registers[destinationRegisterIndex] = instruction[31:12] _ 12d0;
+		state = STATE_FETCH;
+
+	case STATE_EXEC_AUIPC:
+		registers[destinationRegisterIndex] = oldPc + (instruction[31:12] _ 12d0);
+		state = STATE_FETCH;
+
+	case STATE_EXEC_JAL:
+		registers[destinationRegisterIndex] = pc;
+		pc = oldPc + (repeat(12, instruction[31]) _ instruction[19:12] _ instruction[20] _ instruction[30:21] _ 1b0);
+		state = STATE_FETCH;
+
+	case STATE_EXEC_JALR:
+		registers[destinationRegisterIndex] = pc;
+		pc = (sourceRegister1 + (repeat(21, instruction[31]) _ instruction[30:20]))[31:1] _ 1b0;
+		state = STATE_FETCH;
+
+	case STATE_MEM_COMPUTE_ADDRESS:
+		state = STATE_MEM_ACCESS;
+
+	case STATE_MEM_ACCESS:
+		state = instruction[3] ? STATE_FETCH : STATE_MEM_EXTEND;
+
+	case STATE_MEM_EXTEND:
+		state = STATE_FETCH;
 
 	}
 }
