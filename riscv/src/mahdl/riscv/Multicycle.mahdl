@@ -37,8 +37,8 @@ register vector[32] pc = 0;
 register matrix[32][32] registers;
 register vector[32] instruction;
 register vector[32] oldPc = 0;
-register vector[32] sourceRegister1;
-register vector[32] sourceRegister2;
+register vector[32] sourceValue1;
+register vector[32] sourceValue2;
 
 // --------------------------------------------------------------------------------------------------------------------
 // derived signals
@@ -73,14 +73,14 @@ do (clk) {
 		case STATE_DECODE_AND_READ1:
 			oldPc = pc;
 			pc = pc + 4;
-			sourceRegister1 = registers[sourceRegisterIndex1];
+			sourceValue1 = registers[sourceRegisterIndex1];
 			switch (opcode) {
 
 				case 0: // LOAD
 					state = STATE_MEM_COMPUTE_ADDRESS;
 
 				case 4: // OP-IMM
-					state = STATE_EXEC_OP;
+					state = STATE_DECODE_AND_READ2;
 
 				case 5: // AUIPC
 					state = STATE_EXEC_AUIPC;
@@ -109,13 +109,16 @@ do (clk) {
 			}
 
 		case STATE_DECODE_AND_READ2:
-			sourceRegister2 = registers[sourceRegisterIndex2];
-			state = (opcode[2] ? STATE_EXEC_OP : STATE_EXEC_BRANCH);
+			sourceValue2 = (opcode[3] ? registers[sourceRegisterIndex2] : (repeat(20, instruction[31]) _ instruction[31:20]));
+			state = (opcode[4] ? STATE_EXEC_BRANCH : STATE_EXEC_OP);
 
 		case STATE_EXEC_OP:
-			// switch(instruction[14:12]) {
-			//
-			// }
+			switch(instruction[14:12]) {
+
+				case 0: // ADD
+					registers[destinationRegisterIndex] = sourceValue1 + sourceValue2;
+				
+			}
 			state = STATE_FETCH;
 
 		case STATE_EXEC_BRANCH:
@@ -136,7 +139,7 @@ do (clk) {
 
 		case STATE_EXEC_JALR:
 			registers[destinationRegisterIndex] = pc;
-			pc = (sourceRegister1 + (repeat(21, instruction[31]) _ instruction[30:20]))[31:1] _ 1b0;
+			pc = (sourceValue1 + (repeat(20, instruction[31]) _ instruction[31:20]))[31:1] _ 1b0;
 			state = STATE_FETCH;
 
 		case STATE_MEM_COMPUTE_ADDRESS:
