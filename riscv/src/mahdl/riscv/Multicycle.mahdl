@@ -64,89 +64,89 @@ signal vector[5] destinationRegisterIndex = instruction[11:7];
 do (clk) {
 	switch (state) {
 
-	case STATE_FETCH:
-		if (instructionReadAcknowledge) {
-			state = STATE_DECODE_AND_READ1;
-			instruction = instructionPort;
-		}
+		case STATE_FETCH:
+			if (instructionReadAcknowledge) {
+				state = STATE_DECODE_AND_READ1;
+				instruction = instructionPort;
+			}
 
-	case STATE_DECODE_AND_READ1:
-        oldPc = pc;
-        pc = pc + 4;
-        sourceRegister1 = registers[sourceRegisterIndex1];
-		switch (opcode) {
+		case STATE_DECODE_AND_READ1:
+			oldPc = pc;
+			pc = pc + 4;
+			sourceRegister1 = registers[sourceRegisterIndex1];
+			switch (opcode) {
 
-			case 0: // LOAD
-                state = STATE_MEM_COMPUTE_ADDRESS;
+				case 0: // LOAD
+					state = STATE_MEM_COMPUTE_ADDRESS;
 
-			case 4: // OP-IMM
-                state = STATE_EXEC_OP;
+				case 4: // OP-IMM
+					state = STATE_EXEC_OP;
 
-			case 5: // AUIPC
-                state = STATE_EXEC_AUIPC;
+				case 5: // AUIPC
+					state = STATE_EXEC_AUIPC;
 
-			case 8: // STORE
-                state = STATE_MEM_COMPUTE_ADDRESS;
+				case 8: // STORE
+					state = STATE_MEM_COMPUTE_ADDRESS;
 
-			case 12: // OP
-                state = STATE_DECODE_AND_READ2;
+				case 12: // OP
+					state = STATE_DECODE_AND_READ2;
 
-			case 13: // LUI
-                state = STATE_EXEC_LUI;
+				case 13: // LUI
+					state = STATE_EXEC_LUI;
 
-			case 24: // BRANCH
-                state = STATE_DECODE_AND_READ2;
+				case 24: // BRANCH
+					state = STATE_DECODE_AND_READ2;
 
-			case 25: // JALR
-                state = STATE_EXEC_JALR;
+				case 25: // JALR
+					state = STATE_EXEC_JALR;
 
-			case 27: // JAL
-                state = STATE_EXEC_JAL;
+				case 27: // JAL
+					state = STATE_EXEC_JAL;
 
-			default: // includes MISC-MEM (=NOP) and SYSTEM
-				state = STATE_FETCH;
+				default: // includes MISC-MEM (=NOP) and SYSTEM
+					state = STATE_FETCH;
 
-		}
+			}
 
-    case STATE_DECODE_AND_READ2:
-		sourceRegister2 = registers[sourceRegisterIndex2];
-		state = (opcode[2] ? STATE_EXEC_OP : STATE_EXEC_BRANCH);
+		case STATE_DECODE_AND_READ2:
+			sourceRegister2 = registers[sourceRegisterIndex2];
+			state = (opcode[2] ? STATE_EXEC_OP : STATE_EXEC_BRANCH);
 
-	case STATE_EXEC_OP:
-		// switch(instruction[14:12]) {
-		//
-		// }
-		state = STATE_FETCH;
+		case STATE_EXEC_OP:
+			// switch(instruction[14:12]) {
+			//
+			// }
+			state = STATE_FETCH;
 
-	case STATE_EXEC_BRANCH:
-		state = STATE_FETCH;
+		case STATE_EXEC_BRANCH:
+			state = STATE_FETCH;
 
-	case STATE_EXEC_LUI:
-		registers[destinationRegisterIndex] = instruction[31:12] _ 12d0;
-		state = STATE_FETCH;
+		case STATE_EXEC_LUI:
+			registers[destinationRegisterIndex] = instruction[31:12] _ 12d0;
+			state = STATE_FETCH;
 
-	case STATE_EXEC_AUIPC:
-		registers[destinationRegisterIndex] = oldPc + (instruction[31:12] _ 12d0);
-		state = STATE_FETCH;
+		case STATE_EXEC_AUIPC:
+			registers[destinationRegisterIndex] = oldPc + (instruction[31:12] _ 12d0);
+			state = STATE_FETCH;
 
-	case STATE_EXEC_JAL:
-		registers[destinationRegisterIndex] = pc;
-		pc = oldPc + (repeat(12, instruction[31]) _ instruction[19:12] _ instruction[20] _ instruction[30:21] _ 1b0);
-		state = STATE_FETCH;
+		case STATE_EXEC_JAL:
+			registers[destinationRegisterIndex] = pc;
+			pc = oldPc + (repeat(12, instruction[31]) _ instruction[19:12] _ instruction[20] _ instruction[30:21] _ 1b0);
+			state = STATE_FETCH;
 
-	case STATE_EXEC_JALR:
-		registers[destinationRegisterIndex] = pc;
-		pc = (sourceRegister1 + (repeat(21, instruction[31]) _ instruction[30:20]))[31:1] _ 1b0;
-		state = STATE_FETCH;
+		case STATE_EXEC_JALR:
+			registers[destinationRegisterIndex] = pc;
+			pc = (sourceRegister1 + (repeat(21, instruction[31]) _ instruction[30:20]))[31:1] _ 1b0;
+			state = STATE_FETCH;
 
-	case STATE_MEM_COMPUTE_ADDRESS:
-		state = STATE_MEM_ACCESS;
+		case STATE_MEM_COMPUTE_ADDRESS:
+			state = STATE_MEM_ACCESS;
 
-	case STATE_MEM_ACCESS:
-		state = instruction[3] ? STATE_FETCH : STATE_MEM_EXTEND;
+		case STATE_MEM_ACCESS:
+			state = instruction[3] ? STATE_FETCH : STATE_MEM_EXTEND;
 
-	case STATE_MEM_EXTEND:
-		state = STATE_FETCH;
+		case STATE_MEM_EXTEND:
+			state = STATE_FETCH;
 
 	}
 }
