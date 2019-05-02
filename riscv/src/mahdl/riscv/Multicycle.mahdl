@@ -58,62 +58,33 @@ signal vector[5] destinationRegisterIndex = instruction[11:7];
 
 // execution helpers
 signal bit isLTS = (~sourceValue1[31] _ sourceValue1[30:0]) < (~sourceValue2[31] _ sourceValue2[30:0]);
+signal bit isLTU = (sourceValue1 < sourceValue2);
 
 // --------------------------------------------------------------------------------------------------------------------
 // logic taken out of the state machine to make it clearer
 // --------------------------------------------------------------------------------------------------------------------
 
 signal vector[32] execOpResult = switch(instruction[14:12]) {
-
-    case 0: // ADD
-		sourceValue1 + sourceValue2
-
-    case 1: // SLL
-		sourceValue1 << sourceValue2[4:0]
-
-    case 2: // SLT
-		isLTS ? 1 : 0
-
-    case 3: // SLTU
-		(sourceValue1 < sourceValue2 ? 1 : 0)
-
-    case 4: // XOR
-		sourceValue1 ^ sourceValue2
-
-    case 5: // SRL/SRA
-		instruction[30] ? ((repeat(32, sourceValue1[31]) _ sourceValue1) >> sourceValue2[4:0])[31:0] :
-            (sourceValue1 >> sourceValue2[4:0])
-
-    case 6: // OR
-		sourceValue1 | sourceValue2
-
-    case 7: // AND
-		sourceValue1 & sourceValue2
-
+    case 0: sourceValue1 + sourceValue2 // ADD
+    case 1: sourceValue1 << sourceValue2[4:0] // SLL
+    case 2: isLTS ? 1 : 0 // SLT
+    case 3: isLTU ? 1 : 0 // SLTU
+    case 4: sourceValue1 ^ sourceValue2 // XOR
+    case 5: instruction[30] ?
+			((repeat(32, sourceValue1[31]) _ sourceValue1) >> sourceValue2[4:0])[31:0] // SRA
+            : (sourceValue1 >> sourceValue2[4:0]) // SRL
+    case 6: sourceValue1 | sourceValue2 // OR
+    case 7: sourceValue1 & sourceValue2 // AND
 };
 
 signal bit branchCondition = switch(instruction[14:12]) {
-
-    case 0: // BEQ
-        sourceValue1 + sourceValue2
-
-    case 1: // BNE
-        sourceValue1 << sourceValue2[4:0]
-
-    case 4: // BLT
-        sourceValue1 ^ sourceValue2
-
-    case 5: // BGE
-        0
-
-    case 6: // BLTU
-        sourceValue1 | sourceValue2
-
-    case 7: // BGEU
-        sourceValue1 & sourceValue2
-
-    default:
-        0
+    case 0: sourceValue1 == sourceValue2 // BEQ
+    case 1: sourceValue1 != sourceValue2 // BNE
+    case 4: isLTS // BLT
+    case 5: ~isLTS // BGE
+    case 6: isLTU // BLTU
+    case 7: ~isLTU // BGEU
+    default: 0
 };
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -176,30 +147,8 @@ do (clk) {
 			state = STATE_FETCH;
 
 		case STATE_EXEC_BRANCH:
-			switch(instruction[14:12]) {
-
-				case 0: // BEQ
-					registers[destinationRegisterIndex] = sourceValue1 + sourceValue2;
-
-				case 1: // BNE
-					registers[destinationRegisterIndex] = sourceValue1 << sourceValue2[4:0];
-
-				case 4: // BLT
-					registers[destinationRegisterIndex] = sourceValue1 ^ sourceValue2;
-
-				case 5: // BGE
-					if (instruction[30]) {
-						registers[destinationRegisterIndex] = ((repeat(32, sourceValue1[31]) _ sourceValue1) >> sourceValue2[4:0])[31:0];
-					} else {
-						registers[destinationRegisterIndex] = sourceValue1 >> sourceValue2[4:0];
-					}
-
-				case 6: // BLTU
-					registers[destinationRegisterIndex] = sourceValue1 | sourceValue2;
-
-				case 7: // BGEU
-					registers[destinationRegisterIndex] = sourceValue1 & sourceValue2;
-
+			if (branchCondition) {
+				pc = oldPc + (repeat(20, instruction[31]) _ instruction[7] _ instruction[30:25] _ instruction[11:8] _ 1b0);
 			}
 			state = STATE_FETCH;
 
@@ -220,6 +169,8 @@ do (clk) {
 			registers[destinationRegisterIndex] = pc;
 			pc = (sourceValue1 + (repeat(20, instruction[31]) _ instruction[31:20]))[31:1] _ 1b0;
 			state = STATE_FETCH;
+
+		// --- TODO ---
 
 		case STATE_MEM_COMPUTE_ADDRESS:
 			state = STATE_MEM_ACCESS;
