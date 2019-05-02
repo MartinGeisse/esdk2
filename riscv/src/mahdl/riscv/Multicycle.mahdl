@@ -8,8 +8,17 @@ interface {
 	// instruction fetching interface
 	out vector[32] instructionAddress;
 	out bit instructionReadEnable;
-	in vector[32] instructionPort;
+	in vector[32] instruction;
 	in bit instructionReadAcknowledge;
+
+	// memory access interface
+	out bit memoryEnable;
+	out bit memoryWrite;
+	out vector[32] memoryWordAddress;
+	in vector[32] memoryReadData;
+	out vector[32] memoryWriteData;
+	out vector[4] memoryWriteMask;
+	in bit memoryAcknowledge;
 
 }
 
@@ -35,10 +44,12 @@ constant integer STATE_MEM_EXTEND = 11;
 register vector[4] state = STATE_FETCH;
 register vector[32] pc = 0;
 register matrix[32][32] registers;
-register vector[32] instruction;
+register vector[32] instructionRegister; // TODO consider prefixing module ports with (interface.)portName to avoid these ugly local names (but sucks for clk)
 register vector[32] oldPc = 0;
 register vector[32] sourceValue1;
 register vector[32] sourceValue2;
+register vector[32] memoryAddressRegister;
+register vector[32] memoryReadDataRegister;
 
 // --------------------------------------------------------------------------------------------------------------------
 // derived signals
@@ -51,33 +62,42 @@ do (*) {
 }
 
 // decoding
-signal vector[5] opcode = instruction[6:2];
-signal vector[5] sourceRegisterIndex1 = instruction[19:15];
-signal vector[5] sourceRegisterIndex2 = instruction[24:20];
-signal vector[5] destinationRegisterIndex = instruction[11:7];
+signal vector[5] opcode = instructionRegister[6:2];
+signal vector[5] sourceRegisterIndex1 = instructionRegister[19:15];
+signal vector[5] sourceRegisterIndex2 = instructionRegister[24:20];
+signal vector[5] destinationRegisterIndex = instructionRegister[11:7];
 
 // execution helpers
 signal bit isLTS = (~sourceValue1[31] _ sourceValue1[30:0]) < (~sourceValue2[31] _ sourceValue2[30:0]);
 signal bit isLTU = (sourceValue1 < sourceValue2);
 
+// memory interface
+do (*) {
+	memoryEnable = (state == STATE_MEM_ACCESS);
+	memoryWrite = instructionRegister[3];
+	memoryWordAddress = 2d0 _ memoryAddressRegister[31:2];
+	memoryWriteData = sourceValue2;
+	memoryWriteMask = instruction[13] ? 4b1111 : instruction[12] ? (memoryAddressRegister[1] ? 4b1100 : 4b0011) : 0; // TODO
+}
+
 // --------------------------------------------------------------------------------------------------------------------
 // logic taken out of the state machine to make it clearer
 // --------------------------------------------------------------------------------------------------------------------
 
-signal vector[32] execOpResult = switch(instruction[14:12]) {
+signal vector[32] execOpResult = switch(instructionRegister[14:12]) {
     case 0: sourceValue1 + sourceValue2 // ADD
     case 1: sourceValue1 << sourceValue2[4:0] // SLL
     case 2: isLTS ? 1 : 0 // SLT
     case 3: isLTU ? 1 : 0 // SLTU
     case 4: sourceValue1 ^ sourceValue2 // XOR
-    case 5: instruction[30] ?
+    case 5: instructionRegister[30] ?
 			((repeat(32, sourceValue1[31]) _ sourceValue1) >> sourceValue2[4:0])[31:0] // SRA
             : (sourceValue1 >> sourceValue2[4:0]) // SRL
     case 6: sourceValue1 | sourceValue2 // OR
     case 7: sourceValue1 & sourceValue2 // AND
 };
 
-signal bit branchCondition = switch(instruction[14:12]) {
+signal bit branchCondition = switch(instructionRegister[14:12]) {
     case 0: sourceValue1 == sourceValue2 // BEQ
     case 1: sourceValue1 != sourceValue2 // BNE
     case 4: isLTS // BLT
@@ -97,20 +117,21 @@ do (clk) {
 		case STATE_FETCH:
 			if (instructionReadAcknowledge) {
 				state = STATE_DECODE_AND_READ1;
-				instruction = instructionPort;
+				instructionRegister = instruction;
 			}
 
 		case STATE_DECODE_AND_READ1:
 			oldPc = pc;
 			pc = pc + 4;
 			sourceValue1 = registers[sourceRegisterIndex1];
+			sourceValue2 = repeat(20, instructionRegister[31]) _ instructionRegister[31:20];
 			switch (opcode) {
 
 				case 0: // LOAD
 					state = STATE_MEM_COMPUTE_ADDRESS;
 
 				case 4: // OP-IMM
-					state = STATE_DECODE_AND_READ2;
+					state = STATE_EXEC_OP;
 
 				case 5: // AUIPC
 					state = STATE_EXEC_AUIPC;
@@ -139,7 +160,7 @@ do (clk) {
 			}
 
 		case STATE_DECODE_AND_READ2:
-			sourceValue2 = (opcode[3] ? registers[sourceRegisterIndex2] : (repeat(20, instruction[31]) _ instruction[31:20]));
+			sourceValue2 = registers[sourceRegisterIndex2];
 			state = (opcode[4] ? STATE_EXEC_BRANCH : STATE_EXEC_OP);
 
 		case STATE_EXEC_OP:
@@ -148,35 +169,42 @@ do (clk) {
 
 		case STATE_EXEC_BRANCH:
 			if (branchCondition) {
-				pc = oldPc + (repeat(20, instruction[31]) _ instruction[7] _ instruction[30:25] _ instruction[11:8] _ 1b0);
+				pc = oldPc + (repeat(20, instructionRegister[31]) _ instructionRegister[7] _ instructionRegister[30:25] _ instructionRegister[11:8] _ 1b0);
 			}
 			state = STATE_FETCH;
 
 		case STATE_EXEC_LUI:
-			registers[destinationRegisterIndex] = instruction[31:12] _ 12d0;
+			registers[destinationRegisterIndex] = instructionRegister[31:12] _ 12d0;
 			state = STATE_FETCH;
 
 		case STATE_EXEC_AUIPC:
-			registers[destinationRegisterIndex] = oldPc + (instruction[31:12] _ 12d0);
+			registers[destinationRegisterIndex] = oldPc + (instructionRegister[31:12] _ 12d0);
 			state = STATE_FETCH;
 
 		case STATE_EXEC_JAL:
 			registers[destinationRegisterIndex] = pc;
-			pc = oldPc + (repeat(12, instruction[31]) _ instruction[19:12] _ instruction[20] _ instruction[30:21] _ 1b0);
+			pc = oldPc + (repeat(12, instructionRegister[31]) _ instructionRegister[19:12] _ instructionRegister[20] _ instructionRegister[30:21] _ 1b0);
 			state = STATE_FETCH;
 
 		case STATE_EXEC_JALR:
 			registers[destinationRegisterIndex] = pc;
-			pc = (sourceValue1 + (repeat(20, instruction[31]) _ instruction[31:20]))[31:1] _ 1b0;
+			pc = (sourceValue1 + (repeat(20, instructionRegister[31]) _ instructionRegister[31:20]))[31:1] _ 1b0;
 			state = STATE_FETCH;
 
 		// --- TODO ---
 
+
 		case STATE_MEM_COMPUTE_ADDRESS:
+			// TODO the STORE instruction has a different immediate encoding!
+			memoryAddressRegister = sourceValue1 + sourceValue2;
+			sourceValue2 = registers[sourceRegisterIndex2];
 			state = STATE_MEM_ACCESS;
 
 		case STATE_MEM_ACCESS:
-			state = instruction[3] ? STATE_FETCH : STATE_MEM_EXTEND;
+			memoryReadDataRegister = memoryReadData;
+			if (memoryAcknowledge) {
+				state = instructionRegister[3] ? STATE_FETCH : STATE_MEM_EXTEND;
+			}
 
 		case STATE_MEM_EXTEND:
 			state = STATE_FETCH;
