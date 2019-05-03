@@ -18,6 +18,14 @@ import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter
 public interface RtlSignal extends RtlItemOwned {
 
 	// ----------------------------------------------------------------------------------------------------------------
+	// factory methods
+	// ----------------------------------------------------------------------------------------------------------------
+
+	default RtlConcatenation concat(RtlSignal other) {
+		return new RtlConcatenation(getRtlItem().getRealm(), this, other);
+	}
+
+	// ----------------------------------------------------------------------------------------------------------------
 	// Verilog generation
 	// ----------------------------------------------------------------------------------------------------------------
 
