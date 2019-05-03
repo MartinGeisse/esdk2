@@ -1,4 +1,4 @@
-package name.martingeisse.esdk.riscv.io;
+package name.martingeisse.esdk.riscv.simulator.io;
 
 /**
  * Used as a Null Object, but the CPU cannot work without a real implementation.

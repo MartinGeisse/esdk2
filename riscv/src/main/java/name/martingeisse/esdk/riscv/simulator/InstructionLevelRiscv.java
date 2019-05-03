@@ -1,4 +1,4 @@
-package name.martingeisse.esdk.riscv;
+package name.martingeisse.esdk.riscv.simulator;
 
 import name.martingeisse.esdk.riscv.extended.ExceptionExtendedInstructionUnit;
 import name.martingeisse.esdk.riscv.extended.ExtendedInstructionUnit;

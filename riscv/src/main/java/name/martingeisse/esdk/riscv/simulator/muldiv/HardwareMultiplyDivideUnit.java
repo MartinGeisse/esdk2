@@ -1,6 +1,6 @@
-package name.martingeisse.esdk.riscv.muldiv;
+package name.martingeisse.esdk.riscv.simulator.muldiv;
 
-import name.martingeisse.esdk.riscv.InstructionLevelRiscv;
+import name.martingeisse.esdk.riscv.simulator.InstructionLevelRiscv;
 
 /**
  *

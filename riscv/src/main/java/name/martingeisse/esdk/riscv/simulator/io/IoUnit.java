@@ -1,4 +1,4 @@
-package name.martingeisse.esdk.riscv.io;
+package name.martingeisse.esdk.riscv.simulator.io;
 
 /**
  *

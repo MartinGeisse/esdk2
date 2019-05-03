@@ -1,4 +1,4 @@
-package name.martingeisse.esdk.riscv.floating;
+package name.martingeisse.esdk.riscv.simulator.floating;
 
 /**
  *

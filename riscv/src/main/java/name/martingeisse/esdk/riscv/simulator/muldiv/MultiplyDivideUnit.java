@@ -1,4 +1,4 @@
-package name.martingeisse.esdk.riscv.muldiv;
+package name.martingeisse.esdk.riscv.simulator.muldiv;
 
 /**
  *
