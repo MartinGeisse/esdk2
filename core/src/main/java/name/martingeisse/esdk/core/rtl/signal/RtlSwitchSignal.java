@@ -1,10 +1,10 @@
 package name.martingeisse.esdk.core.rtl.signal;
 
 import com.google.common.collect.ImmutableList;
+import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
-import name.martingeisse.esdk.core.rtl.block.statement.RtlStatement;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.SignalUsageConsumer;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 
 import java.util.ArrayList;
@@ -13,11 +13,11 @@ import java.util.List;
 /**
  *
  */
-public final class RtlSwitchSignal extends RtlStatement {
+public abstract class RtlSwitchSignal<B extends RtlSignal> extends RtlItem implements RtlSignal {
 
 	private final RtlVectorSignal selector;
-	private final List<Case> cases;
-	private RtlVectorSignal defaultSignal;
+	private final List<Case<B>> cases;
+	private B defaultSignal;
 
 	public RtlSwitchSignal(RtlRealm realm, RtlVectorSignal selector) {
 		super(realm);
@@ -26,51 +26,55 @@ public final class RtlSwitchSignal extends RtlStatement {
 		this.defaultSignal = null;
 	}
 
-	public RtlVectorSignal getSelector() {
+	public final RtlVectorSignal getSelector() {
 		return selector;
 	}
 
-	public ImmutableList<Case> getCases() {
+	public final ImmutableList<Case<B>> getCases() {
 		return ImmutableList.copyOf(cases);
 	}
 
-	public RtlVectorSignal getDefaultSignal() {
+	public final B getDefaultSignal() {
 		return defaultSignal;
 	}
 
-	public void setDefaultSignal(RtlVectorSignal defaultSignal) {
+	public final void setDefaultSignal(B defaultSignal) {
+		validateOnAdd(defaultSignal);
 		this.defaultSignal = defaultSignal;
 	}
 
-	public void addCase(VectorValue selectorValue, RtlVectorSignal branch) {
+	public final void addCase(VectorValue selectorValue, B branch) {
 		addCase(ImmutableList.of(selectorValue), branch);
 	}
 
-	public void addCase(VectorValue selectorValue1, VectorValue selectorValue2, RtlVectorSignal branch) {
+	public final void addCase(VectorValue selectorValue1, VectorValue selectorValue2, B branch) {
 		addCase(ImmutableList.of(selectorValue1, selectorValue2), branch);
 	}
 
-	public void addCase(VectorValue selectorValue1, VectorValue selectorValue2,
-						VectorValue selectorValue3, RtlVectorSignal branch) {
+	public final void addCase(VectorValue selectorValue1, VectorValue selectorValue2,
+						VectorValue selectorValue3, B branch) {
 		addCase(ImmutableList.of(selectorValue1, selectorValue2, selectorValue3), branch);
 	}
 
-	public void addCase(ImmutableList<VectorValue> selectorValues, RtlVectorSignal branch) {
+	public final void addCase(ImmutableList<VectorValue> selectorValues, B branch) {
 		for (VectorValue selectorValue : selectorValues) {
 			if (selectorValue.getWidth() != selector.getWidth()) {
 				throw new IllegalArgumentException("selector value has width " + selectorValue.getWidth() +
 					", expected " + selector.getWidth());
 			}
 		}
-		cases.add(new Case(getRealm(), selectorValues, branch));
+		validateOnAdd(branch);
+		cases.add(new Case<>(getRealm(), selectorValues, branch));
 	}
 
-	public static final class Case {
+	protected abstract void validateOnAdd(B branch);
+
+	public static final class Case<B extends RtlSignal> {
 
 		private final ImmutableList<VectorValue> selectorValues;
-		private final RtlVectorSignal branch;
+		private final B branch;
 
-		public Case(RtlRealm realm, ImmutableList<VectorValue> selectorValues, RtlVectorSignal branch) {
+		public Case(RtlRealm realm, ImmutableList<VectorValue> selectorValues, B branch) {
 			this.selectorValues = selectorValues;
 			this.branch = branch;
 		}
@@ -79,23 +83,18 @@ public final class RtlSwitchSignal extends RtlStatement {
 			return selectorValues;
 		}
 
-		public RtlVectorSignal getBranch() {
+		public B getBranch() {
 			return branch;
 		}
 	}
 
 	@Override
-	public void execute() {
+	public VerilogContribution getVerilogContribution() {
 		throw new UnsupportedOperationException("not yet implemented");
 	}
 
 	@Override
-	public void analyzeSignalUsage(SignalUsageConsumer consumer) {
-		throw new UnsupportedOperationException("not yet implemented");
-	}
-
-	@Override
-	public void printVerilogStatements(VerilogWriter out) {
+	public void printVerilogImplementationExpression(VerilogExpressionWriter out) {
 		throw new UnsupportedOperationException("not yet implemented");
 	}
 
