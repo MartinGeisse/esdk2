@@ -4,7 +4,7 @@
  */
 package name.martingeisse.esdk.riscv.simulator.ui;
 
-import name.martingeisse.esdk.riscv.InstructionLevelRiscv;
+import name.martingeisse.esdk.riscv.simulator.InstructionLevelRiscv;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;

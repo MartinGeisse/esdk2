@@ -1,13 +1,13 @@
 package name.martingeisse.esdk.riscv.simulator;
 
-import name.martingeisse.esdk.riscv.extended.ExceptionExtendedInstructionUnit;
-import name.martingeisse.esdk.riscv.extended.ExtendedInstructionUnit;
-import name.martingeisse.esdk.riscv.floating.ExceptionFloatingPointUnit;
-import name.martingeisse.esdk.riscv.floating.FloatingPointUnit;
-import name.martingeisse.esdk.riscv.io.BrokenIoUnit;
-import name.martingeisse.esdk.riscv.io.IoUnit;
-import name.martingeisse.esdk.riscv.muldiv.ExceptionMultiplyDivideUnit;
-import name.martingeisse.esdk.riscv.muldiv.MultiplyDivideUnit;
+import name.martingeisse.esdk.riscv.simulator.extended.ExceptionExtendedInstructionUnit;
+import name.martingeisse.esdk.riscv.simulator.extended.ExtendedInstructionUnit;
+import name.martingeisse.esdk.riscv.simulator.floating.ExceptionFloatingPointUnit;
+import name.martingeisse.esdk.riscv.simulator.floating.FloatingPointUnit;
+import name.martingeisse.esdk.riscv.simulator.io.BrokenIoUnit;
+import name.martingeisse.esdk.riscv.simulator.io.IoUnit;
+import name.martingeisse.esdk.riscv.simulator.muldiv.ExceptionMultiplyDivideUnit;
+import name.martingeisse.esdk.riscv.simulator.muldiv.MultiplyDivideUnit;
 
 /**
  * Note: Interrupts are not supported for now.

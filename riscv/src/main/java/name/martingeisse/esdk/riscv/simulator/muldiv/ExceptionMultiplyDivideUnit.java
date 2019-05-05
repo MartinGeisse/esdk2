@@ -1,7 +1,7 @@
 package name.martingeisse.esdk.riscv.simulator.muldiv;
 
 import name.martingeisse.esdk.riscv.simulator.InstructionLevelRiscv;
-import name.martingeisse.esdk.riscv.floating.FloatingPointUnit;
+import name.martingeisse.esdk.riscv.simulator.floating.FloatingPointUnit;
 
 /**
  *
