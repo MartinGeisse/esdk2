@@ -85,26 +85,26 @@ do (*) {
 // --------------------------------------------------------------------------------------------------------------------
 
 signal vector[32] execOpResult = switch(instructionRegister[14:12]) {
-    case 0: sourceValue1 + sourceValue2 // ADD
-    case 1: sourceValue1 << sourceValue2[4:0] // SLL
-    case 2: isLTS ? 1 : 0 // SLT
-    case 3: isLTU ? 1 : 0 // SLTU
-    case 4: sourceValue1 ^ sourceValue2 // XOR
-    case 5: instructionRegister[30] ?
+    case 3d0: sourceValue1 + sourceValue2 // ADD
+    case 3d1: sourceValue1 << sourceValue2[4:0] // SLL
+    case 3d2: isLTS ? 1 : 0 // SLT
+    case 3d3: isLTU ? 1 : 0 // SLTU
+    case 3d4: sourceValue1 ^ sourceValue2 // XOR
+    case 3d5: instructionRegister[30] ?
 			((repeat(32, sourceValue1[31]) _ sourceValue1) >> sourceValue2[4:0])[31:0] // SRA
             : (sourceValue1 >> sourceValue2[4:0]) // SRL
-    case 6: sourceValue1 | sourceValue2 // OR
-    case 7: sourceValue1 & sourceValue2 // AND
+    case 3d6: sourceValue1 | sourceValue2 // OR
+    case 3d7: sourceValue1 & sourceValue2 // AND
 };
 
 signal bit branchCondition = switch(instructionRegister[14:12]) {
-    case 0: sourceValue1 == sourceValue2 // BEQ
-    case 1: sourceValue1 != sourceValue2 // BNE
-    case 4: isLTS // BLT
-    case 5: ~isLTS // BGE
-    case 6: isLTU // BLTU
-    case 7: ~isLTU // BGEU
-    default: 0
+    case 3d0: sourceValue1 == sourceValue2 // BEQ
+    case 3d1: sourceValue1 != sourceValue2 // BNE
+    case 3d4: isLTS // BLT
+    case 3d5: ~isLTS // BGE
+    case 3d6: isLTU // BLTU
+    case 3d7: ~isLTU // BGEU
+    default: bit(0)
 };
 
 // --------------------------------------------------------------------------------------------------------------------
