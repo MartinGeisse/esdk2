@@ -27,18 +27,18 @@ interface {
 // --------------------------------------------------------------------------------------------------------------------
 
 // state machine
-constant integer STATE_FETCH = 0;
-constant integer STATE_DECODE_AND_READ1 = 1;
-constant integer STATE_DECODE_AND_READ2 = 2;
-constant integer STATE_EXEC_OP = 3;
-constant integer STATE_EXEC_BRANCH = 4;
-constant integer STATE_EXEC_LUI = 5;
-constant integer STATE_EXEC_AUIPC = 6;
-constant integer STATE_EXEC_JAL = 7;
-constant integer STATE_EXEC_JALR = 8;
-constant integer STATE_MEM_COMPUTE_ADDRESS = 9;
-constant integer STATE_MEM_ACCESS = 10;
-constant integer STATE_MEM_EXTEND = 11;
+constant vector[4] STATE_FETCH = 0;
+constant vector[4] STATE_DECODE_AND_READ1 = 1;
+constant vector[4] STATE_DECODE_AND_READ2 = 2;
+constant vector[4] STATE_EXEC_OP = 3;
+constant vector[4] STATE_EXEC_BRANCH = 4;
+constant vector[4] STATE_EXEC_LUI = 5;
+constant vector[4] STATE_EXEC_AUIPC = 6;
+constant vector[4] STATE_EXEC_JAL = 7;
+constant vector[4] STATE_EXEC_JALR = 8;
+constant vector[4] STATE_MEM_COMPUTE_ADDRESS = 9;
+constant vector[4] STATE_MEM_ACCESS = 10;
+constant vector[4] STATE_MEM_EXTEND = 11;
 
 // CPU state
 register vector[4] state = STATE_FETCH;
