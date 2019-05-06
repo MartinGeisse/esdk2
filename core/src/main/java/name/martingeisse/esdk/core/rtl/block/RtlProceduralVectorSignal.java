@@ -6,7 +6,10 @@ package name.martingeisse.esdk.core.rtl.block;
 
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.block.statement.target.RtlVectorAssignmentTarget;
-import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
+import name.martingeisse.esdk.core.rtl.block.statement.target.RtlVectorTargetConstantIndexSelection;
+import name.martingeisse.esdk.core.rtl.block.statement.target.RtlVectorTargetIndexSelection;
+import name.martingeisse.esdk.core.rtl.block.statement.target.RtlVectorTargetRangeSelection;
+import name.martingeisse.esdk.core.rtl.signal.*;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 
 /**
@@ -28,6 +31,22 @@ public final class RtlProceduralVectorSignal extends RtlProceduralSignal impleme
 	@Override
 	public int getWidth() {
 		return width;
+	}
+
+	// ----------------------------------------------------------------------------------------------------------------
+	// factory methods
+	// ----------------------------------------------------------------------------------------------------------------
+
+	public RtlVectorTargetIndexSelection selectTarget(RtlVectorSignal index) {
+		return new RtlVectorTargetIndexSelection(getRtlItem().getRealm(), this, index);
+	}
+
+	public RtlVectorTargetConstantIndexSelection selectTarget(int index) {
+		return new RtlVectorTargetConstantIndexSelection(getRtlItem().getRealm(), this, index);
+	}
+
+	public RtlVectorTargetRangeSelection selectTarget(int from, int to) {
+		return new RtlVectorTargetRangeSelection(getRtlItem().getRealm(), this, from, to);
 	}
 
 	// ----------------------------------------------------------------------------------------------------------------
