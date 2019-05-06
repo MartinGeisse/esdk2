@@ -7,5 +7,5 @@ interface {
 }
 
 register vector[3] counter = 0;
-do(clk) counter = counter + 1;
+do(clk) counter = counter + 3d1;
 do(*) output = counter;
