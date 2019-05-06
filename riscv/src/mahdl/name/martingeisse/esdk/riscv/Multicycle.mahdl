@@ -122,36 +122,36 @@ do (clk) {
 
 		case STATE_DECODE_AND_READ1:
 			oldPc = pc;
-			pc = pc + 4;
+			pc = pc + 32d4;
 			sourceValue1 = registers[sourceRegisterIndex1];
 			sourceValue2 = repeat(20, instructionRegister[31]) _ instructionRegister[31:20];
 			switch (opcode) {
 
-				case 0: // LOAD
+				case 5d0: // LOAD
 					state = STATE_MEM_COMPUTE_ADDRESS;
 
-				case 4: // OP-IMM
+				case 5d4: // OP-IMM
 					state = STATE_EXEC_OP;
 
-				case 5: // AUIPC
+				case 5d5: // AUIPC
 					state = STATE_EXEC_AUIPC;
 
-				case 8: // STORE
+				case 5d8: // STORE
 					state = STATE_MEM_COMPUTE_ADDRESS;
 
-				case 12: // OP
+				case 5d12: // OP
 					state = STATE_DECODE_AND_READ2;
 
-				case 13: // LUI
+				case 5d13: // LUI
 					state = STATE_EXEC_LUI;
 
-				case 24: // BRANCH
+				case 5d24: // BRANCH
 					state = STATE_DECODE_AND_READ2;
 
-				case 25: // JALR
+				case 5d25: // JALR
 					state = STATE_EXEC_JALR;
 
-				case 27: // JAL
+				case 5d27: // JAL
 					state = STATE_EXEC_JAL;
 
 				default: // includes MISC-MEM (=NOP) and SYSTEM
