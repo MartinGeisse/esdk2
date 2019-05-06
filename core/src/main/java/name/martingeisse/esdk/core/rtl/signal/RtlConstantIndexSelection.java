@@ -23,7 +23,7 @@ public final class RtlConstantIndexSelection extends RtlItem implements RtlBitSi
 
 	public RtlConstantIndexSelection(RtlRealm realm, RtlVectorSignal containerSignal, int index) {
 		super(realm);
-		if (index >= containerSignal.getWidth()) {
+		if (index < 0 || index >= containerSignal.getWidth()) {
 			throw new IllegalArgumentException("index " + index + " out of bounds for width " + containerSignal.getWidth());
 		}
 		this.containerSignal = checkSameRealm(containerSignal);

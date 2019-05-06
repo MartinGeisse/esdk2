@@ -7,33 +7,35 @@ package name.martingeisse.esdk.core.rtl.block.statement.target;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.block.RtlProceduralVectorSignal;
-import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.*;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.EmptyVerilogContribution;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.SignalUsageConsumer;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 
 /**
  *
  */
-public final class RtlVectorTargetIndexSelection extends RtlItem implements RtlBitAssignmentTarget {
+public final class RtlVectorTargetConstantIndexSelection extends RtlItem implements RtlBitAssignmentTarget {
 
 	private final RtlProceduralVectorSignal containerTarget;
-	private final RtlVectorSignal indexSignal;
+	private final int index;
 
-	public RtlVectorTargetIndexSelection(RtlRealm realm, RtlProceduralVectorSignal containerTarget, RtlVectorSignal indexSignal) {
+	public RtlVectorTargetConstantIndexSelection(RtlRealm realm, RtlProceduralVectorSignal containerTarget, int index) {
 		super(realm);
-		if (containerTarget.getWidth() < (1 << indexSignal.getWidth())) {
-			throw new IllegalArgumentException("container of width " + containerTarget.getWidth() + " is too small for index of width " + indexSignal.getWidth());
+		if (index < 0 || index >= containerTarget.getWidth()) {
+			throw new IllegalArgumentException("index " + index + " out of bounds for width " + containerTarget.getWidth());
 		}
 		this.containerTarget = checkSameRealm(containerTarget);
-		this.indexSignal = checkSameRealm(indexSignal);
+		this.index = index;
 	}
 
 	public RtlProceduralVectorSignal getContainerTarget() {
 		return containerTarget;
 	}
 
-	public RtlVectorSignal getIndexSignal() {
-		return indexSignal;
+	public int getIndex() {
+		return index;
 	}
 
 	// ----------------------------------------------------------------------------------------------------------------
@@ -42,7 +44,6 @@ public final class RtlVectorTargetIndexSelection extends RtlItem implements RtlB
 
 	@Override
 	public void setNextValue(boolean nextValue) {
-		int index = indexSignal.getValue().getAsUnsignedInt();
 		VectorValue nextContainerValue = containerTarget.getNextValue();
 		VectorValue updatedValue;
 		if (index == 0) {
@@ -73,14 +74,13 @@ public final class RtlVectorTargetIndexSelection extends RtlItem implements RtlB
 	public final void printVerilogAssignmentTarget(VerilogWriter out) {
 		containerTarget.printVerilogAssignmentTarget(out);
 		out.print('[');
-		out.print(indexSignal);
+		out.print(index);
 		out.print(']');
 	}
 
 	@Override
 	public void analyzeSignalUsage(SignalUsageConsumer consumer) {
 		containerTarget.analyzeSignalUsage(consumer);
-		consumer.consumeSignalUsage(indexSignal, VerilogExpressionNesting.SIGNALS_AND_CONSTANTS);
 	}
 
 }
