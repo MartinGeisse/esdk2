@@ -77,7 +77,7 @@ do (*) {
 	memoryWrite = instructionRegister[3];
 	memoryWordAddress = 2d0 _ memoryAddressRegister[31:2];
 	memoryWriteData = sourceValue2;
-	memoryWriteMask = instruction[13] ? 4b1111 : instruction[12] ? (memoryAddressRegister[1] ? 4b1100 : 4b0011) : 0; // TODO
+	memoryWriteMask = instruction[13] ? 4b1111 : instruction[12] ? (memoryAddressRegister[1] ? 4b1100 : 4b0011) : 4d0; // TODO
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -87,8 +87,8 @@ do (*) {
 signal vector[32] execOpResult = switch(instructionRegister[14:12]) {
     case 3d0: sourceValue1 + sourceValue2 // ADD
     case 3d1: sourceValue1 << sourceValue2[4:0] // SLL
-    case 3d2: isLTS ? 1 : 0 // SLT
-    case 3d3: isLTU ? 1 : 0 // SLTU
+    case 3d2: isLTS ? 32d1 : 32d0 // SLT
+    case 3d3: isLTU ? 32d1 : 32d0 // SLTU
     case 3d4: sourceValue1 ^ sourceValue2 // XOR
     case 3d5: instructionRegister[30] ?
 			((repeat(32, sourceValue1[31]) _ sourceValue1) >> sourceValue2[4:0])[31:0] // SRA
