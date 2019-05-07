@@ -25,6 +25,7 @@ import java.util.List;
 public final class RtlClockedBlock extends RtlClockedItem {
 
 	private final List<RtlProceduralSignal> proceduralSignals;
+	private final List<RtlProceduralMemory> proceduralMemories;
 	private final RtlStatementSequence initializerStatements;
 	private final RtlStatementSequence statements;
 
@@ -32,6 +33,7 @@ public final class RtlClockedBlock extends RtlClockedItem {
 		super(clockNetwork);
 
 		this.proceduralSignals = new ArrayList<>();
+		this.proceduralMemories = new ArrayList<>();
 		this.initializerStatements = new RtlStatementSequence(getRealm());
 		this.statements = new RtlStatementSequence(getRealm());
 	}
@@ -40,8 +42,16 @@ public final class RtlClockedBlock extends RtlClockedItem {
 		proceduralSignals.add(proceduralSignal);
 	}
 
+	void registerProceduralMemory(RtlProceduralMemory proceduralMemory) {
+		proceduralMemories.add(proceduralMemory);
+	}
+
 	public List<RtlProceduralSignal> getProceduralSignals() {
 		return proceduralSignals;
+	}
+
+	public List<RtlProceduralMemory> getProceduralMemories() {
+		return proceduralMemories;
 	}
 
 	public RtlStatementSequence getInitializerStatements() {
@@ -101,6 +111,9 @@ public final class RtlClockedBlock extends RtlClockedItem {
 		for (RtlProceduralSignal signal : proceduralSignals) {
 			signal.updateValue();
 		}
+		for (RtlProceduralMemory memory : proceduralMemories) {
+			memory.updateMatrix();
+		}
 	}
 
 	// ----------------------------------------------------------------------------------------------------------------
@@ -116,6 +129,7 @@ public final class RtlClockedBlock extends RtlClockedItem {
 				for (RtlSignal signal : proceduralSignals) {
 					context.declareSignal(signal, "r", true, VerilogSignalKind.REG, false);
 				}
+				// TODO memories
 			}
 
 			@Override

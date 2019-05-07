@@ -28,6 +28,7 @@ public final class RtlProceduralMemory extends RtlItem {
 		super(block.getRealm());
 		this.block = block;
 		this.matrix = matrix;
+		block.registerProceduralMemory(this);
 	}
 
 	public RtlClockedBlock getBlock() {

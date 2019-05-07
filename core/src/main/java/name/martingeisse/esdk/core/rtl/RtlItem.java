@@ -5,6 +5,8 @@
 package name.martingeisse.esdk.core.rtl;
 
 import name.martingeisse.esdk.core.model.Item;
+import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
+import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.SynthesisNotSupportedException;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
 
@@ -49,6 +51,19 @@ public abstract class RtlItem extends Item implements RtlItemOwned {
 
 	public SynthesisNotSupportedException newSynthesisNotSupportedException() {
 		return new SynthesisNotSupportedException("synthesis not supported for " + this);
+	}
+
+	@Override
+	public String toString() {
+		if (this instanceof RtlBitSignal) {
+			RtlBitSignal signal = (RtlBitSignal)this;
+			return signal.getValue() + " -- " + super.toString();
+		} else if (this instanceof RtlVectorSignal) {
+			RtlVectorSignal signal = (RtlVectorSignal)this;
+			return signal.getValue() + " -- " + super.toString();
+		} else {
+			return super.toString();
+		}
 	}
 
 }

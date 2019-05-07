@@ -21,6 +21,7 @@ public class SimpleTests {
 	private final RtlClockNetwork clock;
 	private final Multicycle cpu;
 	private final RtlSimulatedSettableVectorSignal instruction;
+	private final ClockStepper clockStepper;
 	private final InstructionStepper stepper;
 
 	public SimpleTests() {
@@ -29,7 +30,8 @@ public class SimpleTests {
 		clock = new RtlClockNetwork(realm);
 		cpu = new Multicycle(realm, clock);
 		instruction = new RtlSimulatedSettableVectorSignal(realm, 32);
-		stepper = new InstructionStepper(new ClockStepper(clock, 10), cpu);
+		clockStepper = new ClockStepper(clock, 10);
+		stepper = new InstructionStepper(clockStepper, cpu);
 		cpu.setInstructionReadAcknowledge(new RtlBitConstant(realm, true));
 		cpu.setInstruction(instruction);
 		cpu.setMemoryAcknowledge(new RtlBitConstant(realm, true));
@@ -48,6 +50,21 @@ public class SimpleTests {
 		Assert.assertEquals(8, cpu.getInstructionAddress().getValue().getBitsAsInt());
 		stepper.step();
 		Assert.assertEquals(12, cpu.getInstructionAddress().getValue().getBitsAsInt());
+	}
+
+
+	@Test
+	public void testAddi() {
+		instruction.setValue(VectorValue.ofUnsigned(32, 0x00500093)); // ADDI x1, x0, 5
+		stepper.skipUntilFetching();
+		Assert.assertEquals(0, cpu.registers.getMatrix().getRow(1).getBitsAsInt());
+		// stepper.step();
+		clockStepper.step();
+		clockStepper.step();
+		clockStepper.step();
+		clockStepper.step();
+		clockStepper.step();
+		Assert.assertEquals(5, cpu.registers.getMatrix().getRow(1).getBitsAsInt());
 	}
 
 }
