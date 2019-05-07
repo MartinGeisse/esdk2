@@ -41,7 +41,7 @@ public class SimpleTests {
 
 	@Test
 	public void testPcIncrement() {
-		instruction.setValue(VectorValue.ofUnsigned(32, 0x00000093)); // ADDI x1, x0, 0
+		instruction.setValue(VectorValue.ofUnsigned(32, 0x000_00_093)); // ADDI x1, x0, 0
 		stepper.skipUntilFetching();
 		Assert.assertEquals(0, cpu.getInstructionAddress().getValue().getBitsAsInt());
 		stepper.step();
@@ -55,16 +55,14 @@ public class SimpleTests {
 
 	@Test
 	public void testAddi() {
-		instruction.setValue(VectorValue.ofUnsigned(32, 0x00500093)); // ADDI x1, x0, 5
+		instruction.setValue(VectorValue.ofUnsigned(32, 0x005_00_093)); // ADDI x1, x0, 5
 		stepper.skipUntilFetching();
 		Assert.assertEquals(0, cpu.registers.getMatrix().getRow(1).getBitsAsInt());
-		// stepper.step();
-		clockStepper.step();
-		clockStepper.step();
-		clockStepper.step();
-		clockStepper.step();
-		clockStepper.step();
+		stepper.step();
 		Assert.assertEquals(5, cpu.registers.getMatrix().getRow(1).getBitsAsInt());
+		instruction.setValue(VectorValue.ofUnsigned(32, 0x002_08_093)); // ADDI x1, x1, 2
+		stepper.step();
+		Assert.assertEquals(7, cpu.registers.getMatrix().getRow(1).getBitsAsInt());
 	}
 
 }
