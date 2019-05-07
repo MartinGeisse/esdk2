@@ -18,7 +18,7 @@ public final class RtlBitSwitchSignal extends RtlSwitchSignal<RtlBitSignal> impl
 
 	@Override
 	public boolean getValue() {
-		throw new UnsupportedOperationException("not yet implemented");
+		return getCurrentlySelectedBranch().getValue();
 	}
 
 }

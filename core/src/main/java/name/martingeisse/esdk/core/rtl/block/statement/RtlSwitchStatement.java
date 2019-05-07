@@ -75,12 +75,28 @@ public final class RtlSwitchStatement extends RtlStatement {
 
 	@Override
 	public void execute() {
-		throw new UnsupportedOperationException("not yet implemented");
+		VectorValue actualSelectorValue = selector.getValue();
+		for (Case aCase : cases) {
+			for (VectorValue caseSelectorValue : aCase.getSelectorValues()) {
+				if (actualSelectorValue.equals(caseSelectorValue)) {
+					aCase.getBranch().execute();
+					return;
+				}
+			}
+		}
+		if (defaultBranch != null) {
+			defaultBranch.execute();
+		}
 	}
 
 	@Override
 	public void analyzeSignalUsage(SignalUsageConsumer consumer) {
-		throw new UnsupportedOperationException("not yet implemented");
+		for (Case aCase : cases) {
+			aCase.getBranch().analyzeSignalUsage(consumer);
+		}
+		if (defaultBranch != null) {
+			defaultBranch.analyzeSignalUsage(consumer);
+		}
 	}
 
 	@Override

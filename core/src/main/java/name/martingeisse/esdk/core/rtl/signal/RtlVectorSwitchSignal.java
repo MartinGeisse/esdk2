@@ -1,14 +1,7 @@
 package name.martingeisse.esdk.core.rtl.signal;
 
-import com.google.common.collect.ImmutableList;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
-import name.martingeisse.esdk.core.rtl.block.statement.RtlStatement;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.SignalUsageConsumer;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
@@ -36,7 +29,7 @@ public final class RtlVectorSwitchSignal extends RtlSwitchSignal<RtlVectorSignal
 
 	@Override
 	public VectorValue getValue() {
-		throw new UnsupportedOperationException("not yet implemented");
+		return getCurrentlySelectedBranch().getValue();
 	}
 
 }

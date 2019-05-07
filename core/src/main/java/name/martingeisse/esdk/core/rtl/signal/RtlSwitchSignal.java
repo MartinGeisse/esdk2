@@ -69,6 +69,22 @@ public abstract class RtlSwitchSignal<B extends RtlSignal> extends RtlItem imple
 
 	protected abstract void validateOnAdd(B branch);
 
+	protected final B getCurrentlySelectedBranch() {
+		VectorValue actualSelectorValue = selector.getValue();
+		for (Case<B> aCase : cases) {
+			for (VectorValue caseSelectorValue : aCase.getSelectorValues()) {
+				if (actualSelectorValue.equals(caseSelectorValue)) {
+					return aCase.getBranch();
+				}
+			}
+		}
+		if (defaultSignal == null) {
+			throw new IllegalStateException("selector value " + actualSelectorValue +
+				" did not match any case but there is no default branch");
+		}
+		return defaultSignal;
+	}
+
 	public static final class Case<B extends RtlSignal> {
 
 		private final ImmutableList<VectorValue> selectorValues;
