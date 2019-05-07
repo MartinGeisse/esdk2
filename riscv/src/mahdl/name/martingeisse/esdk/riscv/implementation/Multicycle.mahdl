@@ -164,7 +164,9 @@ do (clk) {
 			state = (opcode[4] ? STATE_EXEC_BRANCH : STATE_EXEC_OP);
 
 		case STATE_EXEC_OP:
-            registers[destinationRegisterIndex] = execOpResult;
+			if (destinationRegisterIndex != 5d0) {
+            	registers[destinationRegisterIndex] = execOpResult;
+			}
 			state = STATE_FETCH;
 
 		case STATE_EXEC_BRANCH:
@@ -174,20 +176,28 @@ do (clk) {
 			state = STATE_FETCH;
 
 		case STATE_EXEC_LUI:
-			registers[destinationRegisterIndex] = instructionRegister[31:12] _ 12d0;
+			if (destinationRegisterIndex != 5d0) {
+				registers[destinationRegisterIndex] = instructionRegister[31:12] _ 12d0;
+			}
 			state = STATE_FETCH;
 
 		case STATE_EXEC_AUIPC:
-			registers[destinationRegisterIndex] = oldPc + (instructionRegister[31:12] _ 12d0);
+			if (destinationRegisterIndex != 5d0) {
+				registers[destinationRegisterIndex] = oldPc + (instructionRegister[31:12] _ 12d0);
+			}
 			state = STATE_FETCH;
 
 		case STATE_EXEC_JAL:
-			registers[destinationRegisterIndex] = pc;
+			if (destinationRegisterIndex != 5d0) {
+				registers[destinationRegisterIndex] = pc;
+			}
 			pc = oldPc + (repeat(12, instructionRegister[31]) _ instructionRegister[19:12] _ instructionRegister[20] _ instructionRegister[30:21] _ 1b0);
 			state = STATE_FETCH;
 
 		case STATE_EXEC_JALR:
-			registers[destinationRegisterIndex] = pc;
+			if (destinationRegisterIndex != 5d0) {
+				registers[destinationRegisterIndex] = pc;
+			}
 			pc = (sourceValue1 + (repeat(20, instructionRegister[31]) _ instructionRegister[31:20]))[31:1] _ 1b0;
 			state = STATE_FETCH;
 

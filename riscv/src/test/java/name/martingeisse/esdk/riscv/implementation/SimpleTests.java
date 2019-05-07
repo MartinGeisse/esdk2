@@ -65,4 +65,13 @@ public class SimpleTests {
 		Assert.assertEquals(7, cpu.registers.getMatrix().getRow(1).getBitsAsInt());
 	}
 
+	@Test
+	public void testRegisterZero() {
+		instruction.setValue(VectorValue.ofUnsigned(32, 0x005_00_013)); // ADDI x0, x0, 5
+		stepper.skipUntilFetching();
+		Assert.assertEquals(0, cpu.registers.getMatrix().getRow(0).getBitsAsInt());
+		stepper.step();
+		Assert.assertEquals(0, cpu.registers.getMatrix().getRow(0).getBitsAsInt());
+	}
+
 }
