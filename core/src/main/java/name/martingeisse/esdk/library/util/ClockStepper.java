@@ -1,4 +1,4 @@
-package name.martingeisse.esdk.mahdl_test;
+package name.martingeisse.esdk.library.util;
 
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlItem;
@@ -6,20 +6,20 @@ import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
 
 /**
- * Allows to single-step through an RTL design with a single clock.
+ * Allows to single-step (clock cycle-wise) through an RTL design with a single clock.
  * <p>
  * To make this class work correctly, no other code should drive the same clock network or start or stop simulation.
  */
-public class Stepper extends RtlItem {
+public class ClockStepper extends RtlItem {
 
 	private final RtlClockNetwork clock;
 	private final int clockPeriod;
 
-	public Stepper(RtlRealm realm, int clockPeriod) {
+	public ClockStepper(RtlRealm realm, int clockPeriod) {
 		this(new RtlClockNetwork(realm), clockPeriod);
 	}
 
-	public Stepper(RtlClockNetwork clock, int clockPeriod) {
+	public ClockStepper(RtlClockNetwork clock, int clockPeriod) {
 		super(clock.getRealm());
 		this.clock = clock;
 		this.clockPeriod = clockPeriod;

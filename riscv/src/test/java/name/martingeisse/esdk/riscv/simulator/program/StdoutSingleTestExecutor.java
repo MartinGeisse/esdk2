@@ -1,7 +1,6 @@
-package name.martingeisse.esdk.riscv.program;
+package name.martingeisse.esdk.riscv.simulator.program;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 
 /**
  *

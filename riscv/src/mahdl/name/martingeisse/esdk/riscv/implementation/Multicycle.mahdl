@@ -1,4 +1,4 @@
-module name.martingeisse.esdk.riscv.Multicycle;
+module name.martingeisse.esdk.riscv.implementation.Multicycle;
 
 interface {
 
