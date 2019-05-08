@@ -31,7 +31,7 @@ public abstract class RtlSignalConnector extends RtlItem implements RtlSignal {
 	@Override
 	public void validate(ValidationContext context) {
 		if (getConnected() == null) {
-			context.reportError("no signal connected");
+			context.reportError(getName() + ": no signal connected");
 		}
 	}
 

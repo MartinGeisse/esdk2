@@ -85,6 +85,7 @@ public final class RtlConditionChainBitSignal extends RtlItem implements RtlBitS
 			for (int i = cases.size() - 1; i >= 0; i--) {
 				Case aCase = cases.get(i);
 				materializedChain = new RtlConditionalBitOperation(getRealm(), aCase.condition, aCase.signal, materializedChain);
+				materializedChain.getRtlItem().setName(getName());
 			}
 		}
 	}

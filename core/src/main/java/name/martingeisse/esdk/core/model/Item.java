@@ -14,6 +14,7 @@ import name.martingeisse.esdk.core.model.validation.ValidationContext;
 public abstract class Item {
 
 	private final Design design;
+	private String name;
 
 	public Item(Design design) {
 		this.design = design;
@@ -22,6 +23,14 @@ public abstract class Item {
 
 	public final Design getDesign() {
 		return design;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	/**

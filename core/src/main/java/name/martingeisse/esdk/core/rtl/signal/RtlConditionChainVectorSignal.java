@@ -93,6 +93,7 @@ public final class RtlConditionChainVectorSignal extends RtlItem implements RtlV
 			for (int i = cases.size() - 1; i >= 0; i--) {
 				Case aCase = cases.get(i);
 				materializedChain = new RtlConditionalVectorOperation(getRealm(), aCase.condition, aCase.signal, materializedChain);
+				materializedChain.getRtlItem().setName(getName());
 			}
 		}
 	}

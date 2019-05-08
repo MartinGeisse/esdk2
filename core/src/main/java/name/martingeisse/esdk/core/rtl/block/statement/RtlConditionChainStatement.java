@@ -86,13 +86,18 @@ public final class RtlConditionChainStatement extends RtlStatement {
 			for (int i = cases.size() - 1; i >= 0; i--) {
 				Case aCase = cases.get(i);
 				RtlWhenStatement when = new RtlWhenStatement(getRealm(), aCase.condition);
+				when.setName(getName());
 				when.getThenBranch().addStatement(aCase.statement);
 				if (result != null) {
 					when.getOtherwiseBranch().addStatement(result);
 				}
 				result = when;
 			}
-			materializedChain = (result == null ? new RtlNopStatement(getRealm()) : result);
+			materializedChain = result;
+			if (materializedChain == null) {
+				materializedChain = new RtlNopStatement(getRealm());
+				materializedChain.setName(getName());
+			}
 		}
 	}
 
