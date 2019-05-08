@@ -14,7 +14,7 @@ interface {
 	// memory access interface
 	out bit memoryEnable;
 	out bit memoryWrite;
-	out vector[32] memoryWordAddress;
+	out vector[30] memoryWordAddress;
 	in vector[32] memoryReadData;
 	out vector[32] memoryWriteData;
 	out vector[4] memoryWriteMask;
@@ -75,7 +75,7 @@ signal bit isLTU = (sourceValue1 < sourceValue2);
 do (*) {
 	memoryEnable = (state == STATE_MEM_ACCESS);
 	memoryWrite = instructionRegister[3];
-	memoryWordAddress = 2d0 _ memoryAddressRegister[31:2];
+	memoryWordAddress = memoryAddressRegister[31:2];
 	memoryWriteData = sourceValue2;
 	memoryWriteMask = instruction[13] ? 4b1111 : instruction[12] ? (memoryAddressRegister[1] ? 4b1100 : 4b0011) : 4d0; // TODO
 }
