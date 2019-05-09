@@ -49,7 +49,7 @@ public interface RtlVectorSignal extends RtlSignal {
 	}
 
 	default RtlVectorSignal operation(RtlVectorOperation.Operator operator, int rightOperand) {
-		return operation(operator, RtlVectorConstant.ofUnsigned(getRtlItem().getRealm(), getWidth(), rightOperand));
+		return operation(operator, RtlVectorConstant.of(getRtlItem().getRealm(), getWidth(), rightOperand));
 	}
 
 	default RtlVectorSignal add(RtlVectorSignal rightOperand) {
@@ -109,7 +109,7 @@ public interface RtlVectorSignal extends RtlSignal {
 	}
 
 	default RtlBitSignal comparison(RtlVectorComparison.Operator operator, int rightOperand) {
-		return comparison(operator, RtlVectorConstant.ofUnsigned(getRtlItem().getRealm(), getWidth(), rightOperand));
+		return comparison(operator, RtlVectorConstant.of(getRtlItem().getRealm(), getWidth(), rightOperand));
 	}
 
 	default RtlBitSignal compareEqual(RtlVectorSignal rightOperand) {

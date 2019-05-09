@@ -186,7 +186,7 @@
 //			} else {
 //				RtlVectorSignal vectorSignal = (RtlVectorSignal) signal;
 //				cachedVectorDataSignals[vectorSignalCount] = vectorSignal;
-//				previousVectorDataValues[vectorSignalCount] = sampledVectorDataValues[vectorSignalCount] = VectorValue.ofUnsigned(vectorSignal.getWidth(), 0);
+//				previousVectorDataValues[vectorSignalCount] = sampledVectorDataValues[vectorSignalCount] = VectorValue.of(vectorSignal.getWidth(), 0);
 //				vectorSignalCount++;
 //			}
 //		}

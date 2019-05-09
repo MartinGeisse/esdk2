@@ -24,7 +24,7 @@ public final class RtlProceduralVectorSignal extends RtlProceduralSignal impleme
 	public RtlProceduralVectorSignal(RtlRealm realm, RtlClockedBlock block, int width) {
 		super(realm, block);
 		this.width = width;
-		this.value = VectorValue.ofUnsigned(width, 0);
+		this.value = VectorValue.of(width, 0);
 		this.nextValue = value;
 	}
 

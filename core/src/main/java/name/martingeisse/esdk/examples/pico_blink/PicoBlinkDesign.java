@@ -36,7 +36,7 @@ public class PicoBlinkDesign extends Design {
 		cpu = new PicoblazeRtlWithAssociatedProgram(clock, getClass());
 		cpu.setPortInputDataSignal(
 			new RtlConcatenation(realm,
-				new RtlVectorConstant(realm, VectorValue.ofUnsigned(7, 0)),
+				new RtlVectorConstant(realm, VectorValue.of(7, 0)),
 				slideSwitch
 			)
 		);

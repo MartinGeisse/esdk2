@@ -25,7 +25,7 @@ public class VectorPinSimulationSignal extends RtlItem implements RtlVectorSigna
 	public VectorPinSimulationSignal(RtlRealm realm, int width) {
 		super(realm);
 		this.width = width;
-		this.value = VectorValue.ofUnsigned(width, 0);
+		this.value = VectorValue.of(width, 0);
 	}
 
 	@Override

@@ -24,7 +24,7 @@ public final class Matrix {
 		this.rowCount = rowCount;
 		this.columnCount = columnCount;
 		this.rows = new VectorValue[rowCount];
-		this.defaultRowValue = VectorValue.ofUnsigned(columnCount, 0);
+		this.defaultRowValue = VectorValue.of(columnCount, 0);
 	}
 
 	public int getRowCount() {

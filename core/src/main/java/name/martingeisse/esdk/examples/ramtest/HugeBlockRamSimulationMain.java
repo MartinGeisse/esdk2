@@ -67,7 +67,7 @@ public class HugeBlockRamSimulationMain {
 			chain.when(cpu.getPortAddress().select(4), cpuReadableByteSelect(ramAddress));
 			chain.when(cpu.getPortAddress().select(5), cpuReadableByteSelect(ramWriteData));
 			chain.when(cpu.getPortAddress().select(6), cpuReadableByteSelect(ramReadData));
-			chain.otherwise(RtlVectorConstant.ofUnsigned(realm, 8, 0));
+			chain.otherwise(RtlVectorConstant.of(realm, 8, 0));
 			cpu.setPortInputDataSignal(chain);
 		}
 
@@ -92,7 +92,7 @@ public class HugeBlockRamSimulationMain {
 
 	private static RtlVectorSignal cpuReadableByteSelect(RtlVectorSignal wordSignal) {
 		return new RtlShiftOperation(realm, RtlShiftOperation.Direction.RIGHT, wordSignal,
-			new RtlConcatenation(realm, cpu.getPortAddress().select(1, 0), RtlVectorConstant.ofUnsigned(realm, 3, 0))
+			new RtlConcatenation(realm, cpu.getPortAddress().select(1, 0), RtlVectorConstant.of(realm, 3, 0))
 		).select(7, 0);
 	}
 

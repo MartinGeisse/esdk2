@@ -42,7 +42,7 @@ public final class RtlVectorRepetition extends RtlItem implements RtlVectorSigna
 	@Override
 	public VectorValue getValue() {
 		VectorValue single = vectorSignal.getValue();
-		VectorValue result = VectorValue.ofUnsigned(0, 0);
+		VectorValue result = VectorValue.of(0, 0);
 		for (int i = 0; i < repetitions; i++) {
 			result = result.concat(single);
 		}

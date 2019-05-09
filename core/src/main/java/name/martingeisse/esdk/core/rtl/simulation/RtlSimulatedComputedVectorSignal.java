@@ -35,7 +35,7 @@ public abstract class RtlSimulatedComputedVectorSignal extends RtlSimulatedCompu
 		};
 	}
 
-	public static RtlSimulatedComputedVectorSignal ofUnsigned(RtlRealm realm, int width, IntProvider intProvider) {
+	public static RtlSimulatedComputedVectorSignal of(RtlRealm realm, int width, IntProvider intProvider) {
 		return new RtlSimulatedComputedVectorSignal(realm) {
 
 			@Override
@@ -45,7 +45,7 @@ public abstract class RtlSimulatedComputedVectorSignal extends RtlSimulatedCompu
 
 			@Override
 			public VectorValue getValue() {
-				return VectorValue.ofUnsigned(width, intProvider.getValue());
+				return VectorValue.of(width, intProvider.getValue());
 			}
 
 		};

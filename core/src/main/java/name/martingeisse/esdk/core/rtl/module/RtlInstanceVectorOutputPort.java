@@ -17,7 +17,7 @@ public final class RtlInstanceVectorOutputPort extends RtlInstanceOutputPort imp
 
 	public RtlInstanceVectorOutputPort(RtlModuleInstance moduleInstance, String portName, int width) {
 		super(moduleInstance, portName);
-		this.simulationSignal = new RtlVectorConstant(getRealm(), VectorValue.ofUnsigned(width, 0));
+		this.simulationSignal = new RtlVectorConstant(getRealm(), VectorValue.of(width, 0));
 	}
 
 	@Override

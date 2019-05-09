@@ -11,7 +11,6 @@ import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlConcatenation;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorConstant;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.EmptyVerilogContribution;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
 
 /**
@@ -56,7 +55,7 @@ public final class Monitor extends RtlClockedItem {
 			return channelSignal;
 		} else if (channelSignal.getWidth() < 8) {
 			RtlRealm realm = channelSignal.getRtlItem().getRealm();
-			RtlVectorSignal filler = RtlVectorConstant.ofUnsigned(realm, 8 - channelSignal.getWidth(), 0);
+			RtlVectorSignal filler = RtlVectorConstant.of(realm, 8 - channelSignal.getWidth(), 0);
 			return new RtlConcatenation(realm, channelSignal, filler);
 		} else {
 			return channelSignal.select(channelSignal.getWidth() - 1, channelSignal.getWidth() - 8);

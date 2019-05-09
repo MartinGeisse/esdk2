@@ -6,8 +6,6 @@ package name.martingeisse.esdk.core.rtl.signal.connector;
 
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlClockedItem;
-import name.martingeisse.esdk.core.rtl.signal.RtlBitSampler;
-import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSampler;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.EmptyVerilogContribution;
@@ -58,7 +56,7 @@ public final class RtlVectorSignalConnectorSampler extends RtlClockedItem {
 		if (connected == null) {
 			throw new IllegalStateException("no connected signal");
 		}
-		sample = VectorValue.ofUnsigned(getWidth(), 0);
+		sample = VectorValue.of(getWidth(), 0);
 	}
 
 	@Override

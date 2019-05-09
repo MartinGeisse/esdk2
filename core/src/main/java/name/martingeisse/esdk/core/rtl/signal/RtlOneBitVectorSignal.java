@@ -35,7 +35,7 @@ public final class RtlOneBitVectorSignal extends RtlItem implements RtlVectorSig
 
 	@Override
 	public VectorValue getValue() {
-		return VectorValue.ofUnsigned(1, bitSignal.getValue() ? 1 : 0);
+		return VectorValue.of(1, bitSignal.getValue() ? 1 : 0);
 	}
 
 	// ----------------------------------------------------------------------------------------------------------------

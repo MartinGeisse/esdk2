@@ -77,10 +77,10 @@ public abstract class AbstractSingleTestExecutor {
 				if (first < 0) {
 					break;
 				}
-				testbench.memory0.getMatrix().setRow(index, VectorValue.ofUnsigned(8, readByteEofSafe(in)));
-				testbench.memory1.getMatrix().setRow(index, VectorValue.ofUnsigned(8, readByteEofSafe(in)));
-				testbench.memory2.getMatrix().setRow(index, VectorValue.ofUnsigned(8, readByteEofSafe(in)));
-				testbench.memory3.getMatrix().setRow(index, VectorValue.ofUnsigned(8, readByteEofSafe(in)));
+				testbench.memory0.getMatrix().setRow(index, VectorValue.of(8, readByteEofSafe(in)));
+				testbench.memory1.getMatrix().setRow(index, VectorValue.of(8, readByteEofSafe(in)));
+				testbench.memory2.getMatrix().setRow(index, VectorValue.of(8, readByteEofSafe(in)));
+				testbench.memory3.getMatrix().setRow(index, VectorValue.of(8, readByteEofSafe(in)));
 				index++;
 			}
 		}

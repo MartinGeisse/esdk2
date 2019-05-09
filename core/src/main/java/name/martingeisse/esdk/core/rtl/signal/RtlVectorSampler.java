@@ -33,7 +33,7 @@ public final class RtlVectorSampler extends RtlClockedItem {
 
 	@Override
 	public void initializeSimulation() {
-		this.sample = VectorValue.ofUnsigned(getWidth(), 0);
+		this.sample = VectorValue.of(getWidth(), 0);
 	}
 
 	@Override

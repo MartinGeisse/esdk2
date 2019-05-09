@@ -41,7 +41,7 @@ public final class RtlBitRepetition extends RtlItem implements RtlVectorSignal {
 
 	@Override
 	public VectorValue getValue() {
-		return VectorValue.ofUnsigned(repetitions, bitSignal.getValue() ? ((1 << repetitions) - 1) : 0);
+		return VectorValue.of(repetitions, bitSignal.getValue() ? ((1 << repetitions) - 1) : 0);
 	}
 
 	// ----------------------------------------------------------------------------------------------------------------

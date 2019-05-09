@@ -65,7 +65,7 @@ public final class RtlConcatenation extends RtlItem implements RtlVectorSignal {
 
 	@Override
 	public VectorValue getValue() {
-		VectorValue result = VectorValue.ofUnsigned(0, 0);
+		VectorValue result = VectorValue.of(0, 0);
 		for (RtlSignal elementSignal : signals) {
 			if (elementSignal instanceof RtlBitSignal) {
 				result = result.concat(((RtlBitSignal) elementSignal).getValue());

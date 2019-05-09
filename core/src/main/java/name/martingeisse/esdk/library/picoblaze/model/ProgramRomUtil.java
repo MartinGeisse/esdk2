@@ -24,7 +24,7 @@ public final class ProgramRomUtil {
 	public static void loadAssociatedProgramRom(Matrix matrix, Class<?> anchorClass, String programSuffix) {
 		AssociatedPicoblazeProgram program = new AssociatedPicoblazeProgram(anchorClass, programSuffix);
 		for (int i = 0; i < 1024; i++) {
-			matrix.setRow(i, VectorValue.ofUnsigned(18, program.readInstruction(i)));
+			matrix.setRow(i, VectorValue.of(18, program.readInstruction(i)));
 		}
 	}
 

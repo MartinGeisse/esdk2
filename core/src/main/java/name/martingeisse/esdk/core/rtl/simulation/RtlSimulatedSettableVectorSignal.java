@@ -15,7 +15,7 @@ public final class RtlSimulatedSettableVectorSignal extends RtlSimulatedSettable
 	public RtlSimulatedSettableVectorSignal(RtlRealm realm, int width) {
 		super(realm);
 		this.width = width;
-		this.value = VectorValue.ofUnsigned(width, 0);
+		this.value = VectorValue.of(width, 0);
 	}
 
 	@Override

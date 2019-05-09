@@ -35,8 +35,8 @@ public final class TestRenderer extends RtlItem {
 			columnRegister = block.createVector(widthBits);
 			rowRegister = block.createVector(heightBits);
 			framebufferRamdacSwitch = block.createBit();
-			block.getInitializerStatements().assign(columnRegister, VectorValue.ofUnsigned(widthBits, 0));
-			block.getInitializerStatements().assign(rowRegister, VectorValue.ofUnsigned(heightBits, 0));
+			block.getInitializerStatements().assign(columnRegister, VectorValue.of(widthBits, 0));
+			block.getInitializerStatements().assign(rowRegister, VectorValue.of(heightBits, 0));
 			block.getInitializerStatements().assign(framebufferRamdacSwitch, false);
 
 			RtlStatementBuilder builder = block.getStatements().builder();
@@ -87,7 +87,7 @@ public final class TestRenderer extends RtlItem {
 			builder.endWhen();
 		}
 
-		cpu.setPortInputDataSignal(new RtlVectorConstant(realm, VectorValue.ofUnsigned(8, 0)));
+		cpu.setPortInputDataSignal(new RtlVectorConstant(realm, VectorValue.of(8, 0)));
 		cpu.setResetSignal(new RtlBitConstant(realm, false));
 
 		framebufferWriteStrobe = cpu.getWriteStrobe().and(cpu.getPortAddress().select(0));

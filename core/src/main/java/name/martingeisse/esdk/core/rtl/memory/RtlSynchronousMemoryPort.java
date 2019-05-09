@@ -57,7 +57,7 @@ public final class RtlSynchronousMemoryPort extends RtlClockedItem implements Rt
 				break;
 
 			case SYNCHRONOUS:
-				synchronousReadData = VectorValue.ofUnsigned(memory.getMatrix().getColumnCount(), 0);
+				synchronousReadData = VectorValue.of(memory.getMatrix().getColumnCount(), 0);
 				readDataSignal = new SynchronousReadDataSignal(getRealm());
 				break;
 

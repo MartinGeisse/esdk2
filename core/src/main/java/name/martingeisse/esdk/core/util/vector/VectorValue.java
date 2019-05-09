@@ -25,30 +25,14 @@ public abstract class VectorValue {
 	private final int width;
 
 	/**
-	 * Creates a vector value with the specified width and whose bits are the unsigned representation of the specified
-	 * value. If the width is greater than 32, then the upper bits will be 0. If the width is less than 32, then the
-	 * remaining upper bits of the value argument must be 0.
+	 * Creates a vector value with the specified width and whose bits are the two's complement representation of the
+	 * specified value.
 	 */
-	public static VectorValue ofUnsigned(int width, int value) {
+	public static VectorValue of(int width, long value) {
 		if (width > 64) {
 			throw new UnsupportedOperationException("vectors larger than 64 bits not yet implemented");
 		}
 		return new LongVectorValue(width, value);
-	}
-
-	/**
-	 * Returns the minimum width to represent the specified value -- which must be non-negative -- as a vector.
-	 */
-	public static int getMinimumWidthForUnsigned(int value) {
-		if (value < 0) {
-			throw new IllegalArgumentException("value cannot be negative");
-		}
-		int width = 0;
-		while (value > 0) {
-			value = (value >> 1);
-			width++;
-		}
-		return width;
 	}
 
 	VectorValue(int width) {

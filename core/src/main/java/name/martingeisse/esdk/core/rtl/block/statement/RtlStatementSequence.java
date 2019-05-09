@@ -69,7 +69,7 @@ public class RtlStatementSequence extends RtlStatement {
 		if (value < 0) {
 			throw new IllegalArgumentException("assignUnsigned called with negative value: " + value);
 		}
-		RtlVectorConstant constant = RtlVectorConstant.ofUnsigned(getRealm(), destination.getWidth(), value);
+		RtlVectorConstant constant = RtlVectorConstant.of(getRealm(), destination.getWidth(), value);
 		RtlVectorAssignment assignment = new RtlVectorAssignment(getRealm(), destination, constant);
 		addStatement(assignment);
 		return assignment;

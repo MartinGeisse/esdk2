@@ -81,8 +81,8 @@ public class RamTestController extends RtlItem {
 			chain.when(cpu.getPortAddress().select(4), cpuReadableByteSelect(ramAddressRegister));
 			chain.when(cpu.getPortAddress().select(5), cpuReadableByteSelect(ramWriteDataRegister));
 			chain.when(cpu.getPortAddress().select(6), cpuReadableByteSelect(ramReadDataRegister));
-			chain.when(cpu.getPortAddress().select(7), new RtlConcatenation(realm, RtlVectorConstant.ofUnsigned(realm, 7, 0), mybusMaster.getStrobeSignal()));
-			chain.otherwise(RtlVectorConstant.ofUnsigned(realm, 8, 0));
+			chain.when(cpu.getPortAddress().select(7), new RtlConcatenation(realm, RtlVectorConstant.of(realm, 7, 0), mybusMaster.getStrobeSignal()));
+			chain.otherwise(RtlVectorConstant.of(realm, 8, 0));
 			// TODO cpu.setPortInputDataSignal(RtlBuilder.vectorRegister(clock, chain));
 			cpu.setPortInputDataSignal(chain);
 		}
@@ -124,7 +124,7 @@ public class RamTestController extends RtlItem {
 
 	private RtlVectorSignal cpuReadableByteSelect(RtlVectorSignal wordSignal) {
 		return new RtlShiftOperation(realm, RtlShiftOperation.Direction.RIGHT, wordSignal,
-			new RtlConcatenation(realm, cpu.getPortAddress().select(1, 0), RtlVectorConstant.ofUnsigned(realm, 3, 0))
+			new RtlConcatenation(realm, cpu.getPortAddress().select(1, 0), RtlVectorConstant.of(realm, 3, 0))
 		).select(7, 0);
 	}
 

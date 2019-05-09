@@ -24,8 +24,8 @@ public final class RtlVectorConstant extends RtlItem implements RtlVectorSignal 
 		this.value = value;
 	}
 
-	public static RtlVectorConstant ofUnsigned(RtlRealm realm, int width, int value) {
-		return new RtlVectorConstant(realm, VectorValue.ofUnsigned(width, value));
+	public static RtlVectorConstant of(RtlRealm realm, int width, long value) {
+		return new RtlVectorConstant(realm, VectorValue.of(width, value));
 	}
 
 	@Override
