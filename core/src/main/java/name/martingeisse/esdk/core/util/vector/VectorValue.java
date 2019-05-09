@@ -35,6 +35,14 @@ public abstract class VectorValue {
 		return new LongVectorValue(width, value);
 	}
 
+	public static VectorValue repeat(int width, boolean bit) {
+		if (width == 64) {
+			return VectorValue.of(width, bit ? -1 : 0);
+		} else {
+			return VectorValue.of(width, bit ? ((1L << width) - 1) : 0);
+		}
+	}
+
 	VectorValue(int width) {
 		if (width < 0) {
 			throw new IllegalArgumentException("width cannot be negative");
