@@ -76,8 +76,16 @@ do (*) {
 	memoryEnable = (state == STATE_MEM_ACCESS);
 	memoryWrite = opcode[3];
 	memoryWordAddress = memoryAddressRegister[31:2];
-	memoryWriteData = sourceValue2;
-	memoryWriteMask = instructionRegister[13] ? 4b1111 : instructionRegister[12] ? (memoryAddressRegister[1] ? 4b1100 : 4b0011) : 4d0; // TODO
+	if (instructionRegister[13]) {
+		memoryWriteMask = 4b1111;
+		memoryWriteData = sourceValue2;
+	} else if (instructionRegister[12]) {
+		memoryWriteMask = memoryAddressRegister[1] ? 4b1100 : 4b0011;
+		memoryWriteData = memoryAddressRegister[1] ? (sourceValue2 << 16) : sourceValue2;
+	} else {
+		memoryWriteMask = memoryAddressRegister[1] ? (memoryAddressRegister[0] ? 4b1000 : 4b0100) : (memoryAddressRegister[0] ? 4b0010 : 4b0001);
+		memoryWriteData = memoryAddressRegister[1] ? (memoryAddressRegister[0] ? (sourceValue2 << 24) : (sourceValue2 << 16)) : (memoryAddressRegister[0] ? (sourceValue2 << 8) : sourceValue2);
+	}
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -207,7 +215,7 @@ do (clk) {
 			} else {
 				memoryAddressRegister = sourceValue1 + sourceValue2;
 			}
-			sourceValue2 = registers[sourceRegisterIndex2]; // TODO halfword / byte shifting
+			sourceValue2 = registers[sourceRegisterIndex2];
 			state = STATE_MEM_ACCESS;
 
 		case STATE_MEM_ACCESS:
@@ -218,10 +226,54 @@ do (clk) {
 
 		case STATE_MEM_EXTEND:
 			if (destinationRegisterIndex != 5d0) {
-				registers[destinationRegisterIndex] = memoryReadDataRegister;
+				if (instructionRegister[13]) {
+					registers[destinationRegisterIndex] = memoryReadDataRegister;
+				} else if (instructionRegister[12]) {
+					if (memoryAddressRegister[1]) {
+						if (instructionRegister[14]) {
+							registers[destinationRegisterIndex] = 16d0 _ memoryReadDataRegister[31:16];
+						} else {
+							registers[destinationRegisterIndex] = repeat(16, memoryReadDataRegister[31]) _ memoryReadDataRegister[31:16];
+						}
+					} else {
+						if (instructionRegister[14]) {
+							registers[destinationRegisterIndex] = 16d0 _ memoryReadDataRegister[15:0];
+						} else {
+							registers[destinationRegisterIndex] = repeat(16, memoryReadDataRegister[15]) _ memoryReadDataRegister[15:0];
+						}
+					}
+				} else {
+					if (memoryAddressRegister[2]) {
+						if (memoryAddressRegister[1]) {
+							if (instructionRegister[14]) {
+								registers[destinationRegisterIndex] = 24d0 _ memoryReadDataRegister[31:24];
+							} else {
+								registers[destinationRegisterIndex] = repeat(24, memoryReadDataRegister[31]) _ memoryReadDataRegister[31:24];
+							}
+						} else {
+							if (instructionRegister[14]) {
+								registers[destinationRegisterIndex] = 24d0 _ memoryReadDataRegister[23:16];
+							} else {
+								registers[destinationRegisterIndex] = repeat(24, memoryReadDataRegister[23]) _ memoryReadDataRegister[23:16];
+							}
+						}
+					} else {
+						if (memoryAddressRegister[1]) {
+							if (instructionRegister[14]) {
+								registers[destinationRegisterIndex] = 24d0 _ memoryReadDataRegister[15:8];
+							} else {
+								registers[destinationRegisterIndex] = repeat(24, memoryReadDataRegister[15]) _ memoryReadDataRegister[15:8];
+							}
+						} else {
+							if (instructionRegister[14]) {
+								registers[destinationRegisterIndex] = 24d0 _ memoryReadDataRegister[7:0];
+							} else {
+								registers[destinationRegisterIndex] = repeat(24, memoryReadDataRegister[7]) _ memoryReadDataRegister[7:0];
+							}
+						}
+					}
+				}
 			}
-			// TODO halfword / byte shifting
-			// TODO zero/sign extension
 			state = STATE_FETCH;
 
 	}
