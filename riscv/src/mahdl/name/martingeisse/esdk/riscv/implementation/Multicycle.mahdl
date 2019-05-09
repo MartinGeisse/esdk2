@@ -217,6 +217,9 @@ do (clk) {
 			}
 
 		case STATE_MEM_EXTEND:
+			if (destinationRegisterIndex != 5d0) {
+				registers[destinationRegisterIndex] = memoryReadDataRegister;
+			}
 			// TODO halfword / byte shifting
 			// TODO zero/sign extension
 			state = STATE_FETCH;
