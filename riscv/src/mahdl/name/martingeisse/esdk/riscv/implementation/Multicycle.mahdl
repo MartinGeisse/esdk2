@@ -85,7 +85,7 @@ do (*) {
 // --------------------------------------------------------------------------------------------------------------------
 
 signal vector[32] execOpResult = switch(instructionRegister[14:12]) {
-    case 3d0: sourceValue1 + sourceValue2 // ADD
+    case 3d0: (opcode[3] & instructionRegister[30]) ? (sourceValue1 - sourceValue2) : (sourceValue1 + sourceValue2) // ADD
     case 3d1: sourceValue1 << sourceValue2[4:0] // SLL
     case 3d2: isLTS ? 32d1 : 32d0 // SLT
     case 3d3: isLTU ? 32d1 : 32d0 // SLTU
