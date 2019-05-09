@@ -6,7 +6,7 @@ interface {
 	in clock clk;
 
 	// instruction fetching interface
-	out vector[32] instructionAddress;
+	out vector[30] instructionWordAddress;
 	out bit instructionReadEnable;
 	in vector[32] instruction;
 	in bit instructionReadAcknowledge;
@@ -58,7 +58,7 @@ register vector[32] memoryReadDataRegister;
 // instruction fetching
 do (*) {
 	instructionReadEnable = (state == STATE_FETCH);
-	instructionAddress = pc;
+	instructionWordAddress = pc[31:2];
 }
 
 // decoding

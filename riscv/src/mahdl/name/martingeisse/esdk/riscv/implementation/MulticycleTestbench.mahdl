@@ -21,13 +21,13 @@ do (*) {
     cpu.clk = clk;
 
     // instruction interface
-    instructionWordAddress = cpu.instructionAddress[21:2];
+    instructionWordAddress = cpu.instructionWordAddress[19:0];
     cpu.instruction = memory3[instructionWordAddress] _ memory2[instructionWordAddress] _
             memory1[instructionWordAddress] _ memory0[instructionWordAddress];
     cpu.instructionReadAcknowledge = 1;
 
     // data interface
-    dataWordAddress = cpu.memoryWordAddress[21:2];
+    dataWordAddress = cpu.memoryWordAddress[19:0];
     cpu.memoryReadData = memory3[dataWordAddress] _ memory2[dataWordAddress] _
             memory1[dataWordAddress] _ memory0[dataWordAddress];
     cpu.memoryAcknowledge = 1;

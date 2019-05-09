@@ -43,13 +43,13 @@ public class SimpleTests {
 	public void testPcIncrement() {
 		instruction.setValue(VectorValue.of(32, 0x000_00_093)); // ADDI x1, x0, 0
 		stepper.skipUntilFetching();
-		Assert.assertEquals(0, cpu.getInstructionAddress().getValue().getBitsAsInt());
+		Assert.assertEquals(0, cpu.getInstructionWordAddress().getValue().getBitsAsInt());
 		stepper.step();
-		Assert.assertEquals(4, cpu.getInstructionAddress().getValue().getBitsAsInt());
+		Assert.assertEquals(1, cpu.getInstructionWordAddress().getValue().getBitsAsInt());
 		stepper.step();
-		Assert.assertEquals(8, cpu.getInstructionAddress().getValue().getBitsAsInt());
+		Assert.assertEquals(2, cpu.getInstructionWordAddress().getValue().getBitsAsInt());
 		stepper.step();
-		Assert.assertEquals(12, cpu.getInstructionAddress().getValue().getBitsAsInt());
+		Assert.assertEquals(3, cpu.getInstructionWordAddress().getValue().getBitsAsInt());
 	}
 
 	@Test
