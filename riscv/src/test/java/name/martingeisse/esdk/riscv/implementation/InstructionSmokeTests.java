@@ -143,6 +143,24 @@ public class InstructionSmokeTests {
 		testSwHelper(0x000_00_180, 21, 6);
 	}
 
+	@Test
+	public void testBeqTaken() {
+		setRegisters(5, 5);
+		instruction.setValue(VectorValue.of(32, 0x102_08_063));
+		stepper.step();
+		assertRegisters(5, 5);
+		Assert.assertNotEquals(4, cpu.pc.getValue().getBitsAsInt());
+	}
+
+	@Test
+	public void testBeqNotTaken() {
+		setRegisters(5, 7);
+		instruction.setValue(VectorValue.of(32, 0x102_08_063));
+		stepper.step();
+		assertRegisters(5, 7);
+		Assert.assertEquals(4, cpu.pc.getValue().getBitsAsInt());
+	}
+
 //region helper classes
 
 	public class StoreRecorder extends RtlClockedItem {
