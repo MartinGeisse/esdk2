@@ -45,6 +45,8 @@ public class InstructionSmokeTests {
 		design.prepareSimulation();
 	}
 
+//region helper methods
+
 	private void setRegisters(int... values) {
 		for (int i = 0; i < values.length; i++) {
 			cpu.registers.getMatrix().setRow(i + 1, VectorValue.of(32, values[i] & 0xffff_ffffL));
@@ -64,6 +66,8 @@ public class InstructionSmokeTests {
 		stepper.step();
 		assertRegisters(registerValue, expectedResult);
 	}
+
+//endregion
 
 	@Test
 	public void testAddi() {
@@ -112,18 +116,34 @@ public class InstructionSmokeTests {
 		testOpImm(7, 6, 12, 4);
 	}
 
+	private void testSwHelper(int immediateAddress, int addressRegister, int expectedAddress) {
+		testSwHelper(immediateAddress, addressRegister, expectedAddress, 10);
+		testSwHelper(immediateAddress, addressRegister, expectedAddress, -10);
+	}
+
+	private void testSwHelper(int instructionImmediateBits, int addressRegister, int expectedWordAddress, int data) {
+		// rs1 = x1 = address
+		// rs2 = x2 = data
+		StoreRecorder storeRecorder = new StoreRecorder(clock);
+		setRegisters(addressRegister, data);
+		instruction.setValue(VectorValue.of(32, instructionImmediateBits | 0x002_0a_023));
+		stepper.step();
+		assertRegisters(addressRegister, data);
+		Assert.assertEquals(1, storeRecorder.entries.size());
+		storeRecorder.entries.get(0).assertEquals(expectedWordAddress & 0x3fff_ffff, data, 15);
+	}
+
 	@Test
 	public void testSw() {
-		// rs1 = x1 = address = 20
-		// rs2 = x2 = data = 30
-		StoreRecorder storeRecorder = new StoreRecorder(clock);
-		setRegisters(20, 30);
-		instruction.setValue(VectorValue.of(32, 0x002_0a_023));
-		stepper.step();
-		assertRegisters(20, 30);
-		Assert.assertEquals(1, storeRecorder.entries.size());
-		storeRecorder.entries.get(0).assertEquals(5, 30, 15);
+		testSwHelper(0x000_00_000, 20, 5);
+		testSwHelper(0x000_00_000, -20, -5);
+		testSwHelper(0x000_00_000, 21, 5);
+		testSwHelper(0x000_00_000, -19, -5);
+		testSwHelper(0x000_00_180, 20, 5);
+		testSwHelper(0x000_00_180, 21, 6);
 	}
+
+//region helper classes
 
 	public class StoreRecorder extends RtlClockedItem {
 
@@ -173,5 +193,7 @@ public class InstructionSmokeTests {
 		}
 
 	}
+
+//endregion
 
 }
