@@ -77,7 +77,7 @@ do (*) {
 	memoryWrite = opcode[3];
 	memoryWordAddress = memoryAddressRegister[31:2];
 	memoryWriteData = sourceValue2;
-	memoryWriteMask = instruction[13] ? 4b1111 : instruction[12] ? (memoryAddressRegister[1] ? 4b1100 : 4b0011) : 4d0; // TODO
+	memoryWriteMask = instructionRegister[13] ? 4b1111 : instructionRegister[12] ? (memoryAddressRegister[1] ? 4b1100 : 4b0011) : 4d0; // TODO
 }
 
 // --------------------------------------------------------------------------------------------------------------------
