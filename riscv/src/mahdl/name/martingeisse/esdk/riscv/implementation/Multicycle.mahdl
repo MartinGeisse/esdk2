@@ -81,10 +81,10 @@ do (*) {
 		memoryWriteData = sourceValue2;
 	} else if (instructionRegister[12]) {
 		memoryWriteMask = memoryAddressRegister[1] ? 4b1100 : 4b0011;
-		memoryWriteData = memoryAddressRegister[1] ? (sourceValue2 << 16) : sourceValue2;
+		memoryWriteData = sourceValue2[15:0] _ sourceValue2[15:0];
 	} else {
 		memoryWriteMask = memoryAddressRegister[1] ? (memoryAddressRegister[0] ? 4b1000 : 4b0100) : (memoryAddressRegister[0] ? 4b0010 : 4b0001);
-		memoryWriteData = memoryAddressRegister[1] ? (memoryAddressRegister[0] ? (sourceValue2 << 24) : (sourceValue2 << 16)) : (memoryAddressRegister[0] ? (sourceValue2 << 8) : sourceValue2);
+		memoryWriteData = sourceValue2[7:0] _ sourceValue2[7:0] _ sourceValue2[7:0] _ sourceValue2[7:0];
 	}
 }
 
