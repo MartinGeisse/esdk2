@@ -115,6 +115,26 @@ signal bit branchCondition = switch(instructionRegister[14:12]) {
     default: bit(0)
 };
 
+// halfword-to-word extension
+signal bit halfwordToWordSignBit = memoryAddressRegister[1] ? memoryReadDataRegister[31] : memoryReadDataRegister[15];
+signal vector[16] halfwordToWordExtension = instructionRegister[14] ? 16d0 : repeat(16, halfwordToWordSignBit);
+signal vector[16] halfwordToWordData = memoryAddressRegister[1] ? memoryReadDataRegister[31:16] : memoryReadDataRegister[15:0];
+
+// byte-to-word extension
+signal bit byteToWordSignBit = switch (memoryAddressRegister[1:0]) {
+	case 2d0: memoryReadDataRegister[7]
+	case 2d1: memoryReadDataRegister[15]
+	case 2d2: memoryReadDataRegister[23]
+	case 2d3: memoryReadDataRegister[31]
+};
+signal vector[24] byteToWordExtension = instructionRegister[14] ? 24d0 : repeat(24, byteToWordSignBit);
+signal vector[8] byteToWordData = switch (memoryAddressRegister[1:0]) {
+	case 2d0: memoryReadDataRegister[7:0]
+	case 2d1: memoryReadDataRegister[15:8]
+	case 2d2: memoryReadDataRegister[23:16]
+	case 2d3: memoryReadDataRegister[31:24]
+};
+
 // --------------------------------------------------------------------------------------------------------------------
 // state machine
 // --------------------------------------------------------------------------------------------------------------------
@@ -229,49 +249,9 @@ do (clk) {
 				if (instructionRegister[13]) {
 					registers[destinationRegisterIndex] = memoryReadDataRegister;
 				} else if (instructionRegister[12]) {
-					if (memoryAddressRegister[1]) {
-						if (instructionRegister[14]) {
-							registers[destinationRegisterIndex] = 16d0 _ memoryReadDataRegister[31:16];
-						} else {
-							registers[destinationRegisterIndex] = repeat(16, memoryReadDataRegister[31]) _ memoryReadDataRegister[31:16];
-						}
-					} else {
-						if (instructionRegister[14]) {
-							registers[destinationRegisterIndex] = 16d0 _ memoryReadDataRegister[15:0];
-						} else {
-							registers[destinationRegisterIndex] = repeat(16, memoryReadDataRegister[15]) _ memoryReadDataRegister[15:0];
-						}
-					}
+					registers[destinationRegisterIndex] = halfwordToWordExtension _ halfwordToWordData;
 				} else {
-					if (memoryAddressRegister[2]) {
-						if (memoryAddressRegister[1]) {
-							if (instructionRegister[14]) {
-								registers[destinationRegisterIndex] = 24d0 _ memoryReadDataRegister[31:24];
-							} else {
-								registers[destinationRegisterIndex] = repeat(24, memoryReadDataRegister[31]) _ memoryReadDataRegister[31:24];
-							}
-						} else {
-							if (instructionRegister[14]) {
-								registers[destinationRegisterIndex] = 24d0 _ memoryReadDataRegister[23:16];
-							} else {
-								registers[destinationRegisterIndex] = repeat(24, memoryReadDataRegister[23]) _ memoryReadDataRegister[23:16];
-							}
-						}
-					} else {
-						if (memoryAddressRegister[1]) {
-							if (instructionRegister[14]) {
-								registers[destinationRegisterIndex] = 24d0 _ memoryReadDataRegister[15:8];
-							} else {
-								registers[destinationRegisterIndex] = repeat(24, memoryReadDataRegister[15]) _ memoryReadDataRegister[15:8];
-							}
-						} else {
-							if (instructionRegister[14]) {
-								registers[destinationRegisterIndex] = 24d0 _ memoryReadDataRegister[7:0];
-							} else {
-								registers[destinationRegisterIndex] = repeat(24, memoryReadDataRegister[7]) _ memoryReadDataRegister[7:0];
-							}
-						}
-					}
+					registers[destinationRegisterIndex] = byteToWordExtension _ byteToWordData;
 				}
 			}
 			state = STATE_FETCH;
