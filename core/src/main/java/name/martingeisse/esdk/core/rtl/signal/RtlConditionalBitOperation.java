@@ -17,7 +17,7 @@ public final class RtlConditionalBitOperation extends RtlConditionalOperation im
 	public RtlConditionalBitOperation(RtlRealm realm, RtlBitSignal condition, RtlBitSignal onTrue, RtlBitSignal onFalse) {
 		super(realm, condition);
 		this.onTrue = checkSameRealm(onTrue);
-		this.onFalse = checkSameRealm(onTrue);
+		this.onFalse = checkSameRealm(onFalse);
 	}
 
 	public RtlBitSignal getOnTrue() {
