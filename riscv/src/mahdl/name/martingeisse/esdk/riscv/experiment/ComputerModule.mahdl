@@ -44,7 +44,7 @@ do (*) {
 }
 
 do (clk) {
-    if (cpu.memoryEnable & cpu.memoryWrite) {
+    if (cpu.memoryEnable & cpu.memoryWrite & ~cpu.memoryWordAddress[12]) {
         if (cpu.memoryWriteMask[0]) {
             memory0[memoryDataWordAddress] = cpu.memoryWriteData[7:0];
         }
