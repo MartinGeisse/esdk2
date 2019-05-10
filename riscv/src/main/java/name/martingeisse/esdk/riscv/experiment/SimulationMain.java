@@ -25,6 +25,10 @@ public class SimulationMain {
 		frame.setResizable(false);
 		frame.setVisible(true);
 
+		new Timer(500, event -> {
+			design.getComputerModule().display.getTextmodePanel().revalidate();
+		}).start();
+
 		design.simulate();
 	}
 
