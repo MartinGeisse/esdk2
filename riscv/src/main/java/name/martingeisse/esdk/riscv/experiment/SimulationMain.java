@@ -26,7 +26,7 @@ public class SimulationMain {
 		frame.setVisible(true);
 
 		new Timer(500, event -> {
-			design.getComputerModule().display.getTextmodePanel().revalidate();
+			design.getComputerModule().display.getTextmodePanel().repaint();
 		}).start();
 
 		design.simulate();
