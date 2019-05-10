@@ -1,0 +1,10 @@
+native module name.martingeisse.esdk.library.textmode.SimulatedTextmodeDisplay;
+
+interface {
+    in clock clk;
+    in bit clockEnable;
+    in bit writeEnable;
+    in vector[12] address;
+    out vector[8] readData;
+    in vector[8] writeData;
+}

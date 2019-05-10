@@ -30,7 +30,7 @@ public class TextmodePanel extends JPanel {
 		image = new BufferedImage(640, 480, BufferedImage.TYPE_INT_RGB);
 		setSize(640, 480);
 		setPreferredSize(new Dimension(640, 480));
-		characterMatrix = new RtlMemory(clock.getRealm(), 128 * 48, 8);
+		characterMatrix = new RtlMemory(clock.getRealm(), 128 * 32, 8);
 		characterMatrixPort = characterMatrix.createSynchronousPort(clock,
 			RtlSynchronousMemoryPort.ReadSupport.SYNCHRONOUS,
 			RtlSynchronousMemoryPort.WriteSupport.SYNCHRONOUS,
