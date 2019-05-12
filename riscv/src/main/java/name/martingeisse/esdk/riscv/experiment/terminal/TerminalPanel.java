@@ -5,13 +5,12 @@
 package name.martingeisse.esdk.riscv.experiment.terminal;
 
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
-import name.martingeisse.esdk.core.rtl.RtlClockedItem;
 import name.martingeisse.esdk.core.rtl.memory.RtlMemory;
 import name.martingeisse.esdk.core.rtl.memory.RtlSynchronousMemoryPort;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
+import name.martingeisse.esdk.core.rtl.simulation.RtlClockedSimulationItem;
 import name.martingeisse.esdk.core.rtl.simulation.RtlSimulatedComputedVectorSignal;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogContribution;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 
 import javax.swing.*;
@@ -58,7 +57,7 @@ public class TerminalPanel extends JPanel {
 			}
 
 		};
-		new RtlClockedItem(clock) {
+		new RtlClockedSimulationItem(clock) {
 
 			private boolean acknowledged;
 
@@ -74,11 +73,6 @@ public class TerminalPanel extends JPanel {
 				}
 			}
 
-			@Override
-			public VerilogContribution getVerilogContribution() {
-				throw newSynthesisNotSupportedException();
-			}
-
 		};
 		addKeyListener(new KeyAdapter() {
 
@@ -86,7 +80,7 @@ public class TerminalPanel extends JPanel {
 
 			@Override
 			public void keyPressed(KeyEvent e) {
-				 handle(translator.translate(e.getKeyCode(), false));
+				handle(translator.translate(e.getKeyCode(), false));
 			}
 
 			@Override

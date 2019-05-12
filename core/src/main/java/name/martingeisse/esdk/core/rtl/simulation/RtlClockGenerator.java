@@ -1,13 +1,11 @@
 package name.martingeisse.esdk.core.rtl.simulation;
 
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
-import name.martingeisse.esdk.core.rtl.RtlItem;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogContribution;
 
 /**
  *
  */
-public final class RtlClockGenerator extends RtlItem {
+public final class RtlClockGenerator extends RtlSimulationItem {
 
 	private final RtlClockNetwork clockNetwork;
 	private final long period;
@@ -34,11 +32,6 @@ public final class RtlClockGenerator extends RtlItem {
 	private void callback() {
 		clockNetwork.simulateClockEdge();
 		fire(this::callback, period);
-	}
-
-	@Override
-	public VerilogContribution getVerilogContribution() {
-		throw newSynthesisNotSupportedException();
 	}
 
 }

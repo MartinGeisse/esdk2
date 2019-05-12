@@ -1,16 +1,15 @@
 package name.martingeisse.esdk.library.util;
 
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
-import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogContribution;
+import name.martingeisse.esdk.core.rtl.simulation.RtlSimulationItem;
 
 /**
  * Allows to single-step (clock cycle-wise) through an RTL design with a single clock.
  * <p>
  * To make this class work correctly, no other code should drive the same clock network or start or stop simulation.
  */
-public class ClockStepper extends RtlItem {
+public class ClockStepper extends RtlSimulationItem {
 
 	private final RtlClockNetwork clock;
 	private final int clockPeriod;
@@ -51,11 +50,6 @@ public class ClockStepper extends RtlItem {
 				stepInternal(cycles - 1);
 			}, clockPeriod);
 		}
-	}
-
-	@Override
-	public VerilogContribution getVerilogContribution() {
-		throw newSynthesisNotSupportedException();
 	}
 
 }

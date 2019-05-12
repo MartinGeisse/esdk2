@@ -2,11 +2,9 @@ package name.martingeisse.esdk.riscv.implementation;
 
 import name.martingeisse.esdk.core.model.Design;
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
-import name.martingeisse.esdk.core.rtl.RtlClockedItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.simulation.RtlClockGenerator;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.SynthesisNotSupportedException;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogContribution;
+import name.martingeisse.esdk.core.rtl.simulation.RtlClockedSimulationItem;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 
 import java.io.File;
@@ -34,7 +32,7 @@ public abstract class AbstractSingleTestExecutor {
 		clock = new RtlClockNetwork(realm);
 		testbench = new MulticycleTestbench(realm, clock);
 		cpu = testbench.cpu;
-		new RtlClockedItem(clock) {
+		new RtlClockedSimulationItem(clock) {
 
 			private VectorValue outputData;
 			private boolean stop;
@@ -53,11 +51,6 @@ public abstract class AbstractSingleTestExecutor {
 				if (stop) {
 					getDesign().stopSimulation();
 				}
-			}
-
-			@Override
-			public VerilogContribution getVerilogContribution() {
-				throw newSynthesisNotSupportedException();
 			}
 
 		};

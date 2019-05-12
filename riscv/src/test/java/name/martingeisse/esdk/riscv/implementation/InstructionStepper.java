@@ -1,7 +1,6 @@
 package name.martingeisse.esdk.riscv.implementation;
 
-import name.martingeisse.esdk.core.rtl.RtlItem;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogContribution;
+import name.martingeisse.esdk.core.rtl.simulation.RtlSimulationItem;
 import name.martingeisse.esdk.library.util.ClockStepper;
 
 /**
@@ -9,7 +8,7 @@ import name.martingeisse.esdk.library.util.ClockStepper;
  * <p>
  * To make this class work correctly, no other code should drive the clock network or start or stop simulation.
  */
-public class InstructionStepper extends RtlItem {
+public class InstructionStepper extends RtlSimulationItem {
 
 	private final ClockStepper clockStepper;
 	private final Multicycle cpu;
@@ -51,11 +50,6 @@ public class InstructionStepper extends RtlItem {
 		for (int i = 0; i < cycles; i++) {
 			step();
 		}
-	}
-
-	@Override
-	public VerilogContribution getVerilogContribution() {
-		throw newSynthesisNotSupportedException();
 	}
 
 }

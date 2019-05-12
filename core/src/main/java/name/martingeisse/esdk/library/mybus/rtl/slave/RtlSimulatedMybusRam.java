@@ -1,14 +1,13 @@
 package name.martingeisse.esdk.library.mybus.rtl.slave;
 
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
-import name.martingeisse.esdk.core.rtl.RtlClockedItem;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.signal.connector.RtlBitSignalConnectorSampler;
 import name.martingeisse.esdk.core.rtl.signal.connector.RtlVectorSignalConnectorSampler;
+import name.martingeisse.esdk.core.rtl.simulation.RtlClockedSimulationItem;
 import name.martingeisse.esdk.core.rtl.simulation.RtlSimulatedComputedBitSignal;
 import name.martingeisse.esdk.core.rtl.simulation.RtlSimulatedSettableVectorSignal;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogContribution;
 import name.martingeisse.esdk.core.util.Matrix;
 import name.martingeisse.esdk.library.mybus.rtl.RtlMybusSlave;
 
@@ -16,7 +15,7 @@ import name.martingeisse.esdk.library.mybus.rtl.RtlMybusSlave;
  * Simulation-only MB-compatible RAM. The purpose of this is to simulate RAMs with long delays, so single-clock
  * bus cycles are not supported to simplify the code.
  */
-public final class RtlSimulatedMybusRam extends RtlClockedItem implements RtlMybusSlave {
+public final class RtlSimulatedMybusRam extends RtlClockedSimulationItem implements RtlMybusSlave {
 
 	private final int addressBits;
 	private final int addressMask;
@@ -121,15 +120,6 @@ public final class RtlSimulatedMybusRam extends RtlClockedItem implements RtlMyb
 	private int getAddress() {
 		// here we compensate for the address vector being 32 bits (we can handle at most 31 because int is signed)
 		return addressSignal.getSample().getBitsAsInt() & addressMask;
-	}
-
-	// ----------------------------------------------------------------------------------------------------------------
-	// Verilog generation
-	// ----------------------------------------------------------------------------------------------------------------
-
-	@Override
-	public VerilogContribution getVerilogContribution() {
-		throw newSynthesisNotSupportedException();
 	}
 
 }

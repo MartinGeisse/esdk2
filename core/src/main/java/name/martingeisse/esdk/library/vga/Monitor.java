@@ -5,13 +5,12 @@
 package name.martingeisse.esdk.library.vga;
 
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
-import name.martingeisse.esdk.core.rtl.RtlClockedItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlConcatenation;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorConstant;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogContribution;
+import name.martingeisse.esdk.core.rtl.simulation.RtlClockedSimulationItem;
 
 /**
  * Simulates a VGA monitor in a very loose way:
@@ -19,11 +18,11 @@ import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogCon
  * - pixels are accepted based on the RTL clock and a clock-enable signal
  * - sync pulses may be as short as one clock cycle
  * - porches must be 0 clock cycles *after* taking the clock-enable into account
- *
+ * <p>
  * While this won't help in debugging sync problems, it should work well enough to debug the rest of the image
  * generation logic.
  */
-public final class Monitor extends RtlClockedItem {
+public final class Monitor extends RtlClockedSimulationItem {
 
 	private RtlVectorSignal r;
 	private RtlVectorSignal g;
@@ -90,11 +89,6 @@ public final class Monitor extends RtlClockedItem {
 	@Override
 	public void updateState() {
 		imageDecoder.consumeDataUnit(sampledR, sampledG, sampledB, sampledHsync, sampledVsync);
-	}
-
-	@Override
-	public VerilogContribution getVerilogContribution() {
-		throw newSynthesisNotSupportedException();
 	}
 
 }

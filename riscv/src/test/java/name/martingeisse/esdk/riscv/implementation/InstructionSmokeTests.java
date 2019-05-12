@@ -2,13 +2,11 @@ package name.martingeisse.esdk.riscv.implementation;
 
 import name.martingeisse.esdk.core.model.Design;
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
-import name.martingeisse.esdk.core.rtl.RtlClockedItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorConstant;
+import name.martingeisse.esdk.core.rtl.simulation.RtlClockedSimulationItem;
 import name.martingeisse.esdk.core.rtl.simulation.RtlSimulatedSettableVectorSignal;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.SynthesisNotSupportedException;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogContribution;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 import name.martingeisse.esdk.library.util.ClockStepper;
 import org.junit.Assert;
@@ -163,7 +161,7 @@ public class InstructionSmokeTests {
 
 //region helper classes
 
-	public class StoreRecorder extends RtlClockedItem {
+	public class StoreRecorder extends RtlClockedSimulationItem {
 
 		public final List<StoreRecorderEntry> entries = new ArrayList<>();
 		private StoreRecorderEntry currentEntry;
@@ -189,11 +187,6 @@ public class InstructionSmokeTests {
 			if (currentEntry != null) {
 				entries.add(currentEntry);
 			}
-		}
-
-		@Override
-		public VerilogContribution getVerilogContribution() {
-			throw newSynthesisNotSupportedException();
 		}
 
 	}

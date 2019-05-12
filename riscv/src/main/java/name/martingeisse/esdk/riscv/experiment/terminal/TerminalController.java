@@ -1,16 +1,15 @@
 package name.martingeisse.esdk.riscv.experiment.terminal;
 
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
-import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogContribution;
+import name.martingeisse.esdk.core.rtl.simulation.RtlSimulationItem;
 
 /**
  *
  */
-public class TerminalController extends RtlItem {
+public class TerminalController extends RtlSimulationItem {
 
 	private final TerminalPanel terminalPanel;
 
@@ -57,11 +56,6 @@ public class TerminalController extends RtlItem {
 
 	public void setWriteData(RtlVectorSignal writeDataSignal) {
 		terminalPanel.getCharacterMatrixPort().setWriteDataSignal(writeDataSignal);
-	}
-
-	@Override
-	public VerilogContribution getVerilogContribution() {
-		throw newSynthesisNotSupportedException();
 	}
 
 	public RtlVectorSignal getInputData() {
