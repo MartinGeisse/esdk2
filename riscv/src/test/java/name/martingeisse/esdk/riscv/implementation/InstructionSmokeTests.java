@@ -193,7 +193,7 @@ public class InstructionSmokeTests {
 
 		@Override
 		public VerilogContribution getVerilogContribution() {
-			throw new SynthesisNotSupportedException();
+			throw newSynthesisNotSupportedException();
 		}
 
 	}

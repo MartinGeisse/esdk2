@@ -57,7 +57,7 @@ public abstract class AbstractSingleTestExecutor {
 
 			@Override
 			public VerilogContribution getVerilogContribution() {
-				throw new SynthesisNotSupportedException();
+				throw newSynthesisNotSupportedException();
 			}
 
 		};

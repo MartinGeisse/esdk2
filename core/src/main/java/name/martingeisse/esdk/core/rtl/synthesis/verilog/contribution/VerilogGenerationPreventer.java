@@ -40,7 +40,7 @@ public final class VerilogGenerationPreventer implements VerilogContribution {
 	}
 
 	private void fail() {
-		throw new SynthesisNotSupportedException();
+		throw new SynthesisNotSupportedException("synthesis not supported for this design");
 	}
 
 }
