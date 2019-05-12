@@ -3,8 +3,8 @@ package name.martingeisse.esdk.core.rtl.signal;
 import com.google.common.collect.ImmutableList;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.*;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogContribution;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 
 import java.util.ArrayList;
@@ -52,7 +52,7 @@ public abstract class RtlSwitchSignal<B extends RtlSignal> extends RtlItem imple
 	}
 
 	public final void addCase(VectorValue selectorValue1, VectorValue selectorValue2,
-						VectorValue selectorValue3, B branch) {
+							  VectorValue selectorValue3, B branch) {
 		addCase(ImmutableList.of(selectorValue1, selectorValue2, selectorValue3), branch);
 	}
 
@@ -106,12 +106,97 @@ public abstract class RtlSwitchSignal<B extends RtlSignal> extends RtlItem imple
 
 	@Override
 	public VerilogContribution getVerilogContribution() {
-		throw new UnsupportedOperationException("not yet implemented");
+		return new VerilogContribution() {
+
+			private String name;
+
+			@Override
+			public void prepareSynthesis(SynthesisPreparationContext context) {
+				name = context.declareSignal(RtlSwitchSignal.this, "switch", true, VerilogSignalKind.REG, false);
+			}
+
+			@Override
+			public void analyzeSignalUsage(SignalUsageConsumer consumer) {
+			}
+
+			@Override
+			public void printDeclarations(VerilogWriter out) {
+			}
+
+			@Override
+			public void printImplementation(VerilogWriter out) {
+				out.indent();
+				out.println("always @(*) begin");
+				out.startIndentation();
+				out.indent();
+				out.print("case (");
+				out.print(selector);
+				out.println(")");
+				out.println();
+				out.startIndentation();
+				for (Case<B> aCase : cases) {
+					out.indent();
+					boolean firstSelectorValue = true;
+					for (VectorValue selectorValue : aCase.selectorValues) {
+						if (firstSelectorValue) {
+							firstSelectorValue = false;
+						} else {
+							out.print(", ");
+						}
+						out.print(selectorValue);
+					}
+					out.println(": begin");
+					out.startIndentation();
+					out.print(RtlSwitchSignal.this);
+					out.print(" <= ");
+					out.print(aCase.branch);
+					out.println(";");
+					out.endIndentation();
+					out.println("end");
+					out.println();
+				}
+				if (defaultSignal != null) {
+					out.indent();
+					out.println("default: begin");
+					out.startIndentation();
+					out.print(RtlSwitchSignal.this);
+					out.print(" <= ");
+					out.print(defaultSignal);
+					out.println(";");
+					out.endIndentation();
+					out.println("end");
+					out.println();
+				}
+				out.endIndentation();
+				out.indent();
+				out.println("endcase");
+				out.endIndentation();
+				out.indent();
+				out.println("end");
+			}
+
+		};
+	}
+
+	@Override
+	public boolean compliesWith(VerilogExpressionNesting nesting) {
+		return false;
+	}
+
+	@Override
+	public void analyzeSignalUsage(SignalUsageConsumer consumer) {
+		consumer.consumeSignalUsage(selector, VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
+		for (Case aCase : cases) {
+			consumer.consumeSignalUsage(aCase.branch, VerilogExpressionNesting.ALL);
+		}
+		if (defaultSignal != null) {
+			consumer.consumeSignalUsage(defaultSignal, VerilogExpressionNesting.ALL);
+		}
 	}
 
 	@Override
 	public void printVerilogImplementationExpression(VerilogExpressionWriter out) {
-		throw new UnsupportedOperationException("not yet implemented");
+		throw new UnsupportedOperationException("cannot generate implementation expression for RtlSwitchSignal");
 	}
 
 }

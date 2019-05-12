@@ -101,7 +101,42 @@ public final class RtlSwitchStatement extends RtlStatement {
 
 	@Override
 	public void printVerilogStatements(VerilogWriter out) {
-		throw new UnsupportedOperationException("not yet implemented");
+		out.indent();
+		out.print("case (");
+		out.print(selector);
+		out.println(")");
+		out.println();
+		out.startIndentation();
+		for (Case aCase : cases) {
+			out.indent();
+			boolean firstSelectorValue = true;
+			for (VectorValue selectorValue : aCase.selectorValues) {
+				if (firstSelectorValue) {
+					firstSelectorValue = false;
+				} else {
+					out.print(", ");
+				}
+				out.print(selectorValue);
+			}
+			out.println(": begin");
+			out.startIndentation();
+			aCase.getBranch().printVerilogStatements(out);
+			out.endIndentation();
+			out.println("end");
+			out.println();
+		}
+		if (defaultBranch != null) {
+			out.indent();
+			out.println("default: begin");
+			out.startIndentation();
+			defaultBranch.printVerilogStatements(out);
+			out.endIndentation();
+			out.println("end");
+			out.println();
+		}
+		out.endIndentation();
+		out.indent();
+		out.println("endcase");
 	}
 
 }
