@@ -9,6 +9,7 @@ import name.martingeisse.esdk.core.rtl.RtlClockedItem;
 import name.martingeisse.esdk.core.rtl.block.statement.RtlStatementSequence;
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.*;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogContribution;
 import name.martingeisse.esdk.core.util.Matrix;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 

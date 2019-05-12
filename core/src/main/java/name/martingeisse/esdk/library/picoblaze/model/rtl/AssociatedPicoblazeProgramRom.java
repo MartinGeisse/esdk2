@@ -10,8 +10,8 @@ import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.memory.RtlMemory;
 import name.martingeisse.esdk.core.rtl.memory.RtlSynchronousMemoryPort;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.EmptyVerilogContribution;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.EmptyVerilogContribution;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogContribution;
 import name.martingeisse.esdk.library.picoblaze.model.ProgramRomUtil;
 
 /**

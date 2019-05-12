@@ -2,8 +2,8 @@ package name.martingeisse.esdk.core.rtl.signal;
 
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlClockedItem;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.EmptyVerilogContribution;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.EmptyVerilogContribution;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogContribution;
 
 /**
  * Samples a bit signal at clock edges and makes it available via a getter method. This is useful to implement custom

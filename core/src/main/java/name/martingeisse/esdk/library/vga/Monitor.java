@@ -11,7 +11,7 @@ import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlConcatenation;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorConstant;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogContribution;
 
 /**
  * Simulates a VGA monitor in a very loose way:

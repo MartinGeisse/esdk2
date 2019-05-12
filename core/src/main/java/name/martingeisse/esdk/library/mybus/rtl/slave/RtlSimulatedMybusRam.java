@@ -8,7 +8,7 @@ import name.martingeisse.esdk.core.rtl.signal.connector.RtlBitSignalConnectorSam
 import name.martingeisse.esdk.core.rtl.signal.connector.RtlVectorSignalConnectorSampler;
 import name.martingeisse.esdk.core.rtl.simulation.RtlSimulatedComputedBitSignal;
 import name.martingeisse.esdk.core.rtl.simulation.RtlSimulatedSettableVectorSignal;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogContribution;
 import name.martingeisse.esdk.core.util.Matrix;
 import name.martingeisse.esdk.library.mybus.rtl.RtlMybusSlave;
 

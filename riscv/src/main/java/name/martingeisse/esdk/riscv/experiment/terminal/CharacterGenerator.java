@@ -3,7 +3,7 @@
  *
  * This file is distributed under the terms of the MIT license.
  */
-package name.martingeisse.esdk.library.textmode;
+package name.martingeisse.esdk.riscv.experiment.terminal;
 
 /**
  * This class contains the static character pixels.

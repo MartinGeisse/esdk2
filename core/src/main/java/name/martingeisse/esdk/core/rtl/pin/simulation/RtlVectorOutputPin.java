@@ -6,9 +6,9 @@ package name.martingeisse.esdk.core.rtl.pin.simulation;
 
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.pin.RtlPin;
-import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.*;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogContribution;
 
 /**
  * This pin type isn't supported by ISE generation but can be used to generate Verilog code for a module with

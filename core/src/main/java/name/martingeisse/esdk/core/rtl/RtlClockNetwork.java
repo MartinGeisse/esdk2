@@ -8,8 +8,8 @@ import name.martingeisse.esdk.core.rtl.block.RtlClockedBlock;
 import name.martingeisse.esdk.core.rtl.pin.RtlPin;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.EmptyVerilogContribution;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.EmptyVerilogContribution;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogContribution;
 
 /**
  * A real clock network (after synthesis) reacts to real clock edges, i.e. 0-to-1 transitions of the clock signal. In

@@ -5,8 +5,8 @@ import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlClockedItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.simulation.RtlClockGenerator;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.SynthesisNotSupportedException;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.SynthesisNotSupportedException;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogContribution;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 
 import java.io.File;

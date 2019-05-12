@@ -3,7 +3,7 @@ package name.martingeisse.esdk.library.util;
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogContribution;
 
 /**
  * Allows to single-step (clock cycle-wise) through an RTL design with a single clock.

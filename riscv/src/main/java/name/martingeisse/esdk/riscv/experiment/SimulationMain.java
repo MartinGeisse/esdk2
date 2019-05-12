@@ -18,15 +18,15 @@ public class SimulationMain {
 		loadProgram(design.getComputerModule());
 		new RtlClockGenerator(design.getClock(), 10);
 
-		JFrame frame = new JFrame("Textmode");
-		frame.add(design.getComputerModule().display.getTextmodePanel());
+		JFrame frame = new JFrame("Terminal");
+		frame.add(design.getComputerModule().terminal.getTerminalPanel());
 		frame.pack();
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		frame.setResizable(false);
 		frame.setVisible(true);
 
 		new Timer(500, event -> {
-			design.getComputerModule().display.getTextmodePanel().repaint();
+			design.getComputerModule().terminal.getTerminalPanel().repaint();
 		}).start();
 
 		design.simulate();

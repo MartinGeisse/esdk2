@@ -1,4 +1,4 @@
-package name.martingeisse.esdk.core.rtl.synthesis.verilog;
+package name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution;
 
 /**
  *

@@ -2,8 +2,8 @@ package name.martingeisse.esdk.core.rtl.signal;
 
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlClockedItem;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.EmptyVerilogContribution;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.EmptyVerilogContribution;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogContribution;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 
 /**

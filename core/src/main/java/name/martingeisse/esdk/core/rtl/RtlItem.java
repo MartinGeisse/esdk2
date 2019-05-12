@@ -7,8 +7,8 @@ package name.martingeisse.esdk.core.rtl;
 import name.martingeisse.esdk.core.model.Item;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.SynthesisNotSupportedException;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogContribution;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.SynthesisNotSupportedException;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogContribution;
 
 /**
  * TODO: There is no useful way to generalize how the RTL code is built. It is just a huge pile of workarounds for

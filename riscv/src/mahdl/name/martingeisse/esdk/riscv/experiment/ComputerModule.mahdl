@@ -7,14 +7,14 @@ interface {
 name.martingeisse.esdk.riscv.implementation.Multicycle cpu;
 signal vector[10] instructionWordAddress;
 signal vector[10] memoryDataWordAddress;
-signal vector[12] displayDataWordAddress;
+signal bit terminalSelected = cpu.memoryWordAddress[12];
 
 // Memory: the number indicates the significance inside a word, NOT the position of a byte in a byte buffer (these
 // are different since RISC-V is little-endian).
 register matrix[1024][8] memory0, memory1, memory2, memory3;
 
 // peripherals
-name.martingeisse.esdk.library.textmode.SimulatedTextmodeDisplay display;
+name.martingeisse.esdk.riscv.experiment.terminal.TerminalController terminal;
 
 do (*) {
 
@@ -27,24 +27,24 @@ do (*) {
             memory1[instructionWordAddress] _ memory0[instructionWordAddress];
     cpu.instructionReadAcknowledge = 1;
 
-    // memory data interface
-    memoryDataWordAddress = cpu.memoryWordAddress[9:0];
-    cpu.memoryReadData = memory3[memoryDataWordAddress] _ memory2[memoryDataWordAddress] _
-            memory1[memoryDataWordAddress] _ memory0[memoryDataWordAddress];
+    // data interface
     cpu.memoryAcknowledge = 1;
+    memoryDataWordAddress = cpu.memoryWordAddress[9:0];
+    cpu.memoryReadData = terminalSelected ?
+            (24d0 _ terminal.inputData) :
+            (memory3[memoryDataWordAddress] _ memory2[memoryDataWordAddress] _ memory1[memoryDataWordAddress] _ memory0[memoryDataWordAddress]);
 
-    // display data interface
-    displayDataWordAddress = cpu.memoryWordAddress[11:0];
-    display.clk = clk;
-    display.address = displayDataWordAddress;
-    display.clockEnable = 1;
-    display.writeEnable = cpu.memoryEnable & cpu.memoryWrite & cpu.memoryWordAddress[12];
-    display.writeData = cpu.memoryWriteData[7:0];
+    terminal.clk = clk;
+    terminal.clockEnable = 1;
+    terminal.writeEnable = cpu.memoryEnable & cpu.memoryWrite & terminalSelected;
+    terminal.address = cpu.memoryWordAddress[11:0];
+    terminal.writeData = cpu.memoryWriteData[7:0];
+    terminal.inputAcknowledge = cpu.memoryEnable & ~cpu.memoryWrite & terminalSelected;
 
 }
 
 do (clk) {
-    if (cpu.memoryEnable & cpu.memoryWrite & ~cpu.memoryWordAddress[12]) {
+    if (cpu.memoryEnable & cpu.memoryWrite & ~terminalSelected) {
         if (cpu.memoryWriteMask[0]) {
             memory0[memoryDataWordAddress] = cpu.memoryWriteData[7:0];
         }
