@@ -6,7 +6,7 @@ package name.martingeisse.esdk.core.rtl.block.statement.target;
 
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
-import name.martingeisse.esdk.core.rtl.block.RtlProceduralVectorSignal;
+import name.martingeisse.esdk.core.rtl.block.RtlProceduralVectorRegister;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.EmptyVerilogContribution;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.SignalUsageConsumer;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogContribution;
@@ -18,11 +18,11 @@ import name.martingeisse.esdk.core.util.vector.VectorValue;
  */
 public final class RtlVectorTargetRangeSelection extends RtlItem implements RtlVectorAssignmentTarget {
 
-	private final RtlProceduralVectorSignal containerTarget;
+	private final RtlProceduralVectorRegister containerTarget;
 	private final int from;
 	private final int to;
 
-	public RtlVectorTargetRangeSelection(RtlRealm realm, RtlProceduralVectorSignal containerTarget, int from, int to) {
+	public RtlVectorTargetRangeSelection(RtlRealm realm, RtlProceduralVectorRegister containerTarget, int from, int to) {
 		super(realm);
 		if (from < 0 || to < 0 || from >= containerTarget.getWidth() || to >= containerTarget.getWidth() || from < to) {
 			throw new IllegalArgumentException("invalid from/to indices for container width " +
@@ -33,7 +33,7 @@ public final class RtlVectorTargetRangeSelection extends RtlItem implements RtlV
 		this.to = to;
 	}
 
-	public RtlProceduralVectorSignal getContainerTarget() {
+	public RtlProceduralVectorRegister getContainerTarget() {
 		return containerTarget;
 	}
 

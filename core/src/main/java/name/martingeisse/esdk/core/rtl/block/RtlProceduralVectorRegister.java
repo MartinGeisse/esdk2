@@ -15,13 +15,13 @@ import name.martingeisse.esdk.core.util.vector.VectorValue;
 /**
  *
  */
-public final class RtlProceduralVectorSignal extends RtlProceduralSignal implements RtlVectorSignal, RtlVectorAssignmentTarget {
+public final class RtlProceduralVectorRegister extends RtlProceduralRegister implements RtlVectorSignal, RtlVectorAssignmentTarget {
 
 	private final int width;
 	private VectorValue value;
 	private VectorValue nextValue;
 
-	public RtlProceduralVectorSignal(RtlRealm realm, RtlClockedBlock block, int width) {
+	public RtlProceduralVectorRegister(RtlRealm realm, RtlClockedBlock block, int width) {
 		super(realm, block);
 		this.width = width;
 		this.value = VectorValue.of(width, 0);

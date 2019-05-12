@@ -2,8 +2,8 @@ package name.martingeisse.esdk.examples.vga;
 
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.block.RtlClockedBlock;
-import name.martingeisse.esdk.core.rtl.block.RtlProceduralBitSignal;
-import name.martingeisse.esdk.core.rtl.block.RtlProceduralVectorSignal;
+import name.martingeisse.esdk.core.rtl.block.RtlProceduralBitRegister;
+import name.martingeisse.esdk.core.rtl.block.RtlProceduralVectorRegister;
 import name.martingeisse.esdk.core.rtl.block.statement.RtlConditionChainStatement;
 import name.martingeisse.esdk.core.rtl.block.statement.RtlStatementSequence;
 import name.martingeisse.esdk.core.rtl.block.statement.RtlWhenStatement;
@@ -15,10 +15,10 @@ import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
  */
 public class VgaTimer {
 
-	private final RtlProceduralVectorSignal x;
-	private final RtlProceduralVectorSignal y;
-	private final RtlProceduralBitSignal hsync;
-	private final RtlProceduralBitSignal vsync;
+	private final RtlProceduralVectorRegister x;
+	private final RtlProceduralVectorRegister y;
+	private final RtlProceduralBitRegister hsync;
+	private final RtlProceduralBitRegister vsync;
 	private final RtlBitSignal blank;
 
 	public VgaTimer(RtlClockNetwork clock) {
@@ -28,9 +28,9 @@ public class VgaTimer {
 		y = block.createVector(10);
 		hsync = block.createBit();
 		vsync = block.createBit();
-		RtlProceduralBitSignal p = block.createBit();
-		RtlProceduralBitSignal xblank = block.createBit();
-		RtlProceduralBitSignal yblank = block.createBit();
+		RtlProceduralBitRegister p = block.createBit();
+		RtlProceduralBitRegister xblank = block.createBit();
+		RtlProceduralBitRegister yblank = block.createBit();
 
 		RtlStatementSequence initializer = block.getInitializerStatements();
 		initializer.assign(p, false);

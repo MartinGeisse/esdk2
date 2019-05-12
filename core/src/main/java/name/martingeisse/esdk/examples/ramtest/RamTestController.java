@@ -9,7 +9,7 @@ import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.block.RtlClockedBlock;
-import name.martingeisse.esdk.core.rtl.block.RtlProceduralBitSignal;
+import name.martingeisse.esdk.core.rtl.block.RtlProceduralBitRegister;
 import name.martingeisse.esdk.core.rtl.block.statement.RtlConditionChainStatement;
 import name.martingeisse.esdk.core.rtl.block.statement.RtlStatementSequence;
 import name.martingeisse.esdk.core.rtl.signal.*;
@@ -58,8 +58,8 @@ public class RamTestController extends RtlItem {
 		// Mybus interface
 		{
 			RtlClockedBlock block = new RtlClockedBlock(clock);
-			RtlProceduralBitSignal mbCycle = block.createBit();
-			RtlProceduralBitSignal mbWrite = block.createBit();
+			RtlProceduralBitRegister mbCycle = block.createBit();
+			RtlProceduralBitRegister mbWrite = block.createBit();
 			RtlConditionChainStatement chain = block.getStatements().conditionChain();
 			RtlStatementSequence startCycle = chain.when(cpu.getWriteStrobe().and(cpu.getPortAddress().select(7)));
 			startCycle.assign(mbCycle, true);

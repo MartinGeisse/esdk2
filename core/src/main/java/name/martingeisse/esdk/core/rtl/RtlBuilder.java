@@ -1,8 +1,8 @@
 package name.martingeisse.esdk.core.rtl;
 
 import name.martingeisse.esdk.core.rtl.block.RtlClockedBlock;
-import name.martingeisse.esdk.core.rtl.block.RtlProceduralBitSignal;
-import name.martingeisse.esdk.core.rtl.block.RtlProceduralVectorSignal;
+import name.martingeisse.esdk.core.rtl.block.RtlProceduralBitRegister;
+import name.martingeisse.esdk.core.rtl.block.RtlProceduralVectorRegister;
 import name.martingeisse.esdk.core.rtl.block.statement.RtlStatementSequence;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
@@ -35,7 +35,7 @@ public final class RtlBuilder {
 
 	private static RtlBitSignal bitRegister(RtlClockNetwork clock, RtlBitSignal data, RtlBitSignal enable, boolean initialize, boolean initialValue) {
 		RtlClockedBlock block = new RtlClockedBlock(clock);
-		RtlProceduralBitSignal register = block.createBit();
+		RtlProceduralBitRegister register = block.createBit();
 		if (initialize) {
 			block.getInitializerStatements().assign(register, initialValue);
 		}
@@ -58,7 +58,7 @@ public final class RtlBuilder {
 
 	public static RtlVectorSignal vectorRegister(RtlClockNetwork clock, RtlVectorSignal data, RtlBitSignal enable, VectorValue initialValue) {
 		RtlClockedBlock block = new RtlClockedBlock(clock);
-		RtlProceduralVectorSignal register = block.createVector(data.getWidth());
+		RtlProceduralVectorRegister register = block.createVector(data.getWidth());
 		if (initialValue != null) {
 			block.getInitializerStatements().assign(register, initialValue);
 		}

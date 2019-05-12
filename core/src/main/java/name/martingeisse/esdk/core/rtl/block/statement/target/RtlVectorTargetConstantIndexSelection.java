@@ -6,7 +6,7 @@ package name.martingeisse.esdk.core.rtl.block.statement.target;
 
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
-import name.martingeisse.esdk.core.rtl.block.RtlProceduralVectorSignal;
+import name.martingeisse.esdk.core.rtl.block.RtlProceduralVectorRegister;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.EmptyVerilogContribution;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.SignalUsageConsumer;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogContribution;
@@ -18,10 +18,10 @@ import name.martingeisse.esdk.core.util.vector.VectorValue;
  */
 public final class RtlVectorTargetConstantIndexSelection extends RtlItem implements RtlBitAssignmentTarget {
 
-	private final RtlProceduralVectorSignal containerTarget;
+	private final RtlProceduralVectorRegister containerTarget;
 	private final int index;
 
-	public RtlVectorTargetConstantIndexSelection(RtlRealm realm, RtlProceduralVectorSignal containerTarget, int index) {
+	public RtlVectorTargetConstantIndexSelection(RtlRealm realm, RtlProceduralVectorRegister containerTarget, int index) {
 		super(realm);
 		if (index < 0 || index >= containerTarget.getWidth()) {
 			throw new IllegalArgumentException("index " + index + " out of bounds for width " + containerTarget.getWidth());
@@ -30,7 +30,7 @@ public final class RtlVectorTargetConstantIndexSelection extends RtlItem impleme
 		this.index = index;
 	}
 
-	public RtlProceduralVectorSignal getContainerTarget() {
+	public RtlProceduralVectorRegister getContainerTarget() {
 		return containerTarget;
 	}
 

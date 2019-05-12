@@ -15,14 +15,14 @@ import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogCon
 /**
  *
  */
-public abstract class RtlProceduralSignal extends RtlItem implements RtlSignal, RtlAssignmentTarget {
+public abstract class RtlProceduralRegister extends RtlItem implements RtlSignal, RtlAssignmentTarget {
 
 	private final RtlClockedBlock block;
 
-	public RtlProceduralSignal(RtlRealm realm, RtlClockedBlock block) {
+	public RtlProceduralRegister(RtlRealm realm, RtlClockedBlock block) {
 		super(realm);
 		this.block = checkSameRealm(block);
-		block.registerProceduralSignal(this);
+		block.registerProceduralRegister(this);
 	}
 
 	public RtlClockedBlock getBlock() {

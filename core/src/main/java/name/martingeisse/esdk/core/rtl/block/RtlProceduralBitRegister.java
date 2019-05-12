@@ -11,12 +11,12 @@ import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 /**
  *
  */
-public final class RtlProceduralBitSignal extends RtlProceduralSignal implements RtlBitSignal, RtlBitAssignmentTarget {
+public final class RtlProceduralBitRegister extends RtlProceduralRegister implements RtlBitSignal, RtlBitAssignmentTarget {
 
 	private boolean value;
 	private boolean nextValue;
 
-	public RtlProceduralBitSignal(RtlRealm realm, RtlClockedBlock block) {
+	public RtlProceduralBitRegister(RtlRealm realm, RtlClockedBlock block) {
 		super(realm, block);
 	}
 

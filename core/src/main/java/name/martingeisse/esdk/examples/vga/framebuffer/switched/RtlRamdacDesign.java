@@ -9,8 +9,8 @@ import name.martingeisse.esdk.core.rtl.RtlBuilder;
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.block.RtlClockedBlock;
-import name.martingeisse.esdk.core.rtl.block.RtlProceduralBitSignal;
-import name.martingeisse.esdk.core.rtl.block.RtlProceduralVectorSignal;
+import name.martingeisse.esdk.core.rtl.block.RtlProceduralBitRegister;
+import name.martingeisse.esdk.core.rtl.block.RtlProceduralVectorRegister;
 import name.martingeisse.esdk.core.rtl.block.statement.RtlConditionChainStatement;
 import name.martingeisse.esdk.core.rtl.block.statement.RtlStatementSequence;
 import name.martingeisse.esdk.core.rtl.memory.RtlMemory;
@@ -47,11 +47,11 @@ public class RtlRamdacDesign extends Design {
 	private final RtlMemory framebuffer;
 	private final RtlSynchronousMemoryPort framebufferPort;
 
-	private final RtlProceduralVectorSignal rowCopierFramebufferRowIndex;
-	private final RtlProceduralVectorSignal rowCopierFramebufferColumnIndex;
-	private final RtlProceduralBitSignal rowCopierReadActive;
-	private final RtlProceduralBitSignal rowCopierDataAvailable;
-	private final RtlProceduralVectorSignal rowCopierWriteAddress;
+	private final RtlProceduralVectorRegister rowCopierFramebufferRowIndex;
+	private final RtlProceduralVectorRegister rowCopierFramebufferColumnIndex;
+	private final RtlProceduralBitRegister rowCopierReadActive;
+	private final RtlProceduralBitRegister rowCopierDataAvailable;
+	private final RtlProceduralVectorRegister rowCopierWriteAddress;
 
 	private final RtlMemory rowBuffer;
 	private final RtlSynchronousMemoryPort rowBufferWritePort;

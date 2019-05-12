@@ -6,7 +6,7 @@ package name.martingeisse.esdk.core.rtl.block.statement.target;
 
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
-import name.martingeisse.esdk.core.rtl.block.RtlProceduralVectorSignal;
+import name.martingeisse.esdk.core.rtl.block.RtlProceduralVectorRegister;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.*;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.EmptyVerilogContribution;
@@ -18,10 +18,10 @@ import name.martingeisse.esdk.core.util.vector.VectorValue;
  */
 public final class RtlVectorTargetIndexSelection extends RtlItem implements RtlBitAssignmentTarget {
 
-	private final RtlProceduralVectorSignal containerTarget;
+	private final RtlProceduralVectorRegister containerTarget;
 	private final RtlVectorSignal indexSignal;
 
-	public RtlVectorTargetIndexSelection(RtlRealm realm, RtlProceduralVectorSignal containerTarget, RtlVectorSignal indexSignal) {
+	public RtlVectorTargetIndexSelection(RtlRealm realm, RtlProceduralVectorRegister containerTarget, RtlVectorSignal indexSignal) {
 		super(realm);
 		if (containerTarget.getWidth() < (1 << indexSignal.getWidth())) {
 			throw new IllegalArgumentException("container of width " + containerTarget.getWidth() + " is too small for index of width " + indexSignal.getWidth());
@@ -30,7 +30,7 @@ public final class RtlVectorTargetIndexSelection extends RtlItem implements RtlB
 		this.indexSignal = checkSameRealm(indexSignal);
 	}
 
-	public RtlProceduralVectorSignal getContainerTarget() {
+	public RtlProceduralVectorRegister getContainerTarget() {
 		return containerTarget;
 	}
 

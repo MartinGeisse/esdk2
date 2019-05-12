@@ -25,7 +25,7 @@ import java.util.List;
  */
 public final class RtlClockedBlock extends RtlClockedItem {
 
-	private final List<RtlProceduralSignal> proceduralSignals;
+	private final List<RtlProceduralRegister> proceduralRegisters;
 	private final List<RtlProceduralMemory> proceduralMemories;
 	private final RtlStatementSequence initializerStatements;
 	private final RtlStatementSequence statements;
@@ -33,22 +33,22 @@ public final class RtlClockedBlock extends RtlClockedItem {
 	public RtlClockedBlock(RtlClockNetwork clockNetwork) {
 		super(clockNetwork);
 
-		this.proceduralSignals = new ArrayList<>();
+		this.proceduralRegisters = new ArrayList<>();
 		this.proceduralMemories = new ArrayList<>();
 		this.initializerStatements = new RtlStatementSequence(getRealm());
 		this.statements = new RtlStatementSequence(getRealm());
 	}
 
-	void registerProceduralSignal(RtlProceduralSignal proceduralSignal) {
-		proceduralSignals.add(proceduralSignal);
+	void registerProceduralRegister(RtlProceduralRegister proceduralRegister) {
+		proceduralRegisters.add(proceduralRegister);
 	}
 
 	void registerProceduralMemory(RtlProceduralMemory proceduralMemory) {
 		proceduralMemories.add(proceduralMemory);
 	}
 
-	public List<RtlProceduralSignal> getProceduralSignals() {
-		return proceduralSignals;
+	public List<RtlProceduralRegister> getProceduralRegisters() {
+		return proceduralRegisters;
 	}
 
 	public List<RtlProceduralMemory> getProceduralMemories() {
@@ -67,22 +67,22 @@ public final class RtlClockedBlock extends RtlClockedItem {
 	// factory methods
 	// ----------------------------------------------------------------------------------------------------------------
 
-	public RtlProceduralBitSignal createBit() {
-		return new RtlProceduralBitSignal(getRealm(), this);
+	public RtlProceduralBitRegister createBit() {
+		return new RtlProceduralBitRegister(getRealm(), this);
 	}
 
-	public RtlProceduralBitSignal createBit(boolean initialValue) {
-		RtlProceduralBitSignal signal = createBit();
+	public RtlProceduralBitRegister createBit(boolean initialValue) {
+		RtlProceduralBitRegister signal = createBit();
 		initializerStatements.assign(signal, initialValue);
 		return signal;
 	}
 
-	public RtlProceduralVectorSignal createVector(int width) {
-		return new RtlProceduralVectorSignal(getRealm(), this, width);
+	public RtlProceduralVectorRegister createVector(int width) {
+		return new RtlProceduralVectorRegister(getRealm(), this, width);
 	}
 
-	public RtlProceduralVectorSignal createVector(int width, VectorValue initialValue) {
-		RtlProceduralVectorSignal signal = createVector(width);
+	public RtlProceduralVectorRegister createVector(int width, VectorValue initialValue) {
+		RtlProceduralVectorRegister signal = createVector(width);
 		initializerStatements.assign(signal, initialValue);
 		return signal;
 	}
@@ -109,7 +109,7 @@ public final class RtlClockedBlock extends RtlClockedItem {
 	}
 
 	public void updateState() {
-		for (RtlProceduralSignal signal : proceduralSignals) {
+		for (RtlProceduralRegister signal : proceduralRegisters) {
 			signal.updateValue();
 		}
 		for (RtlProceduralMemory memory : proceduralMemories) {
@@ -127,7 +127,7 @@ public final class RtlClockedBlock extends RtlClockedItem {
 
 			@Override
 			public void prepareSynthesis(SynthesisPreparationContext context) {
-				for (RtlSignal signal : proceduralSignals) {
+				for (RtlSignal signal : proceduralRegisters) {
 					context.declareSignal(signal, "r", true, VerilogSignalKind.REG, false);
 				}
 				// TODO memories

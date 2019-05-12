@@ -8,7 +8,7 @@ import name.martingeisse.esdk.core.model.Design;
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.block.RtlClockedBlock;
-import name.martingeisse.esdk.core.rtl.block.RtlProceduralVectorSignal;
+import name.martingeisse.esdk.core.rtl.block.RtlProceduralVectorRegister;
 import name.martingeisse.esdk.core.rtl.block.statement.RtlWhenStatement;
 import name.martingeisse.esdk.core.rtl.pin.RtlInputPin;
 import name.martingeisse.esdk.core.rtl.pin.RtlOutputPin;
@@ -39,7 +39,7 @@ public class MovingLightDesign extends Design {
 		// do (clk) {
 		//   prescaler = prescaler + 1;
 		// }
-		RtlProceduralVectorSignal prescaler = block.createVector(24);
+		RtlProceduralVectorRegister prescaler = block.createVector(24);
 		block.getInitializerStatements().assignUnsigned(prescaler, 0);
 		block.getStatements().assign(prescaler, prescaler.add(1));
 
@@ -50,7 +50,7 @@ public class MovingLightDesign extends Design {
 		//   }
 		// }
 		//
-		RtlProceduralVectorSignal leds = block.createVector(8);
+		RtlProceduralVectorRegister leds = block.createVector(8);
 		block.getInitializerStatements().assignUnsigned(leds, 1);
 		RtlWhenStatement whenPrescalerZero = block.getStatements().when(prescaler.compareEqual(0));
 		whenPrescalerZero.getThenBranch().assign(leds,

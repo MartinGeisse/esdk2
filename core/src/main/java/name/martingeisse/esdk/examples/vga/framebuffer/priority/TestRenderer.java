@@ -4,7 +4,7 @@ import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.block.RtlClockedBlock;
-import name.martingeisse.esdk.core.rtl.block.RtlProceduralVectorSignal;
+import name.martingeisse.esdk.core.rtl.block.RtlProceduralVectorRegister;
 import name.martingeisse.esdk.core.rtl.block.statement.RtlStatementBuilder;
 import name.martingeisse.esdk.core.rtl.signal.*;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.EmptyVerilogContribution;
@@ -19,8 +19,8 @@ public final class TestRenderer extends RtlItem {
 
 	private final RtlClockNetwork clock;
 	private final PicoblazeRtlWithAssociatedProgram cpu;
-	private final RtlProceduralVectorSignal columnRegister;
-	private final RtlProceduralVectorSignal rowRegister;
+	private final RtlProceduralVectorRegister columnRegister;
+	private final RtlProceduralVectorRegister rowRegister;
 	private final RtlBitSignal framebufferWriteStrobe;
 	private final RtlVectorSignal framebufferWriteAddress;
 	private final RtlVectorSignal framebufferWriteData;

@@ -12,7 +12,7 @@ import name.martingeisse.esdk.core.model.validation.print.WriterValidationResult
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.block.RtlClockedBlock;
-import name.martingeisse.esdk.core.rtl.block.RtlProceduralBitSignal;
+import name.martingeisse.esdk.core.rtl.block.RtlProceduralBitRegister;
 import name.martingeisse.esdk.core.rtl.memory.RtlMemory;
 import name.martingeisse.esdk.core.rtl.memory.RtlSynchronousMemoryPort;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
@@ -35,7 +35,7 @@ public class RamTestControllerBlockramSimulationMain {
 
 		// BlockRAM test
 		RtlClockedBlock block = new RtlClockedBlock(clock);
-		RtlProceduralBitSignal ackReg = block.createBit(false);
+		RtlProceduralBitRegister ackReg = block.createBit(false);
 		block.getStatements().when(controller.getMybusMaster().getStrobeSignal()).getThenBranch()
 			.assign(ackReg, ackReg.not());
 		controller.getMybusMaster().setAckSignal(ackReg);
