@@ -35,6 +35,7 @@ public class TerminalPanel extends JPanel {
 
 	public TerminalPanel(RtlClockNetwork clock) {
 		super(false);
+		setFocusable(true);
 		image = new BufferedImage(640, 480, BufferedImage.TYPE_INT_RGB);
 		setSize(640, 480);
 		setPreferredSize(new Dimension(640, 480));
@@ -53,7 +54,7 @@ public class TerminalPanel extends JPanel {
 			@Override
 			public VectorValue getValue() {
 				Byte data = inputBuffer.peek();
-				return VectorValue.of(8, data == null ? 0 : data.longValue());
+				return VectorValue.of(8, data == null ? 0 : (data.longValue() & 0xff));
 			}
 
 		};
