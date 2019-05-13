@@ -16,16 +16,73 @@ interface {
 // output side
 // --------------------------------------------------------------------------------------------------------------------
 
+// VGA timing
+register vector[10] outputStage1x, outputStage1y, outputStage1hblank, outputStage1vblank, outputStage1hsync, outputStage1vsync;
+do (clk) {
+    if (outputStage1x == 10d799) {
+        outputStage1hblank = 0;
+        outputStage1x = 0;
+        // TODO
+    } else {
+        if (outputStage1x == 10d639) {
+            outputStage1hblank = 1;
+        } else if (outputStage1x == 10d655) {
+            outputStage1hsync = 0;
+        } else if (outputStage1x == 10d751) {
+            outputStage1hsync = 1;
+        }
+        outputStage1x = outputStage1x + 10d1;
+    }
+
+}
+
+/*
+		RtlStatementSequence statements = block.getStatements();
+		statements.assign(p, p.not());
+		RtlStatementSequence pixelFinished = statements.when(p).getThenBranch();
+		RtlWhenStatement whenRowFinished = pixelFinished.when(x.compareEqual(799));
+		{
+			RtlStatementSequence rowFinished = whenRowFinished.getThenBranch();
+			rowFinished.assignUnsigned(x, 0);
+			rowFinished.assign(xblank, false);
+			RtlWhenStatement whenFrameFinished = rowFinished.when(y.compareEqual(524));
+			{
+				RtlStatementSequence frameFinished = whenFrameFinished.getThenBranch();
+				frameFinished.assignUnsigned(y, 0);
+				frameFinished.assign(yblank, false);
+			}
+			{
+				RtlStatementSequence frameNotFinished = whenFrameFinished.getOtherwiseBranch();
+				RtlConditionChainStatement chain = frameNotFinished.conditionChain();
+				chain.when(y.compareEqual(479)).assign(yblank, true);
+				chain.when(y.compareEqual(489)).assign(vsync, false);
+				chain.when(y.compareEqual(491)).assign(vsync, true);
+				frameNotFinished.assign(y, y.add(1));
+			}
+		}
+		{
+			RtlStatementSequence rowNotFinished = whenRowFinished.getOtherwiseBranch();
+			RtlConditionChainStatement chain = rowNotFinished.conditionChain();
+			chain.when(x.compareEqual(639)).assign(xblank, true);
+			chain.when(x.compareEqual(655)).assign(hsync, false);
+			chain.when(x.compareEqual(751)).assign(hsync, true);
+			rowNotFinished.assign(x, x.add(1));
+		}
+ */
+
+
+
 register matrix[128 * 32][8] characterMatrix;
 constant matrix[256 * 16][8] characterGenerator =
         loadMatrix("CharacterGenerator.txt", 256 * 16, 8);
 
+
+// bus interface
 do (clk) {
     if (clockEnable & writeEnable) {
         characterMatrix[address] = writeData;
     }
 }
-
 
 
 
