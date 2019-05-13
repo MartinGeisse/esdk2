@@ -9,11 +9,11 @@ import name.martingeisse.esdk.core.rtl.simulation.RtlSimulationItem;
 /**
  *
  */
-public class TerminalController extends RtlSimulationItem {
+public class SimulatedTerminalController extends RtlSimulationItem {
 
 	private final TerminalPanel terminalPanel;
 
-	public TerminalController(RtlRealm realm, RtlClockNetwork clockNetwork) {
+	public SimulatedTerminalController(RtlRealm realm, RtlClockNetwork clockNetwork) {
 		super(realm);
 		this.terminalPanel = new TerminalPanel(clockNetwork);
 	}
