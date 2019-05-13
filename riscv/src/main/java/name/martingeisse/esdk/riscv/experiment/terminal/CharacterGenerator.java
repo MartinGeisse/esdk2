@@ -286,5 +286,19 @@ public class CharacterGenerator {
 		{0, 0, 0, 0, 62, 62, 62, 62, 62, 62, 62, 0, 0, 0, 0, 0, },
 		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
 	};
+
+	/**
+	 * Exports the character generator as a MaHDL matrix file.
+	 */
+	public static void main(String[] args) {
+		System.out.println("rows: 4096");
+		System.out.println("columns: 8");
+		System.out.println("");
+		for (byte[] character : CHARACTER_DATA) {
+			for (byte pixelRow : character) {
+				System.out.println(Integer.toHexString(pixelRow & 0xff));
+			}
+		}
+	}
 	
 }

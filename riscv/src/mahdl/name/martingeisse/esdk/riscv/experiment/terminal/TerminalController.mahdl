@@ -1,4 +1,4 @@
-native module name.martingeisse.esdk.riscv.experiment.terminal.TerminalController;
+module name.martingeisse.esdk.riscv.experiment.terminal.TerminalController;
 
 interface {
     in clock clk;
@@ -11,3 +11,13 @@ interface {
     out vector[8] inputData;
     in bit inputAcknowledge;
 }
+
+// output side
+register matrix[128 * 32][8] characterMatrix;
+register matrix[256 * 16][8] characterGenerator =
+        loadMatrix("CharacterGenerator.txt", 256 * 16, 8);
+
+
+
+// input side
+do (*) inputData = 0;
