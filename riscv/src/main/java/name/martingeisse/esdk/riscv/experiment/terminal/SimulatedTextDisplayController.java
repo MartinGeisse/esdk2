@@ -25,6 +25,7 @@ public class SimulatedTextDisplayController extends RtlSimulationItem {
 		this.writeEnable = new RtlBitSignalConnector(realm);
 		this.address = new RtlVectorSignalConnector(realm, 12);
 		this.writeData = new RtlVectorSignalConnector(realm, 8);
+		setTerminalPanel(null);
 	}
 
 	public TerminalPanel getTerminalPanel() {
@@ -33,10 +34,12 @@ public class SimulatedTextDisplayController extends RtlSimulationItem {
 
 	public void setTerminalPanel(TerminalPanel terminalPanel) {
 		this.terminalPanel = terminalPanel;
-		terminalPanel.getCharacterMatrixPort().setClockEnableSignal(clockEnable);
-		terminalPanel.getCharacterMatrixPort().setWriteEnableSignal(writeEnable);
-		terminalPanel.getCharacterMatrixPort().setAddressSignal(address);
-		terminalPanel.getCharacterMatrixPort().setWriteDataSignal(writeData);
+		if (terminalPanel != null) {
+			terminalPanel.getCharacterMatrixPort().setClockEnableSignal(clockEnable);
+			terminalPanel.getCharacterMatrixPort().setWriteEnableSignal(writeEnable);
+			terminalPanel.getCharacterMatrixPort().setAddressSignal(address);
+			terminalPanel.getCharacterMatrixPort().setWriteDataSignal(writeData);
+		}
 	}
 
 	public RtlBitSignal getClockEnable() {

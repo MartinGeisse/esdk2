@@ -14,7 +14,7 @@ signal bit terminalSelected = cpu.memoryWordAddress[12];
 register matrix[1024][8] memory0, memory1, memory2, memory3;
 
 // peripherals
-name.martingeisse.esdk.riscv.experiment.terminal.SimulatedTextDisplayController textDisplay;
+name.martingeisse.esdk.riscv.experiment.terminal.TextDisplayController textDisplay;
 name.martingeisse.esdk.riscv.experiment.terminal.SimulatedKeyboardController keyboard;
 
 do (*) {

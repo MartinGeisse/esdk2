@@ -3,10 +3,12 @@ package name.martingeisse.esdk.riscv.experiment.terminal;
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
+import name.martingeisse.esdk.core.rtl.signal.RtlVectorConstant;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.signal.connector.RtlBitSignalConnector;
 import name.martingeisse.esdk.core.rtl.signal.connector.RtlVectorSignalConnector;
 import name.martingeisse.esdk.core.rtl.simulation.RtlSimulationItem;
+import name.martingeisse.esdk.core.util.vector.VectorValue;
 
 /**
  *
@@ -21,6 +23,7 @@ public class SimulatedKeyboardController extends RtlSimulationItem {
 		super(realm);
 		this.inputData = new RtlVectorSignalConnector(realm, 8);
 		this.inputAcknowledge = new RtlBitSignalConnector(realm);
+		setTerminalPanel(null);
 	}
 
 	public TerminalPanel getTerminalPanel() {
@@ -29,8 +32,12 @@ public class SimulatedKeyboardController extends RtlSimulationItem {
 
 	public void setTerminalPanel(TerminalPanel terminalPanel) {
 		this.terminalPanel = terminalPanel;
-		inputData.setConnected(terminalPanel.getInputDataSignal());
-		terminalPanel.setInputAcknowledgeSignal(inputAcknowledge);
+		if (terminalPanel == null) {
+			inputData.setConnected(new RtlVectorConstant(getRealm(), VectorValue.of(8, 0)));
+		} else {
+			inputData.setConnected(terminalPanel.getInputDataSignal());
+			terminalPanel.setInputAcknowledgeSignal(inputAcknowledge);
+		}
 	}
 
 	public RtlVectorSignal getInputData() {

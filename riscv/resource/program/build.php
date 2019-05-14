@@ -6,7 +6,7 @@ system('mkdir build');
 
 system('riscv32-unknown-elf-gcc -c -o build/hello.o src/hello.S');
 system('riscv32-unknown-elf-gcc -c -o build/keycodes.o src/keycodes.S');
-system('riscv32-unknown-elf-ld -N -Ttext 0 -o build/program.elf -e 0 build/keycodes.o');
+system('riscv32-unknown-elf-ld -N -Ttext 0 -o build/program.elf -e 0 build/hello.o');
 system('riscv32-unknown-elf-objcopy -j .text -I elf32-littleriscv -O binary build/program.elf build/program.bin');
 
 /*
