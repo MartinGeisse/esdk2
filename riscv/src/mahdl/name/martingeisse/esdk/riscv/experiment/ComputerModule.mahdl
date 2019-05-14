@@ -14,7 +14,8 @@ signal bit terminalSelected = cpu.memoryWordAddress[12];
 register matrix[1024][8] memory0, memory1, memory2, memory3;
 
 // peripherals
-name.martingeisse.esdk.riscv.experiment.terminal.TerminalController terminal;
+name.martingeisse.esdk.riscv.experiment.terminal.SimulatedTextDisplayController textDisplay;
+name.martingeisse.esdk.riscv.experiment.terminal.SimulatedKeyboardController keyboard;
 
 do (*) {
 
@@ -31,15 +32,17 @@ do (*) {
     cpu.memoryAcknowledge = 1;
     memoryDataWordAddress = cpu.memoryWordAddress[9:0];
     cpu.memoryReadData = terminalSelected ?
-            (24d0 _ terminal.inputData) :
+            (24d0 _ keyboard.inputData) :
             (memory3[memoryDataWordAddress] _ memory2[memoryDataWordAddress] _ memory1[memoryDataWordAddress] _ memory0[memoryDataWordAddress]);
 
-    terminal.clk = clk;
-    terminal.clockEnable = 1;
-    terminal.writeEnable = cpu.memoryEnable & cpu.memoryWrite & terminalSelected;
-    terminal.address = cpu.memoryWordAddress[11:0];
-    terminal.writeData = cpu.memoryWriteData[7:0];
-    terminal.inputAcknowledge = cpu.memoryEnable & ~cpu.memoryWrite & terminalSelected;
+    textDisplay.clk = clk;
+    textDisplay.clockEnable = 1;
+    textDisplay.writeEnable = cpu.memoryEnable & cpu.memoryWrite & terminalSelected;
+    textDisplay.address = cpu.memoryWordAddress[11:0];
+    textDisplay.writeData = cpu.memoryWriteData[7:0];
+
+    keyboard.clk = clk;
+    keyboard.inputAcknowledge = cpu.memoryEnable & ~cpu.memoryWrite & terminalSelected;
 
 }
 

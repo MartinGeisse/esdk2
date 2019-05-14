@@ -1,0 +1,5 @@
+native module name.martingeisse.esdk.riscv.experiment.terminal.VgaConnector;
+
+interface {
+    in bit r, g, b, hsync, vsync;
+}
