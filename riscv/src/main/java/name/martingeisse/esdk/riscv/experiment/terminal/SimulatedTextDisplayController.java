@@ -4,6 +4,8 @@ import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
+import name.martingeisse.esdk.core.rtl.signal.connector.RtlBitSignalConnector;
+import name.martingeisse.esdk.core.rtl.signal.connector.RtlVectorSignalConnector;
 import name.martingeisse.esdk.core.rtl.simulation.RtlSimulationItem;
 
 /**
@@ -12,9 +14,17 @@ import name.martingeisse.esdk.core.rtl.simulation.RtlSimulationItem;
 public class SimulatedTextDisplayController extends RtlSimulationItem {
 
 	private TerminalPanel terminalPanel;
+	private RtlBitSignalConnector clockEnable;
+	private RtlBitSignalConnector writeEnable;
+	private RtlVectorSignalConnector address;
+	private RtlVectorSignalConnector writeData;
 
 	public SimulatedTextDisplayController(RtlRealm realm, RtlClockNetwork ignored) {
 		super(realm);
+		this.clockEnable = new RtlBitSignalConnector(realm);
+		this.writeEnable = new RtlBitSignalConnector(realm);
+		this.address = new RtlVectorSignalConnector(realm, 12);
+		this.writeData = new RtlVectorSignalConnector(realm, 8);
 	}
 
 	public TerminalPanel getTerminalPanel() {
@@ -23,42 +33,42 @@ public class SimulatedTextDisplayController extends RtlSimulationItem {
 
 	public void setTerminalPanel(TerminalPanel terminalPanel) {
 		this.terminalPanel = terminalPanel;
-	}
-
-	public RtlVectorSignal getReadData() {
-		return terminalPanel.getCharacterMatrixPort().getReadDataSignal();
+		terminalPanel.getCharacterMatrixPort().setClockEnableSignal(clockEnable);
+		terminalPanel.getCharacterMatrixPort().setWriteEnableSignal(writeEnable);
+		terminalPanel.getCharacterMatrixPort().setAddressSignal(address);
+		terminalPanel.getCharacterMatrixPort().setWriteDataSignal(writeData);
 	}
 
 	public RtlBitSignal getClockEnable() {
-		return terminalPanel.getCharacterMatrixPort().getClockEnableSignal();
+		return clockEnable.getConnected();
 	}
 
 	public void setClockEnable(RtlBitSignal clockEnableSignal) {
-		terminalPanel.getCharacterMatrixPort().setClockEnableSignal(clockEnableSignal);
+		clockEnable.setConnected(clockEnableSignal);
 	}
 
 	public RtlBitSignal getWriteEnable() {
-		return terminalPanel.getCharacterMatrixPort().getWriteEnableSignal();
+		return writeEnable.getConnected();
 	}
 
 	public void setWriteEnable(RtlBitSignal writeEnableSignal) {
-		terminalPanel.getCharacterMatrixPort().setWriteEnableSignal(writeEnableSignal);
+		writeEnable.setConnected(writeEnableSignal);
 	}
 
 	public RtlVectorSignal getAddress() {
-		return terminalPanel.getCharacterMatrixPort().getAddressSignal();
+		return address.getConnected();
 	}
 
 	public void setAddress(RtlVectorSignal addressSignal) {
-		terminalPanel.getCharacterMatrixPort().setAddressSignal(addressSignal);
+		address.setConnected(addressSignal);
 	}
 
 	public RtlVectorSignal getWriteData() {
-		return terminalPanel.getCharacterMatrixPort().getWriteDataSignal();
+		return writeData.getConnected();
 	}
 
 	public void setWriteData(RtlVectorSignal writeDataSignal) {
-		terminalPanel.getCharacterMatrixPort().setWriteDataSignal(writeDataSignal);
+		writeData.setConnected(writeDataSignal);
 	}
 
 }
