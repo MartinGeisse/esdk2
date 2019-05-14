@@ -2,6 +2,7 @@ package name.martingeisse.esdk.riscv.experiment;
 
 import name.martingeisse.esdk.core.rtl.simulation.RtlClockGenerator;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
+import name.martingeisse.esdk.riscv.experiment.terminal.TerminalPanel;
 
 import javax.swing.*;
 import java.io.FileInputStream;
@@ -18,17 +19,17 @@ public class SimulationMain {
 		loadProgram(design.getComputerModule());
 		new RtlClockGenerator(design.getClock(), 10);
 
-		/*
+		TerminalPanel terminalPanel = new TerminalPanel(design.getClock());
+		design.getComputerModule().textDisplay.setTerminalPanel(terminalPanel);
+		design.getComputerModule().keyboard.setTerminalPanel(terminalPanel);
+
 		JFrame frame = new JFrame("Terminal");
-		frame.add(design.getComputerModule().terminal.getTerminalPanel());
+		frame.add(terminalPanel);
 		frame.pack();
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		frame.setResizable(false);
 		frame.setVisible(true);
-		new Timer(500, event -> {
-			design.getComputerModule().terminal.getTerminalPanel().repaint();
-		}).start();
-		 */
+		new Timer(500, event -> terminalPanel.repaint()).start();
 
 		design.simulate();
 	}

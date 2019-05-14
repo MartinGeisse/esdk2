@@ -9,17 +9,20 @@ import name.martingeisse.esdk.core.rtl.simulation.RtlSimulationItem;
 /**
  *
  */
-public class SimulatedTerminalController extends RtlSimulationItem {
+public class SimulatedTextDisplayController extends RtlSimulationItem {
 
-	private final TerminalPanel terminalPanel;
+	private TerminalPanel terminalPanel;
 
-	public SimulatedTerminalController(RtlRealm realm, RtlClockNetwork clockNetwork) {
+	public SimulatedTextDisplayController(RtlRealm realm, RtlClockNetwork ignored) {
 		super(realm);
-		this.terminalPanel = new TerminalPanel(clockNetwork);
 	}
 
 	public TerminalPanel getTerminalPanel() {
 		return terminalPanel;
+	}
+
+	public void setTerminalPanel(TerminalPanel terminalPanel) {
+		this.terminalPanel = terminalPanel;
 	}
 
 	public RtlVectorSignal getReadData() {
@@ -56,18 +59,6 @@ public class SimulatedTerminalController extends RtlSimulationItem {
 
 	public void setWriteData(RtlVectorSignal writeDataSignal) {
 		terminalPanel.getCharacterMatrixPort().setWriteDataSignal(writeDataSignal);
-	}
-
-	public RtlVectorSignal getInputData() {
-		return terminalPanel.getInputDataSignal();
-	}
-
-	public RtlBitSignal getInputAcknowledge() {
-		return terminalPanel.getInputAcknowledgeSignal();
-	}
-
-	public void setInputAcknowledge(RtlBitSignal inputAcknowledgeSignal) {
-		terminalPanel.setInputAcknowledgeSignal(inputAcknowledgeSignal);
 	}
 
 }
