@@ -45,7 +45,7 @@ do (clk) {
 
 // stage 2: read character matrix
 register bit stage2blank, stage2hsync, stage2vsync;
-register matrix[128 * 32][8] characterMatrix;
+register matrix[128 * 32][8] characterMatrix = loadMatrix("InitialDisplayContents.txt", 128 * 32, 8);
 register vector[8] stage2character;
 register vector[3] stage2pixelX;
 register vector[4] stage2pixelY;
