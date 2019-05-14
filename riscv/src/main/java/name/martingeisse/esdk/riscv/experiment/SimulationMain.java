@@ -38,7 +38,7 @@ public class SimulationMain {
 		design.simulate();
 	}
 
-	private static void loadProgram(ComputerModule computerModule) throws Exception {
+	static void loadProgram(ComputerModule computerModule) throws Exception {
 		try (FileInputStream in = new FileInputStream("riscv/resource/program/build/program.bin")) {
 			int index = 0;
 			while (true) {

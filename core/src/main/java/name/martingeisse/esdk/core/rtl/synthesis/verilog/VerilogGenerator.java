@@ -63,7 +63,7 @@ public class VerilogGenerator {
 		for (RtlItem item : realm.getItems()) {
 			VerilogContribution contribution = item.getVerilogContribution();
 			if (contribution == null) {
-				throw new RuntimeException("Got null verilog contribution which is not allowed.");
+				throw new RuntimeException("Got null verilog contribution which is not allowed; item = " + item);
 			}
 			contributions.add(contribution);
 		}

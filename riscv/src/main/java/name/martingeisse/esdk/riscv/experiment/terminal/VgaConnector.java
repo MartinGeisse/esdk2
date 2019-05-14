@@ -3,6 +3,7 @@ package name.martingeisse.esdk.riscv.experiment.terminal;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.EmptyVerilogContribution;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogContribution;
 
 /**
@@ -58,8 +59,7 @@ public class VgaConnector extends RtlItem {
 
 	@Override
 	public VerilogContribution getVerilogContribution() {
-		// TODO
-		return null;
+		return new EmptyVerilogContribution();
 	}
 
 }
