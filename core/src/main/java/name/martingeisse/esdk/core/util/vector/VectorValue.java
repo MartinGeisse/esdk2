@@ -11,6 +11,7 @@ import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.math.BigInteger;
 
 /**
  * Represents a bit vector with a specific width.
@@ -41,6 +42,13 @@ public abstract class VectorValue {
 		} else {
 			return VectorValue.of(width, bit ? ((1L << width) - 1) : 0);
 		}
+	}
+
+	public static VectorValue parseHex(int width, String digits) {
+		if (width > 64) {
+			throw new UnsupportedOperationException("vectors larger than 64 bits not yet implemented");
+		}
+		return new LongVectorValue(width, new BigInteger(digits, 16).longValue());
 	}
 
 	VectorValue(int width) {
