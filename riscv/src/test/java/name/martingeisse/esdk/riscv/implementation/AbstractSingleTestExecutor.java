@@ -31,7 +31,7 @@ public abstract class AbstractSingleTestExecutor {
 		realm = new RtlRealm(design);
 		clock = new RtlClockNetwork(realm);
 		testbench = new MulticycleTestbench(realm, clock);
-		cpu = testbench.cpu;
+		cpu = testbench._cpu;
 		new RtlClockedSimulationItem(clock) {
 
 			private VectorValue outputData;
@@ -70,10 +70,10 @@ public abstract class AbstractSingleTestExecutor {
 				if (first < 0) {
 					break;
 				}
-				testbench.memory0.getMatrix().setRow(index, VectorValue.of(8, first));
-				testbench.memory1.getMatrix().setRow(index, VectorValue.of(8, readByteEofSafe(in)));
-				testbench.memory2.getMatrix().setRow(index, VectorValue.of(8, readByteEofSafe(in)));
-				testbench.memory3.getMatrix().setRow(index, VectorValue.of(8, readByteEofSafe(in)));
+				testbench._memory0.getMatrix().setRow(index, VectorValue.of(8, first));
+				testbench._memory1.getMatrix().setRow(index, VectorValue.of(8, readByteEofSafe(in)));
+				testbench._memory2.getMatrix().setRow(index, VectorValue.of(8, readByteEofSafe(in)));
+				testbench._memory3.getMatrix().setRow(index, VectorValue.of(8, readByteEofSafe(in)));
 				index++;
 			}
 		}

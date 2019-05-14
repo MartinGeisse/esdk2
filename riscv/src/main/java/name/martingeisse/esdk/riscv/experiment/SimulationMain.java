@@ -23,7 +23,7 @@ public class SimulationMain {
 		// design.getComputerModule().textDisplay.setTerminalPanel(terminalPanel);
 		// design.getComputerModule().keyboard.setTerminalPanel(terminalPanel);
 
-		MyMonitorPanel monitorPanel = new MyMonitorPanel(design.getClock(), design.getComputerModule().textDisplay);
+		MyMonitorPanel monitorPanel = new MyMonitorPanel(design.getClock(), design.getComputerModule()._textDisplay);
 
 		JFrame frame = new JFrame("Terminal");
 		// frame.add(terminalPanel);
@@ -46,10 +46,10 @@ public class SimulationMain {
 				if (first < 0) {
 					break;
 				}
-				computerModule.memory0.getMatrix().setRow(index, VectorValue.of(8, first));
-				computerModule.memory1.getMatrix().setRow(index, VectorValue.of(8, readByteEofSafe(in)));
-				computerModule.memory2.getMatrix().setRow(index, VectorValue.of(8, readByteEofSafe(in)));
-				computerModule.memory3.getMatrix().setRow(index, VectorValue.of(8, readByteEofSafe(in)));
+				computerModule._memory0.getMatrix().setRow(index, VectorValue.of(8, first));
+				computerModule._memory1.getMatrix().setRow(index, VectorValue.of(8, readByteEofSafe(in)));
+				computerModule._memory2.getMatrix().setRow(index, VectorValue.of(8, readByteEofSafe(in)));
+				computerModule._memory3.getMatrix().setRow(index, VectorValue.of(8, readByteEofSafe(in)));
 				index++;
 			}
 		}

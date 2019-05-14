@@ -56,21 +56,21 @@ public class SimpleTests {
 	public void testAddi() {
 		instruction.setValue(VectorValue.of(32, 0x005_00_093)); // ADDI x1, x0, 5
 		stepper.skipUntilFetching();
-		Assert.assertEquals(0, cpu.registers.getMatrix().getRow(1).getBitsAsInt());
+		Assert.assertEquals(0, cpu._registers.getMatrix().getRow(1).getBitsAsInt());
 		stepper.step();
-		Assert.assertEquals(5, cpu.registers.getMatrix().getRow(1).getBitsAsInt());
+		Assert.assertEquals(5, cpu._registers.getMatrix().getRow(1).getBitsAsInt());
 		instruction.setValue(VectorValue.of(32, 0x002_08_093)); // ADDI x1, x1, 2
 		stepper.step();
-		Assert.assertEquals(7, cpu.registers.getMatrix().getRow(1).getBitsAsInt());
+		Assert.assertEquals(7, cpu._registers.getMatrix().getRow(1).getBitsAsInt());
 	}
 
 	@Test
 	public void testRegisterZero() {
 		instruction.setValue(VectorValue.of(32, 0x005_00_013)); // ADDI x0, x0, 5
 		stepper.skipUntilFetching();
-		Assert.assertEquals(0, cpu.registers.getMatrix().getRow(0).getBitsAsInt());
+		Assert.assertEquals(0, cpu._registers.getMatrix().getRow(0).getBitsAsInt());
 		stepper.step();
-		Assert.assertEquals(0, cpu.registers.getMatrix().getRow(0).getBitsAsInt());
+		Assert.assertEquals(0, cpu._registers.getMatrix().getRow(0).getBitsAsInt());
 	}
 
 	@Test
@@ -81,9 +81,9 @@ public class SimpleTests {
 		stepper.step();
 		instruction.setValue(VectorValue.of(32, 0x002_08_1b3)); // ADD x3, x1, x2
 		stepper.step();
-		Assert.assertEquals(5, cpu.registers.getMatrix().getRow(1).getBitsAsInt());
-		Assert.assertEquals(4, cpu.registers.getMatrix().getRow(2).getBitsAsInt());
-		Assert.assertEquals(9, cpu.registers.getMatrix().getRow(3).getBitsAsInt());
+		Assert.assertEquals(5, cpu._registers.getMatrix().getRow(1).getBitsAsInt());
+		Assert.assertEquals(4, cpu._registers.getMatrix().getRow(2).getBitsAsInt());
+		Assert.assertEquals(9, cpu._registers.getMatrix().getRow(3).getBitsAsInt());
 	}
 
 }

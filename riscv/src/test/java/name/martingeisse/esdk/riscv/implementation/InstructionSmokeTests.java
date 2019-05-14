@@ -47,13 +47,13 @@ public class InstructionSmokeTests {
 
 	private void setRegisters(int... values) {
 		for (int i = 0; i < values.length; i++) {
-			cpu.registers.getMatrix().setRow(i + 1, VectorValue.of(32, values[i] & 0xffff_ffffL));
+			cpu._registers.getMatrix().setRow(i + 1, VectorValue.of(32, values[i] & 0xffff_ffffL));
 		}
 	}
 
 	private void assertRegisters(int... values) {
 		for (int i = 0; i < values.length; i++) {
-			int value = cpu.registers.getMatrix().getRow(i + 1).getBitsAsInt();
+			int value = cpu._registers.getMatrix().getRow(i + 1).getBitsAsInt();
 			Assert.assertEquals(values[i], value);
 		}
 	}
@@ -147,7 +147,7 @@ public class InstructionSmokeTests {
 		instruction.setValue(VectorValue.of(32, 0x102_08_063));
 		stepper.step();
 		assertRegisters(5, 5);
-		Assert.assertNotEquals(4, cpu.pc.getValue().getBitsAsInt());
+		Assert.assertNotEquals(4, cpu._pc.getValue().getBitsAsInt());
 	}
 
 	@Test
@@ -156,7 +156,7 @@ public class InstructionSmokeTests {
 		instruction.setValue(VectorValue.of(32, 0x102_08_063));
 		stepper.step();
 		assertRegisters(5, 7);
-		Assert.assertEquals(4, cpu.pc.getValue().getBitsAsInt());
+		Assert.assertEquals(4, cpu._pc.getValue().getBitsAsInt());
 	}
 
 //region helper classes
