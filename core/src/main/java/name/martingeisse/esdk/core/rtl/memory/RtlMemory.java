@@ -98,7 +98,7 @@ public final class RtlMemory extends RtlItem {
 
 			@Override
 			public void prepareSynthesis(SynthesisPreparationContext context) {
-				memoryName = context.declareSignal(memorySignal, "mem", true, null, false);
+				memoryName = context.declareSignal(memorySignal, "mem", null, false);
 				MemoryImplementationUtil.generateMif(context.getAuxiliaryFileFactory(), memoryName + ".mif", getMatrix());
 				for (RtlMemoryPort port : ports) {
 					port.prepareSynthesis(context);

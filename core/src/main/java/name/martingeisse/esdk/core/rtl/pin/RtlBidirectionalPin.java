@@ -74,7 +74,7 @@ public final class RtlBidirectionalPin extends RtlPin implements RtlBitSignal {
 
 			@Override
 			public void prepareSynthesis(SynthesisPreparationContext context) {
-				context.declareSignal(RtlBidirectionalPin.this, getNetName(), false, null, false);
+				context.declareFixedNameSignal(RtlBidirectionalPin.this, getNetName(), null, false);
 			}
 
 			@Override

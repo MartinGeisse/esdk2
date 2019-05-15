@@ -128,7 +128,7 @@ public final class RtlClockedBlock extends RtlClockedItem {
 			@Override
 			public void prepareSynthesis(SynthesisPreparationContext context) {
 				for (RtlSignal signal : proceduralRegisters) {
-					context.declareSignal(signal, "r", true, VerilogSignalKind.REG, false);
+					context.declareSignal(signal, "r", VerilogSignalKind.REG, false);
 				}
 				// TODO memories
 			}
