@@ -171,7 +171,7 @@ public final class RtlClockedBlock extends RtlClockedItem {
 				for (RtlProceduralMemory memory : proceduralMemories) {
 					String memoryName = memoryNames.get(memory);
 					Matrix matrix = memory.getMatrix();
-					out.println("initial $readmemh(\"" + memoryName + ".mif\", " + memoryName + ", 0, " +
+					out.println("\t$readmemh(\"" + memoryName + ".mif\", " + memoryName + ", 0, " +
 						(matrix.getRowCount() - 1) + ");\n");
 				}
 				out.endIndentation();
