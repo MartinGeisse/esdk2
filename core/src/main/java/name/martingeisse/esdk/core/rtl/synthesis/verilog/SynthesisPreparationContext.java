@@ -4,6 +4,7 @@
  */
 package name.martingeisse.esdk.core.rtl.synthesis.verilog;
 
+import name.martingeisse.esdk.core.rtl.block.RtlProceduralMemory;
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
 
 /**
@@ -20,6 +21,8 @@ public interface SynthesisPreparationContext {
 						 String fallbackPrefix,
 						 VerilogSignalKind signalKindForExplicitDeclarationOrNullForNoDeclaration,
 						 boolean generateAssignment);
+
+	String declareProceduralMemory(RtlProceduralMemory memory);
 
 	String reserveName(String nameOrPrefix, boolean appendCounterSuffix);
 

@@ -99,7 +99,7 @@ public final class RtlMemory extends RtlItem {
 			@Override
 			public void prepareSynthesis(SynthesisPreparationContext context) {
 				memoryName = context.declareSignal(memorySignal, "mem", null, false);
-				MemoryImplementationUtil.generateMif(context.getAuxiliaryFileFactory(), memoryName + ".mif", getMatrix());
+				VerilogUtil.generateMif(context.getAuxiliaryFileFactory(), memoryName + ".mif", getMatrix());
 				for (RtlMemoryPort port : ports) {
 					port.prepareSynthesis(context);
 				}

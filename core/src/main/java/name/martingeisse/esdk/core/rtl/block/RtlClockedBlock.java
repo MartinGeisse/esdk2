@@ -14,7 +14,9 @@ import name.martingeisse.esdk.core.util.Matrix;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This class implements a clocked block of statements, equivalent to a pair of "initial" and "always"
@@ -22,6 +24,10 @@ import java.util.List;
  * <p>
  * For a sequence of statements grouped as a single statement, commonly referred to as a "block"
  * inside compilers, see {@link RtlStatementSequence}.
+ * <p>
+ * TODO get rid of "initializer statements" and just use the current value of procedural registers to create the
+ * initial-block, just like for matrices.
+ * </p>
  */
 public final class RtlClockedBlock extends RtlClockedItem {
 
@@ -125,12 +131,18 @@ public final class RtlClockedBlock extends RtlClockedItem {
 	public VerilogContribution getVerilogContribution() {
 		return new VerilogContribution() {
 
+			private final Map<RtlProceduralMemory, String> memoryNames = new HashMap<>();
+
 			@Override
 			public void prepareSynthesis(SynthesisPreparationContext context) {
 				for (RtlSignal signal : proceduralRegisters) {
 					context.declareSignal(signal, "r", VerilogSignalKind.REG, false);
 				}
-				// TODO memories
+				for (RtlProceduralMemory memory : proceduralMemories) {
+					String memoryName = context.declareProceduralMemory(memory);
+					VerilogUtil.generateMif(context.getAuxiliaryFileFactory(), memoryName + ".mif", memory.getMatrix());
+					memoryNames.put(memory, memoryName);
+				}
 			}
 
 			@Override
@@ -140,12 +152,28 @@ public final class RtlClockedBlock extends RtlClockedItem {
 			}
 
 			@Override
+			public void printDeclarations(VerilogWriter out) {
+				for (RtlProceduralMemory memory : proceduralMemories) {
+					String memoryName = memoryNames.get(memory);
+					Matrix matrix = memory.getMatrix();
+					out.println("reg [" + (matrix.getColumnCount() - 1) + ":0] " + memoryName + " [" +
+						(matrix.getRowCount() - 1) + ":0];");
+				}
+			}
+
+			@Override
 			public void printImplementation(VerilogWriter out) {
 
 				out.indent();
 				out.println("initial begin");
 				out.startIndentation();
 				initializerStatements.printVerilogStatements(out);
+				for (RtlProceduralMemory memory : proceduralMemories) {
+					String memoryName = memoryNames.get(memory);
+					Matrix matrix = memory.getMatrix();
+					out.println("initial $readmemh(\"" + memoryName + ".mif\", " + memoryName + ", 0, " +
+						(matrix.getRowCount() - 1) + ");\n");
+				}
 				out.endIndentation();
 				out.indent();
 				out.println("end");

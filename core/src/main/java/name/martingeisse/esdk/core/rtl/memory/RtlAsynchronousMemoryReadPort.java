@@ -37,7 +37,13 @@ public final class RtlAsynchronousMemoryReadPort extends RtlItem implements RtlM
 	}
 
 	public void setAddressSignal(RtlVectorSignal addressSignal) {
-		MemoryImplementationUtil.checkAddressSignal(addressSignal, memory.getMatrix().getRowCount());
+		if (addressSignal.getWidth() > 30) {
+			throw new IllegalArgumentException("address width of " + addressSignal.getWidth() + " not supported");
+		}
+		if (1 << addressSignal.getWidth() > memory.getMatrix().getRowCount()) {
+			throw new IllegalArgumentException("address width of " + addressSignal.getWidth() +
+				" is too large for matrix row count " + memory.getMatrix().getRowCount());
+		}
 		this.addressSignal = addressSignal;
 	}
 

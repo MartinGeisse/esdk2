@@ -96,6 +96,14 @@ public class VerilogGenerator {
 				}
 
 				@Override
+				public String declareProceduralMemory(RtlProceduralMemory memory) {
+					String prefix = memory.getName() == null ? "mem" : memory.getName();
+					String globalName = reserveName(prefix, true);
+					memoryNames.put(memory, globalName);
+					return globalName;
+				}
+
+				@Override
 				public String reserveName(String nameOrPrefix, boolean appendCounterSuffix) {
 					if (appendCounterSuffix) {
 						return VerilogGenerator.this.assignGeneratedName(nameOrPrefix);
