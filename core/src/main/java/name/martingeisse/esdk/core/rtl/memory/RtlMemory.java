@@ -27,6 +27,10 @@ public final class RtlMemory extends RtlItem {
 		this.memorySignal = new RtlSignal() {
 
 			@Override
+			public void analyzeSignalUsage(SignalUsageConsumer consumer) {
+			}
+
+			@Override
 			public void printVerilogImplementationExpression(VerilogExpressionWriter out) {
 				throw newSynthesisNotSupportedException();
 			}
