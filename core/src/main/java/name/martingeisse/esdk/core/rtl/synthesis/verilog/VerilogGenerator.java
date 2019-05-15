@@ -73,14 +73,26 @@ public class VerilogGenerator {
 			SynthesisPreparationContext synthesisPreparationContext = new SynthesisPreparationContext() {
 
 				@Override
-				public String declareSignal(RtlSignal signal, String nameOrPrefix, boolean appendCounterSuffix, VerilogSignalKind signalKindForExplicitDeclarationOrNullForNoDeclaration, boolean generateAssignment) {
-					String name = reserveName(nameOrPrefix, appendCounterSuffix);
+				public void declareFixedNameSignal(RtlSignal signal, String name, VerilogSignalKind signalKindForExplicitDeclarationOrNullForNoDeclaration, boolean generateAssignment) {
+					reserveName(name, false);
+					internalDeclareSignal(signal, name, signalKindForExplicitDeclarationOrNullForNoDeclaration, generateAssignment);
+				}
+
+				@Override
+				public String declareSignal(RtlSignal signal, String fallbackPrefix, VerilogSignalKind signalKindForExplicitDeclarationOrNullForNoDeclaration, boolean generateAssignment) {
+					String signalName = signal.getRtlItem().getName();
+					String prefix = signalName == null ? fallbackPrefix : signalName;
+					String globalName = reserveName(prefix, true);
+					internalDeclareSignal(signal, globalName, signalKindForExplicitDeclarationOrNullForNoDeclaration, generateAssignment);
+					return globalName;
+				}
+
+				private void internalDeclareSignal(RtlSignal signal, String name, VerilogSignalKind signalKindForExplicitDeclarationOrNullForNoDeclaration, boolean generateAssignment) {
 					namedSignals.put(signal, new NamedSignal(signal, name,
 						signalKindForExplicitDeclarationOrNullForNoDeclaration != null,
 						signalKindForExplicitDeclarationOrNullForNoDeclaration,
 						generateAssignment
 					));
-					return name;
 				}
 
 				@Override
@@ -166,7 +178,11 @@ public class VerilogGenerator {
 
 				private void declareSignal(RtlSignal signal) {
 					if (namedSignals.get(signal) == null) {
-						namedSignals.put(signal, new NamedSignal(signal, assignGeneratedName("s"), true, VerilogSignalKind.WIRE, true));
+						String prefix = signal.getRtlItem().getName();
+						if (prefix == null) {
+							prefix = "s";
+						}
+						namedSignals.put(signal, new NamedSignal(signal, assignGeneratedName(prefix), true, VerilogSignalKind.WIRE, true));
 					}
 				}
 

@@ -11,8 +11,13 @@ import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
  */
 public interface SynthesisPreparationContext {
 
+	void declareFixedNameSignal(RtlSignal signal,
+								String name,
+								VerilogSignalKind signalKindForExplicitDeclarationOrNullForNoDeclaration,
+								boolean generateAssignment);
+
 	String declareSignal(RtlSignal signal,
-						 String nameOrPrefix, boolean appendCounterSuffix,
+						 String fallbackPrefix,
 						 VerilogSignalKind signalKindForExplicitDeclarationOrNullForNoDeclaration,
 						 boolean generateAssignment);
 

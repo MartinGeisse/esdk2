@@ -117,11 +117,12 @@ public final class RtlModuleInstance extends RtlItem {
 
 			@Override
 			public void prepareSynthesis(SynthesisPreparationContext context) {
-				instanceName = context.reserveName("m", true);
+				String prefix = getName() == null ? "m" : getName();
+				instanceName = context.reserveName(prefix, true);
 				for (RtlInstancePort port : ports.values()) {
 					if (port instanceof RtlInstanceOutputPort) {
 						RtlInstanceOutputPort outputPort = (RtlInstanceOutputPort) port;
-						context.declareSignal(outputPort, "mp", true, VerilogSignalKind.WIRE, false);
+						context.declareSignal(outputPort, "mp", VerilogSignalKind.WIRE, false);
 					}
 				}
 			}
