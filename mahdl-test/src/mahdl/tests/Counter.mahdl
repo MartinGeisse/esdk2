@@ -2,7 +2,6 @@ module tests.Counter;
 
 interface {
     in clock clk;
-    in bit selector;
     out vector[3] output;
 }
 
