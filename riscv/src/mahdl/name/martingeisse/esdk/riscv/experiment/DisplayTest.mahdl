@@ -8,7 +8,19 @@ name.martingeisse.esdk.riscv.experiment.terminal.TextDisplayController textDispl
 do (*) {
     textDisplay.clk = clk;
     textDisplay.clockEnable = 1;
-    textDisplay.writeEnable = 0;
+    textDisplay.writeEnable = 1;
     textDisplay.address = 0;
-    textDisplay.writeData = 0;
+    textDisplay.writeData = 8d64;
 }
+
+/*
+Writing an @ to the first address works:
+
+do (*) {
+    textDisplay.clk = clk;
+    textDisplay.clockEnable = 1;
+    textDisplay.writeEnable = 1;
+    textDisplay.address = 0;
+    textDisplay.writeData = 8d64;
+}
+ */

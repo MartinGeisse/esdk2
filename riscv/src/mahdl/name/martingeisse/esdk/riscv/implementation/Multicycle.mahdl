@@ -38,7 +38,7 @@ constant vector[4] STATE_MEM_EXTEND = 12;
 // CPU state
 register vector[4] state = STATE_START;
 register vector[32] pc = 0;
-register matrix[32][32] registers;
+register matrix[32][32] registers; // TODO cannot use a BlockRAM; reason is probably because there isn't one unique data-out register
 register vector[32] instructionRegister; // TODO consider prefixing module ports with (interface.)portName to avoid these ugly local names (but sucks for clk)
 register vector[32] oldPc = 0;
 register vector[32] sourceValue1;
