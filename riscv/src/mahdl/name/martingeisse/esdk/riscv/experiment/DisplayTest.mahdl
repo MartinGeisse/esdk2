@@ -14,7 +14,7 @@ do (*) {
 }
 
 /*
-Writing an @ to the first address works:
+Writing an @ to the first address works (also when this is embedded in the whole ComputerModule):
 
 do (*) {
     textDisplay.clk = clk;
