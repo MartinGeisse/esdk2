@@ -12,6 +12,8 @@ signal bit terminalSelected = cpu.memoryWordAddress[12];
 // Memory: the number indicates the significance inside a word, NOT the position of a byte in a byte buffer (these
 // are different since RISC-V is little-endian).
 register matrix[1024][8] memory0, memory1, memory2, memory3;
+register vector[32] memoryReadData;
+register bit secondReadCycle = 0;
 
 // peripherals
 name.martingeisse.esdk.riscv.experiment.terminal.TextDisplayController textDisplay;
@@ -29,11 +31,9 @@ do (*) {
     cpu.instructionReadAcknowledge = 1;
 
     // data interface
-    cpu.memoryAcknowledge = 1;
+    cpu.memoryAcknowledge = cpu.memoryWrite | secondReadCycle;
     memoryDataWordAddress = cpu.memoryWordAddress[9:0];
-    cpu.memoryReadData = terminalSelected ?
-            (24d0 _ keyboard.inputData) :
-            (memory3[memoryDataWordAddress] _ memory2[memoryDataWordAddress] _ memory1[memoryDataWordAddress] _ memory0[memoryDataWordAddress]);
+    cpu.memoryReadData = terminalSelected ? (24d0 _ keyboard.inputData) : memoryReadData;
 
     textDisplay.clk = clk;
     textDisplay.clockEnable = 1;
@@ -60,6 +60,13 @@ do (clk) {
         if (cpu.memoryWriteMask[3]) {
             memory3[memoryDataWordAddress] = cpu.memoryWriteData[31:24];
         }
+    }
+    memoryReadData = memory3[memoryDataWordAddress] _ memory2[memoryDataWordAddress] _
+            memory1[memoryDataWordAddress] _ memory0[memoryDataWordAddress];
+    if (cpu.memoryEnable & ~cpu.memoryWrite) {
+        secondReadCycle = ~secondReadCycle;
+    } else {
+        secondReadCycle = 0;
     }
 }
 
