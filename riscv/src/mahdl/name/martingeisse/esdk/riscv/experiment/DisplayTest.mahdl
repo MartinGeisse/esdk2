@@ -1,0 +1,14 @@
+module name.martingeisse.esdk.riscv.experiment.DisplayTest;
+
+interface {
+    in clock clk;
+}
+
+name.martingeisse.esdk.riscv.experiment.terminal.TextDisplayController textDisplay;
+do (*) {
+    textDisplay.clk = clk;
+    textDisplay.clockEnable = 1;
+    textDisplay.writeEnable = 0;
+    textDisplay.address = 0;
+    textDisplay.writeData = 0;
+}
