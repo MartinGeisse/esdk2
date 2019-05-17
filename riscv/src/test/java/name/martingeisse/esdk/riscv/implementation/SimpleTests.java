@@ -32,10 +32,8 @@ public class SimpleTests {
 		instruction = new RtlSimulatedSettableVectorSignal(realm, 32);
 		clockStepper = new ClockStepper(clock, 10);
 		stepper = new InstructionStepper(clockStepper, cpu);
-		cpu.setInstructionReadAcknowledge(new RtlBitConstant(realm, true));
-		cpu.setInstruction(instruction);
 		cpu.setMemoryAcknowledge(new RtlBitConstant(realm, true));
-		cpu.setMemoryReadData(RtlVectorConstant.of(realm, 32, 0));
+		cpu.setMemoryReadData(instruction);
 		design.prepareSimulation();
 	}
 
@@ -43,13 +41,13 @@ public class SimpleTests {
 	public void testPcIncrement() {
 		instruction.setValue(VectorValue.of(32, 0x000_00_093)); // ADDI x1, x0, 0
 		stepper.skipUntilFetching();
-		Assert.assertEquals(0, cpu.getInstructionWordAddress().getValue().getBitsAsInt());
+		Assert.assertEquals(0, cpu.getMemoryWordAddress().getValue().getBitsAsInt());
 		stepper.step();
-		Assert.assertEquals(1, cpu.getInstructionWordAddress().getValue().getBitsAsInt());
+		Assert.assertEquals(1, cpu.getMemoryWordAddress().getValue().getBitsAsInt());
 		stepper.step();
-		Assert.assertEquals(2, cpu.getInstructionWordAddress().getValue().getBitsAsInt());
+		Assert.assertEquals(2, cpu.getMemoryWordAddress().getValue().getBitsAsInt());
 		stepper.step();
-		Assert.assertEquals(3, cpu.getInstructionWordAddress().getValue().getBitsAsInt());
+		Assert.assertEquals(3, cpu.getMemoryWordAddress().getValue().getBitsAsInt());
 	}
 
 	@Test

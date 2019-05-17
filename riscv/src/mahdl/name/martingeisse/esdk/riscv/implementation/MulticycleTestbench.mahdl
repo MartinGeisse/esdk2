@@ -8,7 +8,6 @@ interface {
 }
 
 name.martingeisse.esdk.riscv.implementation.Multicycle cpu;
-signal vector[20] instructionWordAddress;
 signal vector[20] dataWordAddress;
 
 // Memory: the number indicates the significance inside a word, NOT the position of a byte in a byte buffer (these
@@ -19,12 +18,6 @@ do (*) {
 
     // control interface
     cpu.clk = clk;
-
-    // instruction interface
-    instructionWordAddress = cpu.instructionWordAddress[19:0];
-    cpu.instruction = memory3[instructionWordAddress] _ memory2[instructionWordAddress] _
-            memory1[instructionWordAddress] _ memory0[instructionWordAddress];
-    cpu.instructionReadAcknowledge = 1;
 
     // data interface
     dataWordAddress = cpu.memoryWordAddress[19:0];

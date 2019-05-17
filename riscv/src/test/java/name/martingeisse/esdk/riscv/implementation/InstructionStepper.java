@@ -28,18 +28,19 @@ public class InstructionStepper extends RtlSimulationItem {
 	}
 
 	/**
-	 * This method can be used to skip the "preamble" before the first instruction without actually stepping over the
-	 * first instruction.
+	 * This method can be used to skip the "preamble" before fetching the first instruction without actually stepping
+	 * over the first instruction. Fetching is chosen as the starting point of the instruction because we can
+	 * observe the PC on the memory address port.
 	 */
 	public void skipUntilFetching() {
-		while (!cpu.getInstructionReadEnable().getValue()) {
+		while (cpu._state.getValue().getBitsAsInt() != 1) {
 			clockStepper.step();
 		}
 	}
 
 	public void step() {
 		skipUntilFetching();
-		while (cpu.getInstructionReadEnable().getValue() && !cpu.getInstructionReadAcknowledge().getValue()) {
+		while (cpu._state.getValue().getBitsAsInt() == 1) {
 			clockStepper.step();
 		}
 		clockStepper.step();

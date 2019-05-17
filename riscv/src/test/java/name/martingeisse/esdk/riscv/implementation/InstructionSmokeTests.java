@@ -36,10 +36,8 @@ public class InstructionSmokeTests {
 		instruction = new RtlSimulatedSettableVectorSignal(realm, 32);
 		clockStepper = new ClockStepper(clock, 10);
 		stepper = new InstructionStepper(clockStepper, cpu);
-		cpu.setInstructionReadAcknowledge(new RtlBitConstant(realm, true));
-		cpu.setInstruction(instruction);
 		cpu.setMemoryAcknowledge(new RtlBitConstant(realm, true));
-		cpu.setMemoryReadData(RtlVectorConstant.of(realm, 32, 0));
+		cpu.setMemoryReadData(instruction);
 		design.prepareSimulation();
 	}
 
