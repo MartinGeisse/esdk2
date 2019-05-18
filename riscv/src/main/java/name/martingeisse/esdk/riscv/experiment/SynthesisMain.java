@@ -32,6 +32,19 @@ import java.io.File;
  * ABBCE is typical for OP-IMM
  * ABBCI is typical for JAL (including J)
  * ABBCKL is typical for stores
+ *
+ *
+ *
+ * One explanation hat would exactly cause this problem is that only every 4th instruction gets executed. I don't
+ * expect the PC to go wrong, but memory initialization could be buggy. (Though it works for the display).
+ * --> this does not seem to be the case. I replaced one of the instructions that *should* be executed without
+ * any effect.
+ *
+ * Verilog level simulation produces the same output as high-level simulation.
+ *
+ * The memory contents seem okay (reading them out at run-time) but they don't make it into the instruction register
+ * OR the presence of the CPU destroys them (problems with the write signal?)
+ *
  */
 public class SynthesisMain {
 

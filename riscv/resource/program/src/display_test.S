@@ -17,7 +17,7 @@
     sw x2, 0(x3)
 
     // filler instructions in case the jump has problems
-    add x31, x1, x1
+    addi x31, x1, 0
     add x31, x1, x1
     add x31, x1, x1
     add x31, x1, x1
