@@ -4,23 +4,38 @@ interface {
     in clock clk;
 }
 
+//
+// debug output
+//
 name.martingeisse.esdk.riscv.experiment.terminal.TextDisplayController textDisplay;
+register vector[7] debugPointer = 0;
+do (clk) {
+    if (debugPointer != 7d80) {
+        debugPointer = debugPointer + 7d1;
+    }
+}
 do (*) {
     textDisplay.clk = clk;
     textDisplay.clockEnable = 1;
     textDisplay.writeEnable = 1;
-    textDisplay.address = 0;
-    textDisplay.writeData = 8d64;
+    textDisplay.address = 5d0 _ debugPointer;
+    textDisplay.writeData = 8d65 + (3d0 _ memoryReadData[6:2]);
 }
 
-/*
-Writing an @ to the first address works (also when this is embedded in the whole ComputerModule):
-
-do (*) {
-    textDisplay.clk = clk;
-    textDisplay.clockEnable = 1;
-    textDisplay.writeEnable = 1;
-    textDisplay.address = 0;
-    textDisplay.writeData = 8d64;
+//
+// memory
+//
+signal vector[10] memoryDataWordAddress = 3d0 _ debugPointer;
+register matrix[1024][8] memory0, memory1, memory2, memory3;
+register vector[32] memoryReadData;
+do (clk) {
+    memoryReadData = memory3[memoryDataWordAddress] _ memory2[memoryDataWordAddress] _
+            memory1[memoryDataWordAddress] _ memory0[memoryDataWordAddress];
+    if (bit(0)) {
+        memory0[memoryDataWordAddress] = 8d0;
+        memory1[memoryDataWordAddress] = 8d0;
+        memory2[memoryDataWordAddress] = 8d0;
+        memory3[memoryDataWordAddress] = 8d0;
+    }
 }
- */
+
