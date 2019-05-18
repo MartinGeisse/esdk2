@@ -45,6 +45,9 @@ import java.io.File;
  * The memory contents seem okay (reading them out at run-time) but they don't make it into the instruction register
  * OR the presence of the CPU destroys them (problems with the write signal?)
  *
+ * When I disable writing to the main RAM, the error is fixed. So the cause may be the write-enable which is generated
+ * wrong, or memory inference.
+ *
  */
 public class SynthesisMain {
 
