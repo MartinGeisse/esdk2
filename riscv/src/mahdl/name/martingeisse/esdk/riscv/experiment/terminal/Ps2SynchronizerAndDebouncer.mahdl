@@ -1,0 +1,24 @@
+module name.martingeisse.esdk.riscv.experiment.terminal.Ps2SynchronizerAndDebouncer;
+
+interface {
+    in clock clk;
+    in bit dataIn;
+    out bit dataOut;
+}
+
+register bit sync1, sync2, previousValue, dataOutRegister;
+register vector[4] clocksUntilStable = 0;
+do (clk) {
+    sync1 = dataIn;
+    sync2 = sync1;
+    previousValue = sync2;
+    if (sync2 != previousValue) {
+        clocksUntilStable = 4d15;
+    } else {
+        clocksUntilStable = clocksUntilStable - 4d1;
+    }
+    if (clocksUntilStable == 4d0) {
+        dataOutRegister = previousValue;
+    }
+}
+do (*) dataOut = dataOutRegister;

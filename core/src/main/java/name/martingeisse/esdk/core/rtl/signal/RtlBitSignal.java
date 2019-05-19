@@ -49,6 +49,14 @@ public interface RtlBitSignal extends RtlSignal {
 		return new RtlConditionalVectorOperation(getRtlItem().getRealm(), this, onTrue, onFalse);
 	}
 
+	default RtlBitSignal compareEqual(RtlBitSignal other) {
+		return xnor(other);
+	}
+
+	default RtlBitSignal compareNotEqual(RtlBitSignal other) {
+		return xor(other);
+	}
+
 	default RtlOneBitVectorSignal asOneBitVector() {
 		return new RtlOneBitVectorSignal(getRtlItem().getRealm(), this);
 	}

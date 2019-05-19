@@ -28,6 +28,9 @@ public class Computer extends Design {
 		vgaPin(realm, "F15", computerModule._textDisplay._vgaConnector.getHsync());
 		vgaPin(realm, "F14", computerModule._textDisplay._vgaConnector.getVsync());
 
+		computerModule._keyboard._ps2.setClk(ps2Pin(realm, "G14"));
+		computerModule._keyboard._ps2.setData(ps2Pin(realm, "G13"));
+
 	}
 
 	public RtlRealm getRealm() {
@@ -60,6 +63,17 @@ public class Computer extends Design {
 		pin.setId(id);
 		pin.setConfiguration(configuration);
 		pin.setOutputSignal(outputSignal);
+		return pin;
+	}
+
+	private static RtlInputPin ps2Pin(RtlRealm realm, String id) {
+		XilinxPinConfiguration configuration = new XilinxPinConfiguration();
+		configuration.setIostandard("LVCMOS33");
+		configuration.setDrive(8);
+		configuration.setSlew(XilinxPinConfiguration.Slew.SLOW);
+		RtlInputPin pin = new RtlInputPin(realm);
+		pin.setId(id);
+		pin.setConfiguration(configuration);
 		return pin;
 	}
 
