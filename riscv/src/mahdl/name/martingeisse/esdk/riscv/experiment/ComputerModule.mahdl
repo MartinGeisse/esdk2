@@ -11,7 +11,7 @@ signal bit terminalSelected = cpu.memoryWordAddress[12];
 // Memory: the number indicates the significance inside a word, NOT the position of a byte in a byte buffer (these
 // are different since RISC-V is little-endian).
 register matrix[1024][8] memory0, memory1, memory2, memory3;
-register vector[32] memoryReadData;
+signal vector[32] memoryReadData;
 register bit secondReadCycle = 0;
 
 // peripherals
@@ -39,7 +39,13 @@ do (*) {
 
 }
 
+register vector[8] memoryReadData0, memoryReadData1, memoryReadData2, memoryReadData3;
+do (*) memoryReadData = memoryReadData3 _ memoryReadData2 _ memoryReadData1 _ memoryReadData0;
 do (clk) {
+    memoryReadData0 = memory0[memoryDataWordAddress];
+    memoryReadData1 = memory1[memoryDataWordAddress];
+    memoryReadData2 = memory2[memoryDataWordAddress];
+    memoryReadData3 = memory3[memoryDataWordAddress];
     if (cpu.memoryEnable & cpu.memoryWrite & ~terminalSelected) {
         if (cpu.memoryWriteMask[0]) {
             memory0[memoryDataWordAddress] = cpu.memoryWriteData[7:0];
@@ -54,12 +60,9 @@ do (clk) {
             memory3[memoryDataWordAddress] = cpu.memoryWriteData[31:24];
         }
     }
-    memoryReadData = memory3[memoryDataWordAddress] _ memory2[memoryDataWordAddress] _
-            memory1[memoryDataWordAddress] _ memory0[memoryDataWordAddress];
     if (cpu.memoryEnable & ~cpu.memoryWrite) {
         secondReadCycle = ~secondReadCycle;
     } else {
         secondReadCycle = 0;
     }
 }
-
