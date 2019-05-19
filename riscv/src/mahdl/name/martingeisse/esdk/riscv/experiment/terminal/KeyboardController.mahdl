@@ -58,7 +58,7 @@ do (clk) {
     if (inputAcknowledge) {
         dataRegister = 0;
     }
-    if (ps2ClockWatchdogCounterExpired) {
+    if (ps2ClockWatchdogCounterExpired & state != STATE_IDLE) {
         if (state == STATE_ERROR) {
             if (ps2Clock & ps2Data) {
                 state = STATE_IDLE;

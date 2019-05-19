@@ -24,7 +24,7 @@ do (*) {
     cpu.clk = clk;
 
     // data interface
-    cpu.memoryAcknowledge = cpu.memoryWrite | secondReadCycle;
+    cpu.memoryAcknowledge = cpu.memoryWrite | secondReadCycle | terminalSelected;
     memoryDataWordAddress = cpu.memoryWordAddress[9:0];
     cpu.memoryReadData = terminalSelected ? (24d0 _ keyboard.inputData) : memoryReadData;
 
