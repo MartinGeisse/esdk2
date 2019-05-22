@@ -7,7 +7,10 @@ system('mkdir build');
 system('riscv32-unknown-elf-gcc -c -o build/display_test.o src/display_test.S');
 system('riscv32-unknown-elf-gcc -c -o build/hello.o src/hello.S');
 system('riscv32-unknown-elf-gcc -c -o build/keycodes.o src/keycodes.S');
-system('riscv32-unknown-elf-ld -N -Ttext 0 -o build/program.elf -e 0 build/keycodes.o');
+system('riscv32-unknown-elf-gcc -c -o build/start.o src/start.S');
+system('riscv32-unknown-elf-gcc -c -o build/main.o src/main.c');
+system('riscv32-unknown-elf-gcc -c -o build/display.o src/display.S');
+system('riscv32-unknown-elf-ld -N -Ttext 0 -o build/program.elf -e 0 build/start.o build/main.o build/display.o');
 system('riscv32-unknown-elf-objcopy -j .text -I elf32-littleriscv -O binary build/program.elf build/program.bin');
 
 /*
