@@ -6,7 +6,8 @@ interface {
 
 name.martingeisse.esdk.riscv.implementation.Multicycle cpu;
 signal vector[10] memoryDataWordAddress;
-signal bit terminalSelected = cpu.memoryWordAddress[12];
+signal bit bigRamSelected = cpu.memoryWordAddress[29];
+signal bit terminalSelected = cpu.memoryWordAddress[12] & ~bigRamSelected;
 
 // Memory: the number indicates the significance inside a word, NOT the position of a byte in a byte buffer (these
 // are different since RISC-V is little-endian).
@@ -17,6 +18,7 @@ register bit secondReadCycle = 0;
 // peripherals
 name.martingeisse.esdk.riscv.experiment.terminal.TextDisplayController textDisplay;
 name.martingeisse.esdk.riscv.experiment.terminal.KeyboardController keyboard;
+name.martingeisse.esdk.riscv.experiment.ram.SimulatedRam bigRam;
 
 do (*) {
 
@@ -36,6 +38,14 @@ do (*) {
 
     keyboard.clk = clk;
     keyboard.inputAcknowledge = cpu.memoryEnable & ~cpu.memoryWrite & terminalSelected;
+
+    bigRam.clk = clk;
+    bigRam.reset = bigRamSelected & cpu.memoryWordAddress[28];
+    bigRam.enable = bigRamSelected;
+    bigRam.write = cpu.memoryWrite;
+    bigRam.wordAddress = cpu.memoryWordAddress[23:0];
+    bigRam.writeData = cpu.memoryWriteData;
+    bigRam.writeMask = cpu.memoryWriteMask;
 
 }
 
