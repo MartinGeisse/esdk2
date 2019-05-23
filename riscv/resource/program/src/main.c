@@ -1,7 +1,7 @@
 
-#include "display.h"
+#include "terminal.h"
 
 void main() {
-    displayWrite(20, 5, 'O');
-    displayWrite(21, 5, 'K');
+    terminalPlaceChar(20, 5, 'O');
+    terminalPlaceChar(21, 5, 'K');
 }
