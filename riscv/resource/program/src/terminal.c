@@ -27,10 +27,48 @@ void terminalWrite(char *s) {
     }
 }
 
+static void terminalWriteIntHelper(int n, int hex) {
+    if (n == 0) {
+        terminalWriteChar('0');
+        return;
+    }
+    if (n < 0) {
+        terminalWriteChar('-');
+        n = -n;
+    }
+    if (n < 0) {
+        terminalWriteChar('*');
+        return;
+    }
+    while (n > 0) {
+
+        //
+        int significance = 1;
+        while (1) {
+            int nextSignificance;
+            if (hex) {
+                nextSignificance = significance << 4;
+            } else {
+                nextSignificance = significance << 1;
+                nextSignificance = (nextSignificance << 2) + nextSignificance;
+            }
+            if (nextSignificance < significance) {
+                // overflow means we reached the highest possible significance
+                break;
+            }
+            if (nextSignificance > n) {
+                // no digits with next or higher significance
+                break;
+            }
+            significance = nextSignificance;
+        }
+    }
+}
+
 void terminalWriteInt(int n) {
-    TODO
+    terminalWriteIntBase(n, 0);
 }
 
 void terminalWriteHex(int n) {
-    TODO
+    terminalWriteIntBase(n, 1);
 }
