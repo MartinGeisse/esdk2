@@ -27,10 +27,59 @@ void terminalWrite(char *s) {
     }
 }
 
+static unsigned int terminalWriteDigit(unsigned int n, unsigned int significance) {
+    unsigned int digit = 0;
+    while (n >= significance) {
+        n -= significance;
+        digit++;
+    }
+    if (digit > 9) {
+        terminalWriteChar(digit - 10 + 'a');
+    } else {
+        terminalWriteChar(digit + '0');
+    }
+    return n;
+}
+
 void terminalWriteInt(int n) {
-    TODO
+    if (n == 0) {
+        terminalWriteChar('0');
+        return;
+    }
+    if (n < 0) {
+        terminalWriteChar('-');
+        n = -n;
+    }
+    if (n < 0) {
+        terminalWriteChar('*');
+        return;
+    }
+    n = terminalWriteDigit(n, 1000000000);
+    n = terminalWriteDigit(n, 100000000);
+    n = terminalWriteDigit(n, 10000000);
+    n = terminalWriteDigit(n, 1000000);
+    n = terminalWriteDigit(n, 100000);
+    n = terminalWriteDigit(n, 10000);
+    n = terminalWriteDigit(n, 1000);
+    n = terminalWriteDigit(n, 100);
+    n = terminalWriteDigit(n, 10);
+    terminalWriteDigit(n, 1);
 }
 
 void terminalWriteHex(int n) {
-    TODO
+    if (n == 0) {
+        terminalWriteChar('0');
+        return;
+    }
+    if (n < 0) {
+        terminalWriteDigit(n >> 28, 1);
+        n = n & 0x0fffffff;
+    }
+    n = terminalWriteDigit(n, 0x1000000);
+    n = terminalWriteDigit(n, 0x100000);
+    n = terminalWriteDigit(n, 0x10000);
+    n = terminalWriteDigit(n, 0x1000);
+    n = terminalWriteDigit(n, 0x100);
+    n = terminalWriteDigit(n, 0x10);
+    terminalWriteDigit(n, 0x1);
 }

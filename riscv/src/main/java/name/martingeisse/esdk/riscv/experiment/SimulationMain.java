@@ -21,23 +21,6 @@ public class SimulationMain {
 		Computer design = new Computer();
 		loadProgram(design.getComputerModule());
 		new RtlClockGenerator(design.getClock(), 10);
-		new RtlClockedItem(design.getClock()) {
-
-			@Override
-			public void computeNextState() {
-				System.out.print("");
-			}
-
-			@Override
-			public void updateState() {
-			}
-
-			@Override
-			public VerilogContribution getVerilogContribution() {
-				return new EmptyVerilogContribution();
-			}
-
-		};
 
 		// TerminalPanel terminalPanel = new TerminalPanel(design.getClock());
 		// design.getComputerModule().textDisplay.setTerminalPanel(terminalPanel);
