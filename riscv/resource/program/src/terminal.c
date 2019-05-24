@@ -66,15 +66,12 @@ void terminalWriteInt(int n) {
     terminalWriteDigit(n, 1);
 }
 
-void terminalWriteHex(int n) {
+void terminalWriteHex(unsigned int n) {
     if (n == 0) {
         terminalWriteChar('0');
         return;
     }
-    if (n < 0) {
-        terminalWriteDigit(n >> 28, 1);
-        n = n & 0x0fffffff;
-    }
+    n = terminalWriteDigit(n, 0x10000000);
     n = terminalWriteDigit(n, 0x1000000);
     n = terminalWriteDigit(n, 0x100000);
     n = terminalWriteDigit(n, 0x10000);
