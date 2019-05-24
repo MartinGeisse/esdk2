@@ -6,6 +6,7 @@ import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.EmptyVeril
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogContribution;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 import name.martingeisse.esdk.riscv.experiment.terminal.MyMonitorPanel;
+import name.martingeisse.esdk.riscv.experiment.terminal.TerminalPanel;
 
 import javax.swing.*;
 import java.io.FileInputStream;
@@ -22,21 +23,21 @@ public class SimulationMain {
 		loadProgram(design.getComputerModule());
 		new RtlClockGenerator(design.getClock(), 10);
 
-		// TerminalPanel terminalPanel = new TerminalPanel(design.getClock());
-		// design.getComputerModule().textDisplay.setTerminalPanel(terminalPanel);
-		// design.getComputerModule().keyboard.setTerminalPanel(terminalPanel);
+		TerminalPanel terminalPanel = new TerminalPanel(design.getClock());
+		design.getComputerModule()._textDisplay.setTerminalPanel(terminalPanel);
+		design.getComputerModule()._keyboard.setTerminalPanel(terminalPanel);
 
-		MyMonitorPanel monitorPanel = new MyMonitorPanel(design.getClock(), design.getComputerModule()._textDisplay);
+		// MyMonitorPanel monitorPanel = new MyMonitorPanel(design.getClock(), design.getComputerModule()._textDisplay);
 
 		JFrame frame = new JFrame("Terminal");
-		// frame.add(terminalPanel);
-		frame.add(monitorPanel);
+		frame.add(terminalPanel);
+		// frame.add(monitorPanel);
 		frame.pack();
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		frame.setResizable(false);
 		frame.setVisible(true);
-		// new Timer(500, event -> terminalPanel.repaint()).start();
-		new Timer(500, event -> monitorPanel.repaint()).start();
+		new Timer(500, event -> terminalPanel.repaint()).start();
+		// new Timer(500, event -> monitorPanel.repaint()).start();
 
 		design.simulate();
 	}
