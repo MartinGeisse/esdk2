@@ -16,8 +16,8 @@ signal vector[32] memoryReadData;
 register bit secondReadCycle = 0;
 
 // peripherals
-name.martingeisse.esdk.riscv.experiment.terminal.TextDisplayController textDisplay;
-name.martingeisse.esdk.riscv.experiment.terminal.KeyboardController keyboard;
+name.martingeisse.esdk.riscv.experiment.terminal.SimulatedTextDisplayController textDisplay;
+name.martingeisse.esdk.riscv.experiment.terminal.SimulatedKeyboardController keyboard;
 name.martingeisse.esdk.riscv.experiment.ram.SimulatedRam bigRam;
 
 do (*) {
@@ -26,9 +26,9 @@ do (*) {
     cpu.clk = clk;
 
     // data interface
-    cpu.memoryAcknowledge = cpu.memoryWrite | secondReadCycle | terminalSelected;
     memoryDataWordAddress = cpu.memoryWordAddress[9:0];
-    cpu.memoryReadData = terminalSelected ? (24d0 _ keyboard.inputData) : memoryReadData;
+    cpu.memoryReadData = bigRamSelected ? bigRam.readData : terminalSelected ? (24d0 _ keyboard.inputData) : memoryReadData;
+    cpu.memoryAcknowledge = bigRamSelected ? bigRam.acknowledge : (cpu.memoryWrite | secondReadCycle | terminalSelected);
 
     textDisplay.clk = clk;
     textDisplay.clockEnable = 1;

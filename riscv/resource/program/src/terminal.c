@@ -27,7 +27,21 @@ void terminalWrite(char *s) {
     }
 }
 
-static void terminalWriteIntHelper(int n, int hex) {
+static unsigned int terminalWriteDigit(unsigned int n, unsigned int significance) {
+    unsigned int digit = 0;
+    while (n >= significance) {
+        n -= significance;
+        digit++;
+    }
+    if (digit > 9) {
+        terminalWriteChar(digit - 10 + 'a');
+    } else {
+        terminalWriteChar(digit + '0');
+    }
+    return n;
+}
+
+void terminalWriteInt(int n) {
     if (n == 0) {
         terminalWriteChar('0');
         return;
@@ -40,35 +54,29 @@ static void terminalWriteIntHelper(int n, int hex) {
         terminalWriteChar('*');
         return;
     }
-    while (n > 0) {
+    n = terminalWriteDigit(n, 1000000000);
+    n = terminalWriteDigit(n, 100000000);
+    n = terminalWriteDigit(n, 10000000);
+    n = terminalWriteDigit(n, 1000000);
+    n = terminalWriteDigit(n, 100000);
+    n = terminalWriteDigit(n, 10000);
+    n = terminalWriteDigit(n, 1000);
+    n = terminalWriteDigit(n, 100);
+    n = terminalWriteDigit(n, 10);
+    terminalWriteDigit(n, 1);
+}
 
-        //
-        int significance = 1;
-        while (1) {
-            int nextSignificance;
-            if (hex) {
-                nextSignificance = significance << 4;
-            } else {
-                nextSignificance = significance << 1;
-                nextSignificance = (nextSignificance << 2) + nextSignificance;
-            }
-            if (nextSignificance < significance) {
-                // overflow means we reached the highest possible significance
-                break;
-            }
-            if (nextSignificance > n) {
-                // no digits with next or higher significance
-                break;
-            }
-            significance = nextSignificance;
-        }
+void terminalWriteHex(unsigned int n) {
+    if (n == 0) {
+        terminalWriteChar('0');
+        return;
     }
-}
-
-void terminalWriteInt(int n) {
-    terminalWriteIntBase(n, 0);
-}
-
-void terminalWriteHex(int n) {
-    terminalWriteIntBase(n, 1);
+    n = terminalWriteDigit(n, 0x10000000);
+    n = terminalWriteDigit(n, 0x1000000);
+    n = terminalWriteDigit(n, 0x100000);
+    n = terminalWriteDigit(n, 0x10000);
+    n = terminalWriteDigit(n, 0x1000);
+    n = terminalWriteDigit(n, 0x100);
+    n = terminalWriteDigit(n, 0x10);
+    terminalWriteDigit(n, 0x1);
 }

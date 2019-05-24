@@ -22,14 +22,14 @@ public class Computer extends Design {
 		this.clock = realm.createClockNetwork(clockPin(realm));
 		this.computerModule = new ComputerModule(realm, clock);
 
-		vgaPin(realm, "H14", computerModule._textDisplay._vgaConnector.getR());
-		vgaPin(realm, "H15", computerModule._textDisplay._vgaConnector.getG());
-		vgaPin(realm, "G15", computerModule._textDisplay._vgaConnector.getB());
-		vgaPin(realm, "F15", computerModule._textDisplay._vgaConnector.getHsync());
-		vgaPin(realm, "F14", computerModule._textDisplay._vgaConnector.getVsync());
-
-		computerModule._keyboard._ps2.setClk(ps2Pin(realm, "G14"));
-		computerModule._keyboard._ps2.setData(ps2Pin(realm, "G13"));
+//		vgaPin(realm, "H14", computerModule._textDisplay._vgaConnector.getR());
+//		vgaPin(realm, "H15", computerModule._textDisplay._vgaConnector.getG());
+//		vgaPin(realm, "G15", computerModule._textDisplay._vgaConnector.getB());
+//		vgaPin(realm, "F15", computerModule._textDisplay._vgaConnector.getHsync());
+//		vgaPin(realm, "F14", computerModule._textDisplay._vgaConnector.getVsync());
+//
+//		computerModule._keyboard._ps2.setClk(ps2Pin(realm, "G14"));
+//		computerModule._keyboard._ps2.setData(ps2Pin(realm, "G13"));
 
 	}
 
