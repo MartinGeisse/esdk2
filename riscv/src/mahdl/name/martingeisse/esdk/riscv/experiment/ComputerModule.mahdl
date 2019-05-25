@@ -16,9 +16,9 @@ signal vector[32] memoryReadData;
 register bit secondReadCycle = 0;
 
 // peripherals
-name.martingeisse.esdk.riscv.experiment.terminal.SimulatedTextDisplayController textDisplay;
-name.martingeisse.esdk.riscv.experiment.terminal.SimulatedKeyboardController keyboard;
-name.martingeisse.esdk.riscv.experiment.ram.SimulatedRam bigRam;
+name.martingeisse.esdk.riscv.experiment.terminal.TextDisplayController textDisplay;
+name.martingeisse.esdk.riscv.experiment.terminal.KeyboardController keyboard;
+name.martingeisse.esdk.riscv.experiment.ram.RamControllerAdapter bigRam;
 
 do (*) {
 
