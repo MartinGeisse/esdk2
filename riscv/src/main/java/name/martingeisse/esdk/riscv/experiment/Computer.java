@@ -45,6 +45,7 @@ public class Computer extends Design {
 	input	clk270;
 	input	reset;
 		 */
+		/*
         RtlModuleInstance ramController = new RtlModuleInstance(realm, "ddr_sdram");
         ramOutputPin(realm, "J5", ramController.createBitOutputPort("sd_CK_P"));
         ramOutputPin(realm, "J4", ramController.createBitOutputPort("sd_CK_N"));
@@ -65,6 +66,7 @@ public class Computer extends Design {
         ramController.createVectorInputPort("wWRB_I", 4, computerModule._bigRam.getWriteMask());
         computerModule._bigRam.getReadData().setConnected(ramController.createVectorOutputPort("wDAT_O", 32));
         computerModule._bigRam.getAcknowledge().setConnected(ramController.createBitOutputPort("wACK_O"));
+		 */
 
     }
 

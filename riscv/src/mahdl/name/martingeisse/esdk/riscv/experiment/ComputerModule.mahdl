@@ -18,7 +18,7 @@ register bit secondReadCycle = 0;
 // peripherals
 name.martingeisse.esdk.riscv.experiment.terminal.TextDisplayController textDisplay;
 name.martingeisse.esdk.riscv.experiment.terminal.KeyboardController keyboard;
-name.martingeisse.esdk.riscv.experiment.ram.RamControllerAdapter bigRam;
+name.martingeisse.esdk.riscv.experiment.ram.NoRam bigRam;
 
 do (*) {
 
