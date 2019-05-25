@@ -7,6 +7,8 @@ import name.martingeisse.esdk.core.rtl.module.RtlModuleInstance;
 import name.martingeisse.esdk.core.rtl.pin.RtlInputPin;
 import name.martingeisse.esdk.core.rtl.pin.RtlOutputPin;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
+import name.martingeisse.esdk.core.rtl.signal.RtlConstantIndexSelection;
+import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.xilinx.XilinxPinConfiguration;
 
 /**
@@ -33,8 +35,6 @@ public class Computer extends Design {
         computerModule._keyboard._ps2.setData(ps2Pin(realm, "G13"));
 
 		/*
-	output 	[12:0] sd_A_O;
-	output 	[1:0]  sd_BA_O;
 	inout 	[15:0] sd_D_IO;
 	inout	sd_UDQS_IO;
 	inout	sd_LDQS_IO;
@@ -48,13 +48,16 @@ public class Computer extends Design {
         RtlModuleInstance ramController = new RtlModuleInstance(realm, "ddr_sdram");
         ramOutputPin(realm, "J5", ramController.createBitOutputPort("sd_CK_P"));
         ramOutputPin(realm, "J4", ramController.createBitOutputPort("sd_CK_N"));
+        ramOutputPin(realm, "K4", ramController.createBitOutputPort("sd_CS_O"));
+        ramOutputPin(realm, "K3", ramController.createBitOutputPort("sd_CKE_O"));
         ramOutputPin(realm, "C1", ramController.createBitOutputPort("sd_RAS_O"));
         ramOutputPin(realm, "C2", ramController.createBitOutputPort("sd_CAS_O"));
         ramOutputPin(realm, "D1", ramController.createBitOutputPort("sd_WE_O"));
         ramOutputPin(realm, "J1", ramController.createBitOutputPort("sd_UDM_O"));
         ramOutputPin(realm, "J2", ramController.createBitOutputPort("sd_LDM_O"));
-        ramOutputPin(realm, "K4", ramController.createBitOutputPort("sd_CS_O"));
-        ramOutputPin(realm, "K3", ramController.createBitOutputPort("sd_CKE_O"));
+        ramOutputPinArray(realm, ramController.createVectorOutputPort("sd_A_O", 13),
+                "T1", "R3", "R2", "P1", "F4", "H4", "H3", "H1", "H2", "N4", "T2", "N5", "P2");
+        ramOutputPinArray(realm, ramController.createVectorOutputPort("sd_BA_O", 2), "K5", "K6");
         ramController.createBitInputPort("wSTB_I", computerModule._bigRam.getEnable());
         ramController.createVectorInputPort("wADR_I", 24, computerModule._bigRam.getWordAddress());
         ramController.createBitInputPort("wWE_I", computerModule._bigRam.getWrite());
@@ -126,6 +129,17 @@ public class Computer extends Design {
         pin.setConfiguration(configuration);
         pin.setOutputSignal(outputSignal);
         return pin;
+    }
+
+    private static void ramOutputPinArray(RtlRealm realm, RtlVectorSignal outputSignal, String... ids) {
+        if (ids.length != outputSignal.getWidth()) {
+            throw new IllegalArgumentException("vector width (" + outputSignal.getWidth() +
+                    ") does not match number of pin IDs (" + ids.length + ")");
+        }
+        for (int i = 0; i < outputSignal.getWidth(); i++) {
+            RtlBitSignal bitSignal = new RtlConstantIndexSelection(realm, outputSignal, i);
+            ramOutputPin(realm, ids[i], bitSignal);
+        }
     }
 
 }
