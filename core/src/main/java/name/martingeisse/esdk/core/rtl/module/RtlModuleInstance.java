@@ -74,9 +74,7 @@ public final class RtlModuleInstance extends RtlItem {
 	}
 
 	public RtlInstanceBitInputPort createBitInputPort(String portName, RtlBitSignal assignedSignal) {
-		RtlInstanceBitInputPort inputPort = new RtlInstanceBitInputPort(this, portName, assignedSignal);
-		addPort(portName, inputPort);
-		return inputPort;
+		return new RtlInstanceBitInputPort(this, portName, assignedSignal);
 	}
 
 	public RtlInstanceVectorInputPort createVectorInputPort(String portName, int width) {
@@ -84,24 +82,18 @@ public final class RtlModuleInstance extends RtlItem {
 	}
 
 	public RtlInstanceVectorInputPort createVectorInputPort(String portName, int width, RtlVectorSignal assignedSignal) {
-		RtlInstanceVectorInputPort inputPort = new RtlInstanceVectorInputPort(this, portName, width, assignedSignal);
-		addPort(portName, inputPort);
-		return inputPort;
+		return new RtlInstanceVectorInputPort(this, portName, width, assignedSignal);
 	}
 
 	public RtlInstanceBitOutputPort createBitOutputPort(String portName) {
-		RtlInstanceBitOutputPort outputPort = new RtlInstanceBitOutputPort(this, portName);
-		addPort(portName, outputPort);
-		return outputPort;
+		return new RtlInstanceBitOutputPort(this, portName);
 	}
 
 	public RtlInstanceVectorOutputPort createVectorOutputPort(String portName, int width) {
-		RtlInstanceVectorOutputPort outputPort = new RtlInstanceVectorOutputPort(this, portName, width);
-		addPort(portName, outputPort);
-		return outputPort;
+		return new RtlInstanceVectorOutputPort(this, portName, width);
 	}
 
-	private void addPort(String portName, RtlInstancePort port) {
+	void addPort(String portName, RtlInstancePort port) {
 		RtlInstancePort oldPort = ports.put(portName, port);
 		if (oldPort != null) {
 			ports.put(portName, oldPort);
@@ -148,21 +140,8 @@ public final class RtlModuleInstance extends RtlItem {
 					} else {
 						out.println(",");
 					}
-					out.print("\t." + port.getPortName() + "(");
-					if (port instanceof RtlInstanceInputPort) {
-						RtlInstanceInputPort inputPort = (RtlInstanceInputPort) port;
-						if (inputPort.getAssignedSignal() == null) {
-							throw new IllegalStateException("input port " + inputPort.getPortName() +
-								" of instance of module " + moduleName + " has no assigned signal");
-						}
-						out.print(inputPort.getAssignedSignal());
-					} else if (port instanceof RtlInstanceOutputPort) {
-						RtlInstanceOutputPort outputPort = (RtlInstanceOutputPort) port;
-						out.print(outputPort);
-					} else {
-						throw new RuntimeException("unknown instance port type");
-					}
-					out.print(')');
+					out.print('\t');
+					port.printPortAssignment(out);
 				}
 				out.println();
 				out.println(");");

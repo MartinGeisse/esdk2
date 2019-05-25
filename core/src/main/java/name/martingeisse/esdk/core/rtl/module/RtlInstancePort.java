@@ -5,6 +5,7 @@
 package name.martingeisse.esdk.core.rtl.module;
 
 import name.martingeisse.esdk.core.rtl.RtlItem;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.EmptyVerilogContribution;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogContribution;
 
@@ -20,6 +21,7 @@ public abstract class RtlInstancePort extends RtlItem {
 		super(moduleInstance.getRealm());
 		this.moduleInstance = moduleInstance;
 		this.portName = portName;
+		moduleInstance.addPort(portName, this);
 	}
 
 	public final RtlModuleInstance getModuleInstance() {
@@ -35,5 +37,7 @@ public abstract class RtlInstancePort extends RtlItem {
 		// ports are synthesized as part of the instance they belong to
 		return new EmptyVerilogContribution();
 	}
+
+	protected abstract void printPortAssignment(VerilogWriter out);
 
 }

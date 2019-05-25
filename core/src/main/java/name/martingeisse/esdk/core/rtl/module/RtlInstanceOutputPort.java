@@ -7,6 +7,7 @@ package name.martingeisse.esdk.core.rtl.module;
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.SignalUsageConsumer;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
 
 /**
  *
@@ -27,6 +28,13 @@ public abstract class RtlInstanceOutputPort extends RtlInstancePort implements R
 	@Override
 	public final void printVerilogImplementationExpression(VerilogExpressionWriter out) {
 		throw new UnsupportedOperationException("cannot write an implementation expression for instance output ports");
+	}
+
+	@Override
+	protected void printPortAssignment(VerilogWriter out) {
+		out.print("." + getPortName() + "(");
+		out.print(this);
+		out.print(')');
 	}
 
 }
