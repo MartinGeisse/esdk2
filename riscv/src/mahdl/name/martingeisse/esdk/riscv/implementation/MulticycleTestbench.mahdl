@@ -18,6 +18,7 @@ do (*) {
 
     // control interface
     cpu.clk = clk;
+    cpu.reset = 0;
 
     // data interface
     dataWordAddress = cpu.memoryWordAddress[19:0];

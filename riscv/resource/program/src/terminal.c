@@ -7,6 +7,11 @@ void terminalPlaceChar(int x, int y, char c) {
     *pointer = c;
 }
 
+void terminalSetCursor(int x, int y) {
+    int *basePointer = (int*)0x4000;
+    cursor = basePointer + 128 * y + x;
+}
+
 void terminalWriteChar(char c) {
     if (c == '\n') {
         cursor = (int*)(((int)cursor & ~511) + 512);

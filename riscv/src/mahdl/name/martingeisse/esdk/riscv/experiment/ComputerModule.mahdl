@@ -2,7 +2,11 @@ module name.martingeisse.esdk.riscv.experiment.ComputerModule;
 
 interface {
     in clock clk;
+    in bit externalReset;
 }
+
+// TODO clk/reset generation
+signal bit reset = externalReset;
 
 name.martingeisse.esdk.riscv.implementation.Multicycle cpu;
 signal vector[10] memoryDataWordAddress;
@@ -24,6 +28,7 @@ do (*) {
 
     // control interface
     cpu.clk = clk;
+    cpu.reset = reset;
 
     // data interface
     memoryDataWordAddress = cpu.memoryWordAddress[9:0];
@@ -40,6 +45,7 @@ do (*) {
     keyboard.inputAcknowledge = cpu.memoryEnable & ~cpu.memoryWrite & terminalSelected;
 
     bigRam.clk = clk;
+    bigRam.reset = reset;
     bigRam.enable = bigRamSelected;
     bigRam.write = cpu.memoryWrite;
     bigRam.wordAddress = cpu.memoryWordAddress[23:0];

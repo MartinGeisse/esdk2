@@ -25,6 +25,8 @@ public class Computer extends Design {
         this.clock = realm.createClockNetwork(clockPin(realm));
         this.computerModule = new ComputerModule(realm, clock);
 
+        computerModule.setExternalReset(buttonPin(realm, "V4"));
+
         vgaPin(realm, "H14", computerModule._textDisplay._vgaConnector.getR());
         vgaPin(realm, "H15", computerModule._textDisplay._vgaConnector.getG());
         vgaPin(realm, "G15", computerModule._textDisplay._vgaConnector.getB());
@@ -87,6 +89,16 @@ public class Computer extends Design {
         configuration.setIostandard("LVCMOS33");
         RtlInputPin pin = new RtlInputPin(realm);
         pin.setId("C9");
+        pin.setConfiguration(configuration);
+        return pin;
+    }
+
+    private static RtlInputPin buttonPin(RtlRealm realm, String id) {
+        XilinxPinConfiguration configuration = new XilinxPinConfiguration();
+        configuration.setIostandard("LVTTL");
+        configuration.setAdditionalInfo("PULLDOWN");
+        RtlInputPin pin = new RtlInputPin(realm);
+        pin.setId(id);
         pin.setConfiguration(configuration);
         return pin;
     }
