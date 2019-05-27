@@ -14,9 +14,6 @@ innerLoop:
     addi x0, x0, 0 // 20
     addi x0, x0, 0 // 24
     addi x0, x0, 0 // 28
-    addi x0, x0, 0 // 32
-    addi x0, x0, 0 // 36
-    addi x0, x0, 0 // 40
     addi t0, t0, -1 // 44
     bne t0, x0, innerLoop // 48 cycles ~~ 1 µs
     addi a0, a0, -1
