@@ -48,6 +48,9 @@ public abstract class RtlPin extends RtlItem {
 
 	public void setId(String id) {
 		this.id = id;
+		if (getName() == null) {
+			setName(id);
+		}
 	}
 
 	public RtlPinConfiguration getConfiguration() {

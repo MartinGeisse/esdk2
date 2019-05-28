@@ -122,6 +122,7 @@ public final class RtlSwitchStatement extends RtlStatement {
 			out.startIndentation();
 			aCase.getBranch().printVerilogStatements(out);
 			out.endIndentation();
+			out.indent();
 			out.println("end");
 			out.println();
 		}
@@ -131,6 +132,7 @@ public final class RtlSwitchStatement extends RtlStatement {
 			out.startIndentation();
 			defaultBranch.printVerilogStatements(out);
 			out.endIndentation();
+			out.indent();
 			out.println("end");
 			out.println();
 		}

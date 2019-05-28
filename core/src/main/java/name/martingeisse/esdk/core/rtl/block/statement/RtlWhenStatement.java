@@ -26,6 +26,10 @@ public final class RtlWhenStatement extends RtlStatement {
 		this.otherwiseBranch = new RtlStatementSequence(realm);
 	}
 
+	public RtlBitSignal getCondition() {
+		return condition;
+	}
+
 	public RtlStatementSequence getThenBranch() {
 		return thenBranch;
 	}
