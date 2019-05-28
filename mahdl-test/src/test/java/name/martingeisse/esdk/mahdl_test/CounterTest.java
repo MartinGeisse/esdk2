@@ -18,7 +18,7 @@ public class CounterTest {
 		Design design = new Design();
 		RtlRealm realm = new RtlRealm(design);
 		RtlClockNetwork clock = new RtlClockNetwork(realm);
-		Counter counter = new Counter(realm, clock);
+		Counter counter = new Counter.Implementation(realm, clock);
 		ClockStepper stepper = new ClockStepper(clock, 10);
 		design.prepareSimulation();
 

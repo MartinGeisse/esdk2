@@ -1,6 +1,7 @@
 package name.martingeisse.esdk.riscv.experiment.terminal;
 
 import name.martingeisse.esdk.core.rtl.RtlItem;
+import name.martingeisse.esdk.core.rtl.RtlItemOwned;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.EmptyVerilogContribution;
@@ -9,57 +10,66 @@ import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogCon
 /**
  *
  */
-public class VgaConnector extends RtlItem {
+public interface VgaConnector extends RtlItemOwned {
+	void setR(RtlBitSignal r);
+	void setG(RtlBitSignal g);
+	void setB(RtlBitSignal b);
+	void setHsync(RtlBitSignal hsync);
+	void setVsync(RtlBitSignal vsync);
 
-	private RtlBitSignal r, g, b, hsync, vsync;
+	class Implementation extends RtlItem implements VgaConnector {
 
-	public VgaConnector(RtlRealm realm) {
-		super(realm);
-	}
+		private RtlBitSignal r, g, b, hsync, vsync;
 
-	public RtlBitSignal getR() {
-		return r;
-	}
+		public Implementation(RtlRealm realm) {
+			super(realm);
+		}
 
-	public void setR(RtlBitSignal r) {
-		this.r = r;
-	}
+		public RtlBitSignal getR() {
+			return r;
+		}
 
-	public RtlBitSignal getG() {
-		return g;
-	}
+		public void setR(RtlBitSignal r) {
+			this.r = r;
+		}
 
-	public void setG(RtlBitSignal g) {
-		this.g = g;
-	}
+		public RtlBitSignal getG() {
+			return g;
+		}
 
-	public RtlBitSignal getB() {
-		return b;
-	}
+		public void setG(RtlBitSignal g) {
+			this.g = g;
+		}
 
-	public void setB(RtlBitSignal b) {
-		this.b = b;
-	}
+		public RtlBitSignal getB() {
+			return b;
+		}
 
-	public RtlBitSignal getHsync() {
-		return hsync;
-	}
+		public void setB(RtlBitSignal b) {
+			this.b = b;
+		}
 
-	public void setHsync(RtlBitSignal hsync) {
-		this.hsync = hsync;
-	}
+		public RtlBitSignal getHsync() {
+			return hsync;
+		}
 
-	public RtlBitSignal getVsync() {
-		return vsync;
-	}
+		public void setHsync(RtlBitSignal hsync) {
+			this.hsync = hsync;
+		}
 
-	public void setVsync(RtlBitSignal vsync) {
-		this.vsync = vsync;
-	}
+		public RtlBitSignal getVsync() {
+			return vsync;
+		}
 
-	@Override
-	public VerilogContribution getVerilogContribution() {
-		return new EmptyVerilogContribution();
+		public void setVsync(RtlBitSignal vsync) {
+			this.vsync = vsync;
+		}
+
+		@Override
+		public VerilogContribution getVerilogContribution() {
+			return new EmptyVerilogContribution();
+		}
+
 	}
 
 }

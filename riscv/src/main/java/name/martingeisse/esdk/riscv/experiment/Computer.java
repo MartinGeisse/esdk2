@@ -10,6 +10,10 @@ import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlConstantIndexSelection;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.xilinx.XilinxPinConfiguration;
+import name.martingeisse.esdk.riscv.experiment.terminal.KeyboardController;
+import name.martingeisse.esdk.riscv.experiment.terminal.Ps2Connector;
+import name.martingeisse.esdk.riscv.experiment.terminal.TextDisplayController;
+import name.martingeisse.esdk.riscv.experiment.terminal.VgaConnector;
 
 /**
  *
@@ -18,23 +22,27 @@ public class Computer extends Design {
 
     private final RtlRealm realm;
     private final RtlClockNetwork clock;
-    private final ComputerModule computerModule;
+    private final ComputerModule.Implementation computerModule;
 
     public Computer() {
         this.realm = new RtlRealm(this);
         this.clock = realm.createClockNetwork(clockPin(realm));
-        this.computerModule = new ComputerModule(realm, clock);
+        this.computerModule = new ComputerModule.Implementation(realm, clock);
 
         computerModule.setExternalReset(buttonPin(realm, "V4"));
 
-        vgaPin(realm, "H14", computerModule._textDisplay._vgaConnector.getR());
-        vgaPin(realm, "H15", computerModule._textDisplay._vgaConnector.getG());
-        vgaPin(realm, "G15", computerModule._textDisplay._vgaConnector.getB());
-        vgaPin(realm, "F15", computerModule._textDisplay._vgaConnector.getHsync());
-        vgaPin(realm, "F14", computerModule._textDisplay._vgaConnector.getVsync());
+        TextDisplayController.Implementation textDisplayController = (TextDisplayController.Implementation)computerModule._textDisplay;
+        VgaConnector.Implementation vgaConnector = (VgaConnector.Implementation)textDisplayController._vgaConnector;
+        vgaPin(realm, "H14", vgaConnector.getR());
+        vgaPin(realm, "H15", vgaConnector.getG());
+        vgaPin(realm, "G15", vgaConnector.getB());
+        vgaPin(realm, "F15", vgaConnector.getHsync());
+        vgaPin(realm, "F14", vgaConnector.getVsync());
 
-        computerModule._keyboard._ps2.setClk(ps2Pin(realm, "G14"));
-        computerModule._keyboard._ps2.setData(ps2Pin(realm, "G13"));
+        KeyboardController.Implementation keyboardController = (KeyboardController.Implementation)computerModule._keyboard;
+        Ps2Connector.Implementation ps2Connector = (Ps2Connector.Implementation)keyboardController._ps2;
+        ps2Connector.setClk(ps2Pin(realm, "G14"));
+        ps2Connector.setData(ps2Pin(realm, "G13"));
 
 		/*
 	inout 	[15:0] sd_D_IO;

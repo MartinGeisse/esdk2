@@ -1,6 +1,7 @@
 package name.martingeisse.esdk.riscv.experiment.terminal;
 
 import name.martingeisse.esdk.core.rtl.RtlItem;
+import name.martingeisse.esdk.core.rtl.RtlItemOwned;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.connector.RtlBitSignalConnector;
@@ -10,35 +11,42 @@ import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogCon
 /**
  *
  */
-public class Ps2Connector extends RtlItem {
+public interface Ps2Connector extends RtlItemOwned {
 
-	private final RtlBitSignalConnector clk, data;
+	RtlBitSignalConnector getClk();
+	RtlBitSignalConnector getData();
 
-	public Ps2Connector(RtlRealm realm) {
-		super(realm);
-		clk = new RtlBitSignalConnector(realm);
-		data = new RtlBitSignalConnector(realm);
-	}
+	class Implementation extends RtlItem implements Ps2Connector {
 
-	public RtlBitSignalConnector getClk() {
-		return clk;
-	}
+		private final RtlBitSignalConnector clk, data;
 
-	public void setClk(RtlBitSignal clk) {
-		this.clk.setConnected(clk);
-	}
+		public Implementation(RtlRealm realm) {
+			super(realm);
+			clk = new RtlBitSignalConnector(realm);
+			data = new RtlBitSignalConnector(realm);
+		}
 
-	public RtlBitSignalConnector getData() {
-		return data;
-	}
+		public RtlBitSignalConnector getClk() {
+			return clk;
+		}
 
-	public void setData(RtlBitSignal data) {
-		this.data.setConnected(data);
-	}
+		public void setClk(RtlBitSignal clk) {
+			this.clk.setConnected(clk);
+		}
 
-	@Override
-	public VerilogContribution getVerilogContribution() {
-		return new EmptyVerilogContribution();
+		public RtlBitSignalConnector getData() {
+			return data;
+		}
+
+		public void setData(RtlBitSignal data) {
+			this.data.setConnected(data);
+		}
+
+		@Override
+		public VerilogContribution getVerilogContribution() {
+			return new EmptyVerilogContribution();
+		}
+
 	}
 
 }
