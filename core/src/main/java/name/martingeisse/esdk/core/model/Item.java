@@ -25,12 +25,16 @@ public abstract class Item {
 		return design;
 	}
 
-	public String getName() {
+	public final String getName() {
 		return name;
 	}
 
-	public void setName(String name) {
+	public final void setName(String name) {
 		this.name = name;
+		onNameChanged();
+	}
+
+	protected void onNameChanged() {
 	}
 
 	/**

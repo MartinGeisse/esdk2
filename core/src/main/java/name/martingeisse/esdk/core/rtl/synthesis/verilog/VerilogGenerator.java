@@ -302,7 +302,7 @@ public class VerilogGenerator {
 	private String assignGeneratedName(String prefix) {
 		MutableInt counter = prefixNameCounters.computeIfAbsent(prefix, p -> new MutableInt());
 		while (true) {
-			String name = prefix + counter.intValue();
+			String name = prefix + "__" + counter.intValue();
 			counter.increment();
 
 			// If the counter collides with a fixed name, we shouldn't just increment again because the order
@@ -312,7 +312,7 @@ public class VerilogGenerator {
 				throw new IllegalStateException("assigned name collides with fixed name: " + name);
 			}
 
-			// There may still be a collision in the odd case of counter prefixes like "foo" and "foo1", so to
+			// There may still be a collision in the odd case of counter prefixes like "foo" and "foo__1", so to
 			// avoid edge cases, we have to check that too, hence the while loop.
 			if (names.add(name)) {
 				return name;
