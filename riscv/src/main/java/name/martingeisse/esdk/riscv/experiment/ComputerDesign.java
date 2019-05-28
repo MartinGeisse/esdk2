@@ -10,10 +10,15 @@ import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlConstantIndexSelection;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.xilinx.XilinxPinConfiguration;
+import name.martingeisse.esdk.core.util.vector.VectorValue;
 import name.martingeisse.esdk.riscv.experiment.terminal.KeyboardController;
 import name.martingeisse.esdk.riscv.experiment.terminal.Ps2Connector;
 import name.martingeisse.esdk.riscv.experiment.terminal.TextDisplayController;
 import name.martingeisse.esdk.riscv.experiment.terminal.VgaConnector;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  *
@@ -24,10 +29,24 @@ public class ComputerDesign extends Design {
     private final RtlClockNetwork clock;
     private final ComputerModule.Implementation computerModule;
 
-    public ComputerDesign() {
+    public ComputerDesign() throws IOException {
         this.realm = new RtlRealm(this);
         this.clock = realm.createClockNetwork(clockPin(realm));
         this.computerModule = new ComputerModule.Implementation(realm, clock);
+        try (FileInputStream in = new FileInputStream("riscv/resource/program/build/program.bin")) {
+            int index = 0;
+            while (true) {
+                int first = in.read();
+                if (first < 0) {
+                    break;
+                }
+                computerModule._memory0.getMatrix().setRow(index, VectorValue.of(8, first));
+                computerModule._memory1.getMatrix().setRow(index, VectorValue.of(8, readByteEofSafe(in)));
+                computerModule._memory2.getMatrix().setRow(index, VectorValue.of(8, readByteEofSafe(in)));
+                computerModule._memory3.getMatrix().setRow(index, VectorValue.of(8, readByteEofSafe(in)));
+                index++;
+            }
+        }
 
         computerModule.setExternalReset(buttonPin(realm, "V4"));
 
@@ -162,6 +181,11 @@ public class ComputerDesign extends Design {
             RtlBitSignal bitSignal = new RtlConstantIndexSelection(realm, outputSignal, i);
             ramOutputPin(realm, ids[i], bitSignal);
         }
+    }
+
+    private static int readByteEofSafe(InputStream in) throws IOException {
+        int x = in.read();
+        return (x < 0 ? 0 : x);
     }
 
 }
