@@ -84,6 +84,7 @@ public final class RtlAsynchronousMemoryReadPort extends RtlItem implements RtlM
 
 		ReadDataSignal(RtlRealm realm) {
 			super(realm);
+			setName("memoryAsyncRead");
 		}
 
 		@Override

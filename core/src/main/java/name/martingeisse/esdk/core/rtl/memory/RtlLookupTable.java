@@ -32,6 +32,10 @@ public final class RtlLookupTable extends RtlItem implements RtlVectorSignal {
 		this.port.setAddressSignal(indexSignal);
 	}
 
+	public RtlMemory getMemory() {
+		return memory;
+	}
+
 	public Matrix getMatrix() {
 		return memory.getMatrix();
 	}

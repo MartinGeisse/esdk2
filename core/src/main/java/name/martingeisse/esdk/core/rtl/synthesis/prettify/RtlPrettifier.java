@@ -3,8 +3,12 @@ package name.martingeisse.esdk.core.rtl.synthesis.prettify;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlItemOwned;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
+import name.martingeisse.esdk.core.rtl.block.RtlProceduralMemoryConstantIndexSelection;
+import name.martingeisse.esdk.core.rtl.block.RtlProceduralMemoryIndexSelection;
 import name.martingeisse.esdk.core.rtl.block.statement.RtlAssignment;
 import name.martingeisse.esdk.core.rtl.block.statement.RtlWhenStatement;
+import name.martingeisse.esdk.core.rtl.memory.*;
+import name.martingeisse.esdk.core.rtl.module.RtlInstanceInputPort;
 import name.martingeisse.esdk.core.rtl.module.RtlInstancePort;
 import name.martingeisse.esdk.core.rtl.module.RtlModuleInstance;
 import name.martingeisse.esdk.core.rtl.pin.RtlBidirectionalPin;
@@ -81,10 +85,13 @@ public class RtlPrettifier {
 			setName(conditional.getOnTrue(), item.getName() + "_then");
 			setName(conditional.getOnFalse(), item.getName() + "_else");
 		} else if (item instanceof RtlModuleInstance) {
-			RtlModuleInstance moduleInstance = (RtlModuleInstance)item;
+			RtlModuleInstance moduleInstance = (RtlModuleInstance) item;
 			for (RtlInstancePort port : moduleInstance.getPorts()) {
 				setName(port, moduleInstance.getName() + "_" + port.getPortName());
 			}
+		} else if (item instanceof RtlInstancePort) {
+			RtlInstanceInputPort port = (RtlInstanceInputPort)item;
+			setName(port.getAssignedSignal(), port.getName());
 		} else if (item instanceof RtlSwitchSignal<?>) {
 			RtlSwitchSignal<?> swtch = (RtlSwitchSignal<?>)item;
 			for (RtlSwitchSignal.Case<?> aCase : swtch.getCases()) {
@@ -107,8 +114,65 @@ public class RtlPrettifier {
 		} else if (item instanceof RtlConstantIndexSelection) {
 			RtlConstantIndexSelection indexSelection = (RtlConstantIndexSelection)item;
 			setName(indexSelection.getContainerSignal(), indexSelection.getName() + "_container");
+		} else if (item instanceof RtlConcatenation) {
+			RtlConcatenation concatenation = (RtlConcatenation)item;
+			int i = 0;
+			for (RtlSignal signal : concatenation.getSignals()) {
+				setName(signal, concatenation.getName() + "_element" + i);
+				i++;
+			}
+		} else if (item instanceof RtlBitRepetition) {
+			RtlBitRepetition repetition = (RtlBitRepetition)item;
+			setName(repetition.getBitSignal(), repetition.getName() + "_element");
+		} else if (item instanceof RtlVectorRepetition) {
+			RtlVectorRepetition repetition = (RtlVectorRepetition)item;
+			setName(repetition.getVectorSignal(), repetition.getName() + "_element");
+		} else if (item instanceof RtlLookupTable) {
+			RtlLookupTable lookupTable = (RtlLookupTable)item;
+			setName(lookupTable.getMemory(), lookupTable.getName());
+		} else if (item instanceof RtlMemory) {
+			RtlMemory memory = (RtlMemory)item;
+			int i = 0;
+			for (RtlMemoryPort port : memory.getPorts()) {
+				setName(port, memory.getName() + "_port" + i);
+				i++;
+			}
+		} else if (item instanceof RtlAsynchronousMemoryReadPort) {
+			RtlAsynchronousMemoryReadPort port = (RtlAsynchronousMemoryReadPort)item;
+			setName(port.getAddressSignal(), port.getName() + "_address");
+			setName(port.getReadDataSignal(), port.getName() + "_data");
+		} else if (item instanceof RtlSynchronousMemoryPort) {
+			RtlSynchronousMemoryPort port = (RtlSynchronousMemoryPort)item;
+			setName(port.getClockEnableSignal(), port.getName() + "_enable");
+			setName(port.getAddressSignal(), port.getName() + "_address");
+			setName(port.getReadDataSignal(), port.getName() + "_readData");
+			setName(port.getWriteDataSignal(), port.getName() + "_writeData");
+			setName(port.getWriteEnableSignal(), port.getName() + "_writeEnable");
+		} else if (item instanceof RtlVectorNotOperation) {
+			RtlVectorNotOperation operation = (RtlVectorNotOperation)item;
+			setName(operation.getOperand(), operation.getName() + "_not");
+		} else if (item instanceof RtlVectorNegateOperation) {
+			RtlVectorNegateOperation operation = (RtlVectorNegateOperation)item;
+			setName(operation.getOperand(), operation.getName() + "_neg");
+		} else if (item instanceof RtlProceduralMemoryIndexSelection) {
+			RtlProceduralMemoryIndexSelection indexSelection = (RtlProceduralMemoryIndexSelection)item;
+			setName(indexSelection.getMemory(), indexSelection.getName() + "_container");
+			setName(indexSelection.getIndexSignal(), indexSelection.getName() + "_index");
+		} else if (item instanceof RtlProceduralMemoryConstantIndexSelection) {
+			RtlProceduralMemoryConstantIndexSelection indexSelection = (RtlProceduralMemoryConstantIndexSelection)item;
+			setName(indexSelection.getMemory(), indexSelection.getName() + "_container");
+		} else if (item instanceof RtlOneBitVectorSignal) {
+			RtlOneBitVectorSignal signal = (RtlOneBitVectorSignal)item;
+			setName(signal.getBitSignal(), signal.getName());
+		} else if (item instanceof RtlShiftOperation) {
+			RtlShiftOperation operation = (RtlShiftOperation)item;
+			String baseName = item.getName() + "_shift";
+			setName(operation.getLeftOperand(), baseName + 'L');
+			setName(operation.getRightOperand(), baseName + 'R');
+		} else if (item instanceof RtlRangeSelection) {
+			RtlRangeSelection rangeSelection = (RtlRangeSelection)item;
+			setName(rangeSelection.getContainerSignal(), rangeSelection.getName() + "_container");
 		}
-		TODO RtlVectorSignal subclasses
 	}
 
 	/**

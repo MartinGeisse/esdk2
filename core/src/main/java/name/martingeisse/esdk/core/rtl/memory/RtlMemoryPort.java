@@ -1,5 +1,6 @@
 package name.martingeisse.esdk.core.rtl.memory;
 
+import name.martingeisse.esdk.core.rtl.RtlItemOwned;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.SignalUsageConsumer;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.SynthesisPreparationContext;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
@@ -7,7 +8,7 @@ import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
 /**
  *
  */
-public interface RtlMemoryPort {
+public interface RtlMemoryPort extends RtlItemOwned {
 
 	void prepareSynthesis(SynthesisPreparationContext context);
 
