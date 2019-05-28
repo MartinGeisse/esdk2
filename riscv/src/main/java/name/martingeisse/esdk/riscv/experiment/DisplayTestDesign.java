@@ -7,6 +7,8 @@ import name.martingeisse.esdk.core.rtl.pin.RtlInputPin;
 import name.martingeisse.esdk.core.rtl.pin.RtlOutputPin;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.xilinx.XilinxPinConfiguration;
+import name.martingeisse.esdk.riscv.experiment.terminal.TextDisplayController;
+import name.martingeisse.esdk.riscv.experiment.terminal.VgaConnector;
 
 /**
  *
@@ -15,18 +17,20 @@ public class DisplayTestDesign extends Design {
 
 	private final RtlRealm realm;
 	private final RtlClockNetwork clock;
-	private final DisplayTest displayTest;
+	private final DisplayTest.Implementation displayTest;
 
 	public DisplayTestDesign() {
 		this.realm = new RtlRealm(this);
 		this.clock = realm.createClockNetwork(clockPin(realm));
-		this.displayTest = new DisplayTest(realm, clock);
+		this.displayTest = new DisplayTest.Implementation(realm, clock);
 
-		vgaPin(realm, "H14", displayTest._textDisplay._vgaConnector.getR());
-		vgaPin(realm, "H15", displayTest._textDisplay._vgaConnector.getG());
-		vgaPin(realm, "G15", displayTest._textDisplay._vgaConnector.getB());
-		vgaPin(realm, "F15", displayTest._textDisplay._vgaConnector.getHsync());
-		vgaPin(realm, "F14", displayTest._textDisplay._vgaConnector.getVsync());
+		TextDisplayController.Implementation textDisplayController = (TextDisplayController.Implementation)displayTest._textDisplay;
+		VgaConnector.Implementation vgaConnector = (VgaConnector.Implementation)textDisplayController._vgaConnector;
+		vgaPin(realm, "H14", vgaConnector.getR());
+		vgaPin(realm, "H15", vgaConnector.getG());
+		vgaPin(realm, "G15", vgaConnector.getB());
+		vgaPin(realm, "F15", vgaConnector.getHsync());
+		vgaPin(realm, "F14", vgaConnector.getVsync());
 
 	}
 

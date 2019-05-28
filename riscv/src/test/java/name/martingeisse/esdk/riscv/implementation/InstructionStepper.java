@@ -11,9 +11,9 @@ import name.martingeisse.esdk.library.util.ClockStepper;
 public class InstructionStepper extends RtlSimulationItem {
 
 	private final ClockStepper clockStepper;
-	private final Multicycle cpu;
+	private final Multicycle.Implementation cpu;
 
-	public InstructionStepper(ClockStepper clockStepper, Multicycle cpu) {
+	public InstructionStepper(ClockStepper clockStepper, Multicycle.Implementation cpu) {
 		super(clockStepper.getRealm());
 		this.clockStepper = clockStepper;
 		this.cpu = cpu;
@@ -23,7 +23,7 @@ public class InstructionStepper extends RtlSimulationItem {
 		return clockStepper;
 	}
 
-	public Multicycle getCpu() {
+	public Multicycle.Implementation getCpu() {
 		return cpu;
 	}
 

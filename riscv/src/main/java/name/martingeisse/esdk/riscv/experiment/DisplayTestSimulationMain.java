@@ -3,6 +3,7 @@ package name.martingeisse.esdk.riscv.experiment;
 import name.martingeisse.esdk.core.rtl.simulation.RtlClockGenerator;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 import name.martingeisse.esdk.riscv.experiment.terminal.MyMonitorPanel;
+import name.martingeisse.esdk.riscv.experiment.terminal.TextDisplayController;
 
 import javax.swing.*;
 import java.io.FileInputStream;
@@ -16,10 +17,11 @@ public class DisplayTestSimulationMain {
 
 	public static void main(String[] args) throws Exception {
 		DisplayTestDesign design = new DisplayTestDesign();
-		loadProgram(design.getDisplayTest());
+		DisplayTest.Implementation displayTest = (DisplayTest.Implementation)design.getDisplayTest();
+		loadProgram(displayTest);
 		new RtlClockGenerator(design.getClock(), 10);
 
-		MyMonitorPanel monitorPanel = new MyMonitorPanel(design.getClock(), design.getDisplayTest()._textDisplay);
+		MyMonitorPanel monitorPanel = new MyMonitorPanel(design.getClock(), (TextDisplayController.Implementation)displayTest._textDisplay);
 
 		JFrame frame = new JFrame("Terminal");
 		frame.add(monitorPanel);
@@ -32,7 +34,7 @@ public class DisplayTestSimulationMain {
 		design.simulate();
 	}
 
-	static void loadProgram(DisplayTest displayTest) throws Exception {
+	static void loadProgram(DisplayTest.Implementation displayTest) throws Exception {
 		try (FileInputStream in = new FileInputStream("riscv/resource/program/build/program.bin")) {
 			int index = 0;
 			while (true) {

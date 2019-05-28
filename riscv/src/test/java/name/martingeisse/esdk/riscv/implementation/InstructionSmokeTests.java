@@ -23,7 +23,7 @@ public class InstructionSmokeTests {
 	private final Design design;
 	private final RtlRealm realm;
 	private final RtlClockNetwork clock;
-	private final Multicycle cpu;
+	private final Multicycle.Implementation cpu;
 	private final RtlSimulatedSettableVectorSignal instruction;
 	private final ClockStepper clockStepper;
 	private final InstructionStepper stepper;
@@ -32,7 +32,7 @@ public class InstructionSmokeTests {
 		design = new Design();
 		realm = new RtlRealm(design);
 		clock = new RtlClockNetwork(realm);
-		cpu = new Multicycle(realm, clock);
+		cpu = new Multicycle.Implementation(realm, clock);
 		instruction = new RtlSimulatedSettableVectorSignal(realm, 32);
 		clockStepper = new ClockStepper(clock, 10);
 		stepper = new InstructionStepper(clockStepper, cpu);

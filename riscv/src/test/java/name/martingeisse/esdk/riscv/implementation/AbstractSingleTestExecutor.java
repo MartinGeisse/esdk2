@@ -22,7 +22,7 @@ public abstract class AbstractSingleTestExecutor {
 	private final Design design;
 	private final RtlRealm realm;
 	private final RtlClockNetwork clock;
-	private final MulticycleTestbench testbench;
+	private final MulticycleTestbench.Implementation testbench;
 	private final Multicycle cpu;
 
 	public AbstractSingleTestExecutor(File textSegmentFile) {
@@ -30,7 +30,7 @@ public abstract class AbstractSingleTestExecutor {
 		design = new Design();
 		realm = new RtlRealm(design);
 		clock = new RtlClockNetwork(realm);
-		testbench = new MulticycleTestbench(realm, clock);
+		testbench = new MulticycleTestbench.Implementation(realm, clock);
 		cpu = testbench._cpu;
 		new RtlClockedSimulationItem(clock) {
 

@@ -12,7 +12,7 @@ public class SynthesisMain {
 
 	public static void main(String[] args) throws Exception {
 		Computer design = new Computer();
-		SimulationMain.loadProgram(design.getComputerModule());
+		SimulationMain.loadProgram((ComputerModule.Implementation)design.getComputerModule());
 		new RtlPrettifier().prettify(design.getRealm());
 		new ProjectGenerator(design.getRealm(), "TerminalTest", new File("ise/terminal_test"), "XC3S500E-FG320-4").generate();
 	}

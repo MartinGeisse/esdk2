@@ -7,6 +7,7 @@ import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogCon
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 import name.martingeisse.esdk.riscv.experiment.terminal.MyMonitorPanel;
 import name.martingeisse.esdk.riscv.experiment.terminal.TerminalPanel;
+import name.martingeisse.esdk.riscv.experiment.terminal.TextDisplayController;
 
 import javax.swing.*;
 import java.io.FileInputStream;
@@ -20,14 +21,15 @@ public class SimulationMain {
 
 	public static void main(String[] args) throws Exception {
 		Computer design = new Computer();
-		loadProgram(design.getComputerModule());
+		loadProgram((ComputerModule.Implementation)design.getComputerModule());
 		new RtlClockGenerator(design.getClock(), 10);
 
 //		TerminalPanel terminalPanel = new TerminalPanel(design.getClock());
 //		design.getComputerModule()._textDisplay.setTerminalPanel(terminalPanel);
 //		design.getComputerModule()._keyboard.setTerminalPanel(terminalPanel);
 
-		MyMonitorPanel monitorPanel = new MyMonitorPanel(design.getClock(), design.getComputerModule()._textDisplay);
+		ComputerModule.Implementation computerModule = (ComputerModule.Implementation)design.getComputerModule();
+		MyMonitorPanel monitorPanel = new MyMonitorPanel(design.getClock(), (TextDisplayController.Implementation) computerModule._textDisplay);
 
 		JFrame frame = new JFrame("Terminal");
 		// frame.add(terminalPanel);
@@ -42,7 +44,7 @@ public class SimulationMain {
 		design.simulate();
 	}
 
-	static void loadProgram(ComputerModule computerModule) throws Exception {
+	static void loadProgram(ComputerModule.Implementation computerModule) throws Exception {
 		try (FileInputStream in = new FileInputStream("riscv/resource/program/build/program.bin")) {
 			int index = 0;
 			while (true) {
