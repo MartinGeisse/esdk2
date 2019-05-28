@@ -18,13 +18,13 @@ import name.martingeisse.esdk.riscv.experiment.terminal.VgaConnector;
 /**
  *
  */
-public class Computer extends Design {
+public class ComputerDesign extends Design {
 
     private final RtlRealm realm;
     private final RtlClockNetwork clock;
     private final ComputerModule.Implementation computerModule;
 
-    public Computer() {
+    public ComputerDesign() {
         this.realm = new RtlRealm(this);
         this.clock = realm.createClockNetwork(clockPin(realm));
         this.computerModule = new ComputerModule.Implementation(realm, clock);

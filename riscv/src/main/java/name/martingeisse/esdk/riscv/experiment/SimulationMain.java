@@ -1,12 +1,8 @@
 package name.martingeisse.esdk.riscv.experiment;
 
-import name.martingeisse.esdk.core.rtl.RtlClockedItem;
 import name.martingeisse.esdk.core.rtl.simulation.RtlClockGenerator;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.EmptyVerilogContribution;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogContribution;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 import name.martingeisse.esdk.riscv.experiment.terminal.MyMonitorPanel;
-import name.martingeisse.esdk.riscv.experiment.terminal.TerminalPanel;
 import name.martingeisse.esdk.riscv.experiment.terminal.TextDisplayController;
 
 import javax.swing.*;
@@ -20,7 +16,7 @@ import java.io.InputStream;
 public class SimulationMain {
 
 	public static void main(String[] args) throws Exception {
-		Computer design = new Computer();
+		ComputerDesign design = new ComputerDesign();
 		loadProgram((ComputerModule.Implementation)design.getComputerModule());
 		new RtlClockGenerator(design.getClock(), 10);
 
