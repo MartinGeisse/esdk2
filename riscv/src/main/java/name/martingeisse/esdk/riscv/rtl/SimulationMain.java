@@ -1,9 +1,8 @@
 package name.martingeisse.esdk.riscv.rtl;
 
 import name.martingeisse.esdk.core.rtl.simulation.RtlClockGenerator;
-import name.martingeisse.esdk.riscv.experiment.ComputerModule;
 import name.martingeisse.esdk.riscv.rtl.terminal.MyMonitorPanel;
-import name.martingeisse.esdk.riscv.experiment.terminal.TextDisplayController;
+import name.martingeisse.esdk.riscv.rtl.terminal.TextDisplayController;
 
 import javax.swing.*;
 

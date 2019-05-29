@@ -10,10 +10,9 @@ import name.martingeisse.esdk.core.rtl.signal.RtlConstantIndexSelection;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.xilinx.XilinxPinConfiguration;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
-import name.martingeisse.esdk.riscv.experiment.ComputerModule;
-import name.martingeisse.esdk.riscv.experiment.terminal.KeyboardController;
+import name.martingeisse.esdk.riscv.rtl.terminal.KeyboardController;
 import name.martingeisse.esdk.riscv.rtl.terminal.Ps2Connector;
-import name.martingeisse.esdk.riscv.experiment.terminal.TextDisplayController;
+import name.martingeisse.esdk.riscv.rtl.terminal.TextDisplayController;
 import name.martingeisse.esdk.riscv.rtl.terminal.VgaConnector;
 
 import java.io.FileInputStream;
