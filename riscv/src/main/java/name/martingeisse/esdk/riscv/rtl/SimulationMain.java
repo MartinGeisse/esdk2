@@ -17,10 +17,19 @@ public class SimulationMain {
 			@Override
 			protected ComputerModule.Implementation createComputerModule() {
 				return new ComputerModule.Implementation(getRealm(), getClock()) {
+
+					@Override
+					protected TextDisplayController createTextDisplay() {
+						// return new SimulatedTextDisplayController(getRealm(), getClock());
+						return super.createTextDisplay();
+					}
+
 					@Override
 					protected KeyboardController createKeyboard() {
+						// return new SimulatedKeyboardController(getRealm(), getClock());
 						return new UnconnectedKeyboard(getRealm());
 					}
+
 				};
 			}
 		};
@@ -29,6 +38,7 @@ public class SimulationMain {
 
 		new RtlClockGenerator(design.getClock(), 10);
 		computerModule.setExternalReset(new RtlBitConstant(realm, false));
+		// prepareHighlevelDisplaySimulation(design);
 		prepareHdlDisplaySimulation(design);
 
 		design.simulate();

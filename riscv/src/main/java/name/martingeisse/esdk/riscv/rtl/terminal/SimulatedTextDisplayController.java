@@ -11,7 +11,7 @@ import name.martingeisse.esdk.core.rtl.simulation.RtlSimulationItem;
 /**
  *
  */
-public class SimulatedTextDisplayController extends RtlSimulationItem {
+public class SimulatedTextDisplayController extends RtlSimulationItem implements TextDisplayController {
 
 	private TerminalPanel terminalPanel;
 	private RtlBitSignalConnector clockEnable;

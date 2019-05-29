@@ -13,7 +13,7 @@ import name.martingeisse.esdk.core.util.vector.VectorValue;
 /**
  *
  */
-public class SimulatedKeyboardController extends RtlSimulationItem {
+public class SimulatedKeyboardController extends RtlSimulationItem implements KeyboardController {
 
 	private TerminalPanel terminalPanel;
 	private RtlVectorSignalConnector inputData;
