@@ -1,0 +1,104 @@
+module name.martingeisse.esdk.riscv.rtl.terminal.KeyboardController;
+
+interface {
+    in clock clk;
+    out vector[8] inputData;
+    in bit inputAcknowledge;
+}
+
+register vector[8] dataRegister;
+do (*) inputData = dataRegister;
+
+name.martingeisse.esdk.riscv.rtl.terminal.Ps2Connector ps2;
+
+//
+// synchronize and de-bounce the PS2 signals
+//
+signal bit ps2Clock, ps2Data;
+name.martingeisse.esdk.riscv.rtl.terminal.Ps2SynchronizerAndDebouncer ps2ClockSynchronizerAndDebouncer;
+name.martingeisse.esdk.riscv.rtl.terminal.Ps2SynchronizerAndDebouncer ps2DataSynchronizerAndDebouncer;
+do (*) {
+    ps2ClockSynchronizerAndDebouncer.clk = clk;
+    ps2ClockSynchronizerAndDebouncer.dataIn = ps2.clk;
+    ps2Clock = ps2ClockSynchronizerAndDebouncer.dataOut;
+    ps2DataSynchronizerAndDebouncer.clk = clk;
+    ps2DataSynchronizerAndDebouncer.dataIn = ps2.data;
+    ps2Data = ps2DataSynchronizerAndDebouncer.dataOut;
+}
+
+//
+// PS2 clock / watchdog
+//
+register bit previousPs2Clock;
+register vector[13] ps2ClockWatchdogCounter;
+signal bit ps2ClockWatchdogCounterExpired = (ps2ClockWatchdogCounter == 13b1010000000000);
+do (clk) {
+    previousPs2Clock = ps2Clock;
+    if (ps2Clock != previousPs2Clock) {
+        ps2ClockWatchdogCounter = 0;
+    } else {
+        ps2ClockWatchdogCounter = ps2ClockWatchdogCounter + 13d1;
+    }
+}
+
+//
+// PS2 data
+//
+constant vector[3] STATE_IDLE = 0;
+constant vector[3] STATE_TRANSMIT = 1;
+constant vector[3] STATE_PARITY = 2;
+constant vector[3] STATE_STOP = 3;
+constant vector[3] STATE_ERROR = 4;
+
+register vector[3] receivedBitCount;
+register vector[3] state = STATE_IDLE;
+register vector[8] shiftRegister;
+register bit parity;
+do (clk) {
+    if (inputAcknowledge) {
+        dataRegister = 0;
+    }
+    if (ps2ClockWatchdogCounterExpired & state != STATE_IDLE) {
+        if (state == STATE_ERROR) {
+            if (ps2Clock & ps2Data) {
+                state = STATE_IDLE;
+            }
+        } else {
+            state = STATE_ERROR;
+        }
+    } else if (previousPs2Clock & ~ps2Clock) {
+        switch (state) {
+
+            case STATE_IDLE:
+                if (ps2Data) {
+                    state = STATE_ERROR;
+                } else {
+                    state = STATE_TRANSMIT;
+                    receivedBitCount = 0;
+                    parity = 0;
+                }
+
+            case STATE_TRANSMIT:
+                shiftRegister = ps2Data _ shiftRegister[7:1];
+                parity = parity ^ ps2Data;
+                if (receivedBitCount == 3d7) {
+                    state = STATE_PARITY;
+                } else {
+                    receivedBitCount = receivedBitCount + 3d1;
+                }
+
+            case STATE_PARITY:
+                if (ps2Data ^ parity) {
+                    state = STATE_STOP;
+                    dataRegister = shiftRegister;
+                } else {
+                    state = STATE_ERROR;
+                }
+                state = (ps2Data ^ parity) ? STATE_STOP : STATE_ERROR;
+
+            case STATE_STOP:
+                state = ps2Data ? STATE_IDLE : STATE_ERROR;
+
+        }
+    }
+}

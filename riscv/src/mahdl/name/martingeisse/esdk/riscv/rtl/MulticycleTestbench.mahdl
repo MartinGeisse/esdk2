@@ -1,0 +1,49 @@
+module name.martingeisse.esdk.riscv.rtl.MulticycleTestbench;
+
+interface {
+    in clock clk;
+    out bit outputEnable;
+    out vector[32] outputData;
+    out bit stopSimulation;
+}
+
+name.martingeisse.esdk.riscv.rtl.Multicycle cpu;
+signal vector[20] dataWordAddress;
+
+// Memory: the number indicates the significance inside a word, NOT the position of a byte in a byte buffer (these
+// are different since RISC-V is little-endian).
+register matrix[1024 * 1024][8] memory0, memory1, memory2, memory3;
+
+do (*) {
+
+    // control interface
+    cpu.clk = clk;
+    cpu.reset = 0;
+
+    // data interface
+    dataWordAddress = cpu.memoryWordAddress[19:0];
+    cpu.memoryReadData = memory3[dataWordAddress] _ memory2[dataWordAddress] _
+            memory1[dataWordAddress] _ memory0[dataWordAddress];
+    cpu.memoryAcknowledge = 1;
+    outputData = cpu.memoryWriteData;
+    outputEnable = cpu.memoryEnable & cpu.memoryWrite & (cpu.memoryWordAddress == 30h3ffffff8);
+    stopSimulation = cpu.memoryEnable & cpu.memoryWrite & (cpu.memoryWordAddress == 30h3ffffff7);
+
+}
+
+do (clk) {
+    if (cpu.memoryEnable & cpu.memoryWrite) {
+        if (cpu.memoryWriteMask[0]) {
+            memory0[dataWordAddress] = cpu.memoryWriteData[7:0];
+        }
+        if (cpu.memoryWriteMask[1]) {
+            memory1[dataWordAddress] = cpu.memoryWriteData[15:8];
+        }
+        if (cpu.memoryWriteMask[2]) {
+            memory2[dataWordAddress] = cpu.memoryWriteData[23:16];
+        }
+        if (cpu.memoryWriteMask[3]) {
+            memory3[dataWordAddress] = cpu.memoryWriteData[31:24];
+        }
+    }
+}

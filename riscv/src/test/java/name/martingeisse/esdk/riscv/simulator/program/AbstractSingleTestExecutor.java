@@ -1,7 +1,7 @@
 package name.martingeisse.esdk.riscv.simulator.program;
 
-import name.martingeisse.esdk.riscv.simulator.InstructionLevelRiscv;
-import name.martingeisse.esdk.riscv.simulator.io.IoUnit;
+import name.martingeisse.esdk.riscv.instruction.InstructionLevelRiscv;
+import name.martingeisse.esdk.riscv.instruction.io.IoUnit;
 
 import java.io.File;
 import java.io.FileInputStream;

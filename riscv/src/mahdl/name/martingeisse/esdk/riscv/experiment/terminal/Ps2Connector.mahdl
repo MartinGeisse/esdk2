@@ -1,5 +1,0 @@
-native module name.martingeisse.esdk.riscv.experiment.terminal.Ps2Connector;
-
-interface {
-    out bit clk, data;
-}

@@ -1,9 +1,0 @@
-native module name.martingeisse.esdk.riscv.experiment.terminal.SimulatedTextDisplayController;
-
-interface {
-    in clock clk;
-    in bit clockEnable;
-    in bit writeEnable;
-    in vector[12] address;
-    in vector[8] writeData;
-}

@@ -1,0 +1,7 @@
+native module name.martingeisse.esdk.riscv.rtl.terminal.SimulatedKeyboardController;
+
+interface {
+    in clock clk;
+    out vector[8] inputData;
+    in bit inputAcknowledge;
+}

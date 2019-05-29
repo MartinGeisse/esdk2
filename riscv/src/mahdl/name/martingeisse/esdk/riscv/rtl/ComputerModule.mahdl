@@ -1,0 +1,83 @@
+module name.martingeisse.esdk.riscv.rtl.ComputerModule;
+
+interface {
+    in clock clk;
+    in bit externalReset;
+}
+
+// TODO clk/reset generation
+signal bit reset = externalReset;
+
+name.martingeisse.esdk.riscv.rtl.Multicycle cpu;
+signal vector[10] memoryDataWordAddress;
+signal bit bigRamSelected = cpu.memoryWordAddress[29];
+signal bit terminalSelected = cpu.memoryWordAddress[12] & ~bigRamSelected;
+
+// Memory: the number indicates the significance inside a word, NOT the position of a byte in a byte buffer (these
+// are different since RISC-V is little-endian).
+register matrix[1024][8] memory0, memory1, memory2, memory3;
+signal vector[32] memoryReadData;
+register bit secondReadCycle = 0;
+
+// peripherals
+name.martingeisse.esdk.riscv.rtl.terminal.TextDisplayController textDisplay;
+name.martingeisse.esdk.riscv.rtl.terminal.KeyboardController keyboard;
+name.martingeisse.esdk.riscv.rtl.ram.NoRam bigRam;
+
+do (*) {
+
+    // control interface
+    cpu.clk = clk;
+    cpu.reset = reset;
+
+    // data interface
+    memoryDataWordAddress = cpu.memoryWordAddress[9:0];
+    cpu.memoryReadData = bigRamSelected ? bigRam.readData : terminalSelected ? (24d0 _ keyboard.inputData) : memoryReadData;
+    cpu.memoryAcknowledge = bigRamSelected ? bigRam.acknowledge : (cpu.memoryWrite | secondReadCycle | terminalSelected);
+
+    textDisplay.clk = clk;
+    textDisplay.clockEnable = 1;
+    textDisplay.writeEnable = cpu.memoryEnable & cpu.memoryWrite & terminalSelected;
+    textDisplay.address = cpu.memoryWordAddress[11:0];
+    textDisplay.writeData = cpu.memoryWriteData[7:0];
+
+    keyboard.clk = clk;
+    keyboard.inputAcknowledge = cpu.memoryEnable & ~cpu.memoryWrite & terminalSelected;
+
+    bigRam.clk = clk;
+    bigRam.reset = reset;
+    bigRam.enable = bigRamSelected;
+    bigRam.write = cpu.memoryWrite;
+    bigRam.wordAddress = cpu.memoryWordAddress[23:0];
+    bigRam.writeData = cpu.memoryWriteData;
+    bigRam.writeMask = cpu.memoryWriteMask;
+
+}
+
+register vector[8] memoryReadData0, memoryReadData1, memoryReadData2, memoryReadData3;
+do (*) memoryReadData = memoryReadData3 _ memoryReadData2 _ memoryReadData1 _ memoryReadData0;
+do (clk) {
+    memoryReadData0 = memory0[memoryDataWordAddress];
+    memoryReadData1 = memory1[memoryDataWordAddress];
+    memoryReadData2 = memory2[memoryDataWordAddress];
+    memoryReadData3 = memory3[memoryDataWordAddress];
+    if (cpu.memoryEnable & cpu.memoryWrite & ~terminalSelected) {
+        if (cpu.memoryWriteMask[0]) {
+            memory0[memoryDataWordAddress] = cpu.memoryWriteData[7:0];
+        }
+        if (cpu.memoryWriteMask[1]) {
+            memory1[memoryDataWordAddress] = cpu.memoryWriteData[15:8];
+        }
+        if (cpu.memoryWriteMask[2]) {
+            memory2[memoryDataWordAddress] = cpu.memoryWriteData[23:16];
+        }
+        if (cpu.memoryWriteMask[3]) {
+            memory3[memoryDataWordAddress] = cpu.memoryWriteData[31:24];
+        }
+    }
+    if (cpu.memoryEnable & ~cpu.memoryWrite) {
+        secondReadCycle = ~secondReadCycle;
+    } else {
+        secondReadCycle = 0;
+    }
+}
