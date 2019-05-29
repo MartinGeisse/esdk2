@@ -6,6 +6,8 @@ import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.simulation.RtlClockGenerator;
 import name.martingeisse.esdk.core.rtl.simulation.RtlClockedSimulationItem;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
+import name.martingeisse.esdk.riscv.rtl.Multicycle;
+import name.martingeisse.esdk.riscv.rtl.MulticycleTestbench;
 
 import java.io.File;
 import java.io.FileInputStream;

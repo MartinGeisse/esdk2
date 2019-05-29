@@ -2,7 +2,6 @@ package name.martingeisse.esdk.riscv.rtl.terminal;
 
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.library.vga.MonitorPanel;
-import name.martingeisse.esdk.riscv.experiment.terminal.TextDisplayController;
 
 /**
  *
