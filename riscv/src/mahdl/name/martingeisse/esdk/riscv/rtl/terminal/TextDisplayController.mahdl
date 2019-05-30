@@ -60,12 +60,12 @@ do (clk) {
 
 // stage 3: read character generator
 register bit stage3blank, stage3hsync, stage3vsync, stage3pixel;
-constant matrix[256 * 16][8] characterGenerator = loadMatrix("CharacterGenerator.txt", 256 * 16, 8);
+constant matrix[256 * 16 * 8][1] characterGenerator = loadMatrix("CharacterGenerator.txt", 256 * 16 * 8, 1);
 do (clk) {
     stage3blank = stage2blank;
     stage3hsync = stage2hsync;
     stage3vsync = stage2vsync;
-    stage3pixel = characterGenerator[stage2character _ stage2pixelY][stage2pixelX];
+    stage3pixel = characterGenerator[stage2character _ stage2pixelY _  stage2pixelX][0];
 }
 
 // stage 4 (non-registered): generate VGA signals
