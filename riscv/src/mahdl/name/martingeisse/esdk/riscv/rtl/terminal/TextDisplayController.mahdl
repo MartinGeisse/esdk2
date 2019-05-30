@@ -58,18 +58,21 @@ do (clk) {
     stage2pixelY = stage1y[3:0];
 }
 
-// stage 3: read character generator
-register bit stage3blank, stage3hsync, stage3vsync, stage3pixel;
-constant matrix[256 * 16 * 8][1] characterGenerator = loadMatrix("CharacterGenerator.txt", 256 * 16 * 8, 1);
+// stage 3: read character generator. This should have been a 32k*1 memory but XST crashes on that.
+register bit stage3blank, stage3hsync, stage3vsync;
+register vector[2] stage3pixels;
+register bit stage3pixelSelector;
+constant matrix[256 * 16 * 4][2] characterGenerator = loadMatrix("CharacterGenerator.txt", 256 * 16 * 4, 2);
 do (clk) {
     stage3blank = stage2blank;
     stage3hsync = stage2hsync;
     stage3vsync = stage2vsync;
-    stage3pixel = characterGenerator[stage2character _ stage2pixelY _  stage2pixelX][0];
+    stage3pixels = characterGenerator[stage2character _ stage2pixelY _  stage2pixelX[2:1]];
+    stage3pixelSelector = stage2pixelX[0];
 }
 
 // stage 4 (non-registered): generate VGA signals
-signal bit outputPixel = stage3pixel & ~stage3blank;
+signal bit outputPixel = stage3pixels[stage3pixelSelector ? 1b1 : 1b0] & ~stage3blank;
 name.martingeisse.esdk.riscv.rtl.terminal.VgaConnector vgaConnector;
 do (*) {
     vgaConnector.r = outputPixel;
