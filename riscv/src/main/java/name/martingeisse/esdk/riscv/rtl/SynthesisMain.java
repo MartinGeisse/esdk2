@@ -84,7 +84,9 @@ public class SynthesisMain {
 		 */
 
 		new RtlPrettifier().prettify(design.getRealm());
-		new ProjectGenerator(design.getRealm(), "TerminalTest", new File("ise/terminal_test"), "XC3S500E-FG320-4").generate();
+		ProjectGenerator projectGenerator = new ProjectGenerator(design.getRealm(), "TerminalTest", new File("ise/terminal_test"), "XC3S500E-FG320-4");
+		projectGenerator.addVerilogFile(new File("riscv/resource/hdl/clk_reset.v"));
+		projectGenerator.generate();
 	}
 
 	private static RtlInputPin clockPin(RtlRealm realm) {
