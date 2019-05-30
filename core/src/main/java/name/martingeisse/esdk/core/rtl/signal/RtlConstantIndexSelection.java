@@ -64,11 +64,9 @@ public final class RtlConstantIndexSelection extends RtlItem implements RtlBitSi
 	@Override
 	public void printVerilogImplementationExpression(VerilogExpressionWriter out) {
 		out.print(containerSignal, VerilogExpressionNesting.SIGNALS_AND_CONSTANTS);
-		if (containerSignal.getWidth() > 1) {
-			out.print('[');
-			out.print(index);
-			out.print(']');
-		}
+		out.print('[');
+		out.print(index);
+		out.print(']');
 	}
 
 }
