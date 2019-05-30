@@ -13,7 +13,7 @@ import javax.swing.*;
 public class SimulationMain {
 
 	public static void main(String[] args) throws Exception {
-		ComputerDesign design = new ComputerDesign(null) {
+		ComputerDesign design = new ComputerDesign() {
 			@Override
 			protected ComputerModule.Implementation createComputerModule() {
 				return new ComputerModule.Implementation(getRealm(), getClock()) {
@@ -36,6 +36,7 @@ public class SimulationMain {
 		ComputerModule.Implementation computerModule = design.getComputerModule();
 		RtlRealm realm = design.getRealm();
 
+		design.getClockSignalConnector().setConnected(new RtlBitConstant(realm, false));
 		new RtlClockGenerator(design.getClock(), 10);
 		computerModule.setExternalReset(new RtlBitConstant(realm, false));
 		// prepareHighlevelDisplaySimulation(design);

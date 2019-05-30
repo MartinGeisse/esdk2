@@ -22,11 +22,11 @@ import java.io.File;
 public class SynthesisMain {
 
 	public static void main(String[] args) throws Exception {
-
-		ComputerDesign design = new ComputerDesign(SynthesisMain::clockPin);
+		ComputerDesign design = new ComputerDesign();
 		ComputerModule.Implementation computerModule = design.getComputerModule();
 		RtlRealm realm = design.getRealm();
 
+		design.getClockSignalConnector().setConnected(clockPin(realm));
 		computerModule.setExternalReset(buttonPin(realm, "V4"));
 
 		TextDisplayController.Implementation textDisplayController = (TextDisplayController.Implementation)computerModule._textDisplay;

@@ -3,13 +3,12 @@ package name.martingeisse.esdk.riscv.rtl;
 import name.martingeisse.esdk.core.model.Design;
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
-import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
+import name.martingeisse.esdk.core.rtl.signal.connector.RtlBitSignalConnector;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.function.Function;
 
 /**
  *
@@ -17,16 +16,14 @@ import java.util.function.Function;
 public class ComputerDesign extends Design {
 
     private final RtlRealm realm;
+    private final RtlBitSignalConnector clockSignalConnector;
     private final RtlClockNetwork clock;
     private final ComputerModule.Implementation computerModule;
 
-    public ComputerDesign(Function<RtlRealm, RtlBitSignal> clockPinFactory) throws IOException {
+    public ComputerDesign() throws IOException {
         this.realm = new RtlRealm(this);
-        if (clockPinFactory == null) {
-            this.clock = realm.createClockNetwork();
-        } else {
-            this.clock = realm.createClockNetwork(clockPinFactory.apply(realm));
-        }
+        this.clockSignalConnector = new RtlBitSignalConnector(realm);
+        this.clock = realm.createClockNetwork(clockSignalConnector);
         this.computerModule = createComputerModule();
         try (FileInputStream in = new FileInputStream("riscv/resource/program/build/program.bin")) {
             int index = 0;
@@ -55,6 +52,10 @@ public class ComputerDesign extends Design {
 
     public RtlRealm getRealm() {
         return realm;
+    }
+
+    public RtlBitSignalConnector getClockSignalConnector() {
+        return clockSignalConnector;
     }
 
     public RtlClockNetwork getClock() {
