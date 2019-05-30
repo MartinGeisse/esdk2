@@ -73,9 +73,11 @@ public final class RtlVectorTargetConstantIndexSelection extends RtlItem impleme
 	@Override
 	public final void printVerilogAssignmentTarget(VerilogWriter out) {
 		containerTarget.printVerilogAssignmentTarget(out);
-		out.print('[');
-		out.print(index);
-		out.print(']');
+		if (containerTarget.getWidth() > 1) {
+			out.print('[');
+			out.print(index);
+			out.print(']');
+		}
 	}
 
 	@Override

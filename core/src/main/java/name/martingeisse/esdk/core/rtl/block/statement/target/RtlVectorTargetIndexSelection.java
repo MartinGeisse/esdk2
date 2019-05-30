@@ -74,9 +74,11 @@ public final class RtlVectorTargetIndexSelection extends RtlItem implements RtlB
 	@Override
 	public final void printVerilogAssignmentTarget(VerilogWriter out) {
 		containerTarget.printVerilogAssignmentTarget(out);
-		out.print('[');
-		out.print(indexSignal);
-		out.print(']');
+		if (containerTarget.getWidth() > 1) {
+			out.print('[');
+			out.print(indexSignal);
+			out.print(']');
+		}
 	}
 
 	@Override

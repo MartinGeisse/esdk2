@@ -62,9 +62,11 @@ public final class RtlIndexSelection extends RtlItem implements RtlBitSignal {
 	@Override
 	public void printVerilogImplementationExpression(VerilogExpressionWriter out) {
 		out.print(containerSignal, VerilogExpressionNesting.SIGNALS_AND_CONSTANTS);
-		out.print('[');
-		out.print(indexSignal, VerilogExpressionNesting.SIGNALS_AND_CONSTANTS);
-		out.print(']');
+		if (containerSignal.getWidth() > 1) {
+			out.print('[');
+			out.print(indexSignal, VerilogExpressionNesting.SIGNALS_AND_CONSTANTS);
+			out.print(']');
+		}
 	}
 
 }

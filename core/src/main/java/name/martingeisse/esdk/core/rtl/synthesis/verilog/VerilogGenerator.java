@@ -235,7 +235,7 @@ public class VerilogGenerator {
 		out.println();
 		if (!pins.isEmpty()) {
 			for (PinContribution pin : pins) {
-				if (pin.width == null) {
+				if (pin.width == null || pin.width < 2) {
 					out.println(pin.direction + ' ' + pin.name + ';');
 				} else {
 					out.println(pin.direction + '[' + (pin.width - 1) + ":0] " + pin.name + ';');
@@ -251,9 +251,11 @@ public class VerilogGenerator {
 				out.print(namedSignal.kind.name().toLowerCase());
 				if (signal instanceof RtlVectorSignal) {
 					RtlVectorSignal vectorSignal = (RtlVectorSignal) signal;
-					out.print('[');
-					out.print(vectorSignal.getWidth() - 1);
-					out.print(":0] ");
+					if (vectorSignal.getWidth() > 1) {
+						out.print('[');
+						out.print(vectorSignal.getWidth() - 1);
+						out.print(":0] ");
+					}
 				} else if (signal instanceof RtlBitSignal) {
 					out.print(' ');
 				} else {
