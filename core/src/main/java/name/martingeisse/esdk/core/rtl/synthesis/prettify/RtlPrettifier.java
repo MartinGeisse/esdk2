@@ -57,7 +57,6 @@ public class RtlPrettifier {
 		if (item.getName() == null) {
 			return;
 		}
-		System.out.println(item.getName() + " / " + item.getClass());
 		if (item instanceof RtlSignalConnector) {
 			RtlSignalConnector connector = (RtlSignalConnector) item;
 			setName(connector.getConnected(), item.getName());
@@ -89,7 +88,7 @@ public class RtlPrettifier {
 			for (RtlInstancePort port : moduleInstance.getPorts()) {
 				setName(port, moduleInstance.getName() + "_" + port.getPortName());
 			}
-		} else if (item instanceof RtlInstancePort) {
+		} else if (item instanceof RtlInstanceInputPort) {
 			RtlInstanceInputPort port = (RtlInstanceInputPort)item;
 			setName(port.getAssignedSignal(), port.getName());
 		} else if (item instanceof RtlSwitchSignal<?>) {

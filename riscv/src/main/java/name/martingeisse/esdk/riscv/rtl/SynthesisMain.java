@@ -1,6 +1,7 @@
 package name.martingeisse.esdk.riscv.rtl;
 
 import name.martingeisse.esdk.core.rtl.RtlRealm;
+import name.martingeisse.esdk.core.rtl.module.RtlModuleInstance;
 import name.martingeisse.esdk.core.rtl.pin.RtlInputPin;
 import name.martingeisse.esdk.core.rtl.pin.RtlOutputPin;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
@@ -26,8 +27,14 @@ public class SynthesisMain {
 		ComputerModule.Implementation computerModule = design.getComputerModule();
 		RtlRealm realm = design.getRealm();
 
-		design.getClockSignalConnector().setConnected(clockPin(realm));
-		computerModule.setExternalReset(buttonPin(realm, "V4"));
+		RtlModuleInstance clkReset = new RtlModuleInstance(realm, "clk_reset");
+		clkReset.createBitInputPort("clk_in", clockPin(realm));
+		clkReset.createBitInputPort("reset_in", buttonPin(realm, "V4"));
+		design.getClockSignalConnector().setConnected(clkReset.createBitOutputPort("clk"));
+		computerModule.setReset(clkReset.createBitOutputPort("reset"));
+
+		// design.getClockSignalConnector().setConnected(clockPin(realm));
+		// computerModule.setReset(buttonPin(realm, "V4"));
 
 		TextDisplayController.Implementation textDisplayController = (TextDisplayController.Implementation)computerModule._textDisplay;
 		VgaConnector.Implementation vgaConnector = (VgaConnector.Implementation)textDisplayController._vgaConnector;

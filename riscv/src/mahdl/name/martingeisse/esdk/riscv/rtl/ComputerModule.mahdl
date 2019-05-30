@@ -2,11 +2,8 @@ module name.martingeisse.esdk.riscv.rtl.ComputerModule;
 
 interface {
     in clock clk;
-    in bit externalReset;
+    in bit reset;
 }
-
-// TODO clk/reset generation
-signal bit reset = externalReset;
 
 name.martingeisse.esdk.riscv.rtl.Multicycle cpu;
 signal vector[10] memoryDataWordAddress;

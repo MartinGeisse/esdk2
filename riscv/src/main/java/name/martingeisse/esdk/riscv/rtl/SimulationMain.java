@@ -38,7 +38,7 @@ public class SimulationMain {
 
 		design.getClockSignalConnector().setConnected(new RtlBitConstant(realm, false));
 		new RtlClockGenerator(design.getClock(), 10);
-		computerModule.setExternalReset(new RtlBitConstant(realm, false));
+		computerModule.setReset(new RtlBitConstant(realm, false));
 		// prepareHighlevelDisplaySimulation(design);
 		prepareHdlDisplaySimulation(design);
 
