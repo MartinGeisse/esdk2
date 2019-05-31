@@ -1,0 +1,259 @@
+module name.martingeisse.esdk.riscv.rtl.MulticycleRegisterBar;
+
+interface {
+
+	// system signals
+	in clock clk;
+	in bit reset;
+
+	// memory access interface
+	out bit memoryEnable;
+	out bit memoryWrite;
+	out vector[30] memoryWordAddress;
+	in vector[32] memoryReadData;
+	out vector[32] memoryWriteData;
+	out vector[4] memoryWriteMask;
+	in bit memoryAcknowledge;
+
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+// definitions
+// --------------------------------------------------------------------------------------------------------------------
+
+// state machine
+constant vector[4] STATE_START = 0;
+constant vector[4] STATE_FETCH = 1;
+constant vector[4] STATE_DECODE_AND_READ1 = 2;
+constant vector[4] STATE_DECODE_AND_READ2 = 3;
+constant vector[4] STATE_EXEC_OP = 4;
+constant vector[4] STATE_EXEC_BRANCH = 5;
+constant vector[4] STATE_EXEC_LUI = 6;
+constant vector[4] STATE_EXEC_AUIPC = 7;
+constant vector[4] STATE_EXEC_JAL = 8;
+constant vector[4] STATE_EXEC_JALR = 9;
+constant vector[4] STATE_MEM_COMPUTE_ADDRESS = 10;
+constant vector[4] STATE_MEM_ACCESS = 11;
+constant vector[4] STATE_MEM_EXTEND = 12;
+
+// CPU state
+register vector[4] state = STATE_START;
+register vector[32] pc = 0;
+register matrix[32][32] registers; // TODO cannot use a BlockRAM; reason is probably because there isn't one unique data-out register
+register vector[32] instructionRegister; // TODO consider prefixing module ports with (interface.)portName to avoid these ugly local names (but sucks for clk)
+register vector[32] oldPc = 0;
+register vector[32] registerReadValue; // register reads go here
+register vector[32] firstRegisterValue; // first read value is stored here on second read
+register vector[32] aluImmediate;
+register vector[32] memoryAddressRegister;
+register vector[32] memoryReadDataRegister;
+
+// --------------------------------------------------------------------------------------------------------------------
+// derived signals
+// --------------------------------------------------------------------------------------------------------------------
+
+// decoding
+signal vector[5] opcode = instructionRegister[6:2];
+signal vector[5] sourceRegisterIndex1 = instructionRegister[19:15];
+signal vector[5] sourceRegisterIndex2 = instructionRegister[24:20];
+signal vector[5] destinationRegisterIndex = instructionRegister[11:7];
+
+// execution helpers
+signal vector[32] sourceValue1 = firstRegisterValue;
+signal vector[32] sourceValue2 = opcode[3] ? registerReadValue : aluImmediate;
+signal bit isLTS = (~sourceValue1[31] _ sourceValue1[30:0]) < (~sourceValue2[31] _ sourceValue2[30:0]);
+signal bit isLTU = (sourceValue1 < sourceValue2);
+
+// memory interface
+do (*) {
+	memoryEnable = (state == STATE_MEM_ACCESS) | (state == STATE_FETCH);
+	memoryWrite = (state == STATE_MEM_ACCESS) & opcode[3];
+	memoryWordAddress = memoryAddressRegister[31:2];
+	if (instructionRegister[13]) {
+		memoryWriteMask = 4b1111;
+		memoryWriteData = registerReadValue;
+	} else if (instructionRegister[12]) {
+		memoryWriteMask = memoryAddressRegister[1] ? 4b1100 : 4b0011;
+		memoryWriteData = registerReadValue[15:0] _ registerReadValue[15:0];
+	} else {
+		memoryWriteMask = memoryAddressRegister[1] ? (memoryAddressRegister[0] ? 4b1000 : 4b0100) : (memoryAddressRegister[0] ? 4b0010 : 4b0001);
+		memoryWriteData = registerReadValue[7:0] _ registerReadValue[7:0] _ registerReadValue[7:0] _ registerReadValue[7:0];
+	}
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+// logic taken out of the state machine to make it clearer
+// --------------------------------------------------------------------------------------------------------------------
+
+signal vector[32] execOpResult = switch(instructionRegister[14:12]) {
+    case 3d0: (opcode[3] & instructionRegister[30]) ? (sourceValue1 - sourceValue2) : (sourceValue1 + sourceValue2) // ADD
+    case 3d1: sourceValue1 << sourceValue2[4:0] // SLL
+    case 3d2: isLTS ? 32d1 : 32d0 // SLT
+    case 3d3: isLTU ? 32d1 : 32d0 // SLTU
+    case 3d4: sourceValue1 ^ sourceValue2 // XOR
+    case 3d5: instructionRegister[30] ?
+			((repeat(32, sourceValue1[31]) _ sourceValue1) >> sourceValue2[4:0])[31:0] // SRA
+            : (sourceValue1 >> sourceValue2[4:0]) // SRL
+    case 3d6: sourceValue1 | sourceValue2 // OR
+    case 3d7: sourceValue1 & sourceValue2 // AND
+};
+
+signal bit branchCondition = switch(instructionRegister[14:12]) {
+    case 3d0: sourceValue1 == sourceValue2 // BEQ
+    case 3d1: sourceValue1 != sourceValue2 // BNE
+    case 3d4: isLTS // BLT
+    case 3d5: ~isLTS // BGE
+    case 3d6: isLTU // BLTU
+    case 3d7: ~isLTU // BGEU
+    default: bit(0)
+};
+
+// halfword-to-word extension
+signal bit halfwordToWordSignBit = memoryAddressRegister[1] ? memoryReadDataRegister[31] : memoryReadDataRegister[15];
+signal vector[16] halfwordToWordExtension = instructionRegister[14] ? 16d0 : repeat(16, halfwordToWordSignBit);
+signal vector[16] halfwordToWordData = memoryAddressRegister[1] ? memoryReadDataRegister[31:16] : memoryReadDataRegister[15:0];
+
+// byte-to-word extension
+signal bit byteToWordSignBit = switch (memoryAddressRegister[1:0]) {
+	case 2d0: memoryReadDataRegister[7]
+	case 2d1: memoryReadDataRegister[15]
+	case 2d2: memoryReadDataRegister[23]
+	case 2d3: memoryReadDataRegister[31]
+};
+signal vector[24] byteToWordExtension = instructionRegister[14] ? 24d0 : repeat(24, byteToWordSignBit);
+signal vector[8] byteToWordData = switch (memoryAddressRegister[1:0]) {
+	case 2d0: memoryReadDataRegister[7:0]
+	case 2d1: memoryReadDataRegister[15:8]
+	case 2d2: memoryReadDataRegister[23:16]
+	case 2d3: memoryReadDataRegister[31:24]
+};
+
+// --------------------------------------------------------------------------------------------------------------------
+// state machine
+// --------------------------------------------------------------------------------------------------------------------
+
+do (clk) {
+	if (reset) {
+		state = STATE_START;
+		pc = 0;
+	} else {
+		switch (state) {
+
+			case STATE_START:
+				memoryAddressRegister = pc;
+				state = STATE_FETCH;
+
+			case STATE_FETCH:
+				if (memoryAcknowledge) {
+					state = STATE_DECODE_AND_READ1;
+					instructionRegister = memoryReadData;
+				}
+
+			case STATE_DECODE_AND_READ1:
+				oldPc = pc;
+				pc = pc + 32d4;
+				aluImmediate = repeat(20, instructionRegister[31]) _ instructionRegister[31:20];
+				state = STATE_DECODE_AND_READ2;
+
+			case STATE_DECODE_AND_READ2:
+				firstRegisterValue = registerReadValue;
+				switch (opcode) {
+
+					case 5d0: // LOAD
+						state = STATE_MEM_COMPUTE_ADDRESS;
+
+					case 5d4: // OP-IMM
+						state = STATE_EXEC_OP;
+
+					case 5d5: // AUIPC
+						state = STATE_EXEC_AUIPC;
+
+					case 5d8: // STORE
+						state = STATE_MEM_COMPUTE_ADDRESS;
+
+					case 5d12: // OP
+						state = STATE_EXEC_OP;
+
+					case 5d13: // LUI
+						state = STATE_EXEC_LUI;
+
+					case 5d24: // BRANCH
+						state = STATE_EXEC_BRANCH;
+
+					case 5d25: // JALR
+						state = STATE_EXEC_JALR;
+
+					case 5d27: // JAL
+						state = STATE_EXEC_JAL;
+
+					default: // includes MISC-MEM (=NOP) and SYSTEM
+						state = STATE_START;
+
+				}
+
+			case STATE_EXEC_OP:
+				state = STATE_START;
+
+			case STATE_EXEC_BRANCH:
+				if (branchCondition) {
+					pc = oldPc + (repeat(20, instructionRegister[31]) _ instructionRegister[7] _ instructionRegister[30:25] _ instructionRegister[11:8] _ 1b0);
+				}
+				state = STATE_START;
+
+			case STATE_EXEC_LUI:
+				state = STATE_START;
+
+			case STATE_EXEC_AUIPC:
+				state = STATE_START;
+
+			case STATE_EXEC_JAL:
+				pc = oldPc + (repeat(12, instructionRegister[31]) _ instructionRegister[19:12] _ instructionRegister[20] _ instructionRegister[30:21] _ 1b0);
+				state = STATE_START;
+
+			case STATE_EXEC_JALR:
+				pc = (sourceValue1 + (repeat(20, instructionRegister[31]) _ instructionRegister[31:20]))[31:1] _ 1b0;
+				state = STATE_START;
+
+			case STATE_MEM_COMPUTE_ADDRESS:
+				if (opcode[3]) {
+					memoryAddressRegister = sourceValue1 + (repeat(20, instructionRegister[31]) _ instructionRegister[31:25] _ instructionRegister[11:7]);
+				} else {
+					memoryAddressRegister = sourceValue1 + aluImmediate;
+				}
+				state = STATE_MEM_ACCESS;
+
+			case STATE_MEM_ACCESS:
+				memoryReadDataRegister = memoryReadData;
+				if (memoryAcknowledge) {
+					state = opcode[3] ? STATE_START : STATE_MEM_EXTEND;
+				}
+
+			case STATE_MEM_EXTEND:
+				state = STATE_START;
+
+		}
+	}
+}
+
+// register file BlockRAM support
+signal vector[5] registersAddress = state == STATE_DECODE_AND_READ1 ? sourceRegisterIndex1 :
+		state == STATE_DECODE_AND_READ2 ? sourceRegisterIndex2 : destinationRegisterIndex;
+signal bit isRegisterWriteState = (state == STATE_EXEC_OP) | (state == STATE_EXEC_LUI) | (state == STATE_EXEC_AUIPC) |
+		(state == STATE_EXEC_JAL) | (state == STATE_EXEC_JALR) | (state == STATE_MEM_EXTEND);
+signal vector[32] registerWriteValue = switch(state) {
+	case STATE_EXEC_OP: execOpResult
+	case STATE_EXEC_LUI: instructionRegister[31:12] _ 12d0
+	case STATE_EXEC_AUIPC: oldPc + (instructionRegister[31:12] _ 12d0)
+	case STATE_EXEC_JAL, STATE_EXEC_JALR: pc
+	case STATE_MEM_EXTEND: instructionRegister[13] ? memoryReadDataRegister : instructionRegister[12] ?
+		(halfwordToWordExtension _ halfwordToWordData) : (byteToWordExtension _ byteToWordData)
+	default: 32d0
+};
+do(clk) {
+	if (state != STATE_MEM_COMPUTE_ADDRESS) {
+		registerReadValue = registers[registersAddress];
+		if (isRegisterWriteState & destinationRegisterIndex != 5d0) {
+			registers[registersAddress] = registerWriteValue;
+		}
+	}
+}
