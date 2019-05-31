@@ -4,8 +4,8 @@ import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.connector.RtlBitSignalConnector;
-import name.martingeisse.esdk.core.rtl.signal.connector.RtlSignalConnector;
 import name.martingeisse.esdk.core.rtl.simulation.RtlClockGenerator;
+import name.martingeisse.esdk.core.rtl.simulation.RtlSimulationCruiseControl;
 
 /**
  *
@@ -25,6 +25,7 @@ public class TestMain {
 		window.add(3, 3, new SimpleBitWidget(register));
 		window.show();
 		new RtlClockGenerator(clock, 10);
+		new RtlSimulationCruiseControl(realm, 1, 100);
 		design.simulate();
 	}
 
