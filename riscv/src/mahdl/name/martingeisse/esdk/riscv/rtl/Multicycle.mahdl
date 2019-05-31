@@ -42,8 +42,9 @@ register vector[32] pc = 0;
 register matrix[32][32] registers; // TODO cannot use a BlockRAM; reason is probably because there isn't one unique data-out register
 register vector[32] instructionRegister; // TODO consider prefixing module ports with (interface.)portName to avoid these ugly local names (but sucks for clk)
 register vector[32] oldPc = 0;
-register vector[32] sourceValue1;
-register vector[32] sourceValue2;
+register vector[32] registerReadValue; // register reads go here
+register vector[32] firstRegisterValue; // first read value is stored here on second read
+register vector[32] aluImmediate;
 register vector[32] memoryAddressRegister;
 register vector[32] memoryReadDataRegister;
 
@@ -58,6 +59,8 @@ signal vector[5] sourceRegisterIndex2 = instructionRegister[24:20];
 signal vector[5] destinationRegisterIndex = instructionRegister[11:7];
 
 // execution helpers
+signal vector[32] sourceValue1 = firstRegisterValue;
+signal vector[32] sourceValue2 = opcode[3] ? registerReadValue : aluImmediate;
 signal bit isLTS = (~sourceValue1[31] _ sourceValue1[30:0]) < (~sourceValue2[31] _ sourceValue2[30:0]);
 signal bit isLTU = (sourceValue1 < sourceValue2);
 
@@ -68,13 +71,13 @@ do (*) {
 	memoryWordAddress = memoryAddressRegister[31:2];
 	if (instructionRegister[13]) {
 		memoryWriteMask = 4b1111;
-		memoryWriteData = sourceValue2;
+		memoryWriteData = registerReadValue;
 	} else if (instructionRegister[12]) {
 		memoryWriteMask = memoryAddressRegister[1] ? 4b1100 : 4b0011;
-		memoryWriteData = sourceValue2[15:0] _ sourceValue2[15:0];
+		memoryWriteData = registerReadValue[15:0] _ registerReadValue[15:0];
 	} else {
 		memoryWriteMask = memoryAddressRegister[1] ? (memoryAddressRegister[0] ? 4b1000 : 4b0100) : (memoryAddressRegister[0] ? 4b0010 : 4b0001);
-		memoryWriteData = sourceValue2[7:0] _ sourceValue2[7:0] _ sourceValue2[7:0] _ sourceValue2[7:0];
+		memoryWriteData = registerReadValue[7:0] _ registerReadValue[7:0] _ registerReadValue[7:0] _ registerReadValue[7:0];
 	}
 }
 
@@ -149,8 +152,13 @@ do (clk) {
 			case STATE_DECODE_AND_READ1:
 				oldPc = pc;
 				pc = pc + 32d4;
-				sourceValue1 = registers[sourceRegisterIndex1];
-				sourceValue2 = repeat(20, instructionRegister[31]) _ instructionRegister[31:20];
+				registerReadValue = registers[sourceRegisterIndex1];
+				aluImmediate = repeat(20, instructionRegister[31]) _ instructionRegister[31:20];
+				state = STATE_DECODE_AND_READ2;
+
+			case STATE_DECODE_AND_READ2:
+				firstRegisterValue = registerReadValue;
+				registerReadValue = registers[sourceRegisterIndex2];
 				switch (opcode) {
 
 					case 5d0: // LOAD
@@ -166,13 +174,13 @@ do (clk) {
 						state = STATE_MEM_COMPUTE_ADDRESS;
 
 					case 5d12: // OP
-						state = STATE_DECODE_AND_READ2;
+						state = STATE_EXEC_OP;
 
 					case 5d13: // LUI
 						state = STATE_EXEC_LUI;
 
 					case 5d24: // BRANCH
-						state = STATE_DECODE_AND_READ2;
+						state = STATE_EXEC_BRANCH;
 
 					case 5d25: // JALR
 						state = STATE_EXEC_JALR;
@@ -184,10 +192,6 @@ do (clk) {
 						state = STATE_START;
 
 				}
-
-			case STATE_DECODE_AND_READ2:
-				sourceValue2 = registers[sourceRegisterIndex2];
-				state = (opcode[4] ? STATE_EXEC_BRANCH : STATE_EXEC_OP);
 
 			case STATE_EXEC_OP:
 				if (destinationRegisterIndex != 5d0) {
@@ -231,9 +235,8 @@ do (clk) {
 				if (opcode[3]) {
 					memoryAddressRegister = sourceValue1 + (repeat(20, instructionRegister[31]) _ instructionRegister[31:25] _ instructionRegister[11:7]);
 				} else {
-					memoryAddressRegister = sourceValue1 + sourceValue2;
+					memoryAddressRegister = sourceValue1 + aluImmediate;
 				}
-				sourceValue2 = registers[sourceRegisterIndex2];
 				state = STATE_MEM_ACCESS;
 
 			case STATE_MEM_ACCESS:

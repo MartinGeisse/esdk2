@@ -33,6 +33,7 @@ public class InstructionSmokeTests {
 		realm = new RtlRealm(design);
 		clock = new RtlClockNetwork(realm);
 		cpu = new Multicycle.Implementation(realm, clock);
+		cpu.setReset(new RtlBitConstant(realm, false));
 		instruction = new RtlSimulatedSettableVectorSignal(realm, 32);
 		clockStepper = new ClockStepper(clock, 10);
 		stepper = new InstructionStepper(clockStepper, cpu);
@@ -140,7 +141,7 @@ public class InstructionSmokeTests {
 	}
 
 	@Test
-	public void testBeqTaken() {
+	public void tetestBeqTaken() {
 		setRegisters(5, 5);
 		instruction.setValue(VectorValue.of(32, 0x102_08_063));
 		stepper.step();

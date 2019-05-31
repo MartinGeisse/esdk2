@@ -29,6 +29,7 @@ public class SimpleTests {
 		realm = new RtlRealm(design);
 		clock = new RtlClockNetwork(realm);
 		cpu = new Multicycle.Implementation(realm, clock);
+		cpu.setReset(new RtlBitConstant(realm, false));
 		instruction = new RtlSimulatedSettableVectorSignal(realm, 32);
 		clockStepper = new ClockStepper(clock, 10);
 		stepper = new InstructionStepper(clockStepper, cpu);
