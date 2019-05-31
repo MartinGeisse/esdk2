@@ -1,3 +1,4 @@
 include 'core'
 include 'mahdl-test'
 include 'riscv'
+include 'ui'
