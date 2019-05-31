@@ -42,7 +42,7 @@ public class VisualizerWindow {
 	public void add(int x, int y, VisualizerWidget widget) {
 		JComponent swingComponent = widget.createSwingComponent();
 		setPosition(swingComponent, x, y);
-		setSizeInCells(swingComponent, widget.getWidthInCells(), widget.getWidthInCells());
+		setSizeInCells(swingComponent, widget.getWidthInCells(), widget.getHeightInCells());
 		window.add(swingComponent);
 		widgets.add(widget);
 	}

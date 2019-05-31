@@ -17,12 +17,24 @@ public class TestMain {
 		RtlRealm realm = new RtlRealm(design);
 		RtlClockNetwork clock = realm.createClockNetwork();
 
-		RtlBitSignalConnector connector = new RtlBitSignalConnector(realm);
-		RtlBitSignal register = RtlBuilder.bitRegister(clock, connector.not(), false);
-		connector.setConnected(register);
+		RtlBitSignalConnector fast = new RtlBitSignalConnector(realm);
+
+		RtlBitSignalConnector connector0 = new RtlBitSignalConnector(realm);
+		RtlBitSignal register0 = RtlBuilder.bitRegister(clock, connector0.not(), false);
+		connector0.setConnected(register0);
+
+		RtlBitSignalConnector connector1 = new RtlBitSignalConnector(realm);
+		RtlBitSignal register1 = RtlBuilder.bitRegister(clock, connector1.not(), register0, false);
+		connector1.setConnected(register1);
 
 		VisualizerWindow window = new VisualizerWindow(design, 20, 15, 1);
-		window.add(3, 3, new SimpleBitWidget(register));
+		window.add(2, 3, new SimpleBitWidget(register1));
+		window.add(3, 3, new SimpleBitWidget(register0));
+		window.add(5, 3, new SimpleBitWidget(fast.conditional(register0, register1)));
+		SimpleButton button = new SimpleButton(realm, "fast");
+		window.add(3, 7, button);
+		fast.setConnected(button.getSignal());
+
 		window.show();
 		new RtlClockGenerator(clock, 10);
 		new RtlSimulationCruiseControl(realm, 1, 100);
