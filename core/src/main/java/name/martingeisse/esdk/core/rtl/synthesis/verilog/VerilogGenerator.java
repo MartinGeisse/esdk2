@@ -205,10 +205,10 @@ public class VerilogGenerator {
 			}
 		}
 
-		// consume pins
-		List<PinContribution> pins = new ArrayList<>();
+		// consume toplevel ports
+		List<ToplevelPortContribution> toplevelPorts = new ArrayList<>();
 		for (VerilogContribution contribution : contributions) {
-			contribution.analyzeToplevelPorts((direction, name, width) -> pins.add(new PinContribution(direction, name, width)));
+			contribution.analyzeToplevelPorts((direction, name, width) -> toplevelPorts.add(new ToplevelPortContribution(direction, name, width)));
 		}
 
 		// assemble the toplevel module
@@ -216,29 +216,29 @@ public class VerilogGenerator {
 		out.println("`timescale 1ns / 1ps");
 		out.println();
 		out.println("module " + toplevelModuleName + "(");
-		if (!pins.isEmpty()) {
+		if (!toplevelPorts.isEmpty()) {
 			out.startIndentation();
 			boolean first = true;
-			for (PinContribution pin : pins) {
+			for (ToplevelPortContribution toplevelPort : toplevelPorts) {
 				if (first) {
 					first = false;
 				} else {
 					out.println(',');
 				}
 				out.indent();
-				out.print(pin.name);
+				out.print(toplevelPort.name);
 			}
 			out.println();
 			out.endIndentation();
 		}
 		out.println(");");
 		out.println();
-		if (!pins.isEmpty()) {
-			for (PinContribution pin : pins) {
-				if (pin.width == null) {
-					out.println(pin.direction + ' ' + pin.name + ';');
+		if (!toplevelPorts.isEmpty()) {
+			for (ToplevelPortContribution toplevelPort : toplevelPorts) {
+				if (toplevelPort.width == null) {
+					out.println(toplevelPort.direction + ' ' + toplevelPort.name + ';');
 				} else {
-					out.println(pin.direction + '[' + (pin.width - 1) + ":0] " + pin.name + ';');
+					out.println(toplevelPort.direction + '[' + (toplevelPort.width - 1) + ":0] " + toplevelPort.name + ';');
 				}
 			}
 			out.println();
@@ -339,13 +339,13 @@ public class VerilogGenerator {
 
 	}
 
-	static class PinContribution {
+	static class ToplevelPortContribution {
 
 		final String direction;
 		final String name;
 		final Integer width;
 
-		public PinContribution(String direction, String name, Integer width) {
+		public ToplevelPortContribution(String direction, String name, Integer width) {
 			this.direction = direction;
 			this.name = name;
 			this.width = width;
