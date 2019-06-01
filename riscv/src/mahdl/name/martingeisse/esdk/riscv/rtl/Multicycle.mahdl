@@ -82,7 +82,7 @@ do (*) {
 }
 
 // --------------------------------------------------------------------------------------------------------------------
-// logic taken out of the state machine to make it clearer
+// ALU logic
 // --------------------------------------------------------------------------------------------------------------------
 
 signal vector[32] execOpResult = switch(instructionRegister[14:12]) {
@@ -107,6 +107,10 @@ signal bit branchCondition = switch(instructionRegister[14:12]) {
 	case 3d7: ~isLTU // BGEU
 	default: bit(0)
 };
+
+// --------------------------------------------------------------------------------------------------------------------
+// zero/sign extension logic
+// --------------------------------------------------------------------------------------------------------------------
 
 // halfword-to-word extension
 signal bit halfwordToWordSignBit = memoryAddressRegister[1] ? memoryReadDataRegister[31] : memoryReadDataRegister[15];
@@ -211,14 +215,14 @@ do (clk) {
 				state = STATE_START;
 
 			case STATE_EXEC_JALR:
-				pc = (sourceValue1 + (repeat(20, instructionRegister[31]) _ instructionRegister[31:20]))[31:1] _ 1b0;
+				pc = (firstRegisterValue + (repeat(20, instructionRegister[31]) _ instructionRegister[31:20]))[31:1] _ 1b0;
 				state = STATE_START;
 
 			case STATE_MEM_COMPUTE_ADDRESS:
 				if (opcode[3]) {
-					memoryAddressRegister = sourceValue1 + (repeat(20, instructionRegister[31]) _ instructionRegister[31:25] _ instructionRegister[11:7]);
+					memoryAddressRegister = firstRegisterValue + (repeat(20, instructionRegister[31]) _ instructionRegister[31:25] _ instructionRegister[11:7]);
 				} else {
-					memoryAddressRegister = sourceValue1 + aluImmediate;
+					memoryAddressRegister = firstRegisterValue + aluImmediate;
 				}
 				state = STATE_MEM_ACCESS;
 
