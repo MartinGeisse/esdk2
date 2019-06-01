@@ -39,7 +39,7 @@ constant vector[4] STATE_MEM_EXTEND = 12;
 // CPU state
 register vector[4] state = STATE_START;
 register vector[32] pc = 0;
-register matrix[32][32] registers; // TODO cannot use a BlockRAM; reason is probably because there isn't one unique data-out register
+register matrix[32][32] registers;
 register vector[32] instructionRegister; // TODO consider prefixing module ports with (interface.)portName to avoid these ugly local names (but sucks for clk)
 register vector[32] oldPc = 0;
 register vector[32] registerReadValue; // register reads go here
@@ -199,6 +199,9 @@ do (clk) {
 				state = STATE_START;
 
 			case STATE_EXEC_BRANCH:
+				// TODO can split off the pc-mux delay by using an extra state and storing a one-bit branchCondition
+				// register. Can further improve by XORing that result with the negation from func3 of the branch
+				// instruction in that NEXT state, which still has plenty of clock slack.
 				if (branchCondition) {
 					pc = oldPc + (repeat(20, instructionRegister[31]) _ instructionRegister[7] _ instructionRegister[30:25] _ instructionRegister[11:8] _ 1b0);
 				}
