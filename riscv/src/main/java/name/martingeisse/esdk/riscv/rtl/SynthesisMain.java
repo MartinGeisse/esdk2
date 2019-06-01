@@ -49,6 +49,7 @@ public class SynthesisMain {
 		//
         // SDRAM
         //
+		/*
         RtlModuleInstance ramController = new RtlModuleInstance(realm, "ddr_sdram");
 
         // system signals
@@ -91,6 +92,7 @@ public class SynthesisMain {
         ramController.createVectorInputPort("wWRB_I", 4, computerModule._bigRam.getWriteMask());
         computerModule._bigRam.getReadData().setConnected(ramController.createVectorOutputPort("wDAT_O", 32));
         computerModule._bigRam.getAcknowledge().setConnected(ramController.createBitOutputPort("wACK_O"));
+		 */
 
 		new RtlPrettifier().prettify(design.getRealm());
 		ProjectGenerator projectGenerator = new ProjectGenerator(design.getRealm(), "TerminalTest", new File("ise/terminal_test"), "XC3S500E-FG320-4");
