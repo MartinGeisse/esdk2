@@ -14,22 +14,20 @@ import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogContribution;
 
 /**
- * This is a special case of an array of bidirectional pins that is directly connected to a (vector-typed)
- * bidirectional module port.
- *
- * TODO
+ * This is a special case of a bidirectional pin that is directly connected to a bidirectional
+ * module port.
  */
-public final class RtlBidirectionalVectorModulePortPin extends RtlPin {
+public final class RtlBidirectionalModulePortPin extends RtlPin {
 
 	private final RtlInstancePort port;
 
-	public RtlBidirectionalVectorModulePortPin(RtlRealm realm, RtlModuleInstance moduleInstance, String portName) {
+	public RtlBidirectionalModulePortPin(RtlRealm realm, RtlModuleInstance moduleInstance, String portName) {
 		super(realm);
 		port = new RtlInstancePort(moduleInstance, portName) {
 			@Override
 			protected void printPortAssignment(VerilogWriter out) {
 				out.print("." + getPortName() + "(");
-				out.print(RtlBidirectionalVectorModulePortPin.this.getNetName());
+				out.print(RtlBidirectionalModulePortPin.this.getNetName());
 				out.print(')');
 			}
 		};

@@ -2,7 +2,7 @@ package name.martingeisse.esdk.riscv.rtl;
 
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.module.RtlModuleInstance;
-import name.martingeisse.esdk.core.rtl.pin.RtlBidirectionalBitModulePortPin;
+import name.martingeisse.esdk.core.rtl.pin.RtlBidirectionalModulePortPin;
 import name.martingeisse.esdk.core.rtl.pin.RtlInputPin;
 import name.martingeisse.esdk.core.rtl.pin.RtlOutputPin;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
@@ -154,10 +154,10 @@ public class SynthesisMain {
 		return pin;
 	}
 
-	private static RtlBidirectionalBitModulePortPin ramBidirectionalPin(RtlRealm realm, String pinId, RtlModuleInstance moduleInstance, String portName) {
+	private static RtlBidirectionalModulePortPin ramBidirectionalPin(RtlRealm realm, String pinId, RtlModuleInstance moduleInstance, String portName) {
 		XilinxPinConfiguration configuration = new XilinxPinConfiguration();
 		configuration.setIostandard("SSTL2_I");
-        RtlBidirectionalBitModulePortPin pin = new RtlBidirectionalBitModulePortPin(realm, moduleInstance, portName);
+        RtlBidirectionalModulePortPin pin = new RtlBidirectionalModulePortPin(realm, moduleInstance, portName);
 		pin.setId(pinId);
 		pin.setConfiguration(configuration);
 		return pin;

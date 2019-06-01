@@ -4,33 +4,70 @@
  */
 package name.martingeisse.esdk.core.rtl.pin;
 
+import com.google.common.collect.ImmutableList;
+import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.module.RtlInstancePort;
 import name.martingeisse.esdk.core.rtl.module.RtlModuleInstance;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.ToplevelPortConsumer;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.SignalUsageConsumer;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.SynthesisPreparationContext;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.ToplevelPortConsumer;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.EmptyVerilogContribution;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogContribution;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * This is a special case of a bidirectional pin that is directly connected to a bidirectional
- * module port.
+ * This is a special case of an array of bidirectional pins that is directly connected to a (vector-typed)
+ * bidirectional module port.
+ *
+ * TODO
  */
-public final class RtlBidirectionalBitModulePortPin extends RtlPin {
+public final class RtlBidirectionalModulePortPinArray extends RtlItem {
 
 	private final RtlInstancePort port;
+	private final String netName;
+	private final ImmutableList<RtlPin> pins;
 
-	public RtlBidirectionalBitModulePortPin(RtlRealm realm, RtlModuleInstance moduleInstance, String portName) {
+	public RtlBidirectionalModulePortPinArray(RtlRealm realm, RtlModuleInstance moduleInstance, String portName, String netName, String... pinIds) {
 		super(realm);
 		port = new RtlInstancePort(moduleInstance, portName) {
 			@Override
 			protected void printPortAssignment(VerilogWriter out) {
-				out.print("." + getPortName() + "(");
-				out.print(RtlBidirectionalBitModulePortPin.this.getNetName());
-				out.print(')');
+				out.print("." + getPortName() + "(" + netName + ")");
 			}
 		};
+		this.netName = netName;
+		List<RtlPin> pins = new ArrayList<>();
+		for (int i = 0; i < pinIds.length; i++) {
+			int index = i;
+			RtlPin pin = new RtlPin(realm) {
+
+				@Override
+				public VerilogContribution getVerilogContribution() {
+					return new EmptyVerilogContribution();
+				}
+
+				@Override
+				public String getNetName() {
+					return netName + "<" + index + ">";
+				}
+
+			};
+			pin.setId(pinIds[i]);
+			pins.add(pin);
+		}
+		this.pins = ImmutableList.copyOf(pins);
+	}
+
+	public RtlInstancePort getPort() {
+		return port;
+	}
+
+	public ImmutableList<RtlPin> getPins() {
+		return pins;
 	}
 
 	// ----------------------------------------------------------------------------------------------------------------
@@ -43,7 +80,7 @@ public final class RtlBidirectionalBitModulePortPin extends RtlPin {
 
 			@Override
 			public void prepareSynthesis(SynthesisPreparationContext context) {
-				context.reserveName(getNetName(), false);
+				context.reserveName(netName, false);
 			}
 
 			@Override
@@ -52,7 +89,7 @@ public final class RtlBidirectionalBitModulePortPin extends RtlPin {
 
 			@Override
 			public void analyzeToplevelPorts(ToplevelPortConsumer consumer) {
-				consumer.consumePort("inout", getNetName(), null);
+				consumer.consumePort("inout", netName, pins.size());
 			}
 
 			@Override
