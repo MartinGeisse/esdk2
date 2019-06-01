@@ -28,9 +28,10 @@ public class SynthesisMain {
 
 		RtlModuleInstance clkReset = new RtlModuleInstance(realm, "clk_reset");
 		RtlBitSignal reset = clkReset.createBitOutputPort("reset");
+		RtlBitSignal mainClockSignal = clkReset.createBitOutputPort("clk");
 		clkReset.createBitInputPort("clk_in", clockPin(realm));
 		clkReset.createBitInputPort("reset_in", buttonPin(realm, "V4"));
-		design.getClockSignalConnector().setConnected(clkReset.createBitOutputPort("clk"));
+		design.getClockSignalConnector().setConnected(mainClockSignal);
 		computerModule.setReset(reset);
 
 		TextDisplayController.Implementation textDisplayController = (TextDisplayController.Implementation)computerModule._textDisplay;
