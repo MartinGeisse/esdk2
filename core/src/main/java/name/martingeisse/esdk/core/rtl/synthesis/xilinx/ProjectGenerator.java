@@ -92,6 +92,10 @@ public class ProjectGenerator {
 			out.println("ssh martin@ise ./auto-ise/upload.sh");
 		});
 
+		generateFile("upload-prom.sh", out -> {
+			out.println("ssh martin@ise ./auto-ise/upload-prom.sh");
+		});
+
 		generateFile("build.ucf", out -> {
 			for (RtlPin pin : realm.getPins()) {
 				RtlPinConfiguration pinConfiguration = pin.getConfiguration();
