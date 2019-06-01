@@ -2,9 +2,7 @@ package name.martingeisse.esdk.riscv.rtl;
 
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.module.RtlModuleInstance;
-import name.martingeisse.esdk.core.rtl.pin.RtlBidirectionalModulePortPin;
-import name.martingeisse.esdk.core.rtl.pin.RtlInputPin;
-import name.martingeisse.esdk.core.rtl.pin.RtlOutputPin;
+import name.martingeisse.esdk.core.rtl.pin.*;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlConstantIndexSelection;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
@@ -75,7 +73,15 @@ public class SynthesisMain {
         ramOutputPinArray(realm, ramController.createVectorOutputPort("sd_BA_O", 2), "K5", "K6");
         ramBidirectionalPin(realm, "G3", ramController, "sd_UDQS_IO");
         ramBidirectionalPin(realm, "L6", ramController, "sd_LDQS_IO");
-        // TODO 	inout 	[15:0] sd_D_IO;
+		RtlBidirectionalModulePortPinArray ramDataPinArray = new RtlBidirectionalModulePortPinArray(
+			realm, ramController, "sd_D_IO", "sd_D_IO",
+				"L2", "L1", "L3", "L4", "M3", "M4", "M5", "M6", "E2", "E1", "F1", "F2", "G6", "G5", "H6", "H5"
+		);
+		for (RtlPin pin : ramDataPinArray.getPins()) {
+			XilinxPinConfiguration configuration = new XilinxPinConfiguration();
+			configuration.setIostandard("SSTL2_I");
+			pin.setConfiguration(configuration);
+		}
 
         // internal Wishbone interface
         ramController.createBitInputPort("wSTB_I", computerModule._bigRam.getEnable());
