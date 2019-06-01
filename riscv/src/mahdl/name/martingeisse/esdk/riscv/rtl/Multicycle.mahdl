@@ -27,14 +27,15 @@ constant vector[4] STATE_FETCH = 1;
 constant vector[4] STATE_DECODE_AND_READ1 = 2;
 constant vector[4] STATE_DECODE_AND_READ2 = 3;
 constant vector[4] STATE_EXEC_OP = 4;
-constant vector[4] STATE_EXEC_BRANCH = 5;
-constant vector[4] STATE_EXEC_LUI = 6;
-constant vector[4] STATE_EXEC_AUIPC = 7;
-constant vector[4] STATE_EXEC_JAL = 8;
-constant vector[4] STATE_EXEC_JALR = 9;
-constant vector[4] STATE_MEM_COMPUTE_ADDRESS = 10;
-constant vector[4] STATE_MEM_ACCESS = 11;
-constant vector[4] STATE_MEM_EXTEND = 12;
+constant vector[4] STATE_PREPARE_BRANCH = 5;
+constant vector[4] STATE_EXEC_BRANCH = 6;
+constant vector[4] STATE_EXEC_LUI = 7;
+constant vector[4] STATE_EXEC_AUIPC = 8;
+constant vector[4] STATE_EXEC_JAL = 9;
+constant vector[4] STATE_EXEC_JALR = 10;
+constant vector[4] STATE_MEM_COMPUTE_ADDRESS = 11;
+constant vector[4] STATE_MEM_ACCESS = 12;
+constant vector[4] STATE_MEM_EXTEND = 13;
 
 // CPU state
 register vector[4] state = STATE_START;
@@ -98,15 +99,15 @@ signal vector[32] execOpResult = switch(instructionRegister[14:12]) {
 	case 3d7: sourceValue1 & sourceValue2 // AND
 };
 
-signal bit branchCondition = switch(instructionRegister[14:12]) {
-	case 3d0: sourceValue1 == sourceValue2 // BEQ
-	case 3d1: sourceValue1 != sourceValue2 // BNE
-	case 3d4: isLTS // BLT
-	case 3d5: ~isLTS // BGE
-	case 3d6: isLTU // BLTU
-	case 3d7: ~isLTU // BGEU
-	default: bit(0)
-};
+register bit partialBranchCondition;
+do (clk) {
+	partialBranchCondition = switch(instructionRegister[14:13]) {
+		case 2d0: sourceValue1 == sourceValue2 // BEQ
+		case 2d2: isLTS // BLT
+		case 2d3: isLTU // BLTU
+		default: bit(0)
+	};
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // zero/sign extension logic
@@ -182,7 +183,7 @@ do (clk) {
 						state = STATE_EXEC_LUI;
 
 					case 5d24: // BRANCH
-						state = STATE_EXEC_BRANCH;
+						state = STATE_PREPARE_BRANCH;
 
 					case 5d25: // JALR
 						state = STATE_EXEC_JALR;
@@ -198,11 +199,12 @@ do (clk) {
 			case STATE_EXEC_OP:
 				state = STATE_START;
 
+			case STATE_PREPARE_BRANCH:
+				// this state loads partialBranchCondition
+				state = STATE_EXEC_BRANCH;
+
 			case STATE_EXEC_BRANCH:
-				// TODO can split off the pc-mux delay by using an extra state and storing a one-bit branchCondition
-				// register. Can further improve by XORing that result with the negation from func3 of the branch
-				// instruction in that NEXT state, which still has plenty of clock slack.
-				if (branchCondition) {
+				if (partialBranchCondition ^ instructionRegister[12]) {
 					pc = oldPc + (repeat(20, instructionRegister[31]) _ instructionRegister[7] _ instructionRegister[30:25] _ instructionRegister[11:8] _ 1b0);
 				}
 				state = STATE_START;
