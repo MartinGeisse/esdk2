@@ -28,13 +28,11 @@ public class SynthesisMain {
 		RtlRealm realm = design.getRealm();
 
 		RtlModuleInstance clkReset = new RtlModuleInstance(realm, "clk_reset");
+		RtlBitSignal reset = clkReset.createBitOutputPort("reset");
 		clkReset.createBitInputPort("clk_in", clockPin(realm));
 		clkReset.createBitInputPort("reset_in", buttonPin(realm, "V4"));
 		design.getClockSignalConnector().setConnected(clkReset.createBitOutputPort("clk"));
-		computerModule.setReset(clkReset.createBitOutputPort("reset"));
-
-		// design.getClockSignalConnector().setConnected(clockPin(realm));
-		// computerModule.setReset(buttonPin(realm, "V4"));
+		computerModule.setReset(reset);
 
 		TextDisplayController.Implementation textDisplayController = (TextDisplayController.Implementation)computerModule._textDisplay;
 		VgaConnector.Implementation vgaConnector = (VgaConnector.Implementation)textDisplayController._vgaConnector;
@@ -53,15 +51,14 @@ public class SynthesisMain {
 	inout 	[15:0] sd_D_IO;
 	inout	sd_UDQS_IO;
 	inout	sd_LDQS_IO;
-	// internal interface signals
-	input 	clk0;
-	input	clk90;
-	input   clk180;
-	input	clk270;
-	input	reset;
 		 */
-		/*
+
         RtlModuleInstance ramController = new RtlModuleInstance(realm, "ddr_sdram");
+		ramController.createBitInputPort("clk0", clkReset.createBitOutputPort("ddr_clk_0"));
+		ramController.createBitInputPort("clk90", clkReset.createBitOutputPort("ddr_clk_90"));
+		ramController.createBitInputPort("clk180", clkReset.createBitOutputPort("ddr_clk_180"));
+		ramController.createBitInputPort("clk270", clkReset.createBitOutputPort("ddr_clk_270"));
+		ramController.createBitInputPort("reset", reset);
         ramOutputPin(realm, "J5", ramController.createBitOutputPort("sd_CK_P"));
         ramOutputPin(realm, "J4", ramController.createBitOutputPort("sd_CK_N"));
         ramOutputPin(realm, "K4", ramController.createBitOutputPort("sd_CS_O"));
@@ -81,7 +78,6 @@ public class SynthesisMain {
         ramController.createVectorInputPort("wWRB_I", 4, computerModule._bigRam.getWriteMask());
         computerModule._bigRam.getReadData().setConnected(ramController.createVectorOutputPort("wDAT_O", 32));
         computerModule._bigRam.getAcknowledge().setConnected(ramController.createBitOutputPort("wACK_O"));
-		 */
 
 		new RtlPrettifier().prettify(design.getRealm());
 		ProjectGenerator projectGenerator = new ProjectGenerator(design.getRealm(), "TerminalTest", new File("ise/terminal_test"), "XC3S500E-FG320-4");
