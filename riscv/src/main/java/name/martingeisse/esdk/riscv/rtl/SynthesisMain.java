@@ -2,6 +2,7 @@ package name.martingeisse.esdk.riscv.rtl;
 
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.module.RtlModuleInstance;
+import name.martingeisse.esdk.core.rtl.pin.RtlBidirectionalBitModulePortPin;
 import name.martingeisse.esdk.core.rtl.pin.RtlInputPin;
 import name.martingeisse.esdk.core.rtl.pin.RtlOutputPin;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
@@ -47,18 +48,19 @@ public class SynthesisMain {
 		ps2Connector.setClk(ps2Pin(realm, "G14"));
 		ps2Connector.setData(ps2Pin(realm, "G13"));
 
-		/*
-	inout 	[15:0] sd_D_IO;
-	inout	sd_UDQS_IO;
-	inout	sd_LDQS_IO;
-		 */
-
+		//
+        // SDRAM
+        //
         RtlModuleInstance ramController = new RtlModuleInstance(realm, "ddr_sdram");
+
+        // system signals
 		ramController.createBitInputPort("clk0", clkReset.createBitOutputPort("ddr_clk_0"));
 		ramController.createBitInputPort("clk90", clkReset.createBitOutputPort("ddr_clk_90"));
 		ramController.createBitInputPort("clk180", clkReset.createBitOutputPort("ddr_clk_180"));
 		ramController.createBitInputPort("clk270", clkReset.createBitOutputPort("ddr_clk_270"));
 		ramController.createBitInputPort("reset", reset);
+
+		// SDRAM DDR interface
         ramOutputPin(realm, "J5", ramController.createBitOutputPort("sd_CK_P"));
         ramOutputPin(realm, "J4", ramController.createBitOutputPort("sd_CK_N"));
         ramOutputPin(realm, "K4", ramController.createBitOutputPort("sd_CS_O"));
@@ -71,6 +73,11 @@ public class SynthesisMain {
         ramOutputPinArray(realm, ramController.createVectorOutputPort("sd_A_O", 13),
                 "T1", "R3", "R2", "P1", "F4", "H4", "H3", "H1", "H2", "N4", "T2", "N5", "P2");
         ramOutputPinArray(realm, ramController.createVectorOutputPort("sd_BA_O", 2), "K5", "K6");
+        ramBidirectionalPin(realm, "G3", ramController, "sd_UDQS_IO");
+        ramBidirectionalPin(realm, "L6", ramController, "sd_LDQS_IO");
+        // TODO 	inout 	[15:0] sd_D_IO;
+
+        // internal Wishbone interface
         ramController.createBitInputPort("wSTB_I", computerModule._bigRam.getEnable());
         ramController.createVectorInputPort("wADR_I", 24, computerModule._bigRam.getWordAddress());
         ramController.createBitInputPort("wWE_I", computerModule._bigRam.getWrite());
@@ -144,6 +151,15 @@ public class SynthesisMain {
 		pin.setId(id);
 		pin.setConfiguration(configuration);
 		pin.setOutputSignal(outputSignal);
+		return pin;
+	}
+
+	private static RtlBidirectionalBitModulePortPin ramBidirectionalPin(RtlRealm realm, String pinId, RtlModuleInstance moduleInstance, String portName) {
+		XilinxPinConfiguration configuration = new XilinxPinConfiguration();
+		configuration.setIostandard("SSTL2_I");
+        RtlBidirectionalBitModulePortPin pin = new RtlBidirectionalBitModulePortPin(realm, moduleInstance, portName);
+		pin.setId(pinId);
+		pin.setConfiguration(configuration);
 		return pin;
 	}
 
