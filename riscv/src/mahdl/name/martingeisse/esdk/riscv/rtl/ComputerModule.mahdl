@@ -42,7 +42,6 @@ do (*) {
     keyboard.inputAcknowledge = cpu.memoryEnable & ~cpu.memoryWrite & terminalSelected;
 
     bigRam.clk = clk;
-    bigRam.reset = reset;
     bigRam.enable = bigRamSelected;
     bigRam.write = cpu.memoryWrite;
     bigRam.wordAddress = cpu.memoryWordAddress[23:0];

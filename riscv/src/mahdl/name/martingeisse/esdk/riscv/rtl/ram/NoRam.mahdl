@@ -2,7 +2,6 @@ module name.martingeisse.esdk.riscv.rtl.ram.NoRam;
 
 interface {
     in clock clk;
-    in bit reset;
     in bit enable, write;
     in vector[24] wordAddress;
     in vector[32] writeData;

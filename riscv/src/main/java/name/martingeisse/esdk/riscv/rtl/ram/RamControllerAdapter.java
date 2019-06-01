@@ -2,6 +2,7 @@ package name.martingeisse.esdk.riscv.rtl.ram;
 
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlItem;
+import name.martingeisse.esdk.core.rtl.RtlItemOwned;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
@@ -10,84 +11,112 @@ import name.martingeisse.esdk.core.rtl.signal.connector.RtlVectorSignalConnector
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.EmptyVerilogContribution;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogContribution;
 
-public class RamControllerAdapter extends RtlItem {
+public interface RamControllerAdapter extends RtlItemOwned {
 
-    private final RtlClockNetwork _clk;
-    private final RtlBitSignalConnector _enable;
-    private final RtlBitSignalConnector _write;
-    private final RtlVectorSignalConnector _wordAddress;
-    private final RtlVectorSignalConnector _writeData;
-    private final RtlVectorSignalConnector _writeMask;
-    private final RtlVectorSignalConnector _readData;
-    private final RtlBitSignalConnector _acknowledge;
+    RtlBitSignalConnector getAcknowledge();
 
-    public RamControllerAdapter(RtlRealm realm, RtlClockNetwork clk) {
-        super(realm);
-        this._clk = clk;
-        _enable = new RtlBitSignalConnector(realm);
-        _write = new RtlBitSignalConnector(realm);
-        _wordAddress = new RtlVectorSignalConnector(realm, 24);
-        _writeData = new RtlVectorSignalConnector(realm, 32);
-        _writeMask = new RtlVectorSignalConnector(realm, 4);
-        _readData = new RtlVectorSignalConnector(realm, 32);
-        _acknowledge = new RtlBitSignalConnector(realm);
-    }
+    void setEnable(RtlBitSignal enable);
 
-    @Override
-    public VerilogContribution getVerilogContribution() {
-        return new EmptyVerilogContribution();
-    }
+    RtlBitSignal getEnable();
 
-    public RtlClockNetwork get_clk() {
-        return _clk;
-    }
+    RtlVectorSignalConnector getReadData();
 
-    public RtlBitSignalConnector getAcknowledge() {
-        return _acknowledge;
-    }
+    void setWordAddress(RtlVectorSignal wordAddress);
 
-    public void setEnable(RtlBitSignal enable) {
-        this._enable.setConnected(enable);
-    }
+    RtlVectorSignal getWordAddress();
 
-    public RtlBitSignal getEnable() {
-        return _enable.getConnected();
-    }
+    void setWrite(RtlBitSignal write);
 
-    public RtlVectorSignalConnector getReadData() {
-        return _readData;
-    }
+    RtlBitSignal getWrite();
 
-    public void setWordAddress(RtlVectorSignal wordAddress) {
-        this._wordAddress.setConnected(wordAddress);
-    }
+    void setWriteData(RtlVectorSignal writeData);
 
-    public RtlVectorSignal getWordAddress() {
-        return _wordAddress.getConnected();
-    }
+    RtlVectorSignal getWriteData();
 
-    public void setWrite(RtlBitSignal write) {
-        this._write.setConnected(write);
-    }
+    void setWriteMask(RtlVectorSignal writeMask);
 
-    public RtlBitSignal getWrite() {
-        return _write.getConnected();
-    }
+    RtlVectorSignal getWriteMask();
 
-    public void setWriteData(RtlVectorSignal writeData) {
-        this._writeData.setConnected(writeData);
-    }
+    class Implementation extends RtlItem implements RamControllerAdapter {
 
-    public RtlVectorSignal getWriteData() {
-        return _writeData.getConnected();
-    }
+        private final RtlClockNetwork _clk;
+        private final RtlBitSignalConnector _enable;
+        private final RtlBitSignalConnector _write;
+        private final RtlVectorSignalConnector _wordAddress;
+        private final RtlVectorSignalConnector _writeData;
+        private final RtlVectorSignalConnector _writeMask;
+        private final RtlVectorSignalConnector _readData;
+        private final RtlBitSignalConnector _acknowledge;
 
-    public void setWriteMask(RtlVectorSignal writeMask) {
-        this._writeMask.setConnected(writeMask);
-    }
+        public Implementation(RtlRealm realm, RtlClockNetwork clk) {
+            super(realm);
+            this._clk = clk;
+            _enable = new RtlBitSignalConnector(realm);
+            _write = new RtlBitSignalConnector(realm);
+            _wordAddress = new RtlVectorSignalConnector(realm, 24);
+            _writeData = new RtlVectorSignalConnector(realm, 32);
+            _writeMask = new RtlVectorSignalConnector(realm, 4);
+            _readData = new RtlVectorSignalConnector(realm, 32);
+            _acknowledge = new RtlBitSignalConnector(realm);
+        }
 
-    public RtlVectorSignal getWriteMask() {
-        return _writeMask.getConnected();
+        @Override
+        public VerilogContribution getVerilogContribution() {
+            return new EmptyVerilogContribution();
+        }
+
+        public RtlClockNetwork get_clk() {
+            return _clk;
+        }
+
+        public RtlBitSignalConnector getAcknowledge() {
+            return _acknowledge;
+        }
+
+        public void setEnable(RtlBitSignal enable) {
+            this._enable.setConnected(enable);
+        }
+
+        public RtlBitSignal getEnable() {
+            return _enable.getConnected();
+        }
+
+        public RtlVectorSignalConnector getReadData() {
+            return _readData;
+        }
+
+        public void setWordAddress(RtlVectorSignal wordAddress) {
+            this._wordAddress.setConnected(wordAddress);
+        }
+
+        public RtlVectorSignal getWordAddress() {
+            return _wordAddress.getConnected();
+        }
+
+        public void setWrite(RtlBitSignal write) {
+            this._write.setConnected(write);
+        }
+
+        public RtlBitSignal getWrite() {
+            return _write.getConnected();
+        }
+
+        public void setWriteData(RtlVectorSignal writeData) {
+            this._writeData.setConnected(writeData);
+        }
+
+        public RtlVectorSignal getWriteData() {
+            return _writeData.getConnected();
+        }
+
+        public void setWriteMask(RtlVectorSignal writeMask) {
+            this._writeMask.setConnected(writeMask);
+        }
+
+        public RtlVectorSignal getWriteMask() {
+            return _writeMask.getConnected();
+        }
+
     }
 
 }
