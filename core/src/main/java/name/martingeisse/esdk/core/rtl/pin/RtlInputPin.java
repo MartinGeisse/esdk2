@@ -62,8 +62,8 @@ public final class RtlInputPin extends RtlPin implements RtlBitSignal {
 			}
 
 			@Override
-			public void analyzePins(PinConsumer consumer) {
-				consumer.consumePin("input", getNetName(), null);
+			public void analyzeToplevelPorts(ToplevelPortConsumer consumer) {
+				consumer.consumePort("input", getNetName(), null);
 			}
 
 			@Override

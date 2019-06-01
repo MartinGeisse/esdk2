@@ -46,8 +46,8 @@ public final class RtlOutputPin extends RtlPin {
 			}
 
 			@Override
-			public void analyzePins(PinConsumer consumer) {
-				consumer.consumePin("output", getNetName(), null);
+			public void analyzeToplevelPorts(ToplevelPortConsumer consumer) {
+				consumer.consumePort("output", getNetName(), null);
 			}
 
 			@Override

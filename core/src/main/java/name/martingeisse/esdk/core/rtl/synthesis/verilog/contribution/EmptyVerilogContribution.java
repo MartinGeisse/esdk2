@@ -4,7 +4,7 @@
  */
 package name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution;
 
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.PinConsumer;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.ToplevelPortConsumer;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.SignalUsageConsumer;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.SynthesisPreparationContext;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
@@ -25,7 +25,7 @@ public final class EmptyVerilogContribution implements VerilogContribution {
 	}
 
 	@Override
-	public void analyzePins(PinConsumer consumer) {
+	public void analyzeToplevelPorts(ToplevelPortConsumer consumer) {
 	}
 
 	@Override

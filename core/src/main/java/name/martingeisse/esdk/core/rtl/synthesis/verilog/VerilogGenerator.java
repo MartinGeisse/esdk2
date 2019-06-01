@@ -208,7 +208,7 @@ public class VerilogGenerator {
 		// consume pins
 		List<PinContribution> pins = new ArrayList<>();
 		for (VerilogContribution contribution : contributions) {
-			contribution.analyzePins((direction, name, width) -> pins.add(new PinContribution(direction, name, width)));
+			contribution.analyzeToplevelPorts((direction, name, width) -> pins.add(new PinContribution(direction, name, width)));
 		}
 
 		// assemble the toplevel module

@@ -72,8 +72,8 @@ public final class RtlVectorInputPin extends RtlPin implements RtlVectorSignal {
 			}
 
 			@Override
-			public void analyzePins(PinConsumer consumer) {
-				consumer.consumePin("input", getNetName(), width);
+			public void analyzeToplevelPorts(ToplevelPortConsumer consumer) {
+				consumer.consumePort("input", getNetName(), width);
 			}
 
 			@Override

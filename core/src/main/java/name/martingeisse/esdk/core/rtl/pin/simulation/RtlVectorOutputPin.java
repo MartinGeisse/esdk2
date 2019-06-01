@@ -53,8 +53,8 @@ public final class RtlVectorOutputPin extends RtlPin {
 			}
 
 			@Override
-			public void analyzePins(PinConsumer consumer) {
-				consumer.consumePin("output", getNetName(), width);
+			public void analyzeToplevelPorts(ToplevelPortConsumer consumer) {
+				consumer.consumePort("output", getNetName(), width);
 			}
 
 			@Override

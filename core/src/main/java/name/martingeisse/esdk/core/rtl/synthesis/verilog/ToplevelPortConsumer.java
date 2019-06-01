@@ -7,8 +7,8 @@ package name.martingeisse.esdk.core.rtl.synthesis.verilog;
 /**
  *
  */
-public interface PinConsumer {
+public interface ToplevelPortConsumer {
 
-	void consumePin(String direction, String name, Integer vectorSize);
+	void consumePort(String direction, String name, Integer vectorSize);
 
 }

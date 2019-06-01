@@ -7,7 +7,7 @@ package name.martingeisse.esdk.core.rtl.pin;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.module.RtlInstancePort;
 import name.martingeisse.esdk.core.rtl.module.RtlModuleInstance;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.PinConsumer;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.ToplevelPortConsumer;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.SignalUsageConsumer;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.SynthesisPreparationContext;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
@@ -53,8 +53,8 @@ public final class RtlBidirectionalVectorModulePortPin extends RtlPin {
 			}
 
 			@Override
-			public void analyzePins(PinConsumer consumer) {
-				consumer.consumePin("inout", getNetName(), null);
+			public void analyzeToplevelPorts(ToplevelPortConsumer consumer) {
+				consumer.consumePort("inout", getNetName(), null);
 			}
 
 			@Override

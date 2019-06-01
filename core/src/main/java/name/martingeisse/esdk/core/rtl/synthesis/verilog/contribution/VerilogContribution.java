@@ -4,7 +4,7 @@
  */
 package name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution;
 
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.PinConsumer;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.ToplevelPortConsumer;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.SignalUsageConsumer;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.SynthesisPreparationContext;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
@@ -18,7 +18,7 @@ public interface VerilogContribution {
 
 	void analyzeSignalUsage(SignalUsageConsumer consumer);
 
-	default void analyzePins(PinConsumer consumer) {
+	default void analyzeToplevelPorts(ToplevelPortConsumer consumer) {
 	}
 
 	default void printDeclarations(VerilogWriter out) {
