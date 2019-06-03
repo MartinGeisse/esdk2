@@ -18,10 +18,13 @@ void main() {
 
     int *basePointer = (int*)0x80000000;
 
-    // wait for SDRAM reset
-    delay(500);
-
     int *pointer = basePointer;
+    for (int i = 0; i < 4096; i++) {
+        *pointer = ' ';
+        pointer++;
+    }
+
+    pointer = basePointer;
     int value = 5;
     for (int i = 0; i < 10; i++) {
         if ((i & 3) == 0) {
@@ -30,7 +33,6 @@ void main() {
         terminalWriteInt(value);
         terminalWrite(" ");
         pointer[i] = value;
-        pointer += 1;
         value += 10;
     }
     terminalWrite("\n");
@@ -42,7 +44,6 @@ void main() {
         }
         terminalWriteInt(pointer[i]);
         terminalWrite(" ");
-        pointer += 1;
     }
 
     terminalWrite("\nDONE\n");
