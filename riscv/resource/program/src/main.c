@@ -30,7 +30,7 @@ void main() {
         terminalWriteInt(value);
         terminalWrite(" ");
         pointer[i] = value;
-        pointer += 1;
+        pointer += 1; // TODO this is wrong because we already use indexing, but it doesn't explain the current error
         value += 10;
     }
     terminalWrite("\n");
@@ -42,10 +42,10 @@ void main() {
         }
         terminalWriteInt(pointer[i]);
         terminalWrite(" ");
-        pointer += 1;
+        pointer += 1; // TODO this is wrong because we already use indexing, but it doesn't explain the current error
     }
 
-    terminalWrite("\nDONE\n");
+    terminalWrite("\nPROGRAM DONE\n");
 
     /*
     int *p1 = basePointer;
