@@ -16,7 +16,6 @@ void main() {
     terminalWrite("\n");
 */
 
-/*
     int *basePointer = (int*)0x80000000;
     int *p1 = basePointer;
     int *p2 = basePointer + 8 * 1024 * 1024;
@@ -32,9 +31,9 @@ void main() {
     terminalWrite("\n");
     terminalWriteInt(*p3);
     terminalWrite("\n");
-*/
 
     // counter to test reset
+    /*
     terminalSetCursor(0, 0);
     terminalWrite("                ");
     int counter = 0;
@@ -44,5 +43,6 @@ void main() {
         counter++;
         delay(1);
     }
+    */
 
 }

@@ -17,7 +17,7 @@ import name.martingeisse.esdk.riscv.rtl.terminal.VgaConnector;
 import java.io.File;
 
 /**
- *
+ * simple RAM test yields "35, 0, 35"
  */
 public class SynthesisMain {
 
@@ -50,7 +50,6 @@ public class SynthesisMain {
 		//
         // SDRAM
         //
-		/*
         RtlModuleInstance ramController = new RtlModuleInstance(realm, "ddr_sdram");
 
         // system signals
@@ -93,11 +92,11 @@ public class SynthesisMain {
         ramController.createVectorInputPort("wWRB_I", 4, computerModule._bigRam.getWriteMask());
         computerModule._bigRam.getReadData().setConnected(ramController.createVectorOutputPort("wDAT_O", 32));
         computerModule._bigRam.getAcknowledge().setConnected(ramController.createBitOutputPort("wACK_O"));
-        */
 
 		new RtlPrettifier().prettify(design.getRealm());
 		ProjectGenerator projectGenerator = new ProjectGenerator(design.getRealm(), "TerminalTest", new File("ise/terminal_test"), "XC3S500E-FG320-4");
 		projectGenerator.addVerilogFile(new File("riscv/resource/hdl/clk_reset.v"));
+		projectGenerator.addVerilogFile(new File("riscv/resource/hdl/ddr_sdram.v"));
 		projectGenerator.addUcfLine("NET \"pinC9\" PERIOD = 20.0ns HIGH 40%;");
 		projectGenerator.addUcfLine("CONFIG PROHIBIT = D2;");
 		projectGenerator.addUcfLine("CONFIG PROHIBIT = G4;");
