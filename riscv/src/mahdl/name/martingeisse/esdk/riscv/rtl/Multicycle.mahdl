@@ -265,7 +265,7 @@ do (clk) {
 
 // register file BlockRAM support
 signal vector[5] registersAddress = state == STATE_DECODE_AND_READ1 ? sourceRegisterIndex1 :
-		state == STATE_DECODE_AND_READ2 ? sourceRegisterIndex2 : destinationRegisterIndex;
+		(state == STATE_DECODE_AND_READ2 | state == STATE_EXEC_OP_1) ? sourceRegisterIndex2 : destinationRegisterIndex;
 signal bit isRegisterWriteState = (state == STATE_EXEC_OP_2) | (state == STATE_EXEC_LUI) | (state == STATE_EXEC_AUIPC) |
 		(state == STATE_EXEC_JAL) | (state == STATE_EXEC_JALR) | (state == STATE_MEM_EXTEND);
 signal vector[32] registerWriteValue = switch(state) {
