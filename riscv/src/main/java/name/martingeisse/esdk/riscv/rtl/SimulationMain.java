@@ -43,20 +43,6 @@ public class SimulationMain {
 		prepareHighlevelDisplaySimulation(design);
 		// prepareHdlDisplaySimulation(design);
 
-		new RtlClockedSimulationItem(design.getClock()) {
-			@Override
-			public void computeNextState() {
-				Multicycle.Implementation cpu = (Multicycle.Implementation) design.getComputerModule()._cpu;
-				if (cpu._pc.getValue().getBitsAsInt() < 0 || cpu._pc.getValue().getBitsAsInt() > 0x10000000) {
-					System.exit(1);
-				}
-			}
-
-			@Override
-			public void updateState() {
-
-			}
-		};
 		design.simulate();
 	}
 
