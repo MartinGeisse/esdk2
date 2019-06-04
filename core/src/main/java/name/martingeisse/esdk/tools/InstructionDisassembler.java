@@ -198,34 +198,27 @@ public final class InstructionDisassembler {
 				break;
 			}
 
-			case 25: // JALR
-				unknownOpcode(builder, "JALR");
-				/*
-				int baseRegisterValue = getRegister(instruction >> 15);
-				setRegister(instruction >> 7, pc);
-				if ((instruction & (1 << 21)) != 0) {
-					triggerException(ExceptionType.INSTRUCTION_ADDRESS_MISALIGNED);
-					break;
-				}
-				pc = (baseRegisterValue + (instruction >> 20)) & -2;
-				*/
+			case 25: { // JALR
+				int jumpTargetIndex = (instruction >> 15) & 31;
+				int destinationIndex = (instruction >> 7) & 31;
+				int offset = (instruction >> 20);
+				fillToAssembler(builder);
+				builder.append("JALR x" + destinationIndex + ", x" + jumpTargetIndex + ", " + offset);
 				break;
+			}
 
 			case 26: // reserved
 				unknownOpcode(builder, "reserved");
 				break;
 
 			case 27: { // JAL
-				unknownOpcode(builder, "JAL");
-				/*
-				// instruction = imm[20], imm[10:1], imm[11], imm[19:12], rd[4:0], opcode[6:0]; implicitly imm[0] = 0
-				setRegister(instruction >> 7, pc);
+				int destinationIndex = (instruction >> 7) & 31;
 				int offset = ((instruction >> 11) & 0xfff00000) |
 					(instruction & 0x000ff000) |
 					((instruction >> 9) & 0x00000800) |
 					((instruction >> 20) & 0x7fe);
-				pc = oldPc + offset;
-				*/
+				fillToAssembler(builder);
+				builder.append("JAL " + destinationIndex + ", pc + " + offset);
 				break;
 			}
 
