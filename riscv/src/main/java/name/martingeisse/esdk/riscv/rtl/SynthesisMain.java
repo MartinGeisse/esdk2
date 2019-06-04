@@ -50,48 +50,48 @@ public class SynthesisMain {
 		//
         // SDRsAM
         //
-//        RtlModuleInstance ramController = new RtlModuleInstance(realm, "ddr_sdram");
-//
-//        // system signals
-//		ramController.createBitInputPort("clk0", clkReset.createBitOutputPort("ddr_clk_0"));
-//		ramController.createBitInputPort("clk90", clkReset.createBitOutputPort("ddr_clk_90"));
-//		ramController.createBitInputPort("clk180", clkReset.createBitOutputPort("ddr_clk_180"));
-//		ramController.createBitInputPort("clk270", clkReset.createBitOutputPort("ddr_clk_270"));
-//		ramController.createBitInputPort("reset", reset);
-//
-//		// SDRAM DDR interface
-//        ramOutputPin(realm, "J5", ramController.createBitOutputPort("sd_CK_P"));
-//        ramOutputPin(realm, "J4", ramController.createBitOutputPort("sd_CK_N"));
-//        ramOutputPin(realm, "K4", ramController.createBitOutputPort("sd_CS_O"));
-//        ramOutputPin(realm, "K3", ramController.createBitOutputPort("sd_CKE_O"));
-//        ramOutputPin(realm, "C1", ramController.createBitOutputPort("sd_RAS_O"));
-//        ramOutputPin(realm, "C2", ramController.createBitOutputPort("sd_CAS_O"));
-//        ramOutputPin(realm, "D1", ramController.createBitOutputPort("sd_WE_O"));
-//        ramOutputPin(realm, "J1", ramController.createBitOutputPort("sd_UDM_O"));
-//        ramOutputPin(realm, "J2", ramController.createBitOutputPort("sd_LDM_O"));
-//        ramOutputPinArray(realm, ramController.createVectorOutputPort("sd_A_O", 13),
-//                "T1", "R3", "R2", "P1", "F4", "H4", "H3", "H1", "H2", "N4", "T2", "N5", "P2");
-//        ramOutputPinArray(realm, ramController.createVectorOutputPort("sd_BA_O", 2), "K5", "K6");
-//        ramBidirectionalPin(realm, "G3", ramController, "sd_UDQS_IO");
-//        ramBidirectionalPin(realm, "L6", ramController, "sd_LDQS_IO");
-//		RtlBidirectionalModulePortPinArray ramDataPinArray = new RtlBidirectionalModulePortPinArray(
-//			realm, ramController, "sd_D_IO", "sd_D_IO",
-//				"L2", "L1", "L3", "L4", "M3", "M4", "M5", "M6", "E2", "E1", "F1", "F2", "G6", "G5", "H6", "H5"
-//		);
-//		for (RtlPin pin : ramDataPinArray.getPins()) {
-//			XilinxPinConfiguration configuration = new XilinxPinConfiguration();
-//			configuration.setIostandard("SSTL2_I");
-//			pin.setConfiguration(configuration);
-//		}
-//
-//        // internal Wishbone interface
-//        ramController.createBitInputPort("wSTB_I", computerModule._bigRam.getEnable());
-//        ramController.createVectorInputPort("wADR_I", 24, computerModule._bigRam.getWordAddress());
-//        ramController.createBitInputPort("wWE_I", computerModule._bigRam.getWrite());
-//        ramController.createVectorInputPort("wDAT_I", 32, computerModule._bigRam.getWriteData());
-//        ramController.createVectorInputPort("wWRB_I", 4, computerModule._bigRam.getWriteMask());
-//        computerModule._bigRam.getReadData().setConnected(ramController.createVectorOutputPort("wDAT_O", 32));
-//        computerModule._bigRam.getAcknowledge().setConnected(ramController.createBitOutputPort("wACK_O"));
+        RtlModuleInstance ramController = new RtlModuleInstance(realm, "ddr_sdram");
+
+        // system signals
+		ramController.createBitInputPort("clk0", clkReset.createBitOutputPort("ddr_clk_0"));
+		ramController.createBitInputPort("clk90", clkReset.createBitOutputPort("ddr_clk_90"));
+		ramController.createBitInputPort("clk180", clkReset.createBitOutputPort("ddr_clk_180"));
+		ramController.createBitInputPort("clk270", clkReset.createBitOutputPort("ddr_clk_270"));
+		ramController.createBitInputPort("reset", reset);
+
+		// SDRAM DDR interface
+        ramOutputPin(realm, "J5", ramController.createBitOutputPort("sd_CK_P"));
+        ramOutputPin(realm, "J4", ramController.createBitOutputPort("sd_CK_N"));
+        ramOutputPin(realm, "K4", ramController.createBitOutputPort("sd_CS_O"));
+        ramOutputPin(realm, "K3", ramController.createBitOutputPort("sd_CKE_O"));
+        ramOutputPin(realm, "C1", ramController.createBitOutputPort("sd_RAS_O"));
+        ramOutputPin(realm, "C2", ramController.createBitOutputPort("sd_CAS_O"));
+        ramOutputPin(realm, "D1", ramController.createBitOutputPort("sd_WE_O"));
+        ramOutputPin(realm, "J1", ramController.createBitOutputPort("sd_UDM_O"));
+        ramOutputPin(realm, "J2", ramController.createBitOutputPort("sd_LDM_O"));
+        ramOutputPinArray(realm, ramController.createVectorOutputPort("sd_A_O", 13),
+                "T1", "R3", "R2", "P1", "F4", "H4", "H3", "H1", "H2", "N4", "T2", "N5", "P2");
+        ramOutputPinArray(realm, ramController.createVectorOutputPort("sd_BA_O", 2), "K5", "K6");
+        ramBidirectionalPin(realm, "G3", ramController, "sd_UDQS_IO");
+        ramBidirectionalPin(realm, "L6", ramController, "sd_LDQS_IO");
+		RtlBidirectionalModulePortPinArray ramDataPinArray = new RtlBidirectionalModulePortPinArray(
+			realm, ramController, "sd_D_IO", "sd_D_IO",
+				"L2", "L1", "L3", "L4", "M3", "M4", "M5", "M6", "E2", "E1", "F1", "F2", "G6", "G5", "H6", "H5"
+		);
+		for (RtlPin pin : ramDataPinArray.getPins()) {
+			XilinxPinConfiguration configuration = new XilinxPinConfiguration();
+			configuration.setIostandard("SSTL2_I");
+			pin.setConfiguration(configuration);
+		}
+
+        // internal Wishbone interface
+        ramController.createBitInputPort("wSTB_I", computerModule._bigRam.getEnable());
+        ramController.createVectorInputPort("wADR_I", 24, computerModule._bigRam.getWordAddress());
+        ramController.createBitInputPort("wWE_I", computerModule._bigRam.getWrite());
+        ramController.createVectorInputPort("wDAT_I", 32, computerModule._bigRam.getWriteData());
+        ramController.createVectorInputPort("wWRB_I", 4, computerModule._bigRam.getWriteMask());
+        computerModule._bigRam.getReadData().setConnected(ramController.createVectorOutputPort("wDAT_O", 32));
+        computerModule._bigRam.getAcknowledge().setConnected(ramController.createBitOutputPort("wACK_O"));
 
 		new RtlPrettifier().prettify(design.getRealm());
 		ProjectGenerator projectGenerator = new ProjectGenerator(design.getRealm(), "TerminalTest", new File("ise/terminal_test"), "XC3S500E-FG320-4");
