@@ -19,7 +19,7 @@ register bit secondReadCycle = 0;
 // peripherals
 name.martingeisse.esdk.riscv.rtl.terminal.TextDisplayController textDisplay;
 name.martingeisse.esdk.riscv.rtl.terminal.KeyboardController keyboard;
-name.martingeisse.esdk.riscv.rtl.ram.RamControllerAdapter bigRam;
+name.martingeisse.esdk.riscv.rtl.ram.SimulatedRam bigRam;
 
 do (*) {
 

@@ -16,10 +16,16 @@ void main() {
     terminalWrite("\n");
 */
 
+
+
+
+
     int *basePointer = (int*)0x80000000;
 
     // wait for SDRAM reset
-    delay(500);
+    // delay(500);
+
+    terminalWrite("\nXXXXX");
 
     int *pointer = basePointer;
     int value = 5;
@@ -30,22 +36,24 @@ void main() {
         terminalWriteInt(value);
         terminalWrite(" ");
         pointer[i] = value;
-        pointer += 1; // TODO this is wrong because we already use indexing, but it doesn't explain the current error
+        // pointer += 1; // TODO this is wrong because we already use indexing, but it doesn't explain the current error
         value += 10;
     }
-    terminalWrite("\n");
-    terminalWrite("\n");
-    pointer = basePointer;
-    for (int i = 0; i < 10; i++) {
-        if ((i & 3) == 0) {
-            terminalWrite("\n");
-        }
-        terminalWriteInt(pointer[i]);
-        terminalWrite(" ");
-        pointer += 1; // TODO this is wrong because we already use indexing, but it doesn't explain the current error
-    }
+//    terminalWrite("\nYYYY\n");
+//    pointer = basePointer;
+//    for (int i = 0; i < 10; i++) {
+//        if ((i & 3) == 0) {
+//            terminalWrite("\n");
+//        }
+//        terminalWriteInt(pointer[i]);
+//        terminalWrite(" ");
+//        pointer += 1; // TODO this is wrong because we already use indexing, but it doesn't explain the current error
+//    }
 
-    terminalWrite("\nPROGRAM DONE\n");
+
+
+
+
 
     /*
     int *p1 = basePointer;

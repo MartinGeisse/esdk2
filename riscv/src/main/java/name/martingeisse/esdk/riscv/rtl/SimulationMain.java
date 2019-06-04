@@ -3,6 +3,7 @@ package name.martingeisse.esdk.riscv.rtl;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
 import name.martingeisse.esdk.core.rtl.simulation.RtlClockGenerator;
+import name.martingeisse.esdk.core.rtl.simulation.RtlClockedSimulationItem;
 import name.martingeisse.esdk.riscv.rtl.terminal.*;
 
 import javax.swing.*;
@@ -20,14 +21,14 @@ public class SimulationMain {
 
 					@Override
 					protected TextDisplayController createTextDisplay() {
-						// return new SimulatedTextDisplayController(getRealm(), getClock());
-						return super.createTextDisplay();
+						return new SimulatedTextDisplayController(getRealm(), getClock());
+						// return super.createTextDisplay();
 					}
 
 					@Override
 					protected KeyboardController createKeyboard() {
-						// return new SimulatedKeyboardController(getRealm(), getClock());
-						return new UnconnectedKeyboard(getRealm());
+						return new SimulatedKeyboardController(getRealm(), getClock());
+						// return new UnconnectedKeyboard(getRealm());
 					}
 
 				};
@@ -39,9 +40,26 @@ public class SimulationMain {
 		design.getClockSignalConnector().setConnected(new RtlBitConstant(realm, false));
 		new RtlClockGenerator(design.getClock(), 10);
 		computerModule.setReset(new RtlBitConstant(realm, false));
-		// prepareHighlevelDisplaySimulation(design);
-		prepareHdlDisplaySimulation(design);
+		prepareHighlevelDisplaySimulation(design);
+		// prepareHdlDisplaySimulation(design);
 
+		CpuStateLogger cpuStateLogger = new CpuStateLogger(design.getClock(), (Multicycle.Implementation) design.getComputerModule()._cpu);
+		cpuStateLogger.setShowRegisters(true);
+		cpuStateLogger.setShowExecutionStates(true);
+		new RtlClockedSimulationItem(design.getClock()) {
+			@Override
+			public void computeNextState() {
+				Multicycle.Implementation cpu = (Multicycle.Implementation) design.getComputerModule()._cpu;
+				if (cpu._pc.getValue().getBitsAsInt() < 0 || cpu._pc.getValue().getBitsAsInt() > 0x10000000) {
+					System.exit(1);
+				}
+			}
+
+			@Override
+			public void updateState() {
+
+			}
+		};
 		design.simulate();
 	}
 

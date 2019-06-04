@@ -12,11 +12,20 @@ import name.martingeisse.esdk.tools.InstructionDisassembler;
 public class CpuStateLogger extends RtlClockedSimulationItem {
 
 	private final Multicycle.Implementation cpu;
+	private boolean showRegisters = false;
 	private boolean showExecutionStates = false;
 
 	public CpuStateLogger(RtlClockNetwork clockNetwork, Multicycle.Implementation cpu) {
 		super(clockNetwork);
 		this.cpu = cpu;
+	}
+
+	public boolean isShowRegisters() {
+		return showRegisters;
+	}
+
+	public void setShowRegisters(boolean showRegisters) {
+		this.showRegisters = showRegisters;
 	}
 
 	public boolean isShowExecutionStates() {
@@ -43,10 +52,30 @@ public class CpuStateLogger extends RtlClockedSimulationItem {
 	protected void showInstruction() {
 		int instruction = cpu._instructionRegister.getValue().getBitsAsInt();
 		System.out.println(hex32(cpu._pc) + ": " + hex32(instruction) + " = " + InstructionDisassembler.disassemble(instruction));
+		if (showRegisters) {
+			for (int i = 0; i < 32; i += 8) {
+				System.out.print("  ");
+				for (int j = 0; j < 8; j++) {
+					System.out.print("  ");
+					int index = i + j;
+					if (index < 10) {
+						System.out.print(' ');
+					}
+					System.out.print(index + "=" + hex32(cpu._registers.getMatrix().getRow(index)));
+				}
+				System.out.println();
+			}
+			System.out.println();
+		}
 	}
 
 	protected void showExecutionState() {
-		System.out.println("\tstate " + cpu._state.getValue());
+		VectorValue state = cpu._state.getValue();
+		System.out.print("\tstate " + state);
+		if (state.equals(Multicycle.Implementation._STATE_MEM_ACCESS)) {
+			System.out.print(" (memory address = " + hex32(cpu._memoryAddressRegister) + ")");
+		}
+		System.out.println();
 	}
 
 	protected static String hex32(RtlVectorSignal signal) {
