@@ -43,9 +43,6 @@ public class SimulationMain {
 		prepareHighlevelDisplaySimulation(design);
 		// prepareHdlDisplaySimulation(design);
 
-		CpuStateLogger cpuStateLogger = new CpuStateLogger(design.getClock(), (Multicycle.Implementation) design.getComputerModule()._cpu);
-		cpuStateLogger.setShowRegisters(true);
-		cpuStateLogger.setShowExecutionStates(true);
 		new RtlClockedSimulationItem(design.getClock()) {
 			@Override
 			public void computeNextState() {
