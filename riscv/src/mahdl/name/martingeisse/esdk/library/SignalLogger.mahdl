@@ -1,0 +1,59 @@
+
+module name.martingeisse.esdk.library.SignalLogger;
+
+interface {
+
+    in clock logClock;
+    in bit logEnable;
+    in vector[32] logData;
+
+    in clock busClock;
+    in bit busEnable, busWrite;
+    in vector[32] busWriteData;
+    out vector[32] busReadData;
+
+}
+
+register matrix[512][32] memory;
+
+// logging interface
+register vector[9] logPointer;
+do (logClock) {
+    if (logEnable | clearMode) {
+        memory[logPointer] = clearMode ? 32d0 : logData;
+    }
+}
+do (logClock) {
+    if (resetLogPointer) {
+        logPointer = 0;
+    } else if (logEnable) {
+        logPointer = logPointer + 9d1;
+    }
+}
+
+// bus read interface
+register vector[9] readPointer;
+register vector[32] busReadDataRegister;
+do (*) busReadData = busReadDataRegister;
+do (busClock) {
+    if (busEnable & ~busWrite) {
+        busReadDataRegister = memory[readPointer];
+    }
+}
+do (busClock) {
+    if (resetReadPointer) {
+        readPointer = 0;
+    } else if (busEnable & ~busWrite) {
+        readPointer = readPointer + 9d1;
+    }
+}
+
+// bus write interface
+register bit resetLogPointer = 0, resetReadPointer = 0, clearMode = 0;
+do (busClock) {
+    if (busEnable & busWrite) {
+        resetLogPointer = busWriteData[0];
+        resetReadPointer = busWriteData[1];
+        clearMode = busWriteData[2];
+    }
+}
