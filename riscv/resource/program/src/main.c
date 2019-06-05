@@ -37,13 +37,15 @@ void main() {
         value += 10;
     }
     terminalWrite("\n\n");
-    pointer = basePointer;
-    for (int i = 0; i < 10; i++) {
-        if ((i & 3) == 0) {
-            terminalWrite("\n");
+    for (int k = 0; k < 4; k++) {
+        pointer = basePointer;
+        for (int i = 0; i < 4; i++) {
+            if ((i & 3) == 0) {
+                terminalWrite("\n");
+            }
+            terminalWriteInt(pointer[i]);
+            terminalWrite(" ");
         }
-        terminalWriteInt(pointer[i]);
-        terminalWrite(" ");
     }
 
 
