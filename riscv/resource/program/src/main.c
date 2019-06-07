@@ -3,6 +3,28 @@
 #include "terminal.h"
 
 void main() {
+
+//        resetLogPointer = busWriteData[0];
+//        resetReadPointer = busWriteData[1];
+//        clearMode = busWriteData[2];
+//        loggingActive = busWriteData[3];
+
+    volatile int *signalLogger = (int*)8192;
+    *signalLogger = 8;
+    *signalLogger = 0;
+
+
+
+
+
+
+
+
+
+
+
+
+
 /*
     terminalWrite("Hello world!\n");
     terminalWrite("This works.\n");
@@ -20,6 +42,12 @@ void main() {
 
 
 
+
+
+
+
+
+/*
     int *basePointer = (int*)0x80000000;
 
     // wait for SDRAM reset
@@ -47,6 +75,11 @@ void main() {
             terminalWrite(" ");
         }
     }
+*/
+
+
+
+
 
 
 
