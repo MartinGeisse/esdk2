@@ -20,14 +20,14 @@ register matrix[512][32] memory;
 // logging interface
 register vector[9] logPointer;
 do (logClock) {
-    if (logEnable | clearMode) {
+    if (clearMode | (loggingActive & logEnable)) {
         memory[logPointer] = clearMode ? 32d0 : logData;
     }
 }
 do (logClock) {
     if (resetLogPointer) {
         logPointer = 0;
-    } else if (logEnable) {
+    } else if (loggingActive & logEnable) {
         logPointer = logPointer + 9d1;
     }
 }
@@ -50,11 +50,19 @@ do (busClock) {
 }
 
 // bus write interface
-register bit resetLogPointer = 0, resetReadPointer = 0, clearMode = 0;
+register bit resetLogPointer = 0, resetReadPointer = 0, clearMode = 0, loggingActive = 0;
 do (busClock) {
     if (busEnable & busWrite) {
         resetLogPointer = busWriteData[0];
         resetReadPointer = busWriteData[1];
         clearMode = busWriteData[2];
+        loggingActive = busWriteData[3];
     }
+}
+
+// bus acknowledge
+register bit secondBusReadCycle = 0;
+do (*) busAcknowledge = busWrite | secondBusReadCycle;
+do (busClock) {
+    secondBusReadCycle = busWrite ? bit(0) : ~secondBusReadCycle;
 }
