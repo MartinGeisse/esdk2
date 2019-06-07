@@ -94,17 +94,6 @@ void main() {
         terminalWrite(" ");
     }
 
-    // write log to screen
-    volatile int *signalLogger = (int*)0x8000;
-    for (int i = 0; i < 64; i++) {
-        terminalWriteHex(*signalLogger);
-        if ((i & 3) == 3) {
-            terminalWrite("\n");
-        } else {
-            terminalWrite(" ");
-        }
-    }
-
 
 
 
