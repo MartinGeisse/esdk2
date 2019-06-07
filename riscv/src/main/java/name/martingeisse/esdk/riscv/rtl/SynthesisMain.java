@@ -103,7 +103,7 @@ public class SynthesisMain {
 		// signal logger
 		//
 		SignalLoggerBusInterface.Implementation loggerInterface = (SignalLoggerBusInterface.Implementation)computerModule._signalLogger;
-		RtlVectorSignal logData = ramController.createVectorOutputPort("debugSignal", 32);
+		RtlVectorSignal logData = ramController.createVectorOutputPort("debugSignal", 32); TODO remove
 		SignalLogger signalLogger = new SignalLogger.Implementation(realm, design.getClock(), ramControllerMainClockNetwork);
 		signalLogger.setLogEnable(computerModule._cpu.getMemoryWrite()
                 .and(computerModule._bigRamSelected)

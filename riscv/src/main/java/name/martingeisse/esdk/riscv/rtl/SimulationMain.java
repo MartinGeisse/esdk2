@@ -47,9 +47,9 @@ public class SimulationMain {
 		// prepareHdlDisplaySimulation(design);
 
 		SignalLoggerBusInterface.Implementation loggerInterface = (SignalLoggerBusInterface.Implementation)computerModule._signalLogger;
-		RtlVectorSignal logData = ((Multicycle.Implementation)computerModule._cpu)._state;
+		RtlVectorSignal logData = RtlVectorConstant.of(realm, 32, 0);
 		SignalLogger signalLogger = new SignalLogger.Implementation(realm, design.getClock(), design.getClock());
-		signalLogger.setLogEnable(new RtlBitConstant(realm, true));
+		signalLogger.setLogEnable(new RtlBitConstant(realm, false));
 		signalLogger.setLogData(RtlVectorConstant.of(realm, 32 - logData.getWidth(), 0).concat(logData));
 		signalLogger.setBusEnable(loggerInterface.getBusEnable());
 		signalLogger.setBusWrite(loggerInterface.getBusWrite());
