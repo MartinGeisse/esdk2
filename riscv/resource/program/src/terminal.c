@@ -73,7 +73,7 @@ void terminalWriteInt(int n) {
 
 void terminalWriteHex(unsigned int n) {
     if (n == 0) {
-        terminalWriteChar('0');
+        terminalWrite("00000000");
         return;
     }
     n = terminalWriteDigit(n, 0x10000000);
