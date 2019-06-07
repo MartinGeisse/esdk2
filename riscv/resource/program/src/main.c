@@ -9,11 +9,11 @@ void main() {
 //        clearMode = busWriteData[2];
 //        loggingActive = busWriteData[3];
 
-    volatile int *signalLogger = (int*)8192;
+    volatile int *signalLogger = (int*)0x8000;
     *signalLogger = 8;
     *signalLogger = 0;
 
-    for (int i = 0; i < 30; i++) {
+    for (int i = 0; i < 25; i++) {
         terminalWriteHex(*signalLogger);
         terminalWrite("\n");
     }
