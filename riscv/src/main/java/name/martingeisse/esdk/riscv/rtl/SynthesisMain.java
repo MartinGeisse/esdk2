@@ -1,9 +1,13 @@
 package name.martingeisse.esdk.riscv.rtl;
 
+import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.module.RtlModuleInstance;
 import name.martingeisse.esdk.core.rtl.pin.*;
-import name.martingeisse.esdk.core.rtl.signal.*;
+import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
+import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
+import name.martingeisse.esdk.core.rtl.signal.RtlConstantIndexSelection;
+import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.prettify.RtlPrettifier;
 import name.martingeisse.esdk.core.rtl.synthesis.xilinx.ProjectGenerator;
 import name.martingeisse.esdk.core.rtl.synthesis.xilinx.XilinxPinConfiguration;
@@ -53,7 +57,9 @@ public class SynthesisMain {
         RtlModuleInstance ramController = new RtlModuleInstance(realm, "ddr_sdram");
 
         // system signals
-		ramController.createBitInputPort("clk0", clkReset.createBitOutputPort("ddr_clk_0"));
+		RtlBitSignal ramControllerMainClock = clkReset.createBitOutputPort("ddr_clk_0");
+		RtlClockNetwork ramControllerMainClockNetwork = realm.createClockNetwork(ramControllerMainClock);
+		ramController.createBitInputPort("clk0", ramControllerMainClock);
 		ramController.createBitInputPort("clk90", clkReset.createBitOutputPort("ddr_clk_90"));
 		ramController.createBitInputPort("clk180", clkReset.createBitOutputPort("ddr_clk_180"));
 		ramController.createBitInputPort("clk270", clkReset.createBitOutputPort("ddr_clk_270"));
@@ -97,10 +103,10 @@ public class SynthesisMain {
 		// signal logger
 		//
 		SignalLoggerBusInterface.Implementation loggerInterface = (SignalLoggerBusInterface.Implementation)computerModule._signalLogger;
-		RtlVectorSignal logData = ((Multicycle.Implementation)computerModule._cpu)._state;
-		SignalLogger signalLogger = new SignalLogger.Implementation(realm, design.getClock(), design.getClock());
+		RtlVectorSignal logData = ramController.createVectorOutputPort("debugSignal", 32);
+		SignalLogger signalLogger = new SignalLogger.Implementation(realm, design.getClock(), ramControllerMainClockNetwork);
 		signalLogger.setLogEnable(new RtlBitConstant(realm, true));
-		signalLogger.setLogData(RtlVectorConstant.of(realm, 32 - logData.getWidth(), 0).concat(logData));
+		signalLogger.setLogData(logData);
 		signalLogger.setBusEnable(loggerInterface.getBusEnable());
 		signalLogger.setBusWrite(loggerInterface.getBusWrite());
 		signalLogger.setBusWriteData(loggerInterface.getBusWriteData());
