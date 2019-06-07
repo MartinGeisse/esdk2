@@ -34,10 +34,10 @@ public class Design {
 		DesignValidationResult result = validator.validate();
 		for (ItemValidationResult itemResult : result.getItemResults().values()) {
 			if (!itemResult.getErrors().isEmpty()) {
-				throw new IllegalStateException("validation failed with errors: " + itemResult.getErrors());
+				throw new IllegalStateException("validation failed with errors for item " + itemResult.getItem() + ": " + itemResult.getErrors());
 			}
 			if (failOnWarnings && !itemResult.getWarnings().isEmpty()) {
-				throw new IllegalStateException("validation failed with warnings" + itemResult.getErrors());
+				throw new IllegalStateException("validation failed with warnings for item " + itemResult.getItem() + ": " + itemResult.getErrors());
 			}
 		}
 	}

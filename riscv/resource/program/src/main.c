@@ -13,6 +13,10 @@ void main() {
     *signalLogger = 8;
     *signalLogger = 0;
 
+    for (int i = 0; i < 30; i++) {
+        terminalWriteHex(*signalLogger);
+        terminalWrite("\n");
+    }
 
 
 

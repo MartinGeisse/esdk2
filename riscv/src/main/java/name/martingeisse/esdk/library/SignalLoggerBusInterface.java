@@ -36,7 +36,9 @@ public interface SignalLoggerBusInterface extends RtlItemOwned {
 		public Implementation(RtlRealm realm) {
 			super(realm);
 			busReadData = new RtlVectorSignalConnector(realm, 32);
+			busReadData.setName("SignalLoggerBusInterface_busReadData");
 			busAcknowledge = new RtlBitSignalConnector(realm);
+			busAcknowledge.setName("SignalLoggerBusInterface_busAcknowledge");
 		}
 
 		@Override

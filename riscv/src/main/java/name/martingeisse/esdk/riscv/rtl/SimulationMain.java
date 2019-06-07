@@ -2,8 +2,11 @@ package name.martingeisse.esdk.riscv.rtl;
 
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
+import name.martingeisse.esdk.core.rtl.signal.RtlVectorConstant;
+import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.simulation.RtlClockGenerator;
-import name.martingeisse.esdk.core.rtl.simulation.RtlClockedSimulationItem;
+import name.martingeisse.esdk.library.SignalLogger;
+import name.martingeisse.esdk.library.SignalLoggerBusInterface;
 import name.martingeisse.esdk.riscv.rtl.terminal.*;
 
 import javax.swing.*;
@@ -42,6 +45,17 @@ public class SimulationMain {
 		computerModule.setReset(new RtlBitConstant(realm, false));
 		prepareHighlevelDisplaySimulation(design);
 		// prepareHdlDisplaySimulation(design);
+
+		SignalLoggerBusInterface.Implementation loggerInterface = (SignalLoggerBusInterface.Implementation)computerModule._signalLogger;
+		RtlVectorSignal logData = ((Multicycle.Implementation)computerModule._cpu)._state;
+		SignalLogger signalLogger = new SignalLogger.Implementation(realm, design.getClock(), design.getClock());
+		signalLogger.setLogEnable(new RtlBitConstant(realm, true));
+		signalLogger.setLogData(RtlVectorConstant.of(realm, 32 - logData.getWidth(), 0).concat(logData));
+		signalLogger.setBusEnable(loggerInterface.getBusEnable());
+		signalLogger.setBusWrite(loggerInterface.getBusWrite());
+		signalLogger.setBusWriteData(loggerInterface.getBusWriteData());
+		loggerInterface.setBusReadData(signalLogger.getBusReadData());
+		loggerInterface.setBusAcknowledge(signalLogger.getBusAcknowledge());
 
 		design.simulate();
 	}

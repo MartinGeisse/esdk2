@@ -57,10 +57,22 @@ public abstract class RtlItem extends Item implements RtlItemOwned {
 	public String toString() {
 		if (this instanceof RtlBitSignal) {
 			RtlBitSignal signal = (RtlBitSignal)this;
-			return getName() + " = " + signal.getValue() + " (" + super.toString() + ")";
+			String value;
+			try {
+				value = Boolean.toString(signal.getValue());
+			} catch (Exception e) {
+				value = "???";
+			}
+			return getName() + " = " + value + " (" + super.toString() + ")";
 		} else if (this instanceof RtlVectorSignal) {
 			RtlVectorSignal signal = (RtlVectorSignal)this;
-			return getName() + " = " + signal.getValue() + " (" + super.toString() + ")";
+			String value;
+			try {
+				value = signal.getValue().toString();
+			} catch (Exception e) {
+				value = "???";
+			}
+			return getName() + " = " + value + " (" + super.toString() + ")";
 		} else {
 			return super.toString();
 		}
