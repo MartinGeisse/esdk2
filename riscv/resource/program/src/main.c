@@ -11,11 +11,16 @@ void main() {
 
     volatile int *signalLogger = (int*)0x8000;
     *signalLogger = 8;
+    *signalLogger = 8;
     *signalLogger = 0;
 
-    for (int i = 0; i < 25; i++) {
-        terminalWriteHex(*signalLogger);
-        terminalWrite("\n");
+    for (int i = 0; i < 64; i++) {
+        terminalWriteInt(*signalLogger);
+        if ((i & 3) == 3) {
+            terminalWrite("\n");
+        } else {
+            terminalWrite(" ");
+        }
     }
 
 

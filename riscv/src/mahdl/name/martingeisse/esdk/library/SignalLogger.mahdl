@@ -44,7 +44,7 @@ do (busClock) {
 do (busClock) {
     if (resetReadPointer) {
         readPointer = 0;
-    } else if (busEnable & ~busWrite) {
+    } else if (busEnable & ~busWrite & secondBusReadCycle) {
         readPointer = readPointer + 9d1;
     }
 }

@@ -48,7 +48,7 @@ static unsigned int terminalWriteDigit(unsigned int n, unsigned int significance
 
 void terminalWriteInt(int n) {
     if (n == 0) {
-        terminalWriteChar('0');
+        terminalWrite("0000000000");
         return;
     }
     if (n < 0) {
