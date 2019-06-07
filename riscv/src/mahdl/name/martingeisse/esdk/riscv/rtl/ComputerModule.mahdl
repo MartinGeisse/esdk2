@@ -9,6 +9,7 @@ name.martingeisse.esdk.riscv.rtl.Multicycle cpu;
 signal vector[10] memoryDataWordAddress;
 signal bit bigRamSelected = cpu.memoryWordAddress[29];
 signal bit terminalSelected = cpu.memoryWordAddress[12] & ~bigRamSelected;
+signal bit signalLoggerSelected = cpu.memoryWordAddress[13] & ~bigRamSelected;
 
 // Memory: the number indicates the significance inside a word, NOT the position of a byte in a byte buffer (these
 // are different since RISC-V is little-endian).
@@ -20,6 +21,7 @@ register bit secondReadCycle = 0;
 name.martingeisse.esdk.riscv.rtl.terminal.TextDisplayController textDisplay;
 name.martingeisse.esdk.riscv.rtl.terminal.KeyboardController keyboard;
 name.martingeisse.esdk.riscv.rtl.ram.RamControllerAdapter bigRam;
+name.martingeisse.esdk.library.SignalLoggerBusInterface signalLogger;
 
 do (*) {
 
@@ -29,8 +31,14 @@ do (*) {
 
     // data interface
     memoryDataWordAddress = cpu.memoryWordAddress[9:0];
-    cpu.memoryReadData = bigRamSelected ? bigRam.readData : terminalSelected ? (24d0 _ keyboard.inputData) : memoryReadData;
-    cpu.memoryAcknowledge = bigRamSelected ? bigRam.acknowledge : (cpu.memoryWrite | secondReadCycle | terminalSelected);
+    cpu.memoryReadData = bigRamSelected ? bigRam.readData :
+            terminalSelected ? (24d0 _ keyboard.inputData) :
+                    signalLoggerSelected ? signalLogger.busReadData :
+                            memoryReadData;
+    cpu.memoryAcknowledge = bigRamSelected ? bigRam.acknowledge :
+            terminalSelected ? bit(1) :
+                    signalLoggerSelected ? signalLogger.busAcknowledge :
+                            (cpu.memoryWrite | secondReadCycle);
 
     textDisplay.clk = clk;
     textDisplay.clockEnable = 1;
@@ -48,6 +56,10 @@ do (*) {
     bigRam.writeData = cpu.memoryWriteData;
     bigRam.writeMask = cpu.memoryWriteMask;
 
+    signalLogger.busEnable = cpu.memoryEnable & signalLoggerSelected;
+    signalLogger.busWrite = cpu.memoryWrite;
+    signalLogger.busWriteData = cpu.memoryWriteData;
+
 }
 
 register vector[8] memoryReadData0, memoryReadData1, memoryReadData2, memoryReadData3;
@@ -57,7 +69,7 @@ do (clk) {
     memoryReadData1 = memory1[memoryDataWordAddress];
     memoryReadData2 = memory2[memoryDataWordAddress];
     memoryReadData3 = memory3[memoryDataWordAddress];
-    if (cpu.memoryEnable & cpu.memoryWrite & ~bigRamSelected & ~terminalSelected) {
+    if (cpu.memoryEnable & cpu.memoryWrite & ~bigRamSelected & ~terminalSelected & ~signalLoggerSelected) {
         if (cpu.memoryWriteMask[0]) {
             memory0[memoryDataWordAddress] = cpu.memoryWriteData[7:0];
         }
