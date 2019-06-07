@@ -1,0 +1,4 @@
+
+Add a watchdog that monitors the bus and reports wrong usage, e.g. write data changing in the middle of a transaction
+(this caused the "spurios SDRAM write failure" when the write hits a refresh-in-progress and the write data gets lost
+due to a CPU bug before the SDRAM could sample it).
