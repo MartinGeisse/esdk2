@@ -16,6 +16,8 @@ import name.martingeisse.esdk.core.util.vector.VectorValue;
 /**
  * Note: Unlike other object fields, the list of signals must be determined in advance. This is to ensure that the
  * result width doesn't change.
+ *
+ * TODO have zero-width operands by removing them; possibly remove the concat after that; what if all are zero-width?
  */
 public final class RtlConcatenation extends RtlItem implements RtlVectorSignal {
 
