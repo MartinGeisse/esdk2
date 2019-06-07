@@ -9,20 +9,32 @@ void main() {
 //        clearMode = busWriteData[2];
 //        loggingActive = busWriteData[3];
 
+
+
+
+
+
+/*
+    // wait for SDRAM reset
+    delay(500);
+
+    // log some data
+    int *basePointer = (int*)0x80000000;
     volatile int *signalLogger = (int*)0x8000;
     *signalLogger = 8;
-    *signalLogger = 8;
+    *basePointer = 15;
     *signalLogger = 0;
 
+    // write log to screen
     for (int i = 0; i < 64; i++) {
-        terminalWriteInt(*signalLogger);
+        terminalWriteHex(*signalLogger);
         if ((i & 3) == 3) {
             terminalWrite("\n");
         } else {
             terminalWrite(" ");
         }
     }
-
+*/
 
 
 
@@ -56,11 +68,10 @@ void main() {
 
 
 
-/*
     int *basePointer = (int*)0x80000000;
 
     // wait for SDRAM reset
-    // delay(500);
+    delay(500);
 
     int *pointer = basePointer;
     int value = 5;
@@ -74,18 +85,25 @@ void main() {
         value += 10;
     }
     terminalWrite("\n\n");
-    for (int k = 0; k < 4; k++) {
-        pointer = basePointer;
-        for (int i = 0; i < 4; i++) {
-            if ((i & 3) == 0) {
-                terminalWrite("\n");
-            }
-            terminalWriteInt(pointer[i]);
+    pointer = basePointer;
+    for (int i = 0; i < 10; i++) {
+        if ((i & 3) == 0) {
+            terminalWrite("\n");
+        }
+        terminalWriteInt(pointer[i]);
+        terminalWrite(" ");
+    }
+
+    // write log to screen
+    volatile int *signalLogger = (int*)0x8000;
+    for (int i = 0; i < 64; i++) {
+        terminalWriteHex(*signalLogger);
+        if ((i & 3) == 3) {
+            terminalWrite("\n");
+        } else {
             terminalWrite(" ");
         }
     }
-*/
-
 
 
 

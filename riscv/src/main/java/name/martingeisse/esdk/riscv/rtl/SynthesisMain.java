@@ -105,7 +105,10 @@ public class SynthesisMain {
 		SignalLoggerBusInterface.Implementation loggerInterface = (SignalLoggerBusInterface.Implementation)computerModule._signalLogger;
 		RtlVectorSignal logData = ramController.createVectorOutputPort("debugSignal", 32);
 		SignalLogger signalLogger = new SignalLogger.Implementation(realm, design.getClock(), ramControllerMainClockNetwork);
-		signalLogger.setLogEnable(new RtlBitConstant(realm, true));
+		signalLogger.setLogEnable(computerModule._cpu.getMemoryWrite()
+                .and(computerModule._bigRamSelected)
+                .and(computerModule._cpu.getMemoryWrite()
+				.and(computerModule._cpu.getMemoryWordAddress().compareEqual(0x20000005))));
 		signalLogger.setLogData(logData);
 		signalLogger.setBusEnable(loggerInterface.getBusEnable());
 		signalLogger.setBusWrite(loggerInterface.getBusWrite());
