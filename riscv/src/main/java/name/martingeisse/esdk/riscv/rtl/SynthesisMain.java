@@ -3,12 +3,12 @@ package name.martingeisse.esdk.riscv.rtl;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.module.RtlModuleInstance;
 import name.martingeisse.esdk.core.rtl.pin.*;
-import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
-import name.martingeisse.esdk.core.rtl.signal.RtlConstantIndexSelection;
-import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
+import name.martingeisse.esdk.core.rtl.signal.*;
 import name.martingeisse.esdk.core.rtl.synthesis.prettify.RtlPrettifier;
 import name.martingeisse.esdk.core.rtl.synthesis.xilinx.ProjectGenerator;
 import name.martingeisse.esdk.core.rtl.synthesis.xilinx.XilinxPinConfiguration;
+import name.martingeisse.esdk.library.SignalLogger;
+import name.martingeisse.esdk.library.SignalLoggerBusInterface;
 import name.martingeisse.esdk.riscv.rtl.terminal.KeyboardController;
 import name.martingeisse.esdk.riscv.rtl.terminal.Ps2Connector;
 import name.martingeisse.esdk.riscv.rtl.terminal.TextDisplayController;
@@ -48,7 +48,7 @@ public class SynthesisMain {
 		ps2Connector.setData(ps2Pin(realm, "G13"));
 
 		//
-        // SDRsAM
+        // SDRAM
         //
         RtlModuleInstance ramController = new RtlModuleInstance(realm, "ddr_sdram");
 
@@ -92,6 +92,20 @@ public class SynthesisMain {
         ramController.createVectorInputPort("wWRB_I", 4, computerModule._bigRam.getWriteMask());
         computerModule._bigRam.getReadData().setConnected(ramController.createVectorOutputPort("wDAT_O", 32));
         computerModule._bigRam.getAcknowledge().setConnected(ramController.createBitOutputPort("wACK_O"));
+
+        //
+		// signal logger
+		//
+		SignalLoggerBusInterface.Implementation loggerInterface = (SignalLoggerBusInterface.Implementation)computerModule._signalLogger;
+		RtlVectorSignal logData = ((Multicycle.Implementation)computerModule._cpu)._state;
+		SignalLogger signalLogger = new SignalLogger.Implementation(realm, design.getClock(), design.getClock());
+		signalLogger.setLogEnable(new RtlBitConstant(realm, true));
+		signalLogger.setLogData(RtlVectorConstant.of(realm, 32 - logData.getWidth(), 0).concat(logData));
+		signalLogger.setBusEnable(loggerInterface.getBusEnable());
+		signalLogger.setBusWrite(loggerInterface.getBusWrite());
+		signalLogger.setBusWriteData(loggerInterface.getBusWriteData());
+		loggerInterface.setBusReadData(signalLogger.getBusReadData());
+		loggerInterface.setBusAcknowledge(signalLogger.getBusAcknowledge());
 
 		new RtlPrettifier().prettify(design.getRealm());
 		ProjectGenerator projectGenerator = new ProjectGenerator(design.getRealm(), "TerminalTest", new File("ise/terminal_test"), "XC3S500E-FG320-4");
