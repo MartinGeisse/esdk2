@@ -4,10 +4,7 @@ import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.module.RtlModuleInstance;
 import name.martingeisse.esdk.core.rtl.pin.*;
-import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
-import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
-import name.martingeisse.esdk.core.rtl.signal.RtlConstantIndexSelection;
-import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
+import name.martingeisse.esdk.core.rtl.signal.*;
 import name.martingeisse.esdk.core.rtl.synthesis.prettify.RtlPrettifier;
 import name.martingeisse.esdk.core.rtl.synthesis.xilinx.ProjectGenerator;
 import name.martingeisse.esdk.core.rtl.synthesis.xilinx.XilinxPinConfiguration;
@@ -103,13 +100,9 @@ public class SynthesisMain {
 		// signal logger
 		//
 		SignalLoggerBusInterface.Implementation loggerInterface = (SignalLoggerBusInterface.Implementation)computerModule._signalLogger;
-		RtlVectorSignal logData = ramController.createVectorOutputPort("debugSignal", 32); TODO remove
 		SignalLogger signalLogger = new SignalLogger.Implementation(realm, design.getClock(), ramControllerMainClockNetwork);
-		signalLogger.setLogEnable(computerModule._cpu.getMemoryWrite()
-                .and(computerModule._bigRamSelected)
-                .and(computerModule._cpu.getMemoryWrite()
-				.and(computerModule._cpu.getMemoryWordAddress().compareEqual(0x20000005))));
-		signalLogger.setLogData(logData);
+		signalLogger.setLogEnable(new RtlBitConstant(realm, false));
+		signalLogger.setLogData(RtlVectorConstant.of(realm, 32, 0));
 		signalLogger.setBusEnable(loggerInterface.getBusEnable());
 		signalLogger.setBusWrite(loggerInterface.getBusWrite());
 		signalLogger.setBusWriteData(loggerInterface.getBusWriteData());

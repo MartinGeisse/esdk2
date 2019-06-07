@@ -58,8 +58,7 @@ module ddr_sdram(sd_CK_P, sd_CK_N,
                  clk180, clk270,
                  reset,
                  wADR_I, wSTB_I, wWE_I, wWRB_I,
-                 wDAT_I, wDAT_O, wACK_O,
-                 debugSignal);
+                 wDAT_I, wDAT_O, wACK_O);
 	// interface to DDR SDRAM memory
 	output  sd_CK_P;
 	output  sd_CK_N;
@@ -94,7 +93,6 @@ module ddr_sdram(sd_CK_P, sd_CK_N,
 	input	[31:0] wDAT_I;
 	output	[31:0] wDAT_O;
 	output	wACK_O;
-	output[31:0] debugSignal; // TODO remove when done
 
 	// Local data storage
 	reg		[5:0] sd_state;
@@ -750,7 +748,5 @@ begin
 			refresh_now <= 1;
 	end
 end
-
-assign debugSignal = {26'd0, sd_state};
 
 endmodule
