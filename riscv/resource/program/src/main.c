@@ -16,11 +16,8 @@ void main() {
             // write test value to SDRAM
             *p = value;
 
-            // newValue = (oldValue * 5 + 1) % 19
+            // newValue = oldValue * 5 + 1
             value = (value << 2) + value + 1;
-            while (value >= 19) {
-                value -= 19;
-            }
 
             // show progress
             if ((((int)p) & 0x007fffff) == 0) {
@@ -40,11 +37,8 @@ void main() {
                 terminalWriteChar('E');
             }
 
-            // newValue = (oldValue * 5 + 1) % 19
+            // newValue = oldValue * 5 + 1
             value = (value << 2) + value + 1;
-            while (value >= 19) {
-                value -= 19;
-            }
 
             // show progress
             if ((((int)p) & 0x007fffff) == 0) {
