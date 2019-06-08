@@ -7,20 +7,52 @@ void main() {
     // wait for SDRAM reset
     delay(500);
     int *basePointer = (int*)0x80000000;
+    int *endPointer = basePointer + 16 * 1024 * 1024;
 
-    int *p1 = basePointer;
-    int *p2 = basePointer + 8 * 1024 * 1024;
-    int *p3 = basePointer + 16 * 1024 * 1024;
+    {
+        int value = 9;
+        for (int *p = basePointer; p < endPointer; p++) {
 
-    *p1 = 15;
-    *p2 = 25;
-    *p3 = 35;
+            // write test value to SDRAM
+            *p = value;
 
-    terminalWriteInt(*p1);
-    terminalWrite("\n");
-    terminalWriteInt(*p2);
-    terminalWrite("\n");
-    terminalWriteInt(*p3);
-    terminalWrite("\n");
+            // newValue = (oldValue * 5 + 1) % 19
+            value = (value << 2) + value + 1;
+            while (value >= 19) {
+                value -= 19;
+            }
+
+            // show progress
+            if ((((int)p) & 0x007fffff) == 0) {
+                terminalWriteChar('.');
+            }
+
+        }
+    }
+    terminalWriteChar('\n');
+
+    {
+        int value = 9;
+        for (int *p = basePointer; p < endPointer; p++) {
+
+            // read back test value from SDRAM
+            if (*p != value) {
+                terminalWriteChar('E');
+            }
+
+            // newValue = (oldValue * 5 + 1) % 19
+            value = (value << 2) + value + 1;
+            while (value >= 19) {
+                value -= 19;
+            }
+
+            // show progress
+            if ((((int)p) & 0x007fffff) == 0) {
+                terminalWriteChar('.');
+            }
+
+        }
+    }
+    terminalWriteChar('\n');
 
 }
