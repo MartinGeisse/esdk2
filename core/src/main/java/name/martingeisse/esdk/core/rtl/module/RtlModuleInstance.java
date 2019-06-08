@@ -11,6 +11,7 @@ import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.*;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogContribution;
+import name.martingeisse.esdk.core.util.vector.VectorValue;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,6 +22,7 @@ import java.util.Map;
 public final class RtlModuleInstance extends RtlItem {
 
 	private String moduleName;
+	private final Map<String, Object> parameters = new HashMap<>();
 	private final Map<String, RtlInstancePort> ports = new HashMap<>();
 
 	public RtlModuleInstance(RtlRealm realm) {
@@ -63,6 +65,10 @@ public final class RtlModuleInstance extends RtlItem {
 
 	public void setModuleName(String moduleName) {
 		this.moduleName = moduleName;
+	}
+
+	public Map<String, Object> getParameters() {
+		return parameters;
 	}
 
 	public Iterable<RtlInstancePort> getPorts() {
@@ -131,7 +137,34 @@ public final class RtlModuleInstance extends RtlItem {
 
 			@Override
 			public void printImplementation(VerilogWriter out) {
-				out.print(moduleName + ' ' + instanceName + '(');
+				if (parameters.isEmpty()) {
+					out.print(moduleName + ' ' + instanceName + " (");
+				} else {
+					out.print(moduleName + " #(");
+					boolean firstParameter = true;
+					for (Map.Entry<String, Object> entry : parameters.entrySet()) {
+						if (firstParameter) {
+							firstParameter = false;
+							out.println();
+						} else {
+							out.println(",");
+						}
+						out.print("\t." + entry.getKey() + '(');
+						Object value = entry.getValue();
+						if (value instanceof String) {
+							out.print("\"" + value + "\"");
+						} else if (value instanceof Integer) {
+							out.print(value);
+						} else if (value instanceof VectorValue) {
+							((VectorValue) value).printVerilogExpression(out);
+						} else {
+							throw new RuntimeException("invalid module parameter value: " + value);
+						}
+						out.print(')');
+					}
+					out.println();
+					out.print(") " + instanceName + " (");
+				}
 				boolean firstPort = true;
 				for (RtlInstancePort port : ports.values()) {
 					if (firstPort) {
