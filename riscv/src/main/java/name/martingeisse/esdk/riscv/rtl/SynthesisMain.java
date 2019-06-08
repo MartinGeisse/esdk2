@@ -34,6 +34,10 @@ public class SynthesisMain {
 		clkReset.createBitInputPort("reset_in", buttonPin(realm, "V4"));
 		design.getClockSignalConnector().setConnected(mainClockSignal);
 		computerModule.setReset(reset);
+		RtlBitSignal ddrClk0 = clkReset.createBitOutputPort("ddr_clk_0");
+		RtlBitSignal ddrClk90 = clkReset.createBitOutputPort("ddr_clk_90");
+		RtlBitSignal ddrClk180 = clkReset.createBitOutputPort("ddr_clk_180");
+		RtlBitSignal ddrClk270 = clkReset.createBitOutputPort("ddr_clk_270");
 
 		TextDisplayController.Implementation textDisplayController = (TextDisplayController.Implementation)computerModule._textDisplay;
 		VgaConnector.Implementation vgaConnector = (VgaConnector.Implementation)textDisplayController._vgaConnector;
@@ -53,13 +57,41 @@ public class SynthesisMain {
         //
         RtlModuleInstance ramController = new RtlModuleInstance(realm, "ddr_sdram");
 
-        // system signals
-		RtlBitSignal ramControllerMainClock = clkReset.createBitOutputPort("ddr_clk_0");
-		RtlClockNetwork ramControllerMainClockNetwork = realm.createClockNetwork(ramControllerMainClock);
-		ramController.createBitInputPort("clk0", ramControllerMainClock);
-		ramController.createBitInputPort("clk90", clkReset.createBitOutputPort("ddr_clk_90"));
-		ramController.createBitInputPort("clk180", clkReset.createBitOutputPort("ddr_clk_180"));
-		ramController.createBitInputPort("clk270", clkReset.createBitOutputPort("ddr_clk_270"));
+        // generate DDR clock signal CK_P
+//		RtlModuleInstance sdramCkpDdr = new RtlModuleInstance(realm, "ODDR2");
+//		sdramCkpDdr.getParameters().put("DDR_ALIGNMENT", "NONE");
+//		sdramCkpDdr.getParameters().put("INIT", RtlVectorConstant.of(realm, 1, 0));
+//		sdramCkpDdr.getParameters().put("SRTYPE", "SYNC");
+//		sdramCkpDdr.setName("sdramCkpDdr");
+//		ramOutputPin(realm, "J5", sdramCkpDdr.createBitOutputPort("Q"));
+//		sdramCkpDdr.createBitInputPort("C0", ddrClk180);
+//		sdramCkpDdr.createBitInputPort("C1", ddrClk0);
+//		sdramCkpDdr.createBitInputPort("CE", new RtlBitConstant(realm, true));
+//		sdramCkpDdr.createBitInputPort("D0", new RtlBitConstant(realm, true));
+//		sdramCkpDdr.createBitInputPort("D1", new RtlBitConstant(realm, false));
+//		sdramCkpDdr.createBitInputPort("R", new RtlBitConstant(realm, false));
+//		sdramCkpDdr.createBitInputPort("S", new RtlBitConstant(realm, false));
+
+		// generate DDR clock signal CK_N
+//		RtlModuleInstance sdramCknDdr = new RtlModuleInstance(realm, "ODDR2");
+//		sdramCknDdr.getParameters().put("DDR_ALIGNMENT", "NONE");
+//		sdramCknDdr.getParameters().put("INIT", RtlVectorConstant.of(realm, 1, 0));
+//		sdramCknDdr.getParameters().put("SRTYPE", "SYNC");
+//		sdramCknDdr.setName("sdramCknDdr");
+//		ramOutputPin(realm, "J4", sdramCknDdr.createBitOutputPort("Q"));
+//		sdramCknDdr.createBitInputPort("C0", ddrClk0);
+//		sdramCknDdr.createBitInputPort("C1", ddrClk180);
+//		sdramCknDdr.createBitInputPort("CE", new RtlBitConstant(realm, true));
+//		sdramCknDdr.createBitInputPort("D0", new RtlBitConstant(realm, true));
+//		sdramCknDdr.createBitInputPort("D1", new RtlBitConstant(realm, false));
+//		sdramCknDdr.createBitInputPort("R", new RtlBitConstant(realm, false));
+//		sdramCknDdr.createBitInputPort("S", new RtlBitConstant(realm, false));
+
+		// system signals
+		ramController.createBitInputPort("clk0", ddrClk0);
+		ramController.createBitInputPort("clk90", ddrClk90);
+		ramController.createBitInputPort("clk180", ddrClk180);
+		ramController.createBitInputPort("clk270", ddrClk270);
 		ramController.createBitInputPort("reset", reset);
 
 		// SDRAM DDR interface
@@ -100,7 +132,7 @@ public class SynthesisMain {
 		// signal logger
 		//
 		SignalLoggerBusInterface.Implementation loggerInterface = (SignalLoggerBusInterface.Implementation)computerModule._signalLogger;
-		SignalLogger signalLogger = new SignalLogger.Implementation(realm, design.getClock(), ramControllerMainClockNetwork);
+		SignalLogger signalLogger = new SignalLogger.Implementation(realm, design.getClock(), design.getClock());
 		signalLogger.setLogEnable(new RtlBitConstant(realm, false));
 		signalLogger.setLogData(RtlVectorConstant.of(realm, 32, 0));
 		signalLogger.setBusEnable(loggerInterface.getBusEnable());
