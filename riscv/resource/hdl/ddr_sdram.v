@@ -48,8 +48,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-module ddr_sdram(sd_CK_P, sd_CK_N,
-                 sd_A_O, sd_BA_O, sd_D_IO, 
+module ddr_sdram(sd_A_O, sd_BA_O, sd_D_IO,
                  sd_RAS_O, sd_CAS_O, sd_WE_O,
                  sd_UDM_O, sd_LDM_O, 
                  sd_UDQS_IO, sd_LDQS_IO,
@@ -60,8 +59,6 @@ module ddr_sdram(sd_CK_P, sd_CK_N,
                  wADR_I, wSTB_I, wWE_I, wWRB_I,
                  wDAT_I, wDAT_O, wACK_O);
 	// interface to DDR SDRAM memory
-	output  sd_CK_P;
-	output  sd_CK_N;
 	output 	[12:0] sd_A_O;
 	output 	[1:0]  sd_BA_O;
 	inout 	[15:0] sd_D_IO;
@@ -123,41 +120,7 @@ module ddr_sdram(sd_CK_P, sd_CK_N,
 	reg		[3:0] D_mask_reg;	// data mask buffer
 
 
-/***************************************************		
- * SD ram clock source
- ***************************************************/
-
-        ODDR2 #(
-                .DDR_ALIGNMENT("NONE"),
-                .INIT(1'b0),
-                .SRTYPE("SYNC")
-        ) ODDR2_inst_CK_P (
-                .Q(sd_CK_P),
-                .C0(clk180),
-                .C1(clk0),
-                .CE(1'b1),
-                .D0(1'b1),
-                .D1(1'b0),
-                .R(1'b0),
-                .S(1'b0)
-        );
-
-        ODDR2 #(
-                .DDR_ALIGNMENT("NONE"),
-                .INIT(1'b0),
-                .SRTYPE("SYNC")
-        ) ODDR2_inst_CK_N (
-                .Q(sd_CK_N),
-                .C0(clk0),
-                .C1(clk180),
-                .CE(1'b1),
-                .D0(1'b1),
-                .D1(1'b0),
-                .R(1'b0),
-                .S(1'b0)
-        );
-
-/***************************************************		
+/***************************************************
  * De-duplex of the data path
  * For some reason, for read, the output is CL=2.5, not CL=2
  * Thus, catching of the data is 1/2 a cycle late.

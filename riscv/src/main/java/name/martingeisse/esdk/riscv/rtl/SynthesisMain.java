@@ -8,6 +8,7 @@ import name.martingeisse.esdk.core.rtl.signal.*;
 import name.martingeisse.esdk.core.rtl.synthesis.prettify.RtlPrettifier;
 import name.martingeisse.esdk.core.rtl.synthesis.xilinx.ProjectGenerator;
 import name.martingeisse.esdk.core.rtl.synthesis.xilinx.XilinxPinConfiguration;
+import name.martingeisse.esdk.core.util.vector.VectorValue;
 import name.martingeisse.esdk.library.SignalLogger;
 import name.martingeisse.esdk.library.SignalLoggerBusInterface;
 import name.martingeisse.esdk.riscv.rtl.terminal.KeyboardController;
@@ -58,34 +59,34 @@ public class SynthesisMain {
         RtlModuleInstance ramController = new RtlModuleInstance(realm, "ddr_sdram");
 
         // generate DDR clock signal CK_P
-//		RtlModuleInstance sdramCkpDdr = new RtlModuleInstance(realm, "ODDR2");
-//		sdramCkpDdr.getParameters().put("DDR_ALIGNMENT", "NONE");
-//		sdramCkpDdr.getParameters().put("INIT", RtlVectorConstant.of(realm, 1, 0));
-//		sdramCkpDdr.getParameters().put("SRTYPE", "SYNC");
-//		sdramCkpDdr.setName("sdramCkpDdr");
-//		ramOutputPin(realm, "J5", sdramCkpDdr.createBitOutputPort("Q"));
-//		sdramCkpDdr.createBitInputPort("C0", ddrClk180);
-//		sdramCkpDdr.createBitInputPort("C1", ddrClk0);
-//		sdramCkpDdr.createBitInputPort("CE", new RtlBitConstant(realm, true));
-//		sdramCkpDdr.createBitInputPort("D0", new RtlBitConstant(realm, true));
-//		sdramCkpDdr.createBitInputPort("D1", new RtlBitConstant(realm, false));
-//		sdramCkpDdr.createBitInputPort("R", new RtlBitConstant(realm, false));
-//		sdramCkpDdr.createBitInputPort("S", new RtlBitConstant(realm, false));
+		RtlModuleInstance sdramCkpDdr = new RtlModuleInstance(realm, "ODDR2");
+		sdramCkpDdr.getParameters().put("DDR_ALIGNMENT", "NONE");
+		sdramCkpDdr.getParameters().put("INIT", VectorValue.of(1, 0));
+		sdramCkpDdr.getParameters().put("SRTYPE", "SYNC");
+		sdramCkpDdr.setName("sdramCkpDdr");
+		ramOutputPin(realm, "J5", sdramCkpDdr.createBitOutputPort("Q"));
+		sdramCkpDdr.createBitInputPort("C0", ddrClk180);
+		sdramCkpDdr.createBitInputPort("C1", ddrClk0);
+		sdramCkpDdr.createBitInputPort("CE", new RtlBitConstant(realm, true));
+		sdramCkpDdr.createBitInputPort("D0", new RtlBitConstant(realm, true));
+		sdramCkpDdr.createBitInputPort("D1", new RtlBitConstant(realm, false));
+		sdramCkpDdr.createBitInputPort("R", new RtlBitConstant(realm, false));
+		sdramCkpDdr.createBitInputPort("S", new RtlBitConstant(realm, false));
 
 		// generate DDR clock signal CK_N
-//		RtlModuleInstance sdramCknDdr = new RtlModuleInstance(realm, "ODDR2");
-//		sdramCknDdr.getParameters().put("DDR_ALIGNMENT", "NONE");
-//		sdramCknDdr.getParameters().put("INIT", RtlVectorConstant.of(realm, 1, 0));
-//		sdramCknDdr.getParameters().put("SRTYPE", "SYNC");
-//		sdramCknDdr.setName("sdramCknDdr");
-//		ramOutputPin(realm, "J4", sdramCknDdr.createBitOutputPort("Q"));
-//		sdramCknDdr.createBitInputPort("C0", ddrClk0);
-//		sdramCknDdr.createBitInputPort("C1", ddrClk180);
-//		sdramCknDdr.createBitInputPort("CE", new RtlBitConstant(realm, true));
-//		sdramCknDdr.createBitInputPort("D0", new RtlBitConstant(realm, true));
-//		sdramCknDdr.createBitInputPort("D1", new RtlBitConstant(realm, false));
-//		sdramCknDdr.createBitInputPort("R", new RtlBitConstant(realm, false));
-//		sdramCknDdr.createBitInputPort("S", new RtlBitConstant(realm, false));
+		RtlModuleInstance sdramCknDdr = new RtlModuleInstance(realm, "ODDR2");
+		sdramCknDdr.getParameters().put("DDR_ALIGNMENT", "NONE");
+		sdramCknDdr.getParameters().put("INIT", VectorValue.of(1, 0));
+		sdramCknDdr.getParameters().put("SRTYPE", "SYNC");
+		sdramCknDdr.setName("sdramCknDdr");
+		ramOutputPin(realm, "J4", sdramCknDdr.createBitOutputPort("Q"));
+		sdramCknDdr.createBitInputPort("C0", ddrClk0);
+		sdramCknDdr.createBitInputPort("C1", ddrClk180);
+		sdramCknDdr.createBitInputPort("CE", new RtlBitConstant(realm, true));
+		sdramCknDdr.createBitInputPort("D0", new RtlBitConstant(realm, true));
+		sdramCknDdr.createBitInputPort("D1", new RtlBitConstant(realm, false));
+		sdramCknDdr.createBitInputPort("R", new RtlBitConstant(realm, false));
+		sdramCknDdr.createBitInputPort("S", new RtlBitConstant(realm, false));
 
 		// system signals
 		ramController.createBitInputPort("clk0", ddrClk0);
@@ -95,8 +96,6 @@ public class SynthesisMain {
 		ramController.createBitInputPort("reset", reset);
 
 		// SDRAM DDR interface
-        ramOutputPin(realm, "J5", ramController.createBitOutputPort("sd_CK_P"));
-        ramOutputPin(realm, "J4", ramController.createBitOutputPort("sd_CK_N"));
         ramOutputPin(realm, "K4", ramController.createBitOutputPort("sd_CS_O"));
         ramOutputPin(realm, "K3", ramController.createBitOutputPort("sd_CKE_O"));
         ramOutputPin(realm, "C1", ramController.createBitOutputPort("sd_RAS_O"));
