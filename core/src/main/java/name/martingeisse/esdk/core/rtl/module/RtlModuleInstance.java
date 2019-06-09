@@ -7,6 +7,7 @@ package name.martingeisse.esdk.core.rtl.module;
 import name.martingeisse.esdk.core.rtl.RtlClockedItem;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
+import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.*;
@@ -81,6 +82,10 @@ public final class RtlModuleInstance extends RtlItem {
 
 	public RtlInstanceBitInputPort createBitInputPort(String portName, RtlBitSignal assignedSignal) {
 		return new RtlInstanceBitInputPort(this, portName, assignedSignal);
+	}
+
+	public RtlInstanceBitInputPort createBitInputPort(String portName, boolean constantValue) {
+		return createBitInputPort(portName, new RtlBitConstant(getRealm(), constantValue));
 	}
 
 	public RtlInstanceVectorInputPort createVectorInputPort(String portName, int width) {

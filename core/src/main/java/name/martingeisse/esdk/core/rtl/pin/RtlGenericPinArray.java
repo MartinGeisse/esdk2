@@ -7,8 +7,6 @@ package name.martingeisse.esdk.core.rtl.pin;
 import com.google.common.collect.ImmutableList;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
-import name.martingeisse.esdk.core.rtl.module.RtlInstancePort;
-import name.martingeisse.esdk.core.rtl.module.RtlModuleInstance;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.SignalUsageConsumer;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.SynthesisPreparationContext;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.ToplevelPortConsumer;
@@ -20,25 +18,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This is a special case of an array of bidirectional pins that is directly connected to a (vector-typed)
- * bidirectional module port.
- *
- * TODO
+ * A generic array of pins that are neither assigned an output signal nor can be used as an input signal. Custom code
+ * is needed to make use of these pins.
  */
-public final class RtlBidirectionalModulePortPinArray extends RtlItem {
+public final class RtlGenericPinArray extends RtlItem {
 
-	private final RtlInstancePort port;
+	private final String verilogDirectionKeyword;
 	private final String netName;
 	private final ImmutableList<RtlPin> pins;
 
-	public RtlBidirectionalModulePortPinArray(RtlRealm realm, RtlModuleInstance moduleInstance, String portName, String netName, String... pinIds) {
+	public RtlGenericPinArray(RtlRealm realm, String verilogDirectionKeyword, String netName, String... pinIds) {
 		super(realm);
-		port = new RtlInstancePort(moduleInstance, portName) {
-			@Override
-			protected void printPortAssignment(VerilogWriter out) {
-				out.print("." + getPortName() + "(" + netName + ")");
-			}
-		};
+		this.verilogDirectionKeyword = verilogDirectionKeyword;
 		this.netName = netName;
 		List<RtlPin> pins = new ArrayList<>();
 		for (int i = 0; i < pinIds.length; i++) {
@@ -62,8 +53,8 @@ public final class RtlBidirectionalModulePortPinArray extends RtlItem {
 		this.pins = ImmutableList.copyOf(pins);
 	}
 
-	public RtlInstancePort getPort() {
-		return port;
+	public String getVerilogDirectionKeyword() {
+		return verilogDirectionKeyword;
 	}
 
 	public String getNetName() {
@@ -93,7 +84,7 @@ public final class RtlBidirectionalModulePortPinArray extends RtlItem {
 
 			@Override
 			public void analyzeToplevelPorts(ToplevelPortConsumer consumer) {
-				consumer.consumePort("inout", netName, pins.size());
+				consumer.consumePort(verilogDirectionKeyword, netName, pins.size());
 			}
 
 			@Override

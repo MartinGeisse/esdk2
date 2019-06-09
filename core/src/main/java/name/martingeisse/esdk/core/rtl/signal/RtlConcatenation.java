@@ -13,6 +13,9 @@ import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionNestin
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Note: Unlike other object fields, the list of signals must be determined in advance. This is to ensure that the
  * result width doesn't change.
@@ -94,9 +97,14 @@ public final class RtlConcatenation extends RtlItem implements RtlVectorSignal {
 		if (width == 0) {
 			throw new RuntimeException("cannot print zero-width concatenation");
 		}
+
+		// XST cannot handle zero-width vectors
+		List<RtlSignal> nonzeroWidthSignals = new ArrayList<>(signals);
+		nonzeroWidthSignals.removeIf(signal -> (signal instanceof RtlVectorSignal) && (((RtlVectorSignal) signal).getWidth() == 0));
+
 		out.print('{');
 		boolean first = true;
-		for (RtlSignal signal : signals) {
+		for (RtlSignal signal : nonzeroWidthSignals) {
 			if (first) {
 				first = false;
 			} else {
