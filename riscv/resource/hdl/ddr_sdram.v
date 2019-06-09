@@ -48,20 +48,24 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-module ddr_sdram(sd_A_O, sd_BA_O, sd_D_IO,
+module ddr_sdram(sd_A_O, sd_BA_O,
                  sd_RAS_O, sd_CAS_O, sd_WE_O,
-                 sd_UDM_O, sd_LDM_O, 
+                 sd_UDM_O, sd_LDM_O,
                  sd_UDQS_IO, sd_LDQS_IO,
                  sd_CS_O, sd_CKE_O,
                  clk0, clk90,
                  clk180, clk270,
                  reset,
                  wADR_I, wSTB_I, wWE_I, wWRB_I,
-                 wDAT_I, wDAT_O, wACK_O);
+                 wDAT_I, wDAT_O, wACK_O,
+
+                 ddrInterfaceDataIn,
+                 ddrInterfaceDataOut,
+                 ddrInterfaceDataOutEnable
+                 );
 	// interface to DDR SDRAM memory
 	output 	[12:0] sd_A_O;
 	output 	[1:0]  sd_BA_O;
-	inout 	[15:0] sd_D_IO;
 	output	sd_RAS_O;
 	output  sd_CAS_O;
 	output  sd_WE_O;
@@ -90,6 +94,11 @@ module ddr_sdram(sd_A_O, sd_BA_O, sd_D_IO,
 	input	[31:0] wDAT_I;
 	output	[31:0] wDAT_O;
 	output	wACK_O;
+	//
+	//
+	input[31:0] ddrInterfaceDataIn;
+	output[31:0] ddrInterfaceDataOut;
+	output ddrInterfaceDataOutEnable;
 
 	// Local data storage
 	reg		[5:0] sd_state;
@@ -110,7 +119,7 @@ module ddr_sdram(sd_A_O, sd_BA_O, sd_D_IO,
 	reg		[3:0] refresh_queue;	// Number of refresh command to queue
 	reg		refresh_now;
 	reg		refresh_ack;
-	
+
 	reg		[31:0] D_rd_reg;
 	reg		DQS_state;
 	reg		DQS_oe;			// 1 for output
@@ -128,62 +137,11 @@ module ddr_sdram(sd_A_O, sd_BA_O, sd_D_IO,
  * on data_mux_latch
  ***************************************************/
 
-	// Data from SDRAM will be loaded at {data_mux_out[31:0]}
-	wire	[31:0] data_mux_out;
-	wire	[15:0] iddr_conn;
-	wire	[15:0] oddr_conn;
+    assign ddrInterfaceDataOut = D_wr_reg;
+    assign ddrInterfaceDataOutEnable = D_oe;
 
 
-	generate
-	genvar i;
 
-		for(i=0;i<16;i=i+1)
-		begin : iou
-			IDDR2 #(
-				.DDR_ALIGNMENT("NONE"), // Sets output alignment to "NONE", "C0" or "C1"
-				.INIT_Q0(1'b0), 		// Sets initial state of the Q0 output to 1'b0 or 1'b1
-				.INIT_Q1(1'b0), 		// Sets initial state of the Q1 output to 1'b0 or 1'b1
-				.SRTYPE("SYNC") 		// Specifies "SYNC" or "ASYNC" set/reset
-			) IDDR2_inst (
-				.Q0(data_mux_out[i]), 				// C0 clock
-				.Q1(data_mux_out[i+16]), 			// C1 clock
-				.C0(clk180),		
-				.C1(clk0),
-				.CE(1'b1),				// Always enabled
-				.D(iddr_conn[i]), 		// 1-bit DDR data input
-				.R(1'b0), 				// 1-bit reset input
-				.S(1'b0) 				// 1-bit set input
-			);
-
-			ODDR2 #(
-				.DDR_ALIGNMENT("NONE"), // Sets output alignment to "NONE", "C0" or "C1"
-				.INIT(1'b0), 			// Sets initial state of the Q output to 1'b0 or 1'b1
-				.SRTYPE("SYNC") 		// Specifies "SYNC" or "ASYNC" set/reset
-			) ODDR2_inst (
-				.Q(oddr_conn[i]),		// 1-bit DDR output data
-				.C0(clk90),			// 1-bit clock input
-				.C1(clk270), 		// 1-bit clock input
-				.CE(1'b1), 				// 1-bit clock enable input
-				.D0(D_wr_reg[i]),		// (associated with C0)
-				.D1(D_wr_reg[i+16]),	// (associated with C1)
-				.R(1'b0), 				// 1-bit reset input
-				.S(1'b0)				// 1-bit set input
-			);
-
-			IOBUF #(
-				.DRIVE(4), 				// Specify the output drive strength
-				.IBUF_DELAY_VALUE("0"), // Specify the amount of added input delay
-				.IFD_DELAY_VALUE("AUTO"), // Specify the amount of added delay for input register, "AUTO", "0"-"8"
-				.IOSTANDARD("DEFAULT"), // Specify the I/O standard
-				.SLEW("SLOW") 			// Specify the output slew rate
-			) IOBUF_inst (
-				.O(iddr_conn[i]), 		// Buffer output
-				.IO(sd_D_IO[i]), 		// Buffer inout port (connect directly to top-level port)
-				.I(oddr_conn[i]), 		// Buffer input
-				.T(~D_oe) 				// 3-state enable input
-			);
-		end
-	endgenerate
 
 
 	wire sd_UDQS_O;
@@ -191,65 +149,65 @@ module ddr_sdram(sd_A_O, sd_BA_O, sd_D_IO,
 
 		ODDR2 #(
 			.DDR_ALIGNMENT("NONE"),
-			.INIT(1'b0), 		
-			.SRTYPE("SYNC") 
+			.INIT(1'b0),
+			.SRTYPE("SYNC")
 		) ODDR2_inst_UDQS (
 			.Q(sd_UDQS_O),
-			.C0(clk180),	
+			.C0(clk180),
 			.C1(clk0),
-			.CE(1'b1), 	
-			.D0(DQS_state),	
+			.CE(1'b1),
+			.D0(DQS_state),
 			.D1(1'b0),
-			.R(1'b0), 		
-			.S(1'b0)	
+			.R(1'b0),
+			.S(1'b0)
 		);
 
 		ODDR2 #(
 			.DDR_ALIGNMENT("NONE"),
-			.INIT(1'b0), 		
-			.SRTYPE("SYNC") 
+			.INIT(1'b0),
+			.SRTYPE("SYNC")
 		) ODDR2_inst_LDQS (
 			.Q(sd_LDQS_O),
-			.C0(clk180),	
+			.C0(clk180),
 			.C1(clk0),
-			.CE(1'b1), 	
-			.D0(DQS_state),	
+			.CE(1'b1),
+			.D0(DQS_state),
 			.D1(1'b0),
-			.R(1'b0), 		
-			.S(1'b0)	
+			.R(1'b0),
+			.S(1'b0)
 		);
 
 		IOBUF #(
-			.DRIVE(4), 	
-			.IBUF_DELAY_VALUE("0"), 
+			.DRIVE(4),
+			.IBUF_DELAY_VALUE("0"),
 			.IFD_DELAY_VALUE("AUTO"),
-			.IOSTANDARD("DEFAULT"), 
-			.SLEW("SLOW") 		
+			.IOSTANDARD("DEFAULT"),
+			.SLEW("SLOW")
 		) IOBUF_inst_UDQS (
 			// .O() intentionally not connected
-			.IO(sd_UDQS_IO), 
+			.IO(sd_UDQS_IO),
 			.I(sd_UDQS_O),
-			.T(~DQS_oe) 		
+			.T(~DQS_oe)
 		);
 
 		IOBUF #(
-			.DRIVE(4), 	
-			.IBUF_DELAY_VALUE("0"), 
+			.DRIVE(4),
+			.IBUF_DELAY_VALUE("0"),
 			.IFD_DELAY_VALUE("AUTO"),
-			.IOSTANDARD("DEFAULT"), 
-			.SLEW("SLOW") 		
+			.IOSTANDARD("DEFAULT"),
+			.SLEW("SLOW")
 		) IOBUF_inst_LDQS (
 			// .O() intentionally not connected
-			.IO(sd_LDQS_IO), 
+			.IO(sd_LDQS_IO),
 			.I(sd_LDQS_O),
-			.T(~DQS_oe) 		
+			.T(~DQS_oe)
 		);
 
 
 	reg [31:0] data_mux_latch;
 	always @ (posedge clk180)
 	begin
-		data_mux_latch <= data_mux_out;
+		data_mux_latch <= ddrInterfaceDataIn;
 	end
 
 /***************************************************		
