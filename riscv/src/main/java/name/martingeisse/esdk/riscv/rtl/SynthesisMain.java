@@ -11,6 +11,7 @@ import name.martingeisse.esdk.core.rtl.synthesis.xilinx.XilinxPinConfiguration;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 import name.martingeisse.esdk.library.SignalLogger;
 import name.martingeisse.esdk.library.SignalLoggerBusInterface;
+import name.martingeisse.esdk.riscv.rtl.ram.RamController;
 import name.martingeisse.esdk.riscv.rtl.terminal.KeyboardController;
 import name.martingeisse.esdk.riscv.rtl.terminal.Ps2Connector;
 import name.martingeisse.esdk.riscv.rtl.terminal.TextDisplayController;
@@ -56,76 +57,7 @@ public class SynthesisMain {
 		//
         // SDRAM
         //
-        RtlModuleInstance ramController = new RtlModuleInstance(realm, "ddr_sdram");
-
-        // generate DDR clock signal CK_P
-		RtlModuleInstance sdramCkpDdr = new RtlModuleInstance(realm, "ODDR2");
-		sdramCkpDdr.getParameters().put("DDR_ALIGNMENT", "NONE");
-		sdramCkpDdr.getParameters().put("INIT", VectorValue.of(1, 0));
-		sdramCkpDdr.getParameters().put("SRTYPE", "SYNC");
-		sdramCkpDdr.setName("sdramCkpDdr");
-		ramOutputPin(realm, "J5", sdramCkpDdr.createBitOutputPort("Q"));
-		sdramCkpDdr.createBitInputPort("C0", ddrClk180);
-		sdramCkpDdr.createBitInputPort("C1", ddrClk0);
-		sdramCkpDdr.createBitInputPort("CE", new RtlBitConstant(realm, true));
-		sdramCkpDdr.createBitInputPort("D0", new RtlBitConstant(realm, true));
-		sdramCkpDdr.createBitInputPort("D1", new RtlBitConstant(realm, false));
-		sdramCkpDdr.createBitInputPort("R", new RtlBitConstant(realm, false));
-		sdramCkpDdr.createBitInputPort("S", new RtlBitConstant(realm, false));
-
-		// generate DDR clock signal CK_N
-		RtlModuleInstance sdramCknDdr = new RtlModuleInstance(realm, "ODDR2");
-		sdramCknDdr.getParameters().put("DDR_ALIGNMENT", "NONE");
-		sdramCknDdr.getParameters().put("INIT", VectorValue.of(1, 0));
-		sdramCknDdr.getParameters().put("SRTYPE", "SYNC");
-		sdramCknDdr.setName("sdramCknDdr");
-		ramOutputPin(realm, "J4", sdramCknDdr.createBitOutputPort("Q"));
-		sdramCknDdr.createBitInputPort("C0", ddrClk0);
-		sdramCknDdr.createBitInputPort("C1", ddrClk180);
-		sdramCknDdr.createBitInputPort("CE", new RtlBitConstant(realm, true));
-		sdramCknDdr.createBitInputPort("D0", new RtlBitConstant(realm, true));
-		sdramCknDdr.createBitInputPort("D1", new RtlBitConstant(realm, false));
-		sdramCknDdr.createBitInputPort("R", new RtlBitConstant(realm, false));
-		sdramCknDdr.createBitInputPort("S", new RtlBitConstant(realm, false));
-
-		// system signals
-		ramController.createBitInputPort("clk0", ddrClk0);
-		ramController.createBitInputPort("clk90", ddrClk90);
-		ramController.createBitInputPort("clk180", ddrClk180);
-		ramController.createBitInputPort("clk270", ddrClk270);
-		ramController.createBitInputPort("reset", reset);
-
-		// SDRAM DDR interface
-        ramOutputPin(realm, "K4", ramController.createBitOutputPort("sd_CS_O"));
-        ramOutputPin(realm, "K3", ramController.createBitOutputPort("sd_CKE_O"));
-        ramOutputPin(realm, "C1", ramController.createBitOutputPort("sd_RAS_O"));
-        ramOutputPin(realm, "C2", ramController.createBitOutputPort("sd_CAS_O"));
-        ramOutputPin(realm, "D1", ramController.createBitOutputPort("sd_WE_O"));
-        ramOutputPin(realm, "J1", ramController.createBitOutputPort("sd_UDM_O"));
-        ramOutputPin(realm, "J2", ramController.createBitOutputPort("sd_LDM_O"));
-        ramOutputPinArray(realm, ramController.createVectorOutputPort("sd_A_O", 13),
-                "T1", "R3", "R2", "P1", "F4", "H4", "H3", "H1", "H2", "N4", "T2", "N5", "P2");
-        ramOutputPinArray(realm, ramController.createVectorOutputPort("sd_BA_O", 2), "K5", "K6");
-        ramBidirectionalPin(realm, "G3", ramController, "sd_UDQS_IO");
-        ramBidirectionalPin(realm, "L6", ramController, "sd_LDQS_IO");
-		RtlBidirectionalModulePortPinArray ramDataPinArray = new RtlBidirectionalModulePortPinArray(
-			realm, ramController, "sd_D_IO", "sd_D_IO",
-				"L2", "L1", "L3", "L4", "M3", "M4", "M5", "M6", "E2", "E1", "F1", "F2", "G6", "G5", "H6", "H5"
-		);
-		for (RtlPin pin : ramDataPinArray.getPins()) {
-			XilinxPinConfiguration configuration = new XilinxPinConfiguration();
-			configuration.setIostandard("SSTL2_I");
-			pin.setConfiguration(configuration);
-		}
-
-        // internal Wishbone interface
-        ramController.createBitInputPort("wSTB_I", computerModule._bigRam.getEnable());
-        ramController.createVectorInputPort("wADR_I", 24, computerModule._bigRam.getWordAddress());
-        ramController.createBitInputPort("wWE_I", computerModule._bigRam.getWrite());
-        ramController.createVectorInputPort("wDAT_I", 32, computerModule._bigRam.getWriteData());
-        ramController.createVectorInputPort("wWRB_I", 4, computerModule._bigRam.getWriteMask());
-        computerModule._bigRam.getReadData().setConnected(ramController.createVectorOutputPort("wDAT_O", 32));
-        computerModule._bigRam.getAcknowledge().setConnected(ramController.createBitOutputPort("wACK_O"));
+		new RamController(realm, ddrClk0, ddrClk90, ddrClk180, ddrClk270, reset, computerModule._bigRam);
 
         //
 		// signal logger
@@ -193,45 +125,6 @@ public class SynthesisMain {
 		pin.setId(id);
 		pin.setConfiguration(configuration);
 		return pin;
-	}
-
-	private static RtlInputPin ramInputPin(RtlRealm realm, String id) {
-		XilinxPinConfiguration configuration = new XilinxPinConfiguration();
-		configuration.setIostandard("SSTL2_I");
-		RtlInputPin pin = new RtlInputPin(realm);
-		pin.setId(id);
-		pin.setConfiguration(configuration);
-		return pin;
-	}
-
-	private static RtlOutputPin ramOutputPin(RtlRealm realm, String id, RtlBitSignal outputSignal) {
-		XilinxPinConfiguration configuration = new XilinxPinConfiguration();
-		configuration.setIostandard("SSTL2_I");
-		RtlOutputPin pin = new RtlOutputPin(realm);
-		pin.setId(id);
-		pin.setConfiguration(configuration);
-		pin.setOutputSignal(outputSignal);
-		return pin;
-	}
-
-	private static RtlBidirectionalModulePortPin ramBidirectionalPin(RtlRealm realm, String pinId, RtlModuleInstance moduleInstance, String portName) {
-		XilinxPinConfiguration configuration = new XilinxPinConfiguration();
-		configuration.setIostandard("SSTL2_I");
-        RtlBidirectionalModulePortPin pin = new RtlBidirectionalModulePortPin(realm, moduleInstance, portName);
-		pin.setId(pinId);
-		pin.setConfiguration(configuration);
-		return pin;
-	}
-
-	private static void ramOutputPinArray(RtlRealm realm, RtlVectorSignal outputSignal, String... ids) {
-		if (ids.length != outputSignal.getWidth()) {
-			throw new IllegalArgumentException("vector width (" + outputSignal.getWidth() +
-					") does not match number of pin IDs (" + ids.length + ")");
-		}
-		for (int i = 0; i < outputSignal.getWidth(); i++) {
-			RtlBitSignal bitSignal = new RtlConstantIndexSelection(realm, outputSignal, i);
-			ramOutputPin(realm, ids[i], bitSignal);
-		}
 	}
 
 }
