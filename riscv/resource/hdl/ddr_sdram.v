@@ -61,7 +61,10 @@ module ddr_sdram(sd_A_O, sd_BA_O,
 
                  ddrInterfaceDataIn,
                  ddrInterfaceDataOut,
-                 ddrInterfaceDataOutEnable
+                 ddrInterfaceDataOutEnable,
+                 ddrInterfaceDataStrobe,
+                 ddrInterfaceDataStrobeEnable
+
                  );
 	// interface to DDR SDRAM memory
 	output 	[12:0] sd_A_O;
@@ -99,6 +102,8 @@ module ddr_sdram(sd_A_O, sd_BA_O,
 	input[31:0] ddrInterfaceDataIn;
 	output[31:0] ddrInterfaceDataOut;
 	output ddrInterfaceDataOutEnable;
+    output ddrInterfaceDataStrobe;
+    output ddrInterfaceDataStrobeEnable;
 
 	// Local data storage
 	reg		[5:0] sd_state;
@@ -139,69 +144,9 @@ module ddr_sdram(sd_A_O, sd_BA_O,
 
     assign ddrInterfaceDataOut = D_wr_reg;
     assign ddrInterfaceDataOutEnable = D_oe;
+    assign ddrInterfaceDataStrobe = DQS_state;
+    assign ddrInterfaceDataStrobeEnable = DQS_oe;
 
-
-
-
-
-	wire sd_UDQS_O;
-	wire sd_LDQS_O;
-
-		ODDR2 #(
-			.DDR_ALIGNMENT("NONE"),
-			.INIT(1'b0),
-			.SRTYPE("SYNC")
-		) ODDR2_inst_UDQS (
-			.Q(sd_UDQS_O),
-			.C0(clk180),
-			.C1(clk0),
-			.CE(1'b1),
-			.D0(DQS_state),
-			.D1(1'b0),
-			.R(1'b0),
-			.S(1'b0)
-		);
-
-		ODDR2 #(
-			.DDR_ALIGNMENT("NONE"),
-			.INIT(1'b0),
-			.SRTYPE("SYNC")
-		) ODDR2_inst_LDQS (
-			.Q(sd_LDQS_O),
-			.C0(clk180),
-			.C1(clk0),
-			.CE(1'b1),
-			.D0(DQS_state),
-			.D1(1'b0),
-			.R(1'b0),
-			.S(1'b0)
-		);
-
-		IOBUF #(
-			.DRIVE(4),
-			.IBUF_DELAY_VALUE("0"),
-			.IFD_DELAY_VALUE("AUTO"),
-			.IOSTANDARD("DEFAULT"),
-			.SLEW("SLOW")
-		) IOBUF_inst_UDQS (
-			// .O() intentionally not connected
-			.IO(sd_UDQS_IO),
-			.I(sd_UDQS_O),
-			.T(~DQS_oe)
-		);
-
-		IOBUF #(
-			.DRIVE(4),
-			.IBUF_DELAY_VALUE("0"),
-			.IFD_DELAY_VALUE("AUTO"),
-			.IOSTANDARD("DEFAULT"),
-			.SLEW("SLOW")
-		) IOBUF_inst_LDQS (
-			// .O() intentionally not connected
-			.IO(sd_LDQS_IO),
-			.I(sd_LDQS_O),
-			.T(~DQS_oe)
-		);
 
 
 	reg [31:0] data_mux_latch;

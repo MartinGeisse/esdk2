@@ -57,7 +57,7 @@ public class RamController extends RtlItem {
         sdramCknDdr.createBitInputPort("S", false);
 
         //
-        // data I/O pins IOBUFs, IDDRs/ODDRs
+        // data I/O pins, IOBUFs, IDDRs/ODDRs
         //
 
         // pins
@@ -138,6 +138,65 @@ public class RamController extends RtlItem {
         controllerCore.createVectorInputPort("ddrInterfaceDataIn", 32, upperDataBits.concat(lowerDataBits));
 
         //
+        // data strobe pins (LDQS, UDQS) and corresponding IOBUFs and ODDRs
+        //
+
+        RtlBitSignal dqsState = controllerCore.createBitOutputPort("ddrInterfaceDataStrobe");
+        RtlBitSignal dqsThreestate = controllerCore.createBitOutputPort("ddrInterfaceDataStrobeEnable").not();
+        {
+            RtlModuleInstance oddr = new RtlModuleInstance(realm, "ODDR2");
+            oddr.getParameters().put("DDR_ALIGNMENT", "NONE");
+            oddr.getParameters().put("INIT", VectorValue.of(1, 0));
+            oddr.getParameters().put("SRTYPE", "SYNC");
+            oddr.createBitInputPort("C0", ddrClk180);
+            oddr.createBitInputPort("C1", ddrClk0);
+            oddr.createBitInputPort("CE", true);
+            oddr.createBitInputPort("R", false);
+            oddr.createBitInputPort("S", false);
+            oddr.createBitInputPort("D0", dqsState);
+            oddr.createBitInputPort("D1", false);
+            RtlBitSignal outputDdrBit = oddr.createBitOutputPort("Q");
+
+            RtlModuleInstance iobuf = new RtlModuleInstance(realm, "IOBUF");
+            iobuf.getParameters().put("DRIVE", 4);
+            iobuf.getParameters().put("IBUF_DELAY_VALUE", "0");
+            iobuf.getParameters().put("IFD_DELAY_VALUE", "AUTO");
+            iobuf.getParameters().put("IOSTANDARD", "DEFAULT");
+            iobuf.getParameters().put("SLEW", "SLOW");
+            // port "O" (input from SDRAM) intentionally not connected like in the original controller, but actually
+            // this should be fed to a DCM, phase-shifted and used to sample read data
+            iobuf.createBitInputPort("I", outputDdrBit);
+            iobuf.createBitInputPort("T", dqsThreestate);
+            ramBidirectionalPin(realm, "G3", iobuf, "IO");
+        }
+        {
+            RtlModuleInstance oddr = new RtlModuleInstance(realm, "ODDR2");
+            oddr.getParameters().put("DDR_ALIGNMENT", "NONE");
+            oddr.getParameters().put("INIT", VectorValue.of(1, 0));
+            oddr.getParameters().put("SRTYPE", "SYNC");
+            oddr.createBitInputPort("C0", ddrClk180);
+            oddr.createBitInputPort("C1", ddrClk0);
+            oddr.createBitInputPort("CE", true);
+            oddr.createBitInputPort("R", false);
+            oddr.createBitInputPort("S", false);
+            oddr.createBitInputPort("D0", dqsState);
+            oddr.createBitInputPort("D1", false);
+            RtlBitSignal outputDdrBit = oddr.createBitOutputPort("Q");
+
+            RtlModuleInstance iobuf = new RtlModuleInstance(realm, "IOBUF");
+            iobuf.getParameters().put("DRIVE", 4);
+            iobuf.getParameters().put("IBUF_DELAY_VALUE", "0");
+            iobuf.getParameters().put("IFD_DELAY_VALUE", "AUTO");
+            iobuf.getParameters().put("IOSTANDARD", "DEFAULT");
+            iobuf.getParameters().put("SLEW", "SLOW");
+            // port "O" (input from SDRAM) intentionally not connected like in the original controller, but actually
+            // this should be fed to a DCM, phase-shifted and used to sample read data
+            iobuf.createBitInputPort("I", outputDdrBit);
+            iobuf.createBitInputPort("T", dqsThreestate);
+            ramBidirectionalPin(realm, "L6", iobuf, "IO");
+        }
+
+        //
         // other stuff
         //
 
@@ -159,8 +218,8 @@ public class RamController extends RtlItem {
         ramOutputPinArray(realm, controllerCore.createVectorOutputPort("sd_A_O", 13),
                 "T1", "R3", "R2", "P1", "F4", "H4", "H3", "H1", "H2", "N4", "T2", "N5", "P2");
         ramOutputPinArray(realm, controllerCore.createVectorOutputPort("sd_BA_O", 2), "K5", "K6");
-        ramBidirectionalPin(realm, "G3", controllerCore, "sd_UDQS_IO");
-        ramBidirectionalPin(realm, "L6", controllerCore, "sd_LDQS_IO");
+        // ramBidirectionalPin(realm, "G3", controllerCore, "sd_UDQS_IO");
+        // ramBidirectionalPin(realm, "L6", controllerCore, "sd_LDQS_IO");
 
         // internal Wishbone interface
         controllerCore.createBitInputPort("wSTB_I", adapter.getEnable());
