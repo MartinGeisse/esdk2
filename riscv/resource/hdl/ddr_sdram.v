@@ -60,8 +60,9 @@ module ddr_sdram(sd_A_O, sd_BA_O,
                  wDAT_I, wDAT_O, wACK_O,
 
                  ddrInterfaceDataIn,
-                 ddrInterfaceDataOut,
                  ddrInterfaceDataOutEnable,
+                 ddrInterfaceDataOut,
+                 ddrInterfaceDataOutMask,
                  ddrInterfaceDataStrobe,
                  ddrInterfaceDataStrobeEnable
 
@@ -100,8 +101,9 @@ module ddr_sdram(sd_A_O, sd_BA_O,
 	//
 	//
 	input[31:0] ddrInterfaceDataIn;
-	output[31:0] ddrInterfaceDataOut;
 	output ddrInterfaceDataOutEnable;
+	output[31:0] ddrInterfaceDataOut;
+	output[3:0] ddrInterfaceDataOutMask;
     output ddrInterfaceDataStrobe;
     output ddrInterfaceDataStrobeEnable;
 
@@ -142,8 +144,9 @@ module ddr_sdram(sd_A_O, sd_BA_O,
  * on data_mux_latch
  ***************************************************/
 
-    assign ddrInterfaceDataOut = D_wr_reg;
     assign ddrInterfaceDataOutEnable = D_oe;
+    assign ddrInterfaceDataOut = D_wr_reg;
+    assign ddrInterfaceDataOutMask = ~D_mask_reg;
     assign ddrInterfaceDataStrobe = DQS_state;
     assign ddrInterfaceDataStrobeEnable = DQS_oe;
 
@@ -161,66 +164,6 @@ module ddr_sdram(sd_A_O, sd_BA_O,
 
 	assign wDAT_O = D_rd_reg[31:0];
 
-	// Mask output
-
-	wire		UDM_conn;
-	wire		LDM_conn;
-
-        ODDR2 #(
-                .DDR_ALIGNMENT("NONE"),
-                .INIT(1'b0),
-                .SRTYPE("SYNC")
-        ) ODDR2_inst_UDM (
-                .Q(UDM_conn),
-                .C0(clk90),
-                .C1(clk270),
-                .CE(1'b1),
-                .D0(~D_mask_reg[1]),
-                .D1(~D_mask_reg[3]),
-                .R(1'b0),
-                .S(1'b0)
-        );
-
-        ODDR2 #(
-                .DDR_ALIGNMENT("NONE"),
-                .INIT(1'b0),
-                .SRTYPE("SYNC")
-        ) ODDR2_inst_LDM (
-                .Q(LDM_conn),
-                .C0(clk90),
-                .C1(clk270),
-                .CE(1'b1),
-                .D0(~D_mask_reg[0]),
-                .D1(~D_mask_reg[2]),
-                .R(1'b0),
-                .S(1'b0)
-        );
-
-        IOBUF #(
-                .DRIVE(4),
-                .IBUF_DELAY_VALUE("0"),
-                .IFD_DELAY_VALUE("AUTO"),
-                .IOSTANDARD("DEFAULT"),
-                .SLEW("SLOW")
-        ) IOBUF_inst_UDM (
-                // .O() intentionally not connected
-                .IO(sd_UDM_O),
-                .I(UDM_conn),
-                .T(1'b0)
-        );
-
-        IOBUF #(
-                .DRIVE(4),
-                .IBUF_DELAY_VALUE("0"),
-                .IFD_DELAY_VALUE("AUTO"),
-                .IOSTANDARD("DEFAULT"),
-                .SLEW("SLOW")
-        ) IOBUF_inst_LDM (
-                // .O() intentionally not connected
-                .IO(sd_LDM_O),
-                .I(LDM_conn),
-                .T(1'b0)
-        );
 
 
 /***************************************************		

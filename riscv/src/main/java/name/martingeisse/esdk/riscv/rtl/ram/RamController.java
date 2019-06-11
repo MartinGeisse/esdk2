@@ -141,7 +141,72 @@ public class RamController extends RtlItem {
         // write data masks (follow the same timing as write data) and corresponding IOBUFs and ODDRs
         //
 
+        RtlVectorSignal ddrInterfaceDataOutMask = controllerCore.createVectorOutputPort("ddrInterfaceDataOutMask", 4);
+
         // TODO
+        /*
+	// Mask output
+
+	wire		UDM_conn;
+	wire		LDM_conn;
+
+        ODDR2 #(
+                .DDR_ALIGNMENT("NONE"),
+                .INIT(1'b0),
+                .SRTYPE("SYNC")
+        ) ODDR2_inst_UDM (
+                .Q(UDM_conn),
+                .C0(clk90),
+                .C1(clk270),
+                .CE(1'b1),
+                .D0(~D_mask_reg[1]),
+                .D1(~D_mask_reg[3]),
+                .R(1'b0),
+                .S(1'b0)
+        );
+
+        ODDR2 #(
+                .DDR_ALIGNMENT("NONE"),
+                .INIT(1'b0),
+                .SRTYPE("SYNC")
+        ) ODDR2_inst_LDM (
+                .Q(LDM_conn),
+                .C0(clk90),
+                .C1(clk270),
+                .CE(1'b1),
+                .D0(~D_mask_reg[0]),
+                .D1(~D_mask_reg[2]),
+                .R(1'b0),
+                .S(1'b0)
+        );
+
+        IOBUF #(
+                .DRIVE(4),
+                .IBUF_DELAY_VALUE("0"),
+                .IFD_DELAY_VALUE("AUTO"),
+                .IOSTANDARD("DEFAULT"),
+                .SLEW("SLOW")
+        ) IOBUF_inst_UDM (
+                // .O() intentionally not connected
+                .IO(sd_UDM_O),
+                .I(UDM_conn),
+                .T(1'b0)
+        );
+
+        IOBUF #(
+                .DRIVE(4),
+                .IBUF_DELAY_VALUE("0"),
+                .IFD_DELAY_VALUE("AUTO"),
+                .IOSTANDARD("DEFAULT"),
+                .SLEW("SLOW")
+        ) IOBUF_inst_LDM (
+                // .O() intentionally not connected
+                .IO(sd_LDM_O),
+                .I(LDM_conn),
+                .T(1'b0)
+        );
+
+         */
 
         //
         // data strobe pins (LDQS, UDQS) and corresponding IOBUFs and ODDRs
