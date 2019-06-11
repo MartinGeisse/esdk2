@@ -81,6 +81,16 @@ public class RamController extends RtlItem {
 
             RtlBitSignalConnector inputDdrBitConnector = new RtlBitSignalConnector(realm);
 
+            // TODO sampling at clk0 and clk180 seems wrong to me. The original ddr_sdram code said in a comment that
+            // with CL=2 the data could for some strange reason be sampled at 2.5 cycles after issuing a READ
+            // command, but it does not say whether the author expected 2 cycles or 2.25 cycles to be correct.
+            // The DDR spec would demand 2.25 cycles -- 2 cycles after the READ comes the positive DQS edge, 0.25
+            // cycles after that is the ideal time to sample read data. It would be relevant whether it was 2.0 or
+            // 2.25 that did not work for the original module; 2.0 would indicate a misunderstanding about
+            // DDR timing, while 2.25 would indicate a problem with how the SDRAM chip works or is connected.
+            //
+            // Note that the timing diagrams make DQS *look* like a clock-enable, but it is actually a clock signal
+            // that must be phase-shifted for reading.
             RtlModuleInstance iddr = new RtlModuleInstance(realm, "IDDR2");
             iddr.getParameters().put("DDR_ALIGNMENT", "NONE");
             iddr.getParameters().put("INIT_Q0", VectorValue.of(1, 0));
