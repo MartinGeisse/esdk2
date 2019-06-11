@@ -138,6 +138,12 @@ public class RamController extends RtlItem {
         controllerCore.createVectorInputPort("ddrInterfaceDataIn", 32, upperDataBits.concat(lowerDataBits));
 
         //
+        // write data masks (follow the same timing as write data) and corresponding IOBUFs and ODDRs
+        //
+
+        // TODO
+
+        //
         // data strobe pins (LDQS, UDQS) and corresponding IOBUFs and ODDRs
         //
 
