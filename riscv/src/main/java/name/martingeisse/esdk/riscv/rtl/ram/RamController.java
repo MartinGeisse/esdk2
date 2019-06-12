@@ -89,6 +89,11 @@ public class RamController extends RtlItem {
             // 2.25 that did not work for the original module; 2.0 would indicate a misunderstanding about
             // DDR timing, while 2.25 would indicate a problem with how the SDRAM chip works or is connected.
             //
+            // Note, though, that the above is only correct for the timing at the RAM chip pins. If you add the return
+            // delay back to the FPGA, things may look different. For example, assume that the return delay is
+            // around 2.5ns (0.25 cycles), then shifting DQS by another 0.25 cycles adds up to the 0.5 cycles that
+            // worked for the original controller.
+            //
             // Note that the timing diagrams make DQS *look* like a clock-enable, but it is actually a clock signal
             // that must be phase-shifted for reading.
             RtlModuleInstance iddr = new RtlModuleInstance(realm, "IDDR2");
