@@ -147,71 +147,58 @@ public class RamController extends RtlItem {
         //
 
         RtlVectorSignal ddrInterfaceDataOutMask = controllerCore.createVectorOutputPort("ddrInterfaceDataOutMask", 4);
+        { // UDM
+            RtlModuleInstance oddr = new RtlModuleInstance(realm, "ODDR2");
+            oddr.getParameters().put("DDR_ALIGNMENT", "NONE");
+            oddr.getParameters().put("INIT", VectorValue.of(1, 0));
+            oddr.getParameters().put("SRTYPE", "SYNC");
+            oddr.createBitInputPort("C0", ddrClk90);
+            oddr.createBitInputPort("C1", ddrClk270);
+            oddr.createBitInputPort("CE", true);
+            oddr.createBitInputPort("R", false);
+            oddr.createBitInputPort("S", false);
+            oddr.createBitInputPort("D0", ddrInterfaceDataOutMask.select(1));
+            oddr.createBitInputPort("D1", ddrInterfaceDataOutMask.select(3));
+            RtlBitSignal outputDdrBit = oddr.createBitOutputPort("Q");
 
-        // TODO
-        /*
-	// Mask output
+            RtlModuleInstance iobuf = new RtlModuleInstance(realm, "IOBUF");
+            iobuf.getParameters().put("DRIVE", 4);
+            iobuf.getParameters().put("IBUF_DELAY_VALUE", "0");
+            iobuf.getParameters().put("IFD_DELAY_VALUE", "AUTO");
+            iobuf.getParameters().put("IOSTANDARD", "DEFAULT");
+            iobuf.getParameters().put("SLEW", "SLOW");
+            // port "O" (input from SDRAM) intentionally not connected like in the original controller, but actually
+            // this should be fed to a DCM, phase-shifted and used to sample read data
+            iobuf.createBitInputPort("I", outputDdrBit);
+            iobuf.createBitInputPort("T", false);
+            ramBidirectionalPin(realm, "J1", iobuf, "IO");
+        }
+        { // LDM
+            RtlModuleInstance oddr = new RtlModuleInstance(realm, "ODDR2");
+            oddr.getParameters().put("DDR_ALIGNMENT", "NONE");
+            oddr.getParameters().put("INIT", VectorValue.of(1, 0));
+            oddr.getParameters().put("SRTYPE", "SYNC");
+            oddr.createBitInputPort("C0", ddrClk90);
+            oddr.createBitInputPort("C1", ddrClk270);
+            oddr.createBitInputPort("CE", true);
+            oddr.createBitInputPort("R", false);
+            oddr.createBitInputPort("S", false);
+            oddr.createBitInputPort("D0", ddrInterfaceDataOutMask.select(0));
+            oddr.createBitInputPort("D1", ddrInterfaceDataOutMask.select(2));
+            RtlBitSignal outputDdrBit = oddr.createBitOutputPort("Q");
 
-	wire		UDM_conn;
-	wire		LDM_conn;
-
-        ODDR2 #(
-                .DDR_ALIGNMENT("NONE"),
-                .INIT(1'b0),
-                .SRTYPE("SYNC")
-        ) ODDR2_inst_UDM (
-                .Q(UDM_conn),
-                .C0(clk90),
-                .C1(clk270),
-                .CE(1'b1),
-                .D0(~D_mask_reg[1]),
-                .D1(~D_mask_reg[3]),
-                .R(1'b0),
-                .S(1'b0)
-        );
-
-        ODDR2 #(
-                .DDR_ALIGNMENT("NONE"),
-                .INIT(1'b0),
-                .SRTYPE("SYNC")
-        ) ODDR2_inst_LDM (
-                .Q(LDM_conn),
-                .C0(clk90),
-                .C1(clk270),
-                .CE(1'b1),
-                .D0(~D_mask_reg[0]),
-                .D1(~D_mask_reg[2]),
-                .R(1'b0),
-                .S(1'b0)
-        );
-
-        IOBUF #(
-                .DRIVE(4),
-                .IBUF_DELAY_VALUE("0"),
-                .IFD_DELAY_VALUE("AUTO"),
-                .IOSTANDARD("DEFAULT"),
-                .SLEW("SLOW")
-        ) IOBUF_inst_UDM (
-                // .O() intentionally not connected
-                .IO(sd_UDM_O),
-                .I(UDM_conn),
-                .T(1'b0)
-        );
-
-        IOBUF #(
-                .DRIVE(4),
-                .IBUF_DELAY_VALUE("0"),
-                .IFD_DELAY_VALUE("AUTO"),
-                .IOSTANDARD("DEFAULT"),
-                .SLEW("SLOW")
-        ) IOBUF_inst_LDM (
-                // .O() intentionally not connected
-                .IO(sd_LDM_O),
-                .I(LDM_conn),
-                .T(1'b0)
-        );
-
-         */
+            RtlModuleInstance iobuf = new RtlModuleInstance(realm, "IOBUF");
+            iobuf.getParameters().put("DRIVE", 4);
+            iobuf.getParameters().put("IBUF_DELAY_VALUE", "0");
+            iobuf.getParameters().put("IFD_DELAY_VALUE", "AUTO");
+            iobuf.getParameters().put("IOSTANDARD", "DEFAULT");
+            iobuf.getParameters().put("SLEW", "SLOW");
+            // port "O" (input from SDRAM) intentionally not connected like in the original controller, but actually
+            // this should be fed to a DCM, phase-shifted and used to sample read data
+            iobuf.createBitInputPort("I", outputDdrBit);
+            iobuf.createBitInputPort("T", false);
+            ramBidirectionalPin(realm, "J2", iobuf, "IO");
+        }
 
         //
         // data strobe pins (LDQS, UDQS) and corresponding IOBUFs and ODDRs
@@ -219,7 +206,7 @@ public class RamController extends RtlItem {
 
         RtlBitSignal dqsState = controllerCore.createBitOutputPort("ddrInterfaceDataStrobe");
         RtlBitSignal dqsThreestate = controllerCore.createBitOutputPort("ddrInterfaceDataStrobeEnable").not();
-        {
+        { // UDQS
             RtlModuleInstance oddr = new RtlModuleInstance(realm, "ODDR2");
             oddr.getParameters().put("DDR_ALIGNMENT", "NONE");
             oddr.getParameters().put("INIT", VectorValue.of(1, 0));
@@ -245,7 +232,7 @@ public class RamController extends RtlItem {
             iobuf.createBitInputPort("T", dqsThreestate);
             ramBidirectionalPin(realm, "G3", iobuf, "IO");
         }
-        {
+        { // LDQS
             RtlModuleInstance oddr = new RtlModuleInstance(realm, "ODDR2");
             oddr.getParameters().put("DDR_ALIGNMENT", "NONE");
             oddr.getParameters().put("INIT", VectorValue.of(1, 0));
@@ -289,8 +276,8 @@ public class RamController extends RtlItem {
         ramOutputPin(realm, "C1", controllerCore.createBitOutputPort("sd_RAS_O"));
         ramOutputPin(realm, "C2", controllerCore.createBitOutputPort("sd_CAS_O"));
         ramOutputPin(realm, "D1", controllerCore.createBitOutputPort("sd_WE_O"));
-        ramOutputPin(realm, "J1", controllerCore.createBitOutputPort("sd_UDM_O"));
-        ramOutputPin(realm, "J2", controllerCore.createBitOutputPort("sd_LDM_O"));
+//        ramOutputPin(realm, "J1", controllerCore.createBitOutputPort("sd_UDM_O"));
+//        ramOutputPin(realm, "J2", controllerCore.createBitOutputPort("sd_LDM_O"));
         ramOutputPinArray(realm, controllerCore.createVectorOutputPort("sd_A_O", 13),
                 "T1", "R3", "R2", "P1", "F4", "H4", "H3", "H1", "H2", "N4", "T2", "N5", "P2");
         ramOutputPinArray(realm, controllerCore.createVectorOutputPort("sd_BA_O", 2), "K5", "K6");
