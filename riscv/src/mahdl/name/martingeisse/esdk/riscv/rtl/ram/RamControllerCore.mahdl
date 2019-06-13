@@ -25,8 +25,6 @@ interface {
     out bit sdramRAS;
     out bit sdramCAS;
     out bit sdramWE;
-    out bit sdramUDM;
-    out bit sdramLDM;
 
     // SDRAM DDR data interface
     out bit ddrInterfaceDataStrobeEnable;
@@ -37,6 +35,16 @@ interface {
     in vector[32] ddrInterfaceDataIn;
 
 }
+
+// interface to DDR SDRAM memory
+//
+// internal interface signals
+// A[25:24] = bank[1:0]
+// A[23:11] = row[12:0]
+// A[10: 2] = col[9:1]
+// (a specific combination of the 2+13+9=24 bits adresses
+// a 32-bit word which is transmitted as a burst of two
+// consecutive 16-bit halfwords in one clock cycle)
 
 // timing
 constant vector[5] WAIT_TIME = 5d5;
@@ -85,80 +93,65 @@ constant vector[4] SI_AUTO_REF = 6;
 constant vector[4] SI_AUTO_REF2 = 7;
 constant vector[4] SI_DONE = 8;
 
-// main state machine
+// SDRAM output registers for the main and init state machine
+register bit sdramRegisterCKE;
+register bit sdramRegisterCS;
+register vector[2] sdramRegisterBA;
+register vector[13] sdramRegisterA;
+register bit sdramRegisterRAS;
+register bit sdramRegisterCAS;
+register bit sdramRegisterWE;
+do (*) {
+    sdramCKE = sdramRegisterCKE;
+    sdramCS = sdramRegisterCS;
+    sdramBA = sdramRegisterBA;
+    sdramA = sdramRegisterA;
+    sdramRAS = sdramRegisterRAS;
+    sdramCAS = sdramRegisterCAS;
+    sdramWE = sdramRegisterWE;
+}
+
+// Wishbone output registers for the main and init state machine
+register bit busRegisterAcknowledge;
+register vector[32] busRegisterReadData;
+do (*) {
+    busAcknowledge = busRegisterAcknowledge;
+    busReadData = busRegisterReadData;
+}
+
+// TODO output registers for DDR signals
+register bit ddrRegisterDataStrobeEnable;
+register bit ddrRegisterDataStrobe;
+register bit ddrRegisterDataOutEnable;
+register vector[32] ddrRegisterDataOut;
+register vector[4] ddrRegisterDataOutMask;
+do (*) {
+    ddrInterfaceDataStrobeEnable = ddrRegisterDataStrobeEnable;
+    ddrInterfaceDataStrobe = ddrRegisterDataStrobe;
+    ddrInterfaceDataOutEnable = ddrRegisterDataOutEnable;
+    ddrInterfaceDataOut = ddrRegisterDataOut;
+    ddrInterfaceDataOutMask = ddrRegisterDataOutMask;
+}
+
+// DDR data sampling
+register vector[32] ddrRegisterDataIn;
+do (clk180) {
+    ddrRegisterDataIn = ddrInterfaceDataIn;
+}
+
+// main and init state machines
 register bit refreshAcknowledge;
+register vector[6] sd_state;
+register vector[4] init_state;
+register vector[6] wait_count;
+register vector[15] init_wait_count;
+register vector[13] mode_reg;
 
 
 
 
 
 /*
-
-        // interface to DDR SDRAM memory
-
-        // internal interface signals
-        // A[25:24] = bank[1:0]
-        // A[23:11] = row[12:0]
-        // A[10: 2] = col[9:1]
-        // (a specific combination of the 2+13+9=24 bits adresses
-        // a 32-bit word which is transmitted as a burst of two
-        // consecutive 16-bit halfwords in one clock cycle)
-        //
-        //
-
-        // Local data storage
-                reg		[5:0] sd_state;
-                reg		[3:0] init_state;
-                reg		[5:0] wait_count;
-                reg		[14:0] init_wait_count;
-                reg		[12:0] sd_A_O;
-                reg		[1:0] sd_BA_O;
-                reg		[12:0] mode_reg;
-                reg		sd_RAS_O;
-                reg		sd_CAS_O;
-                reg		sd_WE_O;
-                reg		sd_CS_O;
-                reg		sd_CKE_O;
-                reg		wACK_O;
-
-                reg		refreshRequest;
-                reg		refresh_ack;
-
-                reg		[31:0] D_rd_reg;
-                reg		DQS_state;
-                reg		DQS_oe;			// 1 for output
-                reg		D_oe;			// 1 for output enable
-
-                reg		[31:0] D_wr_reg;	// Data write buffer
-                reg		[3:0] D_mask_reg;	// data mask buffer
-
-
-         // De-duplex of the data path
-
-                assign ddrInterfaceDataOutEnable = D_oe;
-                assign ddrInterfaceDataOut = D_wr_reg;
-                assign ddrInterfaceDataOutMask = ~D_mask_reg;
-                assign ddrInterfaceDataStrobe = DQS_state;
-                assign ddrInterfaceDataStrobeEnable = DQS_oe;
-
-
-
-                reg [31:0] data_mux_latch;
-                always @ (posedge clk180)
-                begin
-                data_mux_latch <= ddrInterfaceDataIn;
-                end
-
-         //  Data bus flow direction control
-
-                assign wDAT_O = D_rd_reg[31:0];
-
-
-
-        // Main state machine
-
-
-
                 always @ (posedge clk0)
                 begin
                 if(reset)
@@ -324,8 +317,8 @@ register bit refreshAcknowledge;
                 sd_BA_O[1:0] <= wADR_I[25:24];
                 sd_A_O[12:0] <= wADR_I[23:11];
                 wait_count <= ACCESS_WAIT;
-                D_oe <= 0;						// Not driving the bus
-                DQS_state <= 0;
+                ddrInterfaceDataOutEnable <= 0;						// Not driving the bus
+                ddrInterfaceDataStrobe <= 0;
                 end
                 SD_RD_COL:
                 begin
@@ -346,7 +339,7 @@ register bit refreshAcknowledge;
                 sd_A_O[10] <= 1;			// Use auto-precharge
                 sd_A_O[0] <= 0;
                 wait_count <= CAS_WAIT;
-                DQS_oe <= 0;			// Set DQS for input
+                ddrRegisterDataStrobeEnable <= 0;			// Set DQS for input
                 end
                 end
                 SD_RD_CAS_WAIT:
@@ -364,20 +357,20 @@ register bit refreshAcknowledge;
                 end
                 SD_RD_LATCH:
                 begin
-                D_rd_reg <= data_mux_latch[31:0];
-                wACK_O <= 1;
+                busRegisterReadData <= ddrRegisterDataIn[31:0];
+                busRegisterAcknowledge <= 1;
                 sd_state <= SD_RD_DONE;
                 end
                 SD_RD_DONE:
                 begin
-                wACK_O <= 1;
+                busRegisterAcknowledge <= 1;
                 sd_state <= SD_RD_DONE_1;
-                DQS_state <= 0;
-                DQS_oe <= 1;	// Set DQS back to output
+                ddrInterfaceDataStrobe <= 0;
+                ddrRegisterDataStrobeEnable <= 1;	// Set DQS back to output
                 end
                 SD_RD_DONE_1:
                 begin
-                wACK_O <= 0;
+                busRegisterAcknowledge <= 0;
                 sd_state <= SD_IDLE;
                 end
         // ** Write cycle *********************************************
@@ -390,10 +383,10 @@ register bit refreshAcknowledge;
                 sd_CS_O <= 0;
                 sd_BA_O[1:0] <= wADR_I[25:24];
                 sd_A_O[12:0] <= wADR_I[23:11];
-                D_wr_reg <= wDAT_I;
-                D_mask_reg <= wWRB_I;
+                ddrRegisterDataOut <= wDAT_I;
+                ddrRegisterDataOutMask <= ~wWRB_I;
                 wait_count <= ACCESS_WAIT;
-                DQS_state <= 0;
+                ddrInterfaceDataStrobe <= 0;
                 end
                 SD_WR_COL:
                 begin
@@ -409,7 +402,7 @@ register bit refreshAcknowledge;
                 sd_RAS_O <= 1;
                 sd_CAS_O <= 0;
                 sd_WE_O <= 0;
-                DQS_oe <= 1;
+                ddrRegisterDataStrobeEnable <= 1;
                 sd_state <= SD_WR_CAS_WAIT;
                 sd_A_O[9:1] <= wADR_I[10:2];
                 sd_A_O[10] <= 1;		// Use auto-precharge
@@ -419,8 +412,8 @@ register bit refreshAcknowledge;
                 SD_WR_CAS_WAIT:
                 begin							// Wait until DQS signal there is data
                 sd_state <= SD_WR_LATCH;
-                DQS_state <= 1;			// Start with DQS low
-                D_oe <= 1;				// Drive the data bus
+                ddrInterfaceDataStrobe <= 1;			// Start with DQS low
+                ddrInterfaceDataOutEnable <= 1;				// Drive the data bus
                 sd_CS_O <= 1;
                 sd_RAS_O <= 1;
                 sd_CAS_O <= 1;
@@ -429,23 +422,23 @@ register bit refreshAcknowledge;
                 SD_WR_LATCH:
                 begin
                 sd_state <= SD_WR_LATCH1;
-                DQS_state <= 0;
+                ddrInterfaceDataStrobe <= 0;
                 end
                 SD_WR_LATCH1:
                 begin
                 sd_state <= SD_WR_DONE;
-                DQS_state <= 0;
-                wACK_O <= 1;
+                ddrInterfaceDataStrobe <= 0;
+                busRegisterAcknowledge <= 1;
                 end
                 SD_WR_DONE:
                 begin
-                D_oe <= 0;
-                wACK_O <= 1;
+                ddrInterfaceDataOutEnable <= 0;
+                busRegisterAcknowledge <= 1;
                 sd_state <= SD_WR_DONE_1;
                 end
                 SD_WR_DONE_1:
                 begin
-                wACK_O <= 0;
+                busRegisterAcknowledge <= 0;
                 sd_state <= SD_IDLE;
                 end
         // Wishbone transfer is done during idle time
