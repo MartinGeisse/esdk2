@@ -1,0 +1,500 @@
+module name.martingeisse.esdk.riscv.rtl.ram.RamControllerCore;
+
+interface {
+
+    // system signals
+    in clock clk0;
+    in clock clk90;
+    in clock clk180;
+    in clock clk270;
+    in bit reset;
+
+    // Wishbone interface
+    in vector[24] busWordAddress;
+    in bit enable, busWrite;
+    in vector[32] busWriteData;
+    in vector[4] busWriteMask;
+    out vector[32] busReadData;
+    out bit busAcknowledge;
+
+    // SDRAM control interface
+    out bit sdramCKE;
+    out bit sdramCS;
+    out vector[2] sdramBA;
+    out vector[13] sdramA;
+    out bit sdramRAS;
+    out bit sdramCAS;
+    out bit sdramWE;
+    out bit sdramUDM;
+    out bit sdramLDM;
+
+    // SDRAM DDR data interface
+    out bit ddrInterfaceDataStrobeEnable;
+    out bit ddrInterfaceDataStrobe;
+    out bit ddrInterfaceDataOutEnable;
+    out vector[32] ddrInterfaceDataOut;
+    out vector[4] ddrInterfaceDataOutMask;
+    in vector[32] ddrInterfaceDataIn;
+
+}
+
+// timing
+constant vector[5] WAIT_TIME = 5d5;
+constant vector[15] INIT_WAIT = 15h3000;
+constant vector[15] INIT_CLK_EN_WAIT = 15h10;
+constant vector[6] WAIT_CMD_MAX = 6b100000;
+constant vector[6] REFRESH_WAIT = WAIT_CMD_MAX - 6d7;
+constant vector[6] ACCESS_WAIT = WAIT_CMD_MAX - 6d1;
+constant vector[6] CAS_WAIT = WAIT_CMD_MAX - 6d3;
+constant vector[10] AVG_REFRESH_DUR = 10d700;
+
+// main state machine
+constant vector[6] SD_IDLE = 0;
+constant vector[6] SD_INIT = 1;
+constant vector[6] SD_INIT_WAIT = 2;
+constant vector[6] SD_PRECHG_ALL = 3;
+constant vector[6] SD_PRECHG_ALL1 = 4;
+constant vector[6] SD_AUTO_REF = 5;
+constant vector[6] SD_AUTO_REF1 = 6;
+constant vector[6] SD_AUTO_REF_ACK = 7;
+constant vector[6] SD_LD_MODE = 8;
+constant vector[6] SD_LD_MODE1 = 9;
+constant vector[6] SD_RD_START = 10;
+constant vector[6] SD_RD_COL = 11;
+constant vector[6] SD_RD_CAS_WAIT = 12;
+constant vector[6] SD_RD_LATCH = 13;
+constant vector[6] SD_RD_LATCH1 = 14;
+constant vector[6] SD_RD_DONE = 15;
+constant vector[6] SD_WR_START = 16;
+constant vector[6] SD_WR_COL = 17;
+constant vector[6] SD_WR_CAS_WAIT = 18;
+constant vector[6] SD_WR_LATCH = 19;
+constant vector[6] SD_WR_LATCH1 = 20;
+constant vector[6] SD_WR_DONE = 21;
+constant vector[6] SD_RD_DONE_1 = 22;
+constant vector[6] SD_WR_DONE_1 = 23;
+
+// initialization state machine
+constant vector[4] SI_START = 0;
+constant vector[4] SI_PRECHG = 1;
+constant vector[4] SI_LOAD_EX_MODE = 2;
+constant vector[4] SI_LOAD_MODE = 3;
+constant vector[4] SI_LOAD_MODE2 = 4;
+constant vector[4] SI_PRECHG2 = 5;
+constant vector[4] SI_AUTO_REF = 6;
+constant vector[4] SI_AUTO_REF2 = 7;
+constant vector[4] SI_DONE = 8;
+
+// main state machine
+register bit refreshAcknowledge;
+
+
+
+
+
+/*
+
+        // interface to DDR SDRAM memory
+
+        // internal interface signals
+        // A[25:24] = bank[1:0]
+        // A[23:11] = row[12:0]
+        // A[10: 2] = col[9:1]
+        // (a specific combination of the 2+13+9=24 bits adresses
+        // a 32-bit word which is transmitted as a burst of two
+        // consecutive 16-bit halfwords in one clock cycle)
+        //
+        //
+
+        // Local data storage
+                reg		[5:0] sd_state;
+                reg		[3:0] init_state;
+                reg		[5:0] wait_count;
+                reg		[14:0] init_wait_count;
+                reg		[12:0] sd_A_O;
+                reg		[1:0] sd_BA_O;
+                reg		[12:0] mode_reg;
+                reg		sd_RAS_O;
+                reg		sd_CAS_O;
+                reg		sd_WE_O;
+                reg		sd_CS_O;
+                reg		sd_CKE_O;
+                reg		wACK_O;
+
+                reg		refreshRequest;
+                reg		refresh_ack;
+
+                reg		[31:0] D_rd_reg;
+                reg		DQS_state;
+                reg		DQS_oe;			// 1 for output
+                reg		D_oe;			// 1 for output enable
+
+                reg		[31:0] D_wr_reg;	// Data write buffer
+                reg		[3:0] D_mask_reg;	// data mask buffer
+
+
+         // De-duplex of the data path
+
+                assign ddrInterfaceDataOutEnable = D_oe;
+                assign ddrInterfaceDataOut = D_wr_reg;
+                assign ddrInterfaceDataOutMask = ~D_mask_reg;
+                assign ddrInterfaceDataStrobe = DQS_state;
+                assign ddrInterfaceDataStrobeEnable = DQS_oe;
+
+
+
+                reg [31:0] data_mux_latch;
+                always @ (posedge clk180)
+                begin
+                data_mux_latch <= ddrInterfaceDataIn;
+                end
+
+         //  Data bus flow direction control
+
+                assign wDAT_O = D_rd_reg[31:0];
+
+
+
+        // Main state machine
+
+
+
+                always @ (posedge clk0)
+                begin
+                if(reset)
+                begin
+                sd_state <= SD_INIT;
+                init_state <= SI_START;
+                end else
+                begin
+                wait_count <= wait_count + 1;
+
+                case (sd_state)
+                SD_INIT:						// Initialize, wait until INIT_WAIT
+                begin
+                case (init_state)
+                SI_START:
+                begin
+                sd_state <= SD_INIT_WAIT;
+                init_state <= SI_PRECHG;
+                sd_RAS_O <= 1;
+                sd_CAS_O <= 1;
+                sd_WE_O <= 1;
+                sd_CS_O <= 1;
+                sd_CKE_O <= 0;
+                init_wait_count <= 16'd0;
+                end
+                SI_PRECHG:
+                begin
+                sd_state <= SD_PRECHG_ALL;
+                init_state <= SI_LOAD_EX_MODE;
+                end
+                SI_LOAD_EX_MODE:
+                begin
+        // Normal operation
+                mode_reg <= 13'b0000000000000;
+                sd_BA_O <= 2'b01;
+                sd_state <= SD_LD_MODE;
+                init_state <= SI_LOAD_MODE;
+                end
+                SI_LOAD_MODE:
+                begin
+        // CAS = 2, Reset DLL, Burst = 2, sequential
+                mode_reg <= {6'b000010, 3'b010, 1'b0, 3'b001};
+                sd_BA_O <= 2'b00;
+                sd_state <= SD_LD_MODE;
+                init_state <= SI_LOAD_MODE2;
+                end
+                SI_LOAD_MODE2:
+                begin
+        // CAS = 2, NO Reset DLL, Burst = 2, sequential
+                mode_reg <= {6'b000000, 3'b010, 1'b0, 3'b001};
+                sd_BA_O <= 2'b00;
+                sd_state <= SD_LD_MODE;
+                init_state <= SI_PRECHG2;
+                end
+                SI_PRECHG2:
+                begin
+                sd_state <= SD_PRECHG_ALL;
+                init_state <= SI_AUTO_REF;
+                end
+                SI_AUTO_REF:
+                begin
+                sd_state <= SD_AUTO_REF;
+                init_state <= SI_AUTO_REF2;
+                end
+                SI_AUTO_REF2:
+                begin
+                sd_state <= SD_AUTO_REF;
+                init_state <= SI_DONE;
+                end
+                SI_DONE:
+                begin
+                init_state <= SI_DONE;
+                sd_state <= SD_IDLE;
+                end
+                default:
+                init_state <= SI_START;
+                endcase
+                end
+        // ** Waiting for SDRAM waking up *****************************
+                SD_INIT_WAIT:
+                begin
+                init_wait_count <= init_wait_count + 1;
+                if(init_wait_count == INIT_WAIT)
+                begin
+                sd_state <= SD_INIT;
+                end
+                if(init_wait_count == INIT_CLK_EN_WAIT)
+                begin
+                sd_CKE_O <= 1;				// Wake up the SDRAM
+                end
+                end
+        // ** Precharge command ***************************************
+                SD_PRECHG_ALL:
+                begin
+                sd_state <= SD_PRECHG_ALL1;
+                sd_RAS_O <= 0;
+                sd_CAS_O <= 1;
+                sd_WE_O <= 0;
+                sd_CS_O <= 0;
+                sd_A_O[10] <= 1;				// Command for precharge all
+                end
+                SD_PRECHG_ALL1:
+                begin
+                sd_CS_O <= 1;
+                sd_RAS_O <= 1;
+                sd_CAS_O <= 1;
+                sd_WE_O <= 1;
+                sd_state <= SD_IDLE;			// Precharge takes 15nS before next command
+                end
+        // ** Load mode register **************************************
+                SD_LD_MODE:
+                begin
+                sd_state <= SD_LD_MODE1;
+                sd_RAS_O <= 0;
+                sd_CAS_O <= 0;
+                sd_WE_O <= 0;
+                sd_CS_O <= 0;
+                sd_A_O[12:0] <= mode_reg;
+                end
+                SD_LD_MODE1:
+                begin
+                sd_CS_O <= 1;
+                sd_RAS_O <= 1;
+                sd_CAS_O <= 1;
+                sd_WE_O <= 1;					// Load Mode takes 12nS
+                sd_state <= SD_IDLE;			// Add wait if needed
+                end
+        // ** Auto refresh command ************************************
+                SD_AUTO_REF:
+                begin
+                sd_state <= SD_AUTO_REF1;
+                sd_RAS_O <= 0;
+                sd_CAS_O <= 0;
+                sd_WE_O <= 1;
+                sd_CS_O <= 0;
+                wait_count <= REFRESH_WAIT;
+                end
+                SD_AUTO_REF1:
+                begin
+                sd_CS_O <= 1;					// Issue NOP during wait
+                sd_RAS_O <= 1;
+                sd_CAS_O <= 1;
+                sd_WE_O <= 1;
+                if(wait_count[5] == 1)			// Time up, return to idle
+                begin
+                sd_state <= SD_AUTO_REF_ACK;
+                refresh_ack <= 1;
+                end
+                end
+                SD_AUTO_REF_ACK:					// Interlocking state
+                begin
+                sd_state <= SD_IDLE;
+                refresh_ack <= 0;
+                end
+        // ** Read cycle **********************************************
+                SD_RD_START:
+                begin
+                sd_state <= SD_RD_COL;
+                sd_RAS_O <= 0;
+                sd_CAS_O <= 1;
+                sd_WE_O <= 1;
+                sd_CS_O <= 0;
+                sd_BA_O[1:0] <= wADR_I[25:24];
+                sd_A_O[12:0] <= wADR_I[23:11];
+                wait_count <= ACCESS_WAIT;
+                D_oe <= 0;						// Not driving the bus
+                DQS_state <= 0;
+                end
+                SD_RD_COL:
+                begin
+                if(wait_count[5] != 1)
+                begin
+                sd_CS_O <= 1;			// NOP command during access wait
+                sd_RAS_O <= 1;
+                sd_CAS_O <= 1;
+                sd_WE_O <= 1;
+                end else
+                begin
+                sd_CS_O <= 0;				// Access column
+                sd_RAS_O <= 1;
+                sd_CAS_O <= 0;
+                sd_WE_O <= 1;
+                sd_state <= SD_RD_CAS_WAIT;
+                sd_A_O[9:1] <= wADR_I[10:2];
+                sd_A_O[10] <= 1;			// Use auto-precharge
+                sd_A_O[0] <= 0;
+                wait_count <= CAS_WAIT;
+                DQS_oe <= 0;			// Set DQS for input
+                end
+                end
+                SD_RD_CAS_WAIT:
+                begin								// Wait until DQS signal there is data
+                if(wait_count[5] != 1)
+                begin
+                sd_CS_O <= 1;				// NOP command during access wait
+                sd_RAS_O <= 1;
+                sd_CAS_O <= 1;
+                sd_WE_O <= 1;
+                end else
+                begin
+                sd_state <= SD_RD_LATCH;
+                end
+                end
+                SD_RD_LATCH:
+                begin
+                D_rd_reg <= data_mux_latch[31:0];
+                wACK_O <= 1;
+                sd_state <= SD_RD_DONE;
+                end
+                SD_RD_DONE:
+                begin
+                wACK_O <= 1;
+                sd_state <= SD_RD_DONE_1;
+                DQS_state <= 0;
+                DQS_oe <= 1;	// Set DQS back to output
+                end
+                SD_RD_DONE_1:
+                begin
+                wACK_O <= 0;
+                sd_state <= SD_IDLE;
+                end
+        // ** Write cycle *********************************************
+                SD_WR_START:
+                begin							// Open the bank - ACTIVE command
+                sd_state <= SD_WR_COL;
+                sd_RAS_O <= 0;
+                sd_CAS_O <= 1;
+                sd_WE_O <= 1;
+                sd_CS_O <= 0;
+                sd_BA_O[1:0] <= wADR_I[25:24];
+                sd_A_O[12:0] <= wADR_I[23:11];
+                D_wr_reg <= wDAT_I;
+                D_mask_reg <= wWRB_I;
+                wait_count <= ACCESS_WAIT;
+                DQS_state <= 0;
+                end
+                SD_WR_COL:
+                begin
+                if(wait_count[5] != 1)
+                begin
+                sd_CS_O <= 1;			// NOP command during access wait
+                sd_RAS_O <= 1;
+                sd_CAS_O <= 1;
+                sd_WE_O <= 1;
+                end else
+                begin
+                sd_CS_O <= 0;			// Access column
+                sd_RAS_O <= 1;
+                sd_CAS_O <= 0;
+                sd_WE_O <= 0;
+                DQS_oe <= 1;
+                sd_state <= SD_WR_CAS_WAIT;
+                sd_A_O[9:1] <= wADR_I[10:2];
+                sd_A_O[10] <= 1;		// Use auto-precharge
+                sd_A_O[0] <= 0;
+                end
+                end
+                SD_WR_CAS_WAIT:
+                begin							// Wait until DQS signal there is data
+                sd_state <= SD_WR_LATCH;
+                DQS_state <= 1;			// Start with DQS low
+                D_oe <= 1;				// Drive the data bus
+                sd_CS_O <= 1;
+                sd_RAS_O <= 1;
+                sd_CAS_O <= 1;
+                sd_WE_O <= 1;
+                end
+                SD_WR_LATCH:
+                begin
+                sd_state <= SD_WR_LATCH1;
+                DQS_state <= 0;
+                end
+                SD_WR_LATCH1:
+                begin
+                sd_state <= SD_WR_DONE;
+                DQS_state <= 0;
+                wACK_O <= 1;
+                end
+                SD_WR_DONE:
+                begin
+                D_oe <= 0;
+                wACK_O <= 1;
+                sd_state <= SD_WR_DONE_1;
+                end
+                SD_WR_DONE_1:
+                begin
+                wACK_O <= 0;
+                sd_state <= SD_IDLE;
+                end
+        // Wishbone transfer is done during idle time
+                SD_IDLE: 						// Idle/sleep process
+                begin
+                sd_RAS_O <= 1;				// Set for NOP by default
+                sd_CAS_O <= 1;
+                sd_WE_O <= 1;
+                sd_CS_O <= 1;
+                if(init_state != SI_DONE)	// If still in init cycle, go back and work
+                sd_state <= SD_INIT;
+                else if(wSTB_I && !wWE_I)				// Start of a read command
+                sd_state <= SD_RD_START;
+                else if(wSTB_I && wWE_I)	// Start of a write command
+                sd_state <= SD_WR_START;
+                else if(refreshRequest)					// Refresh is the last command
+                sd_state <= SD_AUTO_REF;
+                end
+
+                default:
+                sd_state <= SD_IDLE;
+                endcase
+                end
+                end
+
+*/
+
+// refresh control logic
+register bit refreshRequest;
+register vector[10] refreshCounter;
+register vector[4] refreshQueue;
+
+do (clk0) {
+    if (refreshAcknowledge) {
+        refreshRequest = 0;
+        refreshQueue = refreshQueue + 4d1;
+    } else if (reset) {
+        refreshCounter = 0;
+        refreshQueue = 0;
+    } else {
+        refreshCounter = refreshCounter + 10d1;
+        if (refreshCounter == AVG_REFRESH_DUR) {
+            refreshCounter = 0;
+            if (refreshQueue != 4d0) {
+                refreshQueue = refreshQueue - 4d1;
+            }
+        }
+        if (refreshQueue != 4d7) {
+            refreshRequest = 1;
+        }
+    }
+}
