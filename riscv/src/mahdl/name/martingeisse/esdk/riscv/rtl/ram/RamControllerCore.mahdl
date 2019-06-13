@@ -169,7 +169,7 @@ do (clk0) {
                         sd_WE_O = 1;
                         sd_CS_O = 1;
                         sd_CKE_O = 0;
-                        init_wait_count = 16'd0;
+                        init_wait_count = 0;
 
                     case SI_PRECHG:
                         sd_state = SD_PRECHG_ALL;
@@ -177,22 +177,22 @@ do (clk0) {
 
                     case SI_LOAD_EX_MODE:
                         // Normal operation
-                        mode_reg = 13'b0000000000000;
-                        sd_BA_O = 2'b01;
+                        mode_reg = 13b0000000000000;
+                        sd_BA_O = 2b01;
                         sd_state = SD_LD_MODE;
                         init_state = SI_LOAD_MODE;
 
                     case SI_LOAD_MODE:
                         // CAS = 2, Reset DLL, Burst = 2, sequential
-                        mode_reg = {6'b000010, 3'b010, 1'b0, 3'b001};
-                        sd_BA_O = 2'b00;
+                        mode_reg = 6b000010 _ 3b010 _ 1b0 _ 3b001;
+                        sd_BA_O = 2b00;
                         sd_state = SD_LD_MODE;
                         init_state = SI_LOAD_MODE2;
 
                     case SI_LOAD_MODE2:
                         // CAS = 2, NO Reset DLL, Burst = 2, sequential
-                        mode_reg = {6'b000000, 3'b010, 1'b0, 3'b001};
-                        sd_BA_O = 2'b00;
+                        mode_reg = 6b000000 _ 3b010 _ 1b0 _ 3b001;
+                        sd_BA_O = 2b00;
                         sd_state = SD_LD_MODE;
                         init_state = SI_PRECHG2;
 
@@ -220,15 +220,13 @@ do (clk0) {
 
             // ** Waiting for SDRAM waking up *****************************
             case SD_INIT_WAIT:
-                init_wait_count = init_wait_count + 1;
-                if(init_wait_count == INIT_WAIT)
-                begin
+                init_wait_count = init_wait_count + 15d1;
+                if (init_wait_count == INIT_WAIT) {
                     sd_state = SD_INIT;
-                end
-                if(init_wait_count == INIT_CLK_EN_WAIT)
-                begin
-                    sd_CKE_O = 1;				// Wake up the SDRAM
-                end
+                }
+                if (init_wait_count == INIT_CLK_EN_WAIT) {
+                    sd_CKE_O = 1;
+                }
 
             // ** Precharge command ***************************************
             case SD_PRECHG_ALL:
@@ -276,14 +274,15 @@ do (clk0) {
                 sd_RAS_O = 1;
                 sd_CAS_O = 1;
                 sd_WE_O = 1;
-                if(wait_count[5] == 1)			// Time up, return to idle
-                begin
+                if (wait_count[5]) {
+                    // Time up, return to idle
                     sd_state = SD_AUTO_REF_ACK;
                     refresh_ack = 1;
-                end
+                }
 
-            case SD_AUTO_REF_ACK:					// Interlocking state
-                sd_state == SD_IDLE;
+            case SD_AUTO_REF_ACK:
+                // Interlocking state
+                sd_state = SD_IDLE;
                 refresh_ack = 0;
 
             // ** Read cycle **********************************************
@@ -300,14 +299,12 @@ do (clk0) {
                 ddrInterfaceDataStrobe = 0;
 
             case SD_RD_COL:
-                if(wait_count[5] != 1)
-                begin
+                if (~wait_count[5]) {
                     sd_CS_O = 1;			// NOP command during access wait
                     sd_RAS_O = 1;
                     sd_CAS_O = 1;
                     sd_WE_O = 1;
-                end else
-                begin
+                } else {
                     sd_CS_O = 0;				// Access column
                     sd_RAS_O = 1;
                     sd_CAS_O = 0;
@@ -318,22 +315,20 @@ do (clk0) {
                     sd_A_O[0] = 0;
                     wait_count = CAS_WAIT;
                     ddrRegisterDataStrobeEnable = 0;			// Set DQS for input
-                end
+                }
 
             case SD_RD_CAS_WAIT:
-                if(wait_count[5] != 1)
-                begin
+                if (~wait_count[5]) {
                     sd_CS_O = 1;				// NOP command during access wait
                     sd_RAS_O = 1;
                     sd_CAS_O = 1;
                     sd_WE_O = 1;
-                end else
-                begin
+                } else {
                     sd_state = SD_RD_LATCH;
-                end
+                }
 
             case SD_RD_LATCH:
-                busRegisterReadData = ddrRegisterDataIn[31:0];
+                busRegisterReadData = ddrRegisterDataIn;
                 busRegisterAcknowledge = 1;
                 sd_state = SD_RD_DONE;
 
@@ -362,14 +357,12 @@ do (clk0) {
                 ddrInterfaceDataStrobe = 0;
 
             case SD_WR_COL:
-                if(wait_count[5] != 1)
-                begin
+                if (~wait_count[5]) {
                     sd_CS_O = 1;			// NOP command during access wait
                     sd_RAS_O = 1;
                     sd_CAS_O = 1;
                     sd_WE_O = 1;
-                end else
-                begin
+                } else {
                     sd_CS_O = 0;			// Access column
                     sd_RAS_O = 1;
                     sd_CAS_O = 0;
@@ -379,7 +372,7 @@ do (clk0) {
                     sd_A_O[9:1] = wADR_I[10:2];
                     sd_A_O[10] = 1;		// Use auto-precharge
                     sd_A_O[0] = 0;
-                end
+                }
 
             case SD_WR_CAS_WAIT:
                 sd_state = SD_WR_LATCH;
@@ -414,14 +407,15 @@ do (clk0) {
                 sd_CAS_O = 1;
                 sd_WE_O = 1;
                 sd_CS_O = 1;
-                if(init_state != SI_DONE)	// If still in init cycle, go back and work
+                if (init_state != SI_DONE) {
                     sd_state = SD_INIT;
-                else if(wSTB_I && !wWE_I)				// Start of a read command
+                } else if (wSTB_I && ~wWE_I) {
                     sd_state = SD_RD_START;
-                else if(wSTB_I && wWE_I)	// Start of a write command
+                } else if (wSTB_I && wWE_I) {
                     sd_state = SD_WR_START;
-                else if(refreshRequest)					// Refresh is the last command
+                } else if (refreshRequest) {
                     sd_state = SD_AUTO_REF;
+                }
 
             default:
                 sd_state = SD_IDLE;
