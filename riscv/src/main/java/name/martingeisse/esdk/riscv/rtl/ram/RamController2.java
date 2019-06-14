@@ -25,6 +25,7 @@ public class RamController2 extends RtlItem {
                           RamControllerAdapter adapter) {
         super(realm);
         RamControllerCore controllerCore = new RamControllerCore.Implementation(realm, ddrClk0, ddrClk180, ddrClk270, ddrClk90);
+        controllerCore.setReset(reset);
 
         //
         // clock signals
@@ -78,8 +79,8 @@ public class RamController2 extends RtlItem {
         // the external interface has 16 data bits
         RtlVectorSignal lowerDataBits = RtlVectorConstant.of(realm, 0, 0);
         RtlVectorSignal upperDataBits = RtlVectorConstant.of(realm, 0, 0);
-        RtlBitSignal ddrInterfaceDataOutThreestate = controllerCore.createBitOutputPort("ddrInterfaceDataOutEnable").not();
-        RtlVectorSignal ddrInterfaceDataOut = controllerCore.createVectorOutputPort("ddrInterfaceDataOut", 32);
+        RtlBitSignal ddrInterfaceDataOutThreestate = controllerCore.getDdrInterfaceDataOutEnable().not();
+        RtlVectorSignal ddrInterfaceDataOut = controllerCore.getDdrInterfaceDataOut();
         for (int i = 0; i < 16; i++) {
             int finalI = i;
 
@@ -144,13 +145,13 @@ public class RamController2 extends RtlItem {
             iobuf.createBitInputPort("T", ddrInterfaceDataOutThreestate);
 
         }
-        controllerCore.createVectorInputPort("ddrInterfaceDataIn", 32, upperDataBits.concat(lowerDataBits));
+        controllerCore.setDdrInterfaceDataIn(upperDataBits.concat(lowerDataBits));
 
         //
         // write data masks (follow the same timing as write data) and corresponding IOBUFs and ODDRs
         //
 
-        RtlVectorSignal ddrInterfaceDataOutMask = controllerCore.createVectorOutputPort("ddrInterfaceDataOutMask", 4);
+        RtlVectorSignal ddrInterfaceDataOutMask = controllerCore.getDdrInterfaceDataOutMask();
         { // UDM
             RtlModuleInstance oddr = new RtlModuleInstance(realm, "ODDR2");
             oddr.getParameters().put("DDR_ALIGNMENT", "NONE");
@@ -208,8 +209,8 @@ public class RamController2 extends RtlItem {
         // data strobe pins (LDQS, UDQS) and corresponding IOBUFs and ODDRs
         //
 
-        RtlBitSignal dqsState = controllerCore.createBitOutputPort("ddrInterfaceDataStrobe");
-        RtlBitSignal dqsThreestate = controllerCore.createBitOutputPort("ddrInterfaceDataStrobeEnable").not();
+        RtlBitSignal dqsState = controllerCore.getDdrInterfaceDataStrobe();
+        RtlBitSignal dqsThreestate = controllerCore.getDdrInterfaceDataStrobeEnable().not();
         { // UDQS
             RtlModuleInstance oddr = new RtlModuleInstance(realm, "ODDR2");
             oddr.getParameters().put("DDR_ALIGNMENT", "NONE");
