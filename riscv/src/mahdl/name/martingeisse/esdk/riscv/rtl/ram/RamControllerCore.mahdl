@@ -17,6 +17,9 @@ interface {
     out vector[32] busReadData;
     out bit busAcknowledge;
 
+    // TODO create pins in the enclosing design
+    // TODO old Verilog file contained ports for *DQS, *DM. Remove first before attempting to use this module.
+
     // SDRAM control interface
     out bit sdramCKE;
     out bit sdramCS;
