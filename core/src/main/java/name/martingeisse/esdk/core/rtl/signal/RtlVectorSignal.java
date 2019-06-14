@@ -44,6 +44,10 @@ public interface RtlVectorSignal extends RtlSignal {
 	// vector operations
 	//
 
+	default RtlVectorNotOperation not() {
+		return new RtlVectorNotOperation(getRtlItem().getRealm(), this);
+	}
+
 	default RtlVectorSignal operation(RtlVectorOperation.Operator operator, RtlVectorSignal rightOperand) {
 		return new RtlVectorOperation(getRtlItem().getRealm(), operator, this, rightOperand);
 	}
