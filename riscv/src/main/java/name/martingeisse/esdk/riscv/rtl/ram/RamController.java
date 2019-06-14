@@ -1,11 +1,15 @@
 package name.martingeisse.esdk.riscv.rtl.ram;
 
+import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.module.RtlInstancePort;
 import name.martingeisse.esdk.core.rtl.module.RtlModuleInstance;
 import name.martingeisse.esdk.core.rtl.pin.*;
-import name.martingeisse.esdk.core.rtl.signal.*;
+import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
+import name.martingeisse.esdk.core.rtl.signal.RtlConstantIndexSelection;
+import name.martingeisse.esdk.core.rtl.signal.RtlVectorConstant;
+import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.signal.connector.RtlBitSignalConnector;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.EmptyVerilogContribution;
@@ -16,11 +20,12 @@ import name.martingeisse.esdk.core.util.vector.VectorValue;
 public class RamController extends RtlItem {
 
     public RamController(RtlRealm realm,
-                         RtlBitSignal ddrClk0, RtlBitSignal ddrClk90, RtlBitSignal ddrClk180, RtlBitSignal ddrClk270,
+                         RtlClockNetwork ddrClk0, RtlClockNetwork ddrClk90, RtlClockNetwork ddrClk180, RtlClockNetwork ddrClk270,
                          RtlBitSignal reset,
                          RamControllerAdapter adapter) {
         super(realm);
-        RtlModuleInstance controllerCore = new RtlModuleInstance(realm, "ddr_sdram");
+        RamControllerCore controllerCore = new RamControllerCore.Implementation(realm, ddrClk0, ddrClk180, ddrClk270, ddrClk90);
+        controllerCore.setReset(reset);
 
         //
         // clock signals
@@ -33,8 +38,8 @@ public class RamController extends RtlItem {
         sdramCkpDdr.getParameters().put("SRTYPE", "SYNC");
         sdramCkpDdr.setName("sdramCkpDdr");
         ramOutputPin(realm, "J5", sdramCkpDdr.createBitOutputPort("Q"));
-        sdramCkpDdr.createBitInputPort("C0", ddrClk180);
-        sdramCkpDdr.createBitInputPort("C1", ddrClk0);
+        sdramCkpDdr.createBitInputPort("C0", ddrClk180.getClockSignal());
+        sdramCkpDdr.createBitInputPort("C1", ddrClk0.getClockSignal());
         sdramCkpDdr.createBitInputPort("CE", true);
         sdramCkpDdr.createBitInputPort("D0", true);
         sdramCkpDdr.createBitInputPort("D1", false);
@@ -48,8 +53,8 @@ public class RamController extends RtlItem {
         sdramCknDdr.getParameters().put("SRTYPE", "SYNC");
         sdramCknDdr.setName("sdramCknDdr");
         ramOutputPin(realm, "J4", sdramCknDdr.createBitOutputPort("Q"));
-        sdramCknDdr.createBitInputPort("C0", ddrClk0);
-        sdramCknDdr.createBitInputPort("C1", ddrClk180);
+        sdramCknDdr.createBitInputPort("C0", ddrClk0.getClockSignal());
+        sdramCknDdr.createBitInputPort("C1", ddrClk180.getClockSignal());
         sdramCknDdr.createBitInputPort("CE", true);
         sdramCknDdr.createBitInputPort("D0", true);
         sdramCknDdr.createBitInputPort("D1", false);
@@ -74,8 +79,8 @@ public class RamController extends RtlItem {
         // the external interface has 16 data bits
         RtlVectorSignal lowerDataBits = RtlVectorConstant.of(realm, 0, 0);
         RtlVectorSignal upperDataBits = RtlVectorConstant.of(realm, 0, 0);
-        RtlBitSignal ddrInterfaceDataOutThreestate = controllerCore.createBitOutputPort("ddrInterfaceDataOutEnable").not();
-        RtlVectorSignal ddrInterfaceDataOut = controllerCore.createVectorOutputPort("ddrInterfaceDataOut", 32);
+        RtlBitSignal ddrInterfaceDataOutThreestate = controllerCore.getDdrInterfaceDataOutEnable().not();
+        RtlVectorSignal ddrInterfaceDataOut = controllerCore.getDdrInterfaceDataOut();
         for (int i = 0; i < 16; i++) {
             int finalI = i;
 
@@ -101,8 +106,8 @@ public class RamController extends RtlItem {
             iddr.getParameters().put("INIT_Q0", VectorValue.of(1, 0));
             iddr.getParameters().put("INIT_Q1", VectorValue.of(1, 0));
             iddr.getParameters().put("SRTYPE", "SYNC");
-            iddr.createBitInputPort("C0", ddrClk180);
-            iddr.createBitInputPort("C1", ddrClk0);
+            iddr.createBitInputPort("C0", ddrClk180.getClockSignal());
+            iddr.createBitInputPort("C1", ddrClk0.getClockSignal());
             iddr.createBitInputPort("CE", true);
             iddr.createBitInputPort("R", false);
             iddr.createBitInputPort("S", false);
@@ -114,8 +119,8 @@ public class RamController extends RtlItem {
             oddr.getParameters().put("DDR_ALIGNMENT", "NONE");
             oddr.getParameters().put("INIT", VectorValue.of(1, 0));
             oddr.getParameters().put("SRTYPE", "SYNC");
-            oddr.createBitInputPort("C0", ddrClk90);
-            oddr.createBitInputPort("C1", ddrClk270);
+            oddr.createBitInputPort("C0", ddrClk90.getClockSignal());
+            oddr.createBitInputPort("C1", ddrClk270.getClockSignal());
             oddr.createBitInputPort("CE", true);
             oddr.createBitInputPort("R", false);
             oddr.createBitInputPort("S", false);
@@ -140,20 +145,20 @@ public class RamController extends RtlItem {
             iobuf.createBitInputPort("T", ddrInterfaceDataOutThreestate);
 
         }
-        controllerCore.createVectorInputPort("ddrInterfaceDataIn", 32, upperDataBits.concat(lowerDataBits));
+        controllerCore.setDdrInterfaceDataIn(upperDataBits.concat(lowerDataBits));
 
         //
         // write data masks (follow the same timing as write data) and corresponding IOBUFs and ODDRs
         //
 
-        RtlVectorSignal ddrInterfaceDataOutMask = controllerCore.createVectorOutputPort("ddrInterfaceDataOutMask", 4);
+        RtlVectorSignal ddrInterfaceDataOutMask = controllerCore.getDdrInterfaceDataOutMask();
         { // UDM
             RtlModuleInstance oddr = new RtlModuleInstance(realm, "ODDR2");
             oddr.getParameters().put("DDR_ALIGNMENT", "NONE");
             oddr.getParameters().put("INIT", VectorValue.of(1, 0));
             oddr.getParameters().put("SRTYPE", "SYNC");
-            oddr.createBitInputPort("C0", ddrClk90);
-            oddr.createBitInputPort("C1", ddrClk270);
+            oddr.createBitInputPort("C0", ddrClk90.getClockSignal());
+            oddr.createBitInputPort("C1", ddrClk270.getClockSignal());
             oddr.createBitInputPort("CE", true);
             oddr.createBitInputPort("R", false);
             oddr.createBitInputPort("S", false);
@@ -178,8 +183,8 @@ public class RamController extends RtlItem {
             oddr.getParameters().put("DDR_ALIGNMENT", "NONE");
             oddr.getParameters().put("INIT", VectorValue.of(1, 0));
             oddr.getParameters().put("SRTYPE", "SYNC");
-            oddr.createBitInputPort("C0", ddrClk90);
-            oddr.createBitInputPort("C1", ddrClk270);
+            oddr.createBitInputPort("C0", ddrClk90.getClockSignal());
+            oddr.createBitInputPort("C1", ddrClk270.getClockSignal());
             oddr.createBitInputPort("CE", true);
             oddr.createBitInputPort("R", false);
             oddr.createBitInputPort("S", false);
@@ -204,15 +209,15 @@ public class RamController extends RtlItem {
         // data strobe pins (LDQS, UDQS) and corresponding IOBUFs and ODDRs
         //
 
-        RtlBitSignal dqsState = controllerCore.createBitOutputPort("ddrInterfaceDataStrobe");
-        RtlBitSignal dqsThreestate = controllerCore.createBitOutputPort("ddrInterfaceDataStrobeEnable").not();
+        RtlBitSignal dqsState = controllerCore.getDdrInterfaceDataStrobe();
+        RtlBitSignal dqsThreestate = controllerCore.getDdrInterfaceDataStrobeEnable().not();
         { // UDQS
             RtlModuleInstance oddr = new RtlModuleInstance(realm, "ODDR2");
             oddr.getParameters().put("DDR_ALIGNMENT", "NONE");
             oddr.getParameters().put("INIT", VectorValue.of(1, 0));
             oddr.getParameters().put("SRTYPE", "SYNC");
-            oddr.createBitInputPort("C0", ddrClk180);
-            oddr.createBitInputPort("C1", ddrClk0);
+            oddr.createBitInputPort("C0", ddrClk180.getClockSignal());
+            oddr.createBitInputPort("C1", ddrClk0.getClockSignal());
             oddr.createBitInputPort("CE", true);
             oddr.createBitInputPort("R", false);
             oddr.createBitInputPort("S", false);
@@ -237,8 +242,8 @@ public class RamController extends RtlItem {
             oddr.getParameters().put("DDR_ALIGNMENT", "NONE");
             oddr.getParameters().put("INIT", VectorValue.of(1, 0));
             oddr.getParameters().put("SRTYPE", "SYNC");
-            oddr.createBitInputPort("C0", ddrClk180);
-            oddr.createBitInputPort("C1", ddrClk0);
+            oddr.createBitInputPort("C0", ddrClk180.getClockSignal());
+            oddr.createBitInputPort("C1", ddrClk0.getClockSignal());
             oddr.createBitInputPort("CE", true);
             oddr.createBitInputPort("R", false);
             oddr.createBitInputPort("S", false);
@@ -263,35 +268,24 @@ public class RamController extends RtlItem {
         // other stuff
         //
 
-        // system signals
-        controllerCore.createBitInputPort("clk0", ddrClk0);
-        controllerCore.createBitInputPort("clk90", ddrClk90);
-        controllerCore.createBitInputPort("clk180", ddrClk180);
-        controllerCore.createBitInputPort("clk270", ddrClk270);
-        controllerCore.createBitInputPort("reset", reset);
-
         // SDRAM DDR interface
-        ramOutputPin(realm, "K4", controllerCore.createBitOutputPort("sd_CS_O"));
-        ramOutputPin(realm, "K3", controllerCore.createBitOutputPort("sd_CKE_O"));
-        ramOutputPin(realm, "C1", controllerCore.createBitOutputPort("sd_RAS_O"));
-        ramOutputPin(realm, "C2", controllerCore.createBitOutputPort("sd_CAS_O"));
-        ramOutputPin(realm, "D1", controllerCore.createBitOutputPort("sd_WE_O"));
-//        ramOutputPin(realm, "J1", controllerCore.createBitOutputPort("sd_UDM_O"));
-//        ramOutputPin(realm, "J2", controllerCore.createBitOutputPort("sd_LDM_O"));
-        ramOutputPinArray(realm, controllerCore.createVectorOutputPort("sd_A_O", 13),
+        ramOutputPin(realm, "K4", controllerCore.getSdramCS());
+        ramOutputPin(realm, "K3", controllerCore.getSdramCKE());
+        ramOutputPin(realm, "C1", controllerCore.getSdramRAS());
+        ramOutputPin(realm, "C2", controllerCore.getSdramCAS());
+        ramOutputPin(realm, "D1", controllerCore.getSdramWE());
+        ramOutputPinArray(realm, controllerCore.getSdramA(),
                 "T1", "R3", "R2", "P1", "F4", "H4", "H3", "H1", "H2", "N4", "T2", "N5", "P2");
-        ramOutputPinArray(realm, controllerCore.createVectorOutputPort("sd_BA_O", 2), "K5", "K6");
-        // ramBidirectionalPin(realm, "G3", controllerCore, "sd_UDQS_IO");
-        // ramBidirectionalPin(realm, "L6", controllerCore, "sd_LDQS_IO");
+        ramOutputPinArray(realm, controllerCore.getSdramBA(), "K5", "K6");
 
         // internal Wishbone interface
-        controllerCore.createBitInputPort("wSTB_I", adapter.getEnable());
-        controllerCore.createVectorInputPort("wADR_I", 24, adapter.getWordAddress());
-        controllerCore.createBitInputPort("wWE_I", adapter.getWrite());
-        controllerCore.createVectorInputPort("wDAT_I", 32, adapter.getWriteData());
-        controllerCore.createVectorInputPort("wWRB_I", 4, adapter.getWriteMask());
-        adapter.getReadData().setConnected(controllerCore.createVectorOutputPort("wDAT_O", 32));
-        adapter.getAcknowledge().setConnected(controllerCore.createBitOutputPort("wACK_O"));
+        controllerCore.setBusEnable(adapter.getEnable());
+        controllerCore.setBusWordAddress(adapter.getWordAddress());
+        controllerCore.setBusWrite(adapter.getWrite());
+        controllerCore.setBusWriteData(adapter.getWriteData());
+        controllerCore.setBusWriteMask(adapter.getWriteMask());
+        adapter.getReadData().setConnected(controllerCore.getBusReadData());
+        adapter.getAcknowledge().setConnected(controllerCore.getBusAcknowledge());
 
     }
 

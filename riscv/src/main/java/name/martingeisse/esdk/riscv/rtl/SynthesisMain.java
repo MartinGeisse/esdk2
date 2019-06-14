@@ -36,10 +36,10 @@ public class SynthesisMain {
 		clkReset.createBitInputPort("reset_in", buttonPin(realm, "V4"));
 		design.getClockSignalConnector().setConnected(mainClockSignal);
 		computerModule.setReset(reset);
-		RtlBitSignal ddrClk0 = clkReset.createBitOutputPort("ddr_clk_0");
-		RtlBitSignal ddrClk90 = clkReset.createBitOutputPort("ddr_clk_90");
-		RtlBitSignal ddrClk180 = clkReset.createBitOutputPort("ddr_clk_180");
-		RtlBitSignal ddrClk270 = clkReset.createBitOutputPort("ddr_clk_270");
+		RtlClockNetwork ddrClk0 = realm.createClockNetwork(clkReset.createBitOutputPort("ddr_clk_0"));
+		RtlClockNetwork ddrClk90 = realm.createClockNetwork(clkReset.createBitOutputPort("ddr_clk_90"));
+		RtlClockNetwork ddrClk180 = realm.createClockNetwork(clkReset.createBitOutputPort("ddr_clk_180"));
+		RtlClockNetwork ddrClk270 = realm.createClockNetwork(clkReset.createBitOutputPort("ddr_clk_270"));
 
 		TextDisplayController.Implementation textDisplayController = (TextDisplayController.Implementation)computerModule._textDisplay;
 		VgaConnector.Implementation vgaConnector = (VgaConnector.Implementation)textDisplayController._vgaConnector;
