@@ -279,13 +279,13 @@ public class RamController2 extends RtlItem {
         ramOutputPinArray(realm, controllerCore.getSdramBA(), "K5", "K6");
 
         // internal Wishbone interface
-        controllerCore.createBitInputPort("wSTB_I", adapter.getEnable());
-        controllerCore.createVectorInputPort("wADR_I", 24, adapter.getWordAddress());
-        controllerCore.createBitInputPort("wWE_I", adapter.getWrite());
-        controllerCore.createVectorInputPort("wDAT_I", 32, adapter.getWriteData());
-        controllerCore.createVectorInputPort("wWRB_I", 4, adapter.getWriteMask());
-        adapter.getReadData().setConnected(controllerCore.createVectorOutputPort("wDAT_O", 32));
-        adapter.getAcknowledge().setConnected(controllerCore.createBitOutputPort("wACK_O"));
+        controllerCore.setBusEnable(adapter.getEnable());
+        controllerCore.setBusWordAddress(adapter.getWordAddress());
+        controllerCore.setBusWrite(adapter.getWrite());
+        controllerCore.setBusWriteData(adapter.getWriteData());
+        controllerCore.setBusWriteMask(adapter.getWriteMask());
+        adapter.getReadData().setConnected(controllerCore.getBusReadData());
+        adapter.getAcknowledge().setConnected(controllerCore.getBusAcknowledge());
 
     }
 
