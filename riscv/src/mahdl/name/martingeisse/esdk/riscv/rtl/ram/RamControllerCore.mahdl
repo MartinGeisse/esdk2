@@ -289,8 +289,8 @@ do (clk0) {
                 sdramRegisterCAS = 1;
                 sdramRegisterWE = 1;
                 sdramRegisterCS = 0;
-                sdramRegisterBA[1:0] = wADR_I[25:24];
-                sdramRegisterA[12:0] = wADR_I[23:11];
+                sdramRegisterBA[1:0] = busWordAddress[23:22];
+                sdramRegisterA[12:0] = busWordAddress[21:9];
                 wait_count = ACCESS_WAIT;
                 ddrRegisterDataOutEnable = 0;						// Not driving the bus
                 ddrRegisterDataStrobe = 0;
@@ -307,7 +307,7 @@ do (clk0) {
                     sdramRegisterCAS = 0;
                     sdramRegisterWE = 1;
                     sd_state = SD_RD_CAS_WAIT;
-                    sdramRegisterA[9:1] = wADR_I[10:2];
+                    sdramRegisterA[9:1] = busWordAddress[8:0];
                     sdramRegisterA[10] = 1;			// Use auto-precharge
                     sdramRegisterA[0] = 0;
                     wait_count = CAS_WAIT;
@@ -346,8 +346,8 @@ do (clk0) {
                 sdramRegisterCAS = 1;
                 sdramRegisterWE = 1;
                 sdramRegisterCS = 0;
-                sdramRegisterBA[1:0] = wADR_I[25:24];
-                sdramRegisterA[12:0] = wADR_I[23:11];
+                sdramRegisterBA[1:0] = busWordAddress[23:22];
+                sdramRegisterA[12:0] = busWordAddress[21:9];
                 ddrRegisterDataOut = busWriteData;
                 ddrRegisterDataOutMask = ~busWriteMask;
                 wait_count = ACCESS_WAIT;
@@ -366,7 +366,7 @@ do (clk0) {
                     sdramRegisterWE = 0;
                     ddrRegisterDataStrobeEnable = 1;
                     sd_state = SD_WR_CAS_WAIT;
-                    sdramRegisterA[9:1] = wADR_I[10:2];
+                    sdramRegisterA[9:1] = busWordAddress[8:0];
                     sdramRegisterA[10] = 1;		// Use auto-precharge
                     sdramRegisterA[0] = 0;
                 }
