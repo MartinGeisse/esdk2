@@ -269,18 +269,14 @@ public class RamController2 extends RtlItem {
         //
 
         // SDRAM DDR interface
-        ramOutputPin(realm, "K4", controllerCore.createBitOutputPort("sd_CS_O"));
-        ramOutputPin(realm, "K3", controllerCore.createBitOutputPort("sd_CKE_O"));
-        ramOutputPin(realm, "C1", controllerCore.createBitOutputPort("sd_RAS_O"));
-        ramOutputPin(realm, "C2", controllerCore.createBitOutputPort("sd_CAS_O"));
-        ramOutputPin(realm, "D1", controllerCore.createBitOutputPort("sd_WE_O"));
-//        ramOutputPin(realm, "J1", controllerCore.createBitOutputPort("sd_UDM_O"));
-//        ramOutputPin(realm, "J2", controllerCore.createBitOutputPort("sd_LDM_O"));
-        ramOutputPinArray(realm, controllerCore.createVectorOutputPort("sd_A_O", 13),
+        ramOutputPin(realm, "K4", controllerCore.getSdramCS());
+        ramOutputPin(realm, "K3", controllerCore.getSdramCKE());
+        ramOutputPin(realm, "C1", controllerCore.getSdramRAS());
+        ramOutputPin(realm, "C2", controllerCore.getSdramCAS());
+        ramOutputPin(realm, "D1", controllerCore.getSdramWE());
+        ramOutputPinArray(realm, controllerCore.getSdramA(),
                 "T1", "R3", "R2", "P1", "F4", "H4", "H3", "H1", "H2", "N4", "T2", "N5", "P2");
-        ramOutputPinArray(realm, controllerCore.createVectorOutputPort("sd_BA_O", 2), "K5", "K6");
-        // ramBidirectionalPin(realm, "G3", controllerCore, "sd_UDQS_IO");
-        // ramBidirectionalPin(realm, "L6", controllerCore, "sd_LDQS_IO");
+        ramOutputPinArray(realm, controllerCore.getSdramBA(), "K5", "K6");
 
         // internal Wishbone interface
         controllerCore.createBitInputPort("wSTB_I", adapter.getEnable());
