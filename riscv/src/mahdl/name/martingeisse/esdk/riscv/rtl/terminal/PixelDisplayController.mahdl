@@ -56,7 +56,7 @@ do (clk) {
     stage2blank = stage1hblank | stage1vblank;
     stage2hsync = stage1hsync;
     stage2vsync = stage1vsync;
-    stage2byte = rowBuffer[stage1x];
+    stage2byte = rowBuffer[~stage1y[0] _ stage1x];
 }
 
 // refill
@@ -65,7 +65,7 @@ register bit refillInProgress;
 // TODO for now we refill vblank lines too, creating unnecessary load on the SDRAM
 do (clk) {
     if (refillInProgress) {
-        rowBuffer[refillPointer] = 5d0 _ stage1y[0] _ 1d0 _ refillPointer[5];
+        rowBuffer[stage1y[0] _ refillPointer] = 5d0 _ stage1y[0] _ 1d0 _ refillPointer[5];
     }
 }
 do (clk) {
