@@ -37,7 +37,7 @@ public class SynthesisMain {
 		RtlClockNetwork ddrClk180 = realm.createClockNetwork(clkReset.createBitOutputPort("ddr_clk_180"));
 		RtlClockNetwork ddrClk270 = realm.createClockNetwork(clkReset.createBitOutputPort("ddr_clk_270"));
 
-		PixelDisplayController.Implementation displayController = (PixelDisplayController.Implementation)computerModule._display;
+		TextDisplayController.Implementation displayController = (TextDisplayController.Implementation)computerModule._display;
 		VgaConnector.Implementation vgaConnector = (VgaConnector.Implementation) displayController._vgaConnector;
 		vgaPin(realm, "H14", vgaConnector.getR());
 		vgaPin(realm, "H15", vgaConnector.getG());
