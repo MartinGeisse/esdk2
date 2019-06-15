@@ -9,14 +9,18 @@ interface {
 // stage 1: VGA timing
 //
 
+// We need the v signals delayed by one row (compared to stage1y) since the Y position is used to fill the row buffer,
+// and that row will be displayed during the *next* monitor beam row. Hence stage1vblankDelayed / stage1vsyncDelayed.
 register vector[10] stage1x, stage1y;
-register bit stage1p, stage1hblank, stage1vblank, stage1hsync, stage1vsync;
+register bit stage1p, stage1hblank, stage1vblank, stage1vblankDelayed, stage1hsync, stage1vsync, stage1vsyncDelayed;
 do (clk) {
     stage1p = ~stage1p;
     if (stage1p) {
         if (stage1x == 10d799) {
             stage1hblank = 0;
             stage1x = 0;
+            stage1vblankDelayed = stage1vblank;
+            stage1vsyncDelayed = stage1vsync;
             if (stage1y == 10d524) {
                 stage1vblank = 0;
                 stage1y = 0;
@@ -53,9 +57,9 @@ register matrix[2048][8] rowBuffer;
 register bit stage2blank, stage2hsync, stage2vsync;
 register vector[8] stage2byte;
 do (clk) {
-    stage2blank = stage1hblank | stage1vblank;
+    stage2blank = stage1hblank | stage1vblankDelayed;
     stage2hsync = stage1hsync;
-    stage2vsync = stage1vsync;
+    stage2vsync = stage1vsyncDelayed;
     stage2byte = rowBuffer[~stage1y[0] _ stage1x];
 }
 
