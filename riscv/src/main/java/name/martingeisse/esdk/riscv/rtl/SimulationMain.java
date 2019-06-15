@@ -20,7 +20,7 @@ public class SimulationMain {
 		ComputerDesign design = new ComputerDesign() {
 			@Override
 			protected ComputerModule.Implementation createComputerModule() {
-				return new ComputerModule.Implementation(getRealm(), getClock()) {
+				return new ComputerModule.Implementation(getRealm(), getClock(), getDdrClock0(), getDdrClock180(), getDdrClock270(), getDdrClock90()) {
 
 //					@Override
 //					protected TextDisplayController createTextDisplay() {

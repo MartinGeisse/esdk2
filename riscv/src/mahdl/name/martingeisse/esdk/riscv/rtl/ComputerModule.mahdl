@@ -3,6 +3,8 @@ module name.martingeisse.esdk.riscv.rtl.ComputerModule;
 interface {
     in clock clk;
     in bit reset;
+
+    in clock ddrClock0, ddrClock90, ddrClock180, ddrClock270;
 }
 
 name.martingeisse.esdk.riscv.rtl.Multicycle cpu;
@@ -20,7 +22,7 @@ register bit secondReadCycle = 0;
 // peripherals
 name.martingeisse.esdk.riscv.rtl.terminal.TextDisplayController display;
 name.martingeisse.esdk.riscv.rtl.terminal.KeyboardController keyboard;
-name.martingeisse.esdk.riscv.rtl.ram.RamControllerAdapter bigRam;
+name.martingeisse.esdk.riscv.rtl.ram.RamControllerCore bigRam;
 name.martingeisse.esdk.library.SignalLoggerBusInterface signalLogger;
 
 do (*) {
@@ -31,11 +33,11 @@ do (*) {
 
     // data interface
     memoryDataWordAddress = cpu.memoryWordAddress[9:0];
-    cpu.memoryReadData = bigRamSelected ? bigRam.readData :
+    cpu.memoryReadData = bigRamSelected ? bigRam.busReadData :
             terminalSelected ? (24d0 _ keyboard.inputData) :
                     signalLoggerSelected ? signalLogger.busReadData :
                             memoryReadData;
-    cpu.memoryAcknowledge = bigRamSelected ? bigRam.acknowledge :
+    cpu.memoryAcknowledge = bigRamSelected ? bigRam.busAcknowledge :
             terminalSelected ? bit(1) :
                     signalLoggerSelected ? signalLogger.busAcknowledge :
                             (cpu.memoryWrite | secondReadCycle);
@@ -49,12 +51,16 @@ do (*) {
     keyboard.clk = clk;
     keyboard.inputAcknowledge = cpu.memoryEnable & ~cpu.memoryWrite & terminalSelected;
 
-    bigRam.clk = clk;
-    bigRam.enable = cpu.memoryEnable & bigRamSelected;
-    bigRam.write = cpu.memoryWrite;
-    bigRam.wordAddress = cpu.memoryWordAddress[23:0];
-    bigRam.writeData = cpu.memoryWriteData;
-    bigRam.writeMask = cpu.memoryWriteMask;
+    bigRam.clk0 = ddrClock0;
+    bigRam.clk90 = ddrClock90;
+    bigRam.clk180 = ddrClock180;
+    bigRam.clk270 = ddrClock270;
+    bigRam.reset = reset;
+    bigRam.busEnable = cpu.memoryEnable & bigRamSelected;
+    bigRam.busWrite = cpu.memoryWrite;
+    bigRam.busWordAddress = cpu.memoryWordAddress[23:0];
+    bigRam.busWriteData = cpu.memoryWriteData;
+    bigRam.busWriteMask = cpu.memoryWriteMask;
 
     signalLogger.busEnable = cpu.memoryEnable & signalLoggerSelected;
     signalLogger.busWrite = cpu.memoryWrite;

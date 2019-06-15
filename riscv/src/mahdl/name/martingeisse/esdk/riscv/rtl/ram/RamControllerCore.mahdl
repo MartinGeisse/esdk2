@@ -17,37 +17,16 @@ interface {
     out vector[32] busReadData;
     out bit busAcknowledge;
 
-    // TODO create pins in the enclosing design
-    // TODO old Verilog file contained ports for *DQS, *DM. Remove first before attempting to use this module.
-
-    // SDRAM control interface
-    out bit sdramCKE;
-    out bit sdramCS;
-    out vector[2] sdramBA;
-    out vector[13] sdramA;
-    out bit sdramRAS;
-    out bit sdramCAS;
-    out bit sdramWE;
-
-    // SDRAM DDR data interface
-    out bit ddrInterfaceDataStrobeEnable;
-    out bit ddrInterfaceDataStrobe;
-    out bit ddrInterfaceDataOutEnable;
-    out vector[32] ddrInterfaceDataOut;
-    out vector[4] ddrInterfaceDataOutMask;
-    in vector[32] ddrInterfaceDataIn;
-
 }
 
-// interface to DDR SDRAM memory
-//
-// internal interface signals
-// A[25:24] = bank[1:0]
-// A[23:11] = row[12:0]
-// A[10: 2] = col[9:1]
-// (a specific combination of the 2+13+9=24 bits adresses
-// a 32-bit word which is transmitted as a burst of two
-// consecutive 16-bit halfwords in one clock cycle)
+// interface to SDRAM
+name.martingeisse.esdk.riscv.rtl.ram.SdramConnector sdram;
+do (*) {
+    sdram.clk0 = clk0;
+    sdram.clk90 = clk90;
+    sdram.clk180 = clk180;
+    sdram.clk270 = clk270;
+}
 
 // timing
 constant vector[5] WAIT_TIME = 5d5;
@@ -105,13 +84,13 @@ register bit sdramRegisterRAS;
 register bit sdramRegisterCAS;
 register bit sdramRegisterWE;
 do (*) {
-    sdramCKE = sdramRegisterCKE;
-    sdramCS = sdramRegisterCS;
-    sdramBA = sdramRegisterBA;
-    sdramA = sdramRegisterA;
-    sdramRAS = sdramRegisterRAS;
-    sdramCAS = sdramRegisterCAS;
-    sdramWE = sdramRegisterWE;
+    sdram.sdramCKE = sdramRegisterCKE;
+    sdram.sdramCS = sdramRegisterCS;
+    sdram.sdramBA = sdramRegisterBA;
+    sdram.sdramA = sdramRegisterA;
+    sdram.sdramRAS = sdramRegisterRAS;
+    sdram.sdramCAS = sdramRegisterCAS;
+    sdram.sdramWE = sdramRegisterWE;
 }
 
 // Wishbone output registers for the main and init state machine
@@ -129,17 +108,17 @@ register bit ddrRegisterDataOutEnable;
 register vector[32] ddrRegisterDataOut;
 register vector[4] ddrRegisterDataOutMask;
 do (*) {
-    ddrInterfaceDataStrobeEnable = ddrRegisterDataStrobeEnable;
-    ddrInterfaceDataStrobe = ddrRegisterDataStrobe;
-    ddrInterfaceDataOutEnable = ddrRegisterDataOutEnable;
-    ddrInterfaceDataOut = ddrRegisterDataOut;
-    ddrInterfaceDataOutMask = ddrRegisterDataOutMask;
+    sdram.ddrInterfaceDataStrobeEnable = ddrRegisterDataStrobeEnable;
+    sdram.ddrInterfaceDataStrobe = ddrRegisterDataStrobe;
+    sdram.ddrInterfaceDataOutEnable = ddrRegisterDataOutEnable;
+    sdram.ddrInterfaceDataOut = ddrRegisterDataOut;
+    sdram.ddrInterfaceDataOutMask = ddrRegisterDataOutMask;
 }
 
 // DDR data sampling
 register vector[32] ddrRegisterDataIn;
 do (clk180) {
-    ddrRegisterDataIn = ddrInterfaceDataIn;
+    ddrRegisterDataIn = sdram.ddrInterfaceDataIn;
 }
 
 // main and init state machines

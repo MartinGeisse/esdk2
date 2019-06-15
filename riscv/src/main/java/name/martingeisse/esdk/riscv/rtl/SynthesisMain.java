@@ -3,15 +3,23 @@ package name.martingeisse.esdk.riscv.rtl;
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.module.RtlModuleInstance;
-import name.martingeisse.esdk.core.rtl.pin.*;
-import name.martingeisse.esdk.core.rtl.signal.*;
+import name.martingeisse.esdk.core.rtl.pin.RtlInputPin;
+import name.martingeisse.esdk.core.rtl.pin.RtlOutputPin;
+import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
+import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
+import name.martingeisse.esdk.core.rtl.signal.RtlVectorConstant;
 import name.martingeisse.esdk.core.rtl.synthesis.prettify.RtlPrettifier;
 import name.martingeisse.esdk.core.rtl.synthesis.xilinx.ProjectGenerator;
 import name.martingeisse.esdk.core.rtl.synthesis.xilinx.XilinxPinConfiguration;
 import name.martingeisse.esdk.library.SignalLogger;
 import name.martingeisse.esdk.library.SignalLoggerBusInterface;
-import name.martingeisse.esdk.riscv.rtl.ram.RamController;
-import name.martingeisse.esdk.riscv.rtl.terminal.*;
+import name.martingeisse.esdk.riscv.rtl.ram.RamControllerCore;
+import name.martingeisse.esdk.riscv.rtl.ram.SdramConnector;
+import name.martingeisse.esdk.riscv.rtl.ram.SdramConnectorImpl;
+import name.martingeisse.esdk.riscv.rtl.terminal.KeyboardController;
+import name.martingeisse.esdk.riscv.rtl.terminal.Ps2Connector;
+import name.martingeisse.esdk.riscv.rtl.terminal.TextDisplayController;
+import name.martingeisse.esdk.riscv.rtl.terminal.VgaConnector;
 
 import java.io.File;
 
@@ -21,7 +29,22 @@ import java.io.File;
 public class SynthesisMain {
 
 	public static void main(String[] args) throws Exception {
-		ComputerDesign design = new ComputerDesign();
+		ComputerDesign design = new ComputerDesign() {
+			@Override
+			protected ComputerModule.Implementation createComputerModule() {
+				return new ComputerModule.Implementation(getRealm(), getClock(), getDdrClock0(), getDdrClock180(), getDdrClock270(), getDdrClock90()) {
+					@Override
+					protected RamControllerCore createBigRam() {
+						return new name.martingeisse.esdk.riscv.rtl.ram.RamControllerCore.Implementation(getRealm(), _ddrClock0, _ddrClock180, _ddrClock270, _ddrClock90) {
+							@Override
+							protected SdramConnector createSdram() {
+								return new SdramConnectorImpl(getRealm(), _clk0, _clk180, _clk270, _clk90);
+							}
+						};
+					}
+				};
+			}
+		};
 		ComputerModule.Implementation computerModule = design.getComputerModule();
 		RtlRealm realm = design.getRealm();
 
@@ -32,10 +55,10 @@ public class SynthesisMain {
 		clkReset.createBitInputPort("reset_in", buttonPin(realm, "V4"));
 		design.getClockSignalConnector().setConnected(mainClockSignal);
 		computerModule.setReset(reset);
-		RtlClockNetwork ddrClk0 = realm.createClockNetwork(clkReset.createBitOutputPort("ddr_clk_0"));
-		RtlClockNetwork ddrClk90 = realm.createClockNetwork(clkReset.createBitOutputPort("ddr_clk_90"));
-		RtlClockNetwork ddrClk180 = realm.createClockNetwork(clkReset.createBitOutputPort("ddr_clk_180"));
-		RtlClockNetwork ddrClk270 = realm.createClockNetwork(clkReset.createBitOutputPort("ddr_clk_270"));
+		design.getDdrClock0SignalConnector().setConnected(clkReset.createBitOutputPort("ddr_clk_0"));
+		design.getDdrClock90SignalConnector().setConnected(clkReset.createBitOutputPort("ddr_clk_90"));
+		design.getDdrClock180SignalConnector().setConnected(clkReset.createBitOutputPort("ddr_clk_180"));
+		design.getDdrClock270SignalConnector().setConnected(clkReset.createBitOutputPort("ddr_clk_270"));
 
 		TextDisplayController.Implementation displayController = (TextDisplayController.Implementation)computerModule._display;
 		VgaConnector.Implementation vgaConnector = (VgaConnector.Implementation) displayController._vgaConnector;
@@ -49,11 +72,6 @@ public class SynthesisMain {
 		Ps2Connector.Implementation ps2Connector = (Ps2Connector.Implementation)keyboardController._ps2;
 		ps2Connector.setClk(ps2Pin(realm, "G14"));
 		ps2Connector.setData(ps2Pin(realm, "G13"));
-
-		//
-        // SDRAM
-        //
-		new RamController(realm, ddrClk0, ddrClk90, ddrClk180, ddrClk270, reset, computerModule._bigRam);
 
         //
 		// signal logger
