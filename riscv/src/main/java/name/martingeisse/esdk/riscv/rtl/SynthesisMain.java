@@ -7,6 +7,7 @@ import name.martingeisse.esdk.core.rtl.pin.RtlInputPin;
 import name.martingeisse.esdk.core.rtl.pin.RtlOutputPin;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
+import name.martingeisse.esdk.core.rtl.signal.RtlConcatenation;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorConstant;
 import name.martingeisse.esdk.core.rtl.synthesis.prettify.RtlPrettifier;
 import name.martingeisse.esdk.core.rtl.synthesis.xilinx.ProjectGenerator;
@@ -49,7 +50,7 @@ public class SynthesisMain {
 		RtlBitSignal reset = clkReset.createBitOutputPort("reset");
 		RtlBitSignal mainClockSignal = clkReset.createBitOutputPort("clk");
 		clkReset.createBitInputPort("clk_in", clockPin(realm));
-		clkReset.createBitInputPort("reset_in", buttonPin(realm, "V4"));
+		clkReset.createBitInputPort("reset_in", buttonPin(realm, "V16"));
 		design.getClockSignalConnector().setConnected(mainClockSignal);
 		computerModule.setReset(reset);
 		design.getDdrClock0SignalConnector().setConnected(clkReset.createBitOutputPort("ddr_clk_0"));
@@ -83,6 +84,20 @@ public class SynthesisMain {
 		loggerInterface.setBusReadData(signalLogger.getBusReadData());
 		loggerInterface.setBusAcknowledge(signalLogger.getBusAcknowledge());
 
+		//
+		// GPIO (buttons and switches; LEDs not yet implemented)
+		//
+		computerModule.setButtonsAndSwitches(new RtlConcatenation(realm,
+			slideSwitchPin(realm, "N17"), // switch 3
+			slideSwitchPin(realm, "H18"), // switch 2
+			slideSwitchPin(realm, "L14"), // switch 1
+			slideSwitchPin(realm, "L13"), // switch 0
+			buttonPin(realm, "V4"), // north
+			buttonPin(realm, "H13"), // east
+			buttonPin(realm, "K17"), // south
+			buttonPin(realm, "D18") // west
+		));
+
 		new RtlPrettifier().prettify(design.getRealm());
 		ProjectGenerator projectGenerator = new ProjectGenerator(design.getRealm(), "TerminalTest", new File("ise/terminal_test"), "XC3S500E-FG320-4");
 		projectGenerator.addVerilogFile(new File("riscv/resource/hdl/clk_reset.v"));
@@ -108,6 +123,16 @@ public class SynthesisMain {
 		XilinxPinConfiguration configuration = new XilinxPinConfiguration();
 		configuration.setIostandard("LVTTL");
 		configuration.setAdditionalInfo("PULLDOWN");
+		RtlInputPin pin = new RtlInputPin(realm);
+		pin.setId(id);
+		pin.setConfiguration(configuration);
+		return pin;
+	}
+
+	private static RtlInputPin slideSwitchPin(RtlRealm realm, String id) {
+		XilinxPinConfiguration configuration = new XilinxPinConfiguration();
+		configuration.setIostandard("LVTTL");
+		configuration.setAdditionalInfo("PULLUP");
 		RtlInputPin pin = new RtlInputPin(realm);
 		pin.setId(id);
 		pin.setConfiguration(configuration);

@@ -24,9 +24,50 @@ static void draw(int x, int y, int size) {
 }
 
 void main() {
+
     // wait for SDRAM reset
     delay(500);
-    int *basePointer = (int*)0x80000000;
+
+    clearScreen(0);
+    int x = 50, y = 240, dx = 1, dy = 0;
+    unsigned char *screen = (unsigned char *)0x80000000;
+    while (1) {
+        unsigned char *pixel = screen + y * 1024 + x;
+        if (*pixel != 0) {
+            dx = dy = 0;
+            continue;
+        }
+        *pixel = 2;
+
+        int buttons = *(int*)0x10000;
+        if (buttons & 8) {
+            dx = 0;
+            dy = -1;
+        } else if (buttons & 4) {
+            dx = 1;
+            dy = 0;
+        } else if (buttons & 2) {
+            dx = 0;
+            dy = 1;
+        } else if (buttons & 1) {
+            dx = -1;
+            dy = 0;
+        }
+
+        x += dx;
+        y += dy;
+        delay(20);
+    }
+
+
+
+
+
+
+    // clearScreen(0);
+    // draw(0, 0, 256);
+
+//     int *basePointer = (int*)0x80000000;
 
     //
     /*
@@ -44,8 +85,6 @@ void main() {
     }
     */
 
-    clearScreen(0);
-    draw(0, 0, 256);
 
 
 //    int *startPointer = basePointer + 1024 * 1024;

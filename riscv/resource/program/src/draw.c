@@ -13,3 +13,8 @@ void clearScreen(unsigned char color) {
         rowPointer += 256;
     }
 }
+
+void drawPixel(int x, int y, unsigned char color) {
+    unsigned char *pixelPointer = (unsigned char *)0x80000000;
+    pixelPointer[(y << 10) + x] = color;
+}

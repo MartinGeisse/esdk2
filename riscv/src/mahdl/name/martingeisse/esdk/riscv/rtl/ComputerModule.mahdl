@@ -5,6 +5,8 @@ interface {
     in bit reset;
 
     in clock ddrClock0, ddrClock90, ddrClock180, ddrClock270;
+
+    in vector[8] buttonsAndSwitches;
 }
 
 name.martingeisse.esdk.riscv.rtl.Multicycle cpu;
@@ -12,6 +14,7 @@ signal vector[10] memoryDataWordAddress;
 signal bit bigRamSelected = cpu.memoryWordAddress[29];
 signal bit terminalSelected = cpu.memoryWordAddress[12] & ~bigRamSelected;
 signal bit signalLoggerSelected = cpu.memoryWordAddress[13] & ~bigRamSelected;
+signal bit gpioSelected = cpu.memoryWordAddress[14] & ~bigRamSelected;
 
 // Memory: the number indicates the significance inside a word, NOT the position of a byte in a byte buffer (these
 // are different since RISC-V is little-endian).
@@ -36,11 +39,13 @@ do (*) {
     cpu.memoryReadData = bigRamSelected ? bigRam.busReadData :
             terminalSelected ? (24d0 _ keyboard.inputData) :
                     signalLoggerSelected ? signalLogger.busReadData :
-                            memoryReadData;
+                            gpioSelected ? (24d0 _ buttonsAndSwitches) :
+                                memoryReadData;
     cpu.memoryAcknowledge = bigRamSelected ? bigRam.busAcknowledge :
             terminalSelected ? bit(1) :
                     signalLoggerSelected ? signalLogger.busAcknowledge :
-                            (cpu.memoryWrite | secondReadCycle);
+                            gpioSelected ? bit(1) :
+                                (cpu.memoryWrite | secondReadCycle);
 
     display.clk = clk;
 //    display.clockEnable = 1;
