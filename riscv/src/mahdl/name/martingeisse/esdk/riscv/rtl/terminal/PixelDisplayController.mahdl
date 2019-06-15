@@ -73,7 +73,7 @@ do (clk) {
 
 // refill
 register vector[8] refillPointer;
-register bit refillInProgress;
+register bit refillInProgress, refillFinished;
 do (*) {
     ramdacWordAddress = 6d0 _ stage1y _ refillPointer;
     ramdacEnable = refillInProgress;
@@ -85,17 +85,19 @@ do (clk) {
 }
 do (clk) {
     if (refillInProgress) {
-        // if (refillPointer == 10d639) {
-        if (refillPointer == 8d16) {
+        if (refillPointer == 8d159) {
             refillInProgress = 0;
+            refillFinished = 1;
         }
         if (ramdacAcknowledge) {
             refillPointer = refillPointer + 8d1;
         }
+    } else if (refillFinished) {
+        if (stage1hblank) {
+            refillFinished = 0;
+        }
     } else {
-        // TODO for now we refill vblank lines too, creating unnecessary load on the SDRAM
-        // (can probably just use (~stage1vblank & ~stage1hblank), NOT stage1vblankDelayed!
-        refillInProgress = ~stage1hblank;
+        refillInProgress = (~stage1vblank & ~stage1hblank);
         refillPointer = 0;
     }
 }
