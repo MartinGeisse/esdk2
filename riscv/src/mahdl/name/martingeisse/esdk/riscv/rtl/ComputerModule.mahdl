@@ -66,6 +66,10 @@ do (*) {
     signalLogger.busWrite = cpu.memoryWrite;
     signalLogger.busWriteData = cpu.memoryWriteData;
 
+    // RAMDAC connections
+    bigRam.ramdacWordAddress = 0;
+    bigRam.ramdacEnable = 0;
+
 }
 
 register vector[8] memoryReadData0, memoryReadData1, memoryReadData2, memoryReadData3;
