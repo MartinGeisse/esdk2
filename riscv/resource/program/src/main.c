@@ -16,8 +16,8 @@ static void draw(int x, int y, int size) {
         draw(x + s1, y + s3, s1);
         draw(x + s3, y + s3, s1);
     } else {
-        int *pixelPointer = (int *)0x80000000;
-        int *rowPointer = pixelPointer + (y << 10);
+        unsigned char *pixelPointer = (unsigned char *)0x80000000;
+        unsigned char *rowPointer = pixelPointer + (y << 10);
         rowPointer[x] = 2;
     }
 }
@@ -45,9 +45,9 @@ void main() {
 
     {
         draw(0, 0, 64);
-        int *pixelPointer = (int *)basePointer;
+        unsigned char *pixelPointer = (unsigned char *)basePointer;
         for (int y = 0; y < 480; y++) {
-            int *rowPointer = pixelPointer + (y << 10);
+            unsigned char *rowPointer = pixelPointer + (y << 10);
             for (int x = 0; x < 64; x++) {
                 rowPointer[x] = 1;
             }

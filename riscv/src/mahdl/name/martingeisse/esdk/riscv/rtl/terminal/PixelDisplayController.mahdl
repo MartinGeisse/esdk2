@@ -57,38 +57,40 @@ do (clk) {
 //
 // stage 2: row buffer
 //
-register matrix[2048][8] rowBuffer;
+register matrix[512][32] rowBuffer;
 
 // read / pixel pipeline
 register bit stage2blank, stage2hsync, stage2vsync;
-register vector[8] stage2byte;
+register vector[32] stage2word;
+register vector[2] stage2byteSelector;
 do (clk) {
     stage2blank = stage1hblank | stage1vblankDelayed;
     stage2hsync = stage1hsync;
     stage2vsync = stage1vsyncDelayed;
-    stage2byte = rowBuffer[~stage1y[0] _ stage1x];
+    stage2word = rowBuffer[~stage1y[0] _ stage1x[9:2]];
+    stage2byteSelector = stage1x[1:0];
 }
 
 // refill
-register vector[10] refillPointer;
+register vector[8] refillPointer;
 register bit refillInProgress;
 do (*) {
-    ramdacWordAddress = 4d0 _ stage1y _ refillPointer;
+    ramdacWordAddress = 6d0 _ stage1y _ refillPointer;
     ramdacEnable = refillInProgress;
 }
 do (clk) {
     if (refillInProgress) {
-        rowBuffer[stage1y[0] _ refillPointer] = ramdacReadData[7:0];
+        rowBuffer[stage1y[0] _ refillPointer] = ramdacReadData;
     }
 }
 do (clk) {
     if (refillInProgress) {
         // if (refillPointer == 10d639) {
-        if (refillPointer == 10d64) {
+        if (refillPointer == 8d16) {
             refillInProgress = 0;
         }
         if (ramdacAcknowledge) {
-            refillPointer = refillPointer + 10d1;
+            refillPointer = refillPointer + 8d1;
         }
     } else {
         // TODO for now we refill vblank lines too, creating unnecessary load on the SDRAM
@@ -103,11 +105,18 @@ do (clk) {
 // stage 3 (non-registered): generate VGA signals
 //
 
+signal vector[8] pixelByte = switch(stage2byteSelector) {
+    case 2d0: stage2word[7:0]
+    case 2d1: stage2word[15:8]
+    case 2d2: stage2word[23:16]
+    case 2d3: stage2word[31:24]
+};
+
 name.martingeisse.esdk.riscv.rtl.terminal.VgaConnector vgaConnector;
 do (*) {
-    vgaConnector.r = stage2byte[2] & ~stage2blank;
-    vgaConnector.g = stage2byte[1] & ~stage2blank;
-    vgaConnector.b = stage2byte[0] & ~stage2blank;
+    vgaConnector.r = pixelByte[2] & ~stage2blank;
+    vgaConnector.g = pixelByte[1] & ~stage2blank;
+    vgaConnector.b = pixelByte[0] & ~stage2blank;
     vgaConnector.hsync = stage2hsync;
     vgaConnector.vsync = stage2vsync;
 }
