@@ -1,6 +1,7 @@
 
 #include "system.h"
 #include "terminal.h"
+#include "draw.h"
 
 static void draw(int x, int y, int size) {
     if (size >= 4) {
@@ -43,17 +44,8 @@ void main() {
     }
     */
 
-    {
-        draw(0, 0, 64);
-        unsigned char *pixelPointer = (unsigned char *)basePointer;
-        for (int y = 0; y < 480; y++) {
-            unsigned char *rowPointer = pixelPointer + (y << 10);
-            for (int x = 0; x < 64; x++) {
-                rowPointer[x] = 1;
-            }
-        }
-        draw(0, 0, 64);
-    }
+    clearScreen(0);
+    draw(0, 0, 256);
 
 
 //    int *startPointer = basePointer + 1024 * 1024;
