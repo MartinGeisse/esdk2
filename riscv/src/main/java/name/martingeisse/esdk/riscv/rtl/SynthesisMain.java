@@ -75,7 +75,6 @@ public class SynthesisMain {
 		new RtlPrettifier().prettify(design.getRealm());
 		ProjectGenerator projectGenerator = new ProjectGenerator(design.getRealm(), "TerminalTest", new File("ise/terminal_test"), "XC3S500E-FG320-4");
 		projectGenerator.addVerilogFile(new File("riscv/resource/hdl/clk_reset.v"));
-		projectGenerator.addVerilogFile(new File("riscv/resource/hdl/ddr_sdram.v"));
 		projectGenerator.addUcfLine("NET \"pinC9\" PERIOD = 20.0ns HIGH 40%;");
 		projectGenerator.addUcfLine("CONFIG PROHIBIT = D2;");
 		projectGenerator.addUcfLine("CONFIG PROHIBIT = G4;");

@@ -4,6 +4,20 @@
 
 void main() {
 
+    //
+    terminalWriteChar('\n');
+    terminalWriteChar('\n');
+    terminalWrite("Hello world!\n");
+    terminalWrite("FOO BAR FUPP\n");
+    for (int i = 0; i < 80; i++) {
+        terminalPlaceChar(i, 0, 1);
+        terminalPlaceChar(i, 29, 1);
+    }
+    for (int i = 0; i < 30; i++) {
+        terminalPlaceChar(0, i, 1);
+        terminalPlaceChar(79, i, 1);
+    }
+
     // wait for SDRAM reset
     delay(500);
     int *basePointer = (int*)0x80000000;
