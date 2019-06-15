@@ -3,14 +3,22 @@
 #include "terminal.h"
 
 static void draw(int x, int y, int size) {
-    if (size > 1) {
-        size = size >> 1;
-        draw(x, y, size);
-        draw(x + size, y + size, size);
+    if (size >= 4) {
+        int s1 = size >> 2;
+        int s2 = s1 + s1;
+        int s3 = s2 + s1;
+        draw(x, y, s1);
+        draw(x + s2, y, s1);
+        draw(x + s1, y + s1, s1);
+        draw(x + s3, y + s1, s1);
+        draw(x, y + s2, s1);
+        draw(x + s2, y + s2, s1);
+        draw(x + s1, y + s3, s1);
+        draw(x + s3, y + s3, s1);
     } else {
-        unsigned char *pixelPointer = (unsigned char *)0x80000000;
-        unsigned char *rowPointer = pixelPointer + (y << 6);
-        rowPointer[x] = 4;
+        int *pixelPointer = (int *)0x80000000;
+        int *rowPointer = pixelPointer + (y << 10);
+        rowPointer[x] = 2;
     }
 }
 
@@ -36,11 +44,12 @@ void main() {
     */
 
     {
-        unsigned char *pixelPointer = (unsigned char *)basePointer;
+        draw(0, 0, 64);
+        int *pixelPointer = (int *)basePointer;
         for (int y = 0; y < 480; y++) {
-            unsigned char *rowPointer = pixelPointer + (y << 6);
+            int *rowPointer = pixelPointer + (y << 10);
             for (int x = 0; x < 64; x++) {
-                rowPointer[x] = 0;
+                rowPointer[x] = 1;
             }
         }
         draw(0, 0, 64);
