@@ -41,10 +41,10 @@ do (*) {
                             (cpu.memoryWrite | secondReadCycle);
 
     display.clk = clk;
-    display.clockEnable = 1;
-    display.writeEnable = cpu.memoryEnable & cpu.memoryWrite & terminalSelected;
-    display.address = cpu.memoryWordAddress[11:0];
-    display.writeData = cpu.memoryWriteData[7:0];
+//    display.clockEnable = 1;
+//    display.writeEnable = cpu.memoryEnable & cpu.memoryWrite & terminalSelected;
+//    display.address = cpu.memoryWordAddress[11:0];
+//    display.writeData = cpu.memoryWriteData[7:0];
 
     keyboard.clk = clk;
     keyboard.inputAcknowledge = cpu.memoryEnable & ~cpu.memoryWrite & terminalSelected;
