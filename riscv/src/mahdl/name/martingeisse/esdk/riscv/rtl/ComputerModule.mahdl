@@ -18,7 +18,7 @@ signal vector[32] memoryReadData;
 register bit secondReadCycle = 0;
 
 // peripherals
-name.martingeisse.esdk.riscv.rtl.terminal.TextDisplayController textDisplay;
+name.martingeisse.esdk.riscv.rtl.terminal.PixelDisplayController display;
 name.martingeisse.esdk.riscv.rtl.terminal.KeyboardController keyboard;
 name.martingeisse.esdk.riscv.rtl.ram.RamControllerAdapter bigRam;
 name.martingeisse.esdk.library.SignalLoggerBusInterface signalLogger;
@@ -40,11 +40,11 @@ do (*) {
                     signalLoggerSelected ? signalLogger.busAcknowledge :
                             (cpu.memoryWrite | secondReadCycle);
 
-    textDisplay.clk = clk;
-    textDisplay.clockEnable = 1;
-    textDisplay.writeEnable = cpu.memoryEnable & cpu.memoryWrite & terminalSelected;
-    textDisplay.address = cpu.memoryWordAddress[11:0];
-    textDisplay.writeData = cpu.memoryWriteData[7:0];
+    display.clk = clk;
+    display.clockEnable = 1;
+    display.writeEnable = cpu.memoryEnable & cpu.memoryWrite & terminalSelected;
+    display.address = cpu.memoryWordAddress[11:0];
+    display.writeData = cpu.memoryWriteData[7:0];
 
     keyboard.clk = clk;
     keyboard.inputAcknowledge = cpu.memoryEnable & ~cpu.memoryWrite & terminalSelected;

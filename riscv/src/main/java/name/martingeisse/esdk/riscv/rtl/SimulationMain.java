@@ -22,11 +22,11 @@ public class SimulationMain {
 			protected ComputerModule.Implementation createComputerModule() {
 				return new ComputerModule.Implementation(getRealm(), getClock()) {
 
-					@Override
-					protected TextDisplayController createTextDisplay() {
-						return new SimulatedTextDisplayController(getRealm(), getClock());
-						// return super.createTextDisplay();
-					}
+//					@Override
+//					protected TextDisplayController createTextDisplay() {
+//						return new SimulatedTextDisplayController(getRealm(), getClock());
+//						// return super.createTextDisplay();
+//					}
 
 					@Override
 					protected KeyboardController createKeyboard() {
@@ -43,7 +43,7 @@ public class SimulationMain {
 		design.getClockSignalConnector().setConnected(new RtlBitConstant(realm, false));
 		new RtlClockGenerator(design.getClock(), 10);
 		computerModule.setReset(new RtlBitConstant(realm, false));
-		prepareHighlevelDisplaySimulation(design);
+		// prepareHighlevelDisplaySimulation(design);
 		// prepareHdlDisplaySimulation(design);
 
 		SignalLoggerBusInterface.Implementation loggerInterface = (SignalLoggerBusInterface.Implementation)computerModule._signalLogger;
@@ -60,31 +60,31 @@ public class SimulationMain {
 		design.simulate();
 	}
 
-	private static void prepareHighlevelDisplaySimulation(ComputerDesign design) {
-		TerminalPanel terminalPanel = new TerminalPanel(design.getClock());
-		((SimulatedTextDisplayController)design.getComputerModule()._textDisplay).setTerminalPanel(terminalPanel);
-		((SimulatedKeyboardController)design.getComputerModule()._keyboard).setTerminalPanel(terminalPanel);
-
-		JFrame frame = new JFrame("Terminal");
-		frame.add(terminalPanel);
-		frame.pack();
-		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		frame.setResizable(false);
-		frame.setVisible(true);
-		new Timer(500, event -> terminalPanel.repaint()).start();
-	}
-
-	private static void prepareHdlDisplaySimulation(ComputerDesign design) {
-		ComputerModule.Implementation computerModule = design.getComputerModule();
-		MyMonitorPanel monitorPanel = new MyMonitorPanel(design.getClock(), (TextDisplayController.Implementation) computerModule._textDisplay);
-
-		JFrame frame = new JFrame("Terminal");
-		frame.add(monitorPanel);
-		frame.pack();
-		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		frame.setResizable(false);
-		frame.setVisible(true);
-		new Timer(500, event -> monitorPanel.repaint()).start();
-	}
+//	private static void prepareHighlevelDisplaySimulation(ComputerDesign design) {
+//		TerminalPanel terminalPanel = new TerminalPanel(design.getClock());
+//		((SimulatedTextDisplayController)design.getComputerModule()._textDisplay).setTerminalPanel(terminalPanel);
+//		((SimulatedKeyboardController)design.getComputerModule()._keyboard).setTerminalPanel(terminalPanel);
+//
+//		JFrame frame = new JFrame("Terminal");
+//		frame.add(terminalPanel);
+//		frame.pack();
+//		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+//		frame.setResizable(false);
+//		frame.setVisible(true);
+//		new Timer(500, event -> terminalPanel.repaint()).start();
+//	}
+//
+//	private static void prepareHdlDisplaySimulation(ComputerDesign design) {
+//		ComputerModule.Implementation computerModule = design.getComputerModule();
+//		MyMonitorPanel monitorPanel = new MyMonitorPanel(design.getClock(), (TextDisplayController.Implementation) computerModule._textDisplay);
+//
+//		JFrame frame = new JFrame("Terminal");
+//		frame.add(monitorPanel);
+//		frame.pack();
+//		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+//		frame.setResizable(false);
+//		frame.setVisible(true);
+//		new Timer(500, event -> monitorPanel.repaint()).start();
+//	}
 
 }

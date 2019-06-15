@@ -8,14 +8,10 @@ import name.martingeisse.esdk.core.rtl.signal.*;
 import name.martingeisse.esdk.core.rtl.synthesis.prettify.RtlPrettifier;
 import name.martingeisse.esdk.core.rtl.synthesis.xilinx.ProjectGenerator;
 import name.martingeisse.esdk.core.rtl.synthesis.xilinx.XilinxPinConfiguration;
-import name.martingeisse.esdk.core.util.vector.VectorValue;
 import name.martingeisse.esdk.library.SignalLogger;
 import name.martingeisse.esdk.library.SignalLoggerBusInterface;
 import name.martingeisse.esdk.riscv.rtl.ram.RamController;
-import name.martingeisse.esdk.riscv.rtl.terminal.KeyboardController;
-import name.martingeisse.esdk.riscv.rtl.terminal.Ps2Connector;
-import name.martingeisse.esdk.riscv.rtl.terminal.TextDisplayController;
-import name.martingeisse.esdk.riscv.rtl.terminal.VgaConnector;
+import name.martingeisse.esdk.riscv.rtl.terminal.*;
 
 import java.io.File;
 
@@ -41,8 +37,8 @@ public class SynthesisMain {
 		RtlClockNetwork ddrClk180 = realm.createClockNetwork(clkReset.createBitOutputPort("ddr_clk_180"));
 		RtlClockNetwork ddrClk270 = realm.createClockNetwork(clkReset.createBitOutputPort("ddr_clk_270"));
 
-		TextDisplayController.Implementation textDisplayController = (TextDisplayController.Implementation)computerModule._textDisplay;
-		VgaConnector.Implementation vgaConnector = (VgaConnector.Implementation)textDisplayController._vgaConnector;
+		PixelDisplayController.Implementation displayController = (PixelDisplayController.Implementation)computerModule._display;
+		VgaConnector.Implementation vgaConnector = (VgaConnector.Implementation) displayController._vgaConnector;
 		vgaPin(realm, "H14", vgaConnector.getR());
 		vgaPin(realm, "H15", vgaConnector.getG());
 		vgaPin(realm, "G15", vgaConnector.getB());
