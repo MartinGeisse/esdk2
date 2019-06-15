@@ -13,7 +13,7 @@ import name.martingeisse.esdk.core.rtl.synthesis.xilinx.ProjectGenerator;
 import name.martingeisse.esdk.core.rtl.synthesis.xilinx.XilinxPinConfiguration;
 import name.martingeisse.esdk.library.SignalLogger;
 import name.martingeisse.esdk.library.SignalLoggerBusInterface;
-import name.martingeisse.esdk.riscv.rtl.ram.RamControllerCore;
+import name.martingeisse.esdk.riscv.rtl.ram.RamController;
 import name.martingeisse.esdk.riscv.rtl.ram.SdramConnector;
 import name.martingeisse.esdk.riscv.rtl.ram.SdramConnectorImpl;
 import name.martingeisse.esdk.riscv.rtl.terminal.KeyboardController;
@@ -34,8 +34,8 @@ public class SynthesisMain {
 			protected ComputerModule.Implementation createComputerModule() {
 				return new ComputerModule.Implementation(getRealm(), getClock(), getDdrClock0(), getDdrClock180(), getDdrClock270(), getDdrClock90()) {
 					@Override
-					protected RamControllerCore createBigRam() {
-						return new name.martingeisse.esdk.riscv.rtl.ram.RamControllerCore.Implementation(getRealm(), _ddrClock0, _ddrClock180, _ddrClock270, _ddrClock90) {
+					protected RamController createBigRam() {
+						return new name.martingeisse.esdk.riscv.rtl.ram.RamController.Implementation(getRealm(), _ddrClock0, _ddrClock180, _ddrClock270, _ddrClock90) {
 							@Override
 							protected SdramConnector createSdram() {
 								return new SdramConnectorImpl(getRealm(), _clk0, _clk180, _clk270, _clk90);

@@ -1,4 +1,4 @@
-module name.martingeisse.esdk.riscv.rtl.ram.RamControllerCore;
+module name.martingeisse.esdk.riscv.rtl.ram.RamController;
 
 interface {
 
