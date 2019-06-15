@@ -2,6 +2,12 @@ module name.martingeisse.esdk.riscv.rtl.terminal.PixelDisplayController;
 
 interface {
     in clock clk;
+
+    out vector[24] ramdacWordAddress;
+    out bit ramdacEnable;
+    in vector[32] ramdacReadData;
+    in bit ramdacAcknowledge;
+
 }
 
 
@@ -66,21 +72,29 @@ do (clk) {
 // refill
 register vector[10] refillPointer;
 register bit refillInProgress;
+do (*) {
+    ramdacWordAddress = 4d0 _ stage1y _ refillPointer;
+    ramdacEnable = refillInProgress;
+}
 do (clk) {
     if (refillInProgress) {
-        rowBuffer[stage1y[0] _ refillPointer] = 5d0 _ stage1y[0] _ 1d0 _ refillPointer[5];
+        rowBuffer[stage1y[0] _ refillPointer] = ramdacReadData[7:0];
     }
 }
 do (clk) {
     if (refillInProgress) {
-        if (refillPointer == 10d639) {
+        // if (refillPointer == 10d639) {
+        if (refillPointer == 10d64) {
             refillInProgress = 0;
         }
-        refillPointer = refillPointer + 10d1;
+        if (ramdacAcknowledge) {
+            refillPointer = refillPointer + 10d1;
+        }
     } else {
         // TODO for now we refill vblank lines too, creating unnecessary load on the SDRAM
         // (can probably just use (~stage1vblank & ~stage1hblank), NOT stage1vblankDelayed!
         refillInProgress = ~stage1hblank;
+        refillPointer = 0;
     }
 }
 

@@ -16,10 +16,7 @@ import name.martingeisse.esdk.library.SignalLoggerBusInterface;
 import name.martingeisse.esdk.riscv.rtl.ram.RamController;
 import name.martingeisse.esdk.riscv.rtl.ram.SdramConnector;
 import name.martingeisse.esdk.riscv.rtl.ram.SdramConnectorImpl;
-import name.martingeisse.esdk.riscv.rtl.terminal.KeyboardController;
-import name.martingeisse.esdk.riscv.rtl.terminal.Ps2Connector;
-import name.martingeisse.esdk.riscv.rtl.terminal.TextDisplayController;
-import name.martingeisse.esdk.riscv.rtl.terminal.VgaConnector;
+import name.martingeisse.esdk.riscv.rtl.terminal.*;
 
 import java.io.File;
 
@@ -60,7 +57,7 @@ public class SynthesisMain {
 		design.getDdrClock180SignalConnector().setConnected(clkReset.createBitOutputPort("ddr_clk_180"));
 		design.getDdrClock270SignalConnector().setConnected(clkReset.createBitOutputPort("ddr_clk_270"));
 
-		TextDisplayController.Implementation displayController = (TextDisplayController.Implementation)computerModule._display;
+		PixelDisplayController.Implementation displayController = (PixelDisplayController.Implementation)computerModule._display;
 		VgaConnector.Implementation vgaConnector = (VgaConnector.Implementation) displayController._vgaConnector;
 		vgaPin(realm, "H14", vgaConnector.getR());
 		vgaPin(realm, "H15", vgaConnector.getG());

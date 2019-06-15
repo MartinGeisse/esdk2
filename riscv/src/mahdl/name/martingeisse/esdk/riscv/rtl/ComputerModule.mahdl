@@ -20,7 +20,7 @@ signal vector[32] memoryReadData;
 register bit secondReadCycle = 0;
 
 // peripherals
-name.martingeisse.esdk.riscv.rtl.terminal.TextDisplayController display;
+name.martingeisse.esdk.riscv.rtl.terminal.PixelDisplayController display;
 name.martingeisse.esdk.riscv.rtl.terminal.KeyboardController keyboard;
 name.martingeisse.esdk.riscv.rtl.ram.RamController bigRam;
 name.martingeisse.esdk.library.SignalLoggerBusInterface signalLogger;
@@ -43,10 +43,10 @@ do (*) {
                             (cpu.memoryWrite | secondReadCycle);
 
     display.clk = clk;
-    display.clockEnable = 1;
-    display.writeEnable = cpu.memoryEnable & cpu.memoryWrite & terminalSelected;
-    display.address = cpu.memoryWordAddress[11:0];
-    display.writeData = cpu.memoryWriteData[7:0];
+//    display.clockEnable = 1;
+//    display.writeEnable = cpu.memoryEnable & cpu.memoryWrite & terminalSelected;
+//    display.address = cpu.memoryWordAddress[11:0];
+//    display.writeData = cpu.memoryWriteData[7:0];
 
     keyboard.clk = clk;
     keyboard.inputAcknowledge = cpu.memoryEnable & ~cpu.memoryWrite & terminalSelected;
@@ -67,8 +67,10 @@ do (*) {
     signalLogger.busWriteData = cpu.memoryWriteData;
 
     // RAMDAC connections
-    bigRam.ramdacWordAddress = 0;
-    bigRam.ramdacEnable = 0;
+    bigRam.ramdacWordAddress = display.ramdacWordAddress;
+    bigRam.ramdacEnable = display.ramdacEnable;
+    display.ramdacReadData = bigRam.ramdacReadData;
+    display.ramdacAcknowledge = bigRam.ramdacAcknowledge;
 
 }
 
