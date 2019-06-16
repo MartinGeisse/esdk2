@@ -1,3 +1,5 @@
+package name.martingeisse.esdk.ui;
+
 import javax.swing.*;
 
 /**

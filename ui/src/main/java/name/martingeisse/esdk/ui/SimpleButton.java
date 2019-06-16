@@ -1,3 +1,5 @@
+package name.martingeisse.esdk.ui;
+
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.simulation.RtlSimulatedSettableBitSignal;
 
@@ -30,6 +32,10 @@ public class SimpleButton implements VisualizerWidget {
 
 	public RtlSimulatedSettableBitSignal getSignal() {
 		return signal;
+	}
+
+	protected String getLabel() {
+		return label;
 	}
 
 	@Override
