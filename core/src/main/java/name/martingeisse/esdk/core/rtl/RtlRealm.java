@@ -9,6 +9,7 @@ import name.martingeisse.esdk.core.model.Item;
 import name.martingeisse.esdk.core.rtl.module.RtlModuleInstance;
 import name.martingeisse.esdk.core.rtl.pin.RtlPin;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
+import name.martingeisse.esdk.core.rtl.simulation.RtlSimulatedComputedBitSignal;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +30,7 @@ public final class RtlRealm extends Item {
 	private final List<RtlClockNetwork> clockNetworks = new ArrayList<>();
 	private final List<RtlClockedItem> clockedItems = new ArrayList<>();
 	private final List<RtlModuleInstance> moduleInstances = new ArrayList<>();
+	private RtlClockNetwork nullClockNetwork = null;
 
 	public RtlRealm(Design design) {
 		super(design);
@@ -111,6 +113,23 @@ public final class RtlRealm extends Item {
 
 	public RtlClockNetwork createClockNetwork(RtlBitSignal clockSignal) {
 		return new RtlClockNetwork(this, clockSignal);
+	}
+
+	/**
+	 * Returns a clock network that never fires during simulation and that causes an exception during synthesis. This
+	 * can be used as the clock network for an unwanted register that gets created solely because NOT creating it
+	 * would complicate the code.
+	 */
+	public RtlClockNetwork getNullClockNetwork() {
+		if (nullClockNetwork == null) {
+			nullClockNetwork = createClockNetwork(new RtlSimulatedComputedBitSignal(this) {
+				@Override
+				public boolean getValue() {
+					return false;
+				}
+			});
+		}
+		return nullClockNetwork;
 	}
 
 	// ----------------------------------------------------------------------------------------------------------------
