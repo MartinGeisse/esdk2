@@ -84,7 +84,7 @@ public class SdramConnectorImpl extends SdramConnector.Implementation {
 
             RtlBitSignalConnector inputDdrBitConnector = new RtlBitSignalConnector(realm);
 
-            // TODO sampling at clk0 and clk180 seems wrong to me. The original ddr_sdram code said in a comment that
+            // Sampling at clk0 and clk180 seems wrong to me. The original ddr_sdram code said in a comment that
             // with CL=2 the data could for some strange reason be sampled at 2.5 cycles after issuing a READ
             // command, but it does not say whether the author expected 2 cycles or 2.25 cycles to be correct.
             // The DDR spec would demand 2.25 cycles -- 2 cycles after the READ comes the positive DQS edge, 0.25
