@@ -10,7 +10,7 @@ import name.martingeisse.esdk.core.rtl.synthesis.verilog.*;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogContribution;
 
 /**
- * TODO generate tri-state assignment
+ *
  */
 public final class RtlBidirectionalPin extends RtlPin implements RtlBitSignal {
 
