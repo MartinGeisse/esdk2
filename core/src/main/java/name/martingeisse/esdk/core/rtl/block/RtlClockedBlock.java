@@ -25,10 +25,6 @@ import java.util.Map;
  * <p>
  * For a sequence of statements grouped as a single statement, commonly referred to as a "block"
  * inside compilers, see {@link RtlStatementSequence}.
- * <p>
- * TODO get rid of "initializer statements" and just use the current value of procedural registers to create the
- * initial-block, just like for matrices.
- * </p>
  */
 public final class RtlClockedBlock extends RtlClockedItem {
 
