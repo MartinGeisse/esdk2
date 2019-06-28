@@ -7,6 +7,7 @@ package name.martingeisse.esdk.core.rtl.block;
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlClockedItem;
 import name.martingeisse.esdk.core.rtl.block.statement.RtlStatementSequence;
+import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.*;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogContribution;
@@ -33,7 +34,6 @@ public final class RtlClockedBlock extends RtlClockedItem {
 
 	private final List<RtlProceduralRegister> proceduralRegisters;
 	private final List<RtlProceduralMemory> proceduralMemories;
-	private final RtlStatementSequence initializerStatements;
 	private final RtlStatementSequence statements;
 
 	public RtlClockedBlock(RtlClockNetwork clockNetwork) {
@@ -41,7 +41,6 @@ public final class RtlClockedBlock extends RtlClockedItem {
 
 		this.proceduralRegisters = new ArrayList<>();
 		this.proceduralMemories = new ArrayList<>();
-		this.initializerStatements = new RtlStatementSequence(getRealm());
 		this.statements = new RtlStatementSequence(getRealm());
 	}
 
@@ -61,10 +60,6 @@ public final class RtlClockedBlock extends RtlClockedItem {
 		return proceduralMemories;
 	}
 
-	public RtlStatementSequence getInitializerStatements() {
-		return initializerStatements;
-	}
-
 	public RtlStatementSequence getStatements() {
 		return statements;
 	}
@@ -78,9 +73,7 @@ public final class RtlClockedBlock extends RtlClockedItem {
 	}
 
 	public RtlProceduralBitRegister createBit(boolean initialValue) {
-		RtlProceduralBitRegister register = new RtlProceduralBitRegister(getRealm(), this, initialValue);
-		initializerStatements.assign(register, initialValue);
-		return register;
+		return new RtlProceduralBitRegister(getRealm(), this, initialValue);
 	}
 
 	public RtlProceduralVectorRegister createVector(int width) {
@@ -88,9 +81,7 @@ public final class RtlClockedBlock extends RtlClockedItem {
 	}
 
 	public RtlProceduralVectorRegister createVector(int width, VectorValue initialValue) {
-		RtlProceduralVectorRegister register = new RtlProceduralVectorRegister(getRealm(), this, width, initialValue);
-		initializerStatements.assign(register, initialValue);
-		return register;
+		return new RtlProceduralVectorRegister(getRealm(), this, width, initialValue);
 	}
 
 	public RtlProceduralVectorRegister createVector(int width, int initialValue) {
@@ -108,11 +99,6 @@ public final class RtlClockedBlock extends RtlClockedItem {
 	// ----------------------------------------------------------------------------------------------------------------
 	// simulation
 	// ----------------------------------------------------------------------------------------------------------------
-
-	public void initializeSimulation() {
-		initializerStatements.execute();
-		updateState();
-	}
 
 	public void computeNextState() {
 		statements.execute();
@@ -151,7 +137,6 @@ public final class RtlClockedBlock extends RtlClockedItem {
 
 			@Override
 			public void analyzeSignalUsage(SignalUsageConsumer consumer) {
-				initializerStatements.analyzeSignalUsage(consumer);
 				statements.analyzeSignalUsage(consumer);
 			}
 
@@ -171,7 +156,21 @@ public final class RtlClockedBlock extends RtlClockedItem {
 				out.indent();
 				out.println("initial begin");
 				out.startIndentation();
-				initializerStatements.printVerilogStatements(out);
+				for (RtlProceduralRegister register : proceduralRegisters) {
+					out.indent();
+					register.printVerilogAssignmentTarget(out);
+					out.print(" <= ");
+					if (register instanceof RtlProceduralBitRegister) {
+						boolean value = ((RtlProceduralBitRegister) register).getValue();
+						out.print(RtlBitConstant.getVerilogConstant(value));
+					} else if (register instanceof RtlProceduralVectorRegister) {
+						VectorValue value = ((RtlProceduralVectorRegister) register).getValue();
+						value.printVerilogExpression(out);
+					} else {
+						throw new RuntimeException("unknown register type: " + register);
+					}
+					out.println(";");
+				}
 				for (RtlProceduralMemory memory : proceduralMemories) {
 					String memoryName = memoryNames.get(memory);
 					Matrix matrix = memory.getMatrix();
