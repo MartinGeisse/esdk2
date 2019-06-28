@@ -98,10 +98,7 @@ Implement the above with few components that can be combined:
 - instruction-level simulator
 	- configurable handling for syscall (incl. super-syscall), IO and unknown instruction
 	- implements Item for composability / concurrency -- allows multiple instances
-	- TODO: RTL bridge
-- TODO: RTL implementations
-	- multiple implementations might be necessary for single-cycle, multi-cycle, pipeline design A, pipeline design B, ...
-	- multiple implementations might be necessary for cycle-level vs. RTL
+	- (RTL bridge)
 
 Adapters:
 - RTL-to-transaction signal bridge (generic, not related to RISC-V)
