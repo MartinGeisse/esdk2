@@ -4,7 +4,7 @@ import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.simulation.RtlClockedSimulationItem;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
-import name.martingeisse.esdk.tools.InstructionDisassembler;
+import name.martingeisse.esdk.riscv.tools.InstructionDisassembler;
 
 /**
  *

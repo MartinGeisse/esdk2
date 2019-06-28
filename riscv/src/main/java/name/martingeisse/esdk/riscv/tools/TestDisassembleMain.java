@@ -2,7 +2,7 @@
  * Copyright (c) 2018 Martin Geisse
  * This file is distributed under the terms of the MIT license.
  */
-package name.martingeisse.esdk.tools;
+package name.martingeisse.esdk.riscv.tools;
 
 import name.martingeisse.esdk.library.util.StringUtil;
 
