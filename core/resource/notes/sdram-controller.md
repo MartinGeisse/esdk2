@@ -79,7 +79,7 @@ One bank at a time is enough for now.
 
 ## Client interface
 
-clock, reset. TODO is there any way to reset the SDRAM-internal state machine?
+clock, reset (resetting SDRAM state machine requires to follow the startup procedure)
 
 address: Transmits the row address during open commands, column address during read/write commands.
 The bank number is part of the row address and is saved internally until the row gets closed.
@@ -91,6 +91,4 @@ much over the top for now.
 open, close: (00) leaves the rows opened/closed. (1x) opens a row, closing the current one if any
 is open. (01) closes the current row.
 
-read/write -- TODO: check bursts, burst interruption etc.
-
-
+read/write
