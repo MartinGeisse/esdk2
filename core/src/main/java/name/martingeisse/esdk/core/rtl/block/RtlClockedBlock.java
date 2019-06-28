@@ -78,9 +78,9 @@ public final class RtlClockedBlock extends RtlClockedItem {
 	}
 
 	public RtlProceduralBitRegister createBit(boolean initialValue) {
-		RtlProceduralBitRegister signal = createBit();
-		initializerStatements.assign(signal, initialValue);
-		return signal;
+		RtlProceduralBitRegister register = new RtlProceduralBitRegister(getRealm(), this, initialValue);
+		initializerStatements.assign(register, initialValue);
+		return register;
 	}
 
 	public RtlProceduralVectorRegister createVector(int width) {
@@ -88,9 +88,9 @@ public final class RtlClockedBlock extends RtlClockedItem {
 	}
 
 	public RtlProceduralVectorRegister createVector(int width, VectorValue initialValue) {
-		RtlProceduralVectorRegister signal = createVector(width);
-		initializerStatements.assign(signal, initialValue);
-		return signal;
+		RtlProceduralVectorRegister register = new RtlProceduralVectorRegister(getRealm(), this, width, initialValue);
+		initializerStatements.assign(register, initialValue);
+		return register;
 	}
 
 	public RtlProceduralMemory createMemory(int rowCount, int columnCount) {

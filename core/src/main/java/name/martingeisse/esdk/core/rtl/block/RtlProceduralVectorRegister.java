@@ -28,6 +28,16 @@ public final class RtlProceduralVectorRegister extends RtlProceduralRegister imp
 		this.nextValue = value;
 	}
 
+	public RtlProceduralVectorRegister(RtlRealm realm, RtlClockedBlock block, int width, VectorValue initialValue) {
+		super(realm, block);
+		if (initialValue.getWidth() != width) {
+			throw new IllegalArgumentException("initial value must have width of register (" + width + "): " + initialValue);
+		}
+		this.width = width;
+		this.value = initialValue;
+		this.nextValue = value;
+	}
+
 	@Override
 	public int getWidth() {
 		return width;

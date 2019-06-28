@@ -20,6 +20,12 @@ public final class RtlProceduralBitRegister extends RtlProceduralRegister implem
 		super(realm, block);
 	}
 
+	public RtlProceduralBitRegister(RtlRealm realm, RtlClockedBlock block, boolean initialValue) {
+		super(realm, block);
+		this.value = initialValue;
+		this.nextValue = initialValue;
+	}
+
 	// ----------------------------------------------------------------------------------------------------------------
 	// simulation
 	// ----------------------------------------------------------------------------------------------------------------

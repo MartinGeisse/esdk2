@@ -13,7 +13,7 @@ import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogCon
 
 /**
  * A real clock network (after synthesis) reacts to real clock edges, i.e. 0-to-1 transitions of the clock signal. In
- * simulation, on the other hand, clock edges must be simulated by calling {@link #fireClockEdge()} since the
+ * simulation, on the other hand, clock edges must be simulated by calling {@link #simulateClockEdge()} since the
  * simulation core doesn't recognize or even simulate asynchronous signal edges. Therefore, simulation of a clock
  * network ignores the clock signal. This shouldn't be a problem in synchronous systems but means you can't use dirty
  * asynchronous tricks such as manually generated clock signals.
