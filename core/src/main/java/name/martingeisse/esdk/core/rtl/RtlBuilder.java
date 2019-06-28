@@ -18,27 +18,20 @@ public final class RtlBuilder {
 	}
 
 	public static RtlBitSignal bitRegister(RtlClockNetwork clock, RtlBitSignal data) {
-		return bitRegister(clock, data, null, false, false);
+		return bitRegister(clock, data, null, false);
 	}
 
 	public static RtlBitSignal bitRegister(RtlClockNetwork clock, RtlBitSignal data, boolean initialValue) {
-		return bitRegister(clock, data, null, true, initialValue);
+		return bitRegister(clock, data, null, initialValue);
 	}
 
 	public static RtlBitSignal bitRegister(RtlClockNetwork clock, RtlBitSignal data, RtlBitSignal enable) {
-		return bitRegister(clock, data, enable, false, false);
+		return bitRegister(clock, data, enable, false);
 	}
 
 	public static RtlBitSignal bitRegister(RtlClockNetwork clock, RtlBitSignal data, RtlBitSignal enable, boolean initialValue) {
-		return bitRegister(clock, data, enable, true, initialValue);
-	}
-
-	private static RtlBitSignal bitRegister(RtlClockNetwork clock, RtlBitSignal data, RtlBitSignal enable, boolean initialize, boolean initialValue) {
 		RtlClockedBlock block = new RtlClockedBlock(clock);
-		RtlProceduralBitRegister register = block.createBit();
-		if (initialize) {
-			block.getInitializerStatements().assign(register, initialValue);
-		}
+		RtlProceduralBitRegister register = block.createBit(initialValue);
 		RtlStatementSequence sequence = enable == null ? block.getStatements() : block.getStatements().when(enable).getThenBranch();
 		sequence.assign(register, data);
 		return register;
@@ -58,10 +51,7 @@ public final class RtlBuilder {
 
 	public static RtlVectorSignal vectorRegister(RtlClockNetwork clock, RtlVectorSignal data, RtlBitSignal enable, VectorValue initialValue) {
 		RtlClockedBlock block = new RtlClockedBlock(clock);
-		RtlProceduralVectorRegister register = block.createVector(data.getWidth());
-		if (initialValue != null) {
-			block.getInitializerStatements().assign(register, initialValue);
-		}
+		RtlProceduralVectorRegister register = block.createVector(data.getWidth(), initialValue);
 		RtlStatementSequence sequence = enable == null ? block.getStatements() : block.getStatements().when(enable).getThenBranch();
 		sequence.assign(register, data);
 		return register;
