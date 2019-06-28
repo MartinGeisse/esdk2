@@ -32,10 +32,8 @@ public final class TestRenderer extends RtlItem {
 
 		{
 			RtlClockedBlock block = new RtlClockedBlock(clock);
-			columnRegister = block.createVector(widthBits);
-			rowRegister = block.createVector(heightBits);
-			block.getInitializerStatements().assign(columnRegister, VectorValue.of(widthBits, 0));
-			block.getInitializerStatements().assign(rowRegister, VectorValue.of(heightBits, 0));
+			columnRegister = block.createVector(widthBits, 0);
+			rowRegister = block.createVector(heightBits, 0);
 
 			RtlStatementBuilder builder = block.getStatements().builder();
 			builder.when(cpu.getWriteStrobe());

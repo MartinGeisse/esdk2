@@ -93,6 +93,10 @@ public final class RtlClockedBlock extends RtlClockedItem {
 		return register;
 	}
 
+	public RtlProceduralVectorRegister createVector(int width, int initialValue) {
+		return createVector(width, VectorValue.of(width, initialValue));
+	}
+
 	public RtlProceduralMemory createMemory(int rowCount, int columnCount) {
 		return new RtlProceduralMemory(this, rowCount, columnCount);
 	}

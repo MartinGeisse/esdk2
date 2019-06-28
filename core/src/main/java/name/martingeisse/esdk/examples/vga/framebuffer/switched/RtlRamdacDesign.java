@@ -71,10 +71,8 @@ public class RtlRamdacDesign extends Design {
 		vgaTimer = new VgaTimer(clock);
 
 		RtlClockedBlock rowCopier = new RtlClockedBlock(clock);
-		rowCopierReadActive = rowCopier.createBit();
-		rowCopier.getInitializerStatements().assign(rowCopierReadActive, false);
-		rowCopierDataAvailable = rowCopier.createBit();
-		rowCopier.getInitializerStatements().assign(rowCopierDataAvailable, false);
+		rowCopierReadActive = rowCopier.createBit(false);
+		rowCopierDataAvailable = rowCopier.createBit(false);
 		rowCopierFramebufferRowIndex = rowCopier.createVector(WIDTH_BITS);
 		rowCopierFramebufferColumnIndex = rowCopier.createVector(HEIGHT_BITS);
 		rowCopierWriteAddress = rowCopier.createVector(WIDTH_BITS);

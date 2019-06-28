@@ -24,22 +24,13 @@ public class VgaTimer {
 	public VgaTimer(RtlClockNetwork clock) {
 
 		RtlClockedBlock block = new RtlClockedBlock(clock);
-		x = block.createVector(10);
-		y = block.createVector(10);
-		hsync = block.createBit();
-		vsync = block.createBit();
-		RtlProceduralBitRegister p = block.createBit();
-		RtlProceduralBitRegister xblank = block.createBit();
-		RtlProceduralBitRegister yblank = block.createBit();
-
-		RtlStatementSequence initializer = block.getInitializerStatements();
-		initializer.assign(p, false);
-		initializer.assignUnsigned(x, 0);
-		initializer.assignUnsigned(y, 0);
-		initializer.assign(hsync, true);
-		initializer.assign(vsync, true);
-		initializer.assign(xblank, false);
-		initializer.assign(yblank, false);
+		x = block.createVector(10, 0);
+		y = block.createVector(10, 0);
+		hsync = block.createBit(true);
+		vsync = block.createBit(true);
+		RtlProceduralBitRegister p = block.createBit(false);
+		RtlProceduralBitRegister xblank = block.createBit(false);
+		RtlProceduralBitRegister yblank = block.createBit(false);
 
 		RtlStatementSequence statements = block.getStatements();
 		statements.assign(p, p.not());
