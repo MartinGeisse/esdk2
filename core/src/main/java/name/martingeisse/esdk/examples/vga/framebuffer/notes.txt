@@ -1,7 +1,0 @@
-
-The priority implementation is simpler.
-
-The switched implementation may contain useful code, but is not entirely going in the right direction either.
-
-A proper implementation would need a clearly defined memory interface first, together with a switch and other
-decorators.
