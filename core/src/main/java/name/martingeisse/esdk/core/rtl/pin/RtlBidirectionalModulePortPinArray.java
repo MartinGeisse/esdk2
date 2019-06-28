@@ -22,8 +22,6 @@ import java.util.List;
 /**
  * This is a special case of an array of bidirectional pins that is directly connected to a (vector-typed)
  * bidirectional module port.
- *
- * TODO
  */
 public final class RtlBidirectionalModulePortPinArray extends RtlItem {
 
