@@ -71,7 +71,7 @@ public final class RtlProceduralMemoryIndexSelection extends RtlItem implements 
 	public void printVerilogImplementationExpression(VerilogExpressionWriter out) {
 		out.print(memory);
 		out.print('[');
-		out.print(indexSignal, VerilogExpressionNesting.SIGNALS_AND_CONSTANTS);
+		out.printSignal(indexSignal, VerilogExpressionNesting.SIGNALS_AND_CONSTANTS);
 		out.print(']');
 	}
 

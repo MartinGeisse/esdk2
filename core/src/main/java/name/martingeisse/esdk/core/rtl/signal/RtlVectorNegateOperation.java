@@ -54,7 +54,7 @@ public final class RtlVectorNegateOperation extends RtlItem implements RtlVector
 	@Override
 	public void printVerilogImplementationExpression(VerilogExpressionWriter out) {
 		out.print('-');
-		out.print(operand, VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
+		out.printSignal(operand, VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
 	}
 
 }

@@ -108,7 +108,7 @@ public final class RtlConcatenation extends RtlItem implements RtlVectorSignal {
 			} else {
 				out.print(", ");
 			}
-			out.print(signal, VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
+			out.printSignal(signal, VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
 		}
 		out.print('}');
 	}

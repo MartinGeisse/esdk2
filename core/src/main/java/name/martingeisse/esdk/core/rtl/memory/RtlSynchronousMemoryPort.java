@@ -166,9 +166,9 @@ public final class RtlSynchronousMemoryPort extends RtlClockedItem implements Rt
 
 		@Override
 		public void printVerilogImplementationExpression(VerilogExpressionWriter out) {
-			out.print(memory.getMemorySignal(), VerilogExpressionNesting.ALL);
+			out.printSignal(memory.getMemorySignal(), VerilogExpressionNesting.ALL);
 			out.print('[');
-			out.print(addressSignal, VerilogExpressionNesting.ALL);
+			out.printSignal(addressSignal, VerilogExpressionNesting.ALL);
 			out.print(']');
 		}
 

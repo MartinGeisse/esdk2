@@ -63,7 +63,7 @@ public final class RtlVectorRepetition extends RtlItem implements RtlVectorSigna
 		out.print('{');
 		out.print(repetitions);
 		out.print('{');
-		out.print(vectorSignal, VerilogExpressionNesting.SIGNALS_AND_CONSTANTS);
+		out.printSignal(vectorSignal, VerilogExpressionNesting.SIGNALS_AND_CONSTANTS);
 		out.print("}}");
 	}
 

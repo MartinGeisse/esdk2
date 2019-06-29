@@ -146,7 +146,7 @@ public class VerilogGenerator {
 					}
 
 					@Override
-					public VerilogExpressionWriter print(RtlSignal subSignal, VerilogExpressionNesting subNesting) {
+					public VerilogExpressionWriter printSignal(RtlSignal subSignal, VerilogExpressionNesting subNesting) {
 						consumeSignalUsage(subSignal, subNesting);
 						return this;
 					}

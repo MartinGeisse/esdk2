@@ -58,7 +58,7 @@ public final class RtlBitRepetition extends RtlItem implements RtlVectorSignal {
 		out.print('{');
 		out.print(repetitions);
 		out.print('{');
-		out.print(bitSignal, VerilogExpressionNesting.SIGNALS_AND_CONSTANTS);
+		out.printSignal(bitSignal, VerilogExpressionNesting.SIGNALS_AND_CONSTANTS);
 		out.print("}}");
 	}
 

@@ -94,7 +94,7 @@ public abstract class VerilogWriter extends PrintWriter {
 			}
 
 			@Override
-			public VerilogExpressionWriter print(RtlSignal signal, VerilogExpressionNesting nesting) {
+			public VerilogExpressionWriter printSignal(RtlSignal signal, VerilogExpressionNesting nesting) {
 				VerilogWriter.this.print(signal);
 				return this;
 			}

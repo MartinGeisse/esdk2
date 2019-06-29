@@ -52,10 +52,10 @@ public interface RtlSignal extends RtlItemOwned {
 	/**
 	 * Writes a Verilog expression for this signal. This method only exists so nobody calls
 	 * {@link #printVerilogImplementationExpression(VerilogExpressionWriter)} accidentally. It is equivalent to
-	 * {@link VerilogExpressionWriter#print(RtlSignal, VerilogExpressionNesting)}.
+	 * {@link VerilogExpressionWriter#printSignal(RtlSignal, VerilogExpressionNesting)}.
 	 */
 	default void printVerilogExpression(VerilogExpressionWriter out, VerilogExpressionNesting nesting) {
-		out.print(this, nesting);
+		out.printSignal(this, nesting);
 	}
 
 	/**

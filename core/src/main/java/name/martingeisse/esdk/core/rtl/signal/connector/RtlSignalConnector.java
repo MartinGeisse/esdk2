@@ -52,7 +52,7 @@ public abstract class RtlSignalConnector extends RtlItem implements RtlSignal {
 	@Override
 	public void printVerilogImplementationExpression(VerilogExpressionWriter out) {
 		// we allow "all" here because we detect invalid nesting in compliesWith()
-		out.print(getConnected(), VerilogExpressionNesting.ALL);
+		out.printSignal(getConnected(), VerilogExpressionNesting.ALL);
 	}
 
 }

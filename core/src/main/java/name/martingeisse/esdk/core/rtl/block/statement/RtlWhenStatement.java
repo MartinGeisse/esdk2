@@ -57,7 +57,7 @@ public final class RtlWhenStatement extends RtlStatement {
 
 	@Override
 	public void analyzeSignalUsage(SignalUsageConsumer consumer) {
-		consumer.getFakeExpressionWriter().print(condition, VerilogExpressionNesting.ALL);
+		consumer.getFakeExpressionWriter().printSignal(condition, VerilogExpressionNesting.ALL);
 		thenBranch.analyzeSignalUsage(consumer);
 		otherwiseBranch.analyzeSignalUsage(consumer);
 	}

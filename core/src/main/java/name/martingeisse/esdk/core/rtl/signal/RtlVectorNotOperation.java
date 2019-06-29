@@ -54,7 +54,7 @@ public final class RtlVectorNotOperation extends RtlItem implements RtlVectorSig
 	@Override
 	public void printVerilogImplementationExpression(VerilogExpressionWriter out) {
 		out.print('~');
-		out.print(operand, VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
+		out.printSignal(operand, VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
 	}
 
 }

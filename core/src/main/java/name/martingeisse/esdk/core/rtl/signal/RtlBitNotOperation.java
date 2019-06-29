@@ -48,7 +48,7 @@ public final class RtlBitNotOperation extends RtlItem implements RtlBitSignal {
 	@Override
 	public void printVerilogImplementationExpression(VerilogExpressionWriter out) {
 		out.print('~');
-		out.print(operand, VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
+		out.printSignal(operand, VerilogExpressionNesting.SELECTIONS_SIGNALS_AND_CONSTANTS);
 	}
 
 }

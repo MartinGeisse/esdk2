@@ -54,7 +54,7 @@ public final class RtlOneBitVectorSignal extends RtlItem implements RtlVectorSig
 
 	@Override
 	public void printVerilogImplementationExpression(VerilogExpressionWriter out) {
-		out.print(bitSignal, VerilogExpressionNesting.SIGNALS_AND_CONSTANTS);
+		out.printSignal(bitSignal, VerilogExpressionNesting.SIGNALS_AND_CONSTANTS);
 	}
 
 }

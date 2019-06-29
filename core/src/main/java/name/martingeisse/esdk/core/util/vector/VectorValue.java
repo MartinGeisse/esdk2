@@ -261,7 +261,7 @@ public abstract class VectorValue {
 		}
 
 		@Override
-		public VerilogExpressionWriter print(RtlSignal signal, VerilogExpressionNesting nesting) {
+		public VerilogExpressionWriter printSignal(RtlSignal signal, VerilogExpressionNesting nesting) {
 			throw new UnsupportedOperationException();
 		}
 
