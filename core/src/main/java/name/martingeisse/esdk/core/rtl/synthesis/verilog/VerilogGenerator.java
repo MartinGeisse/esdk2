@@ -43,7 +43,7 @@ public class VerilogGenerator {
 
 			@Override
 			protected String getMemoryName(RtlProceduralMemory memory) {
-				return memoryNames.computeIfAbsent(memory, ignored -> "memory" + memoryNames.size());
+			    return memoryNames.get(memory);
 			}
 
 		};
