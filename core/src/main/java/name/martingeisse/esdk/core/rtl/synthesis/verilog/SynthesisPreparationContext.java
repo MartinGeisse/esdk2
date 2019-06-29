@@ -14,7 +14,7 @@ public interface SynthesisPreparationContext {
 
     void assignFixedName(String name, VerilogNamed object);
 
-    String assignGeneratedName(String fallbackPrefix, VerilogNamed object);
+    void assignGeneratedName(String fallbackPrefix, VerilogNamed object);
 
     void declareFixedNameSignal(RtlSignal signal,
                                 String name,

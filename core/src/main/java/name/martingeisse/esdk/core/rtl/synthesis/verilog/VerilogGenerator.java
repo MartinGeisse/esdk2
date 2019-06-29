@@ -34,13 +34,8 @@ public class VerilogGenerator {
 		this.out = new VerilogWriter(out) {
 
 			@Override
-			protected String getSignalName(RtlSignal signal) {
-				return names.getName(signal);
-			}
-
-			@Override
-			protected String getMemoryName(RtlProceduralMemory memory) {
-			    return names.getName(memory);
+			protected String getName(VerilogNamed namedObject) {
+				return names.getName(namedObject);
 			}
 
 		};
@@ -75,8 +70,8 @@ public class VerilogGenerator {
 				}
 
 				@Override
-				public String assignGeneratedName(String fallbackPrefix, VerilogNamed object) {
-					return names.assignGeneratedName(fallbackPrefix, object);
+				public void assignGeneratedName(String fallbackPrefix, VerilogNamed object) {
+					names.assignGeneratedName(fallbackPrefix, object);
 				}
 
 				@Override

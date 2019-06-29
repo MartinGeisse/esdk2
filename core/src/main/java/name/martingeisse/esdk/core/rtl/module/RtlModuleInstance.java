@@ -118,11 +118,9 @@ public final class RtlModuleInstance extends RtlItem implements VerilogNamed {
 	public VerilogContribution getVerilogContribution() {
 		return new VerilogContribution() {
 
-			private String instanceName;
-
 			@Override
 			public void prepareSynthesis(SynthesisPreparationContext context) {
-				instanceName = context.assignGeneratedName("m", RtlModuleInstance.this);
+				context.assignGeneratedName("m", RtlModuleInstance.this);
 				for (RtlInstancePort port : ports.values()) {
 					if (port instanceof RtlInstanceOutputPort) {
 						RtlInstanceOutputPort outputPort = (RtlInstanceOutputPort) port;
@@ -144,7 +142,9 @@ public final class RtlModuleInstance extends RtlItem implements VerilogNamed {
 			@Override
 			public void printImplementation(VerilogWriter out) {
 				if (parameters.isEmpty()) {
-					out.print(moduleName + ' ' + instanceName + " (");
+					out.print(moduleName + ' ');
+					out.printName(RtlModuleInstance.this);
+					out.print(" (");
 				} else {
 					out.print(moduleName + " #(");
 					boolean firstParameter = true;
@@ -169,7 +169,9 @@ public final class RtlModuleInstance extends RtlItem implements VerilogNamed {
 						out.print(')');
 					}
 					out.println();
-					out.print(") " + instanceName + " (");
+					out.print(") ");
+                    out.printName(RtlModuleInstance.this);
+                    out.print(" (");
 				}
 				boolean firstPort = true;
 				for (RtlInstancePort port : ports.values()) {

@@ -37,8 +37,15 @@ public abstract class VerilogWriter extends PrintWriter {
 		}
 	}
 
-	protected abstract String getSignalName(RtlSignal signal);
-	protected abstract String getMemoryName(RtlProceduralMemory memory);
+	protected abstract String getName(VerilogNamed namedObject);
+
+	public void printName(VerilogNamed namedObject) {
+		String name = getName(namedObject);
+		if (name == null) {
+			throw new IllegalArgumentException("no name has been assigned to object: " + namedObject);
+		}
+		print(name);
+	}
 
 	/**
 	 * Prints the expression to use for a signal at a point where the signal gets used.
@@ -47,7 +54,7 @@ public abstract class VerilogWriter extends PrintWriter {
 		if (signal == null) {
 			throw new IllegalArgumentException("signal argument is null");
 		}
-		String name = getSignalName(signal);
+		String name = getName(signal);
 		if (name == null) {
 			printImplementationExpression(signal);
 		} else {
@@ -62,7 +69,7 @@ public abstract class VerilogWriter extends PrintWriter {
 		if (memory == null) {
 			throw new IllegalArgumentException("memory argument is null");
 		}
-		String name = getMemoryName(memory);
+		String name = getName(memory);
 		if (name == null) {
 			throw new RuntimeException("could not determine name for memory");
 		}
