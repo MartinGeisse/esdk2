@@ -64,7 +64,7 @@ public final class RtlVectorInputPin extends RtlPin implements RtlVectorSignal {
 
 			@Override
 			public void prepareSynthesis(SynthesisPreparationContext context) {
-				context.declareFixedNameSignal(RtlVectorInputPin.this, getNetName(), null, false);
+				context.declareFixedNameSignal(RtlVectorInputPin.this, getNetName(), VerilogSignalDeclarationKeyword.NONE, false);
 			}
 
 			@Override

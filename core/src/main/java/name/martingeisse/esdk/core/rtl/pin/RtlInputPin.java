@@ -54,7 +54,7 @@ public final class RtlInputPin extends RtlPin implements RtlBitSignal {
 
 			@Override
 			public void prepareSynthesis(SynthesisPreparationContext context) {
-				context.declareFixedNameSignal(RtlInputPin.this, getNetName(), null, false);
+				context.declareFixedNameSignal(RtlInputPin.this, getNetName(), VerilogSignalDeclarationKeyword.NONE, false);
 			}
 
 			@Override

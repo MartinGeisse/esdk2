@@ -68,26 +68,22 @@ public class VerilogGenerator {
 			SynthesisPreparationContext synthesisPreparationContext = new SynthesisPreparationContext() {
 
 				@Override
-				public void declareFixedNameSignal(RtlSignal signal, String name, VerilogSignalKind signalKindForExplicitDeclarationOrNullForNoDeclaration, boolean generateAssignment) {
+				public void declareFixedNameSignal(RtlSignal signal, String name, VerilogSignalDeclarationKeyword keyword, boolean generateAssignment) {
 					reserveName(name, false);
-					internalDeclareSignal(signal, name, signalKindForExplicitDeclarationOrNullForNoDeclaration, generateAssignment);
+					internalDeclareSignal(signal, name, keyword, generateAssignment);
 				}
 
 				@Override
-				public String declareSignal(RtlSignal signal, String fallbackPrefix, VerilogSignalKind signalKindForExplicitDeclarationOrNullForNoDeclaration, boolean generateAssignment) {
+				public String declareSignal(RtlSignal signal, String fallbackPrefix, VerilogSignalDeclarationKeyword keyword, boolean generateAssignment) {
 					String signalName = signal.getRtlItem().getName();
 					String prefix = signalName == null ? fallbackPrefix : signalName;
 					String globalName = reserveName(prefix, true);
-					internalDeclareSignal(signal, globalName, signalKindForExplicitDeclarationOrNullForNoDeclaration, generateAssignment);
+					internalDeclareSignal(signal, globalName, keyword, generateAssignment);
 					return globalName;
 				}
 
-				private void internalDeclareSignal(RtlSignal signal, String name, VerilogSignalKind signalKindForExplicitDeclarationOrNullForNoDeclaration, boolean generateAssignment) {
-					signalDeclarations.put(signal, new SignalDeclaration(signal, name,
-						signalKindForExplicitDeclarationOrNullForNoDeclaration != null,
-						signalKindForExplicitDeclarationOrNullForNoDeclaration,
-						generateAssignment
-					));
+				private void internalDeclareSignal(RtlSignal signal, String name, VerilogSignalDeclarationKeyword keyword, boolean generateAssignment) {
+					signalDeclarations.put(signal, new SignalDeclaration(signal, name, keyword, generateAssignment));
 				}
 
 				@Override
@@ -182,7 +178,7 @@ public class VerilogGenerator {
 						if (prefix == null) {
 							prefix = "s";
 						}
-						signalDeclarations.put(signal, new SignalDeclaration(signal, names.assignGeneratedName(prefix), true, VerilogSignalKind.WIRE, true));
+						signalDeclarations.put(signal, new SignalDeclaration(signal, names.assignGeneratedName(prefix), VerilogSignalDeclarationKeyword.WIRE, true));
 					}
 				}
 
@@ -239,8 +235,8 @@ public class VerilogGenerator {
 		for (Map.Entry<RtlSignal, SignalDeclaration> signalEntry : signalDeclarations.entrySet()) {
 			RtlSignal signal = signalEntry.getKey();
 			SignalDeclaration signalDeclaration = signalEntry.getValue();
-			if (signalDeclaration.explicitDeclaration) {
-				out.print(signalDeclaration.kind.name().toLowerCase());
+			if (signalDeclaration.keyword != VerilogSignalDeclarationKeyword.NONE) {
+				out.print(signalDeclaration.keyword.name().toLowerCase());
 				if (signal instanceof RtlVectorSignal) {
 					RtlVectorSignal vectorSignal = (RtlVectorSignal) signal;
 					out.print('[');
@@ -283,15 +279,22 @@ public class VerilogGenerator {
 
 		final RtlSignal signal;
 		final String name;
-		final boolean explicitDeclaration;
-		final VerilogSignalKind kind;
+		final VerilogSignalDeclarationKeyword keyword;
 		final boolean assignment;
 
-		SignalDeclaration(RtlSignal signal, String name, boolean explicitDeclaration, VerilogSignalKind kind, boolean assignment) {
+		SignalDeclaration(RtlSignal signal, String name, VerilogSignalDeclarationKeyword keyword, boolean assignment) {
+			if (signal == null) {
+				throw new IllegalArgumentException("signal is null");
+			}
+			if (name == null) {
+				throw new IllegalArgumentException("name is null");
+			}
+			if (keyword == null) {
+				throw new IllegalArgumentException("keyword is null");
+			}
 			this.signal = signal;
 			this.name = name;
-			this.explicitDeclaration = explicitDeclaration;
-			this.kind = kind;
+			this.keyword = keyword;
 			this.assignment = assignment;
 		}
 

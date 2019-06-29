@@ -14,12 +14,12 @@ public interface SynthesisPreparationContext {
 
 	void declareFixedNameSignal(RtlSignal signal,
 								String name,
-								VerilogSignalKind signalKindForExplicitDeclarationOrNullForNoDeclaration,
+								VerilogSignalDeclarationKeyword keyword,
 								boolean generateAssignment);
 
 	String declareSignal(RtlSignal signal,
 						 String fallbackPrefix,
-						 VerilogSignalKind signalKindForExplicitDeclarationOrNullForNoDeclaration,
+						 VerilogSignalDeclarationKeyword keyword,
 						 boolean generateAssignment);
 
 	String declareProceduralMemory(RtlProceduralMemory memory);

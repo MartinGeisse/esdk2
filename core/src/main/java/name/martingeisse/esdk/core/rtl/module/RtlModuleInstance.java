@@ -125,7 +125,7 @@ public final class RtlModuleInstance extends RtlItem {
 				for (RtlInstancePort port : ports.values()) {
 					if (port instanceof RtlInstanceOutputPort) {
 						RtlInstanceOutputPort outputPort = (RtlInstanceOutputPort) port;
-						context.declareSignal(outputPort, "mp", VerilogSignalKind.WIRE, false);
+						context.declareSignal(outputPort, "mp", VerilogSignalDeclarationKeyword.WIRE, false);
 					}
 				}
 			}

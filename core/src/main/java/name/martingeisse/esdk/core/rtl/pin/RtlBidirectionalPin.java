@@ -74,7 +74,7 @@ public final class RtlBidirectionalPin extends RtlPin implements RtlBitSignal {
 
 			@Override
 			public void prepareSynthesis(SynthesisPreparationContext context) {
-				context.declareFixedNameSignal(RtlBidirectionalPin.this, getNetName(), null, false);
+				context.declareFixedNameSignal(RtlBidirectionalPin.this, getNetName(), VerilogSignalDeclarationKeyword.NONE, false);
 			}
 
 			@Override
