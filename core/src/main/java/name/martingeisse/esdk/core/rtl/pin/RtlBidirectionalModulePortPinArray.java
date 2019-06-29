@@ -5,14 +5,12 @@
 package name.martingeisse.esdk.core.rtl.pin;
 
 import com.google.common.collect.ImmutableList;
+import name.martingeisse.esdk.core.model.Item;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.module.RtlInstancePort;
 import name.martingeisse.esdk.core.rtl.module.RtlModuleInstance;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.SignalUsageConsumer;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.SynthesisPreparationContext;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.ToplevelPortConsumer;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.*;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.EmptyVerilogContribution;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogContribution;
 
@@ -23,7 +21,7 @@ import java.util.List;
  * This is a special case of an array of bidirectional pins that is directly connected to a (vector-typed)
  * bidirectional module port.
  */
-public final class RtlBidirectionalModulePortPinArray extends RtlItem {
+public final class RtlBidirectionalModulePortPinArray extends RtlItem implements VerilogNamed {
 
 	private final RtlInstancePort port;
 	private final String netName;
@@ -82,7 +80,7 @@ public final class RtlBidirectionalModulePortPinArray extends RtlItem {
 
 			@Override
 			public void prepareSynthesis(SynthesisPreparationContext context) {
-				context.reserveName(netName, false);
+				context.assignFixedName(netName, RtlBidirectionalModulePortPinArray.this);
 			}
 
 			@Override
@@ -99,6 +97,11 @@ public final class RtlBidirectionalModulePortPinArray extends RtlItem {
 			}
 
 		};
+	}
+
+	@Override
+	public Item getVerilogNameSuggestionProvider() {
+		return this;
 	}
 
 }

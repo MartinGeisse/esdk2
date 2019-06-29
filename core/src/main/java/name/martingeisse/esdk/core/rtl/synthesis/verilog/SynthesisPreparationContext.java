@@ -12,20 +12,22 @@ import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
  */
 public interface SynthesisPreparationContext {
 
-	void declareFixedNameSignal(RtlSignal signal,
-								String name,
-								VerilogSignalDeclarationKeyword keyword,
-								boolean generateAssignment);
+    void assignFixedName(String name, VerilogNamed object);
 
-	String declareSignal(RtlSignal signal,
-						 String fallbackPrefix,
-						 VerilogSignalDeclarationKeyword keyword,
-						 boolean generateAssignment);
+    String assignGeneratedName(String fallbackPrefix, VerilogNamed object);
 
-	String declareProceduralMemory(RtlProceduralMemory memory);
+    void declareFixedNameSignal(RtlSignal signal,
+                                String name,
+                                VerilogSignalDeclarationKeyword keyword,
+                                boolean generateAssignment);
 
-	String reserveName(String nameOrPrefix, boolean appendCounterSuffix);
+    String declareSignal(RtlSignal signal,
+                         String fallbackPrefix,
+                         VerilogSignalDeclarationKeyword keyword,
+                         boolean generateAssignment);
 
-	AuxiliaryFileFactory getAuxiliaryFileFactory();
+    String declareProceduralMemory(RtlProceduralMemory memory);
+
+    AuxiliaryFileFactory getAuxiliaryFileFactory();
 
 }

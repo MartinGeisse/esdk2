@@ -4,6 +4,7 @@
  */
 package name.martingeisse.esdk.core.rtl.module;
 
+import name.martingeisse.esdk.core.model.Item;
 import name.martingeisse.esdk.core.rtl.RtlClockedItem;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
@@ -20,7 +21,7 @@ import java.util.Map;
 /**
  *
  */
-public final class RtlModuleInstance extends RtlItem {
+public final class RtlModuleInstance extends RtlItem implements VerilogNamed {
 
 	private String moduleName;
 	private final Map<String, Object> parameters = new HashMap<>();
@@ -120,8 +121,7 @@ public final class RtlModuleInstance extends RtlItem {
 
 			@Override
 			public void prepareSynthesis(SynthesisPreparationContext context) {
-				String prefix = getName() == null ? "m" : getName();
-				instanceName = context.reserveName(prefix, true);
+				instanceName = context.assignGeneratedName("m", RtlModuleInstance.this);
 				for (RtlInstancePort port : ports.values()) {
 					if (port instanceof RtlInstanceOutputPort) {
 						RtlInstanceOutputPort outputPort = (RtlInstanceOutputPort) port;
@@ -187,4 +187,10 @@ public final class RtlModuleInstance extends RtlItem {
 
 		};
 	}
+
+	@Override
+	public Item getVerilogNameSuggestionProvider() {
+		return this;
+	}
+
 }

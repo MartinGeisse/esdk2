@@ -5,12 +5,10 @@
 package name.martingeisse.esdk.core.rtl.pin;
 
 import com.google.common.collect.ImmutableList;
+import name.martingeisse.esdk.core.model.Item;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.SignalUsageConsumer;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.SynthesisPreparationContext;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.ToplevelPortConsumer;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.*;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.EmptyVerilogContribution;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogContribution;
 
@@ -21,7 +19,7 @@ import java.util.List;
  * A generic array of pins that are neither assigned an output signal nor can be used as an input signal. Custom code
  * is needed to make use of these pins.
  */
-public final class RtlGenericPinArray extends RtlItem {
+public final class RtlGenericPinArray extends RtlItem implements VerilogNamed {
 
 	private final String verilogDirectionKeyword;
 	private final String netName;
@@ -75,7 +73,7 @@ public final class RtlGenericPinArray extends RtlItem {
 
 			@Override
 			public void prepareSynthesis(SynthesisPreparationContext context) {
-				context.reserveName(netName, false);
+				context.assignFixedName(netName, RtlGenericPinArray.this);
 			}
 
 			@Override
@@ -92,6 +90,11 @@ public final class RtlGenericPinArray extends RtlItem {
 			}
 
 		};
+	}
+
+	@Override
+	public Item getVerilogNameSuggestionProvider() {
+		return this;
 	}
 
 }

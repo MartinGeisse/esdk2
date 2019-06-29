@@ -1,6 +1,6 @@
 package name.martingeisse.esdk.core.rtl.synthesis.verilog;
 
-import name.martingeisse.esdk.core.rtl.block.RtlProceduralMemory;
+import name.martingeisse.esdk.core.model.Item;
 import org.apache.commons.lang3.mutable.MutableInt;
 
 import java.util.HashMap;
@@ -13,21 +13,25 @@ import java.util.Set;
  */
 class Names {
 
-    private final Set<String> names = new HashSet<>();
     private final Set<String> fixedNames = new HashSet<>();
     private final Map<String, MutableInt> prefixNameCounters = new HashMap<>();
-    private final Map<RtlProceduralMemory, String> memoryNames = new HashMap<>();
+    private final Map<String, VerilogNamed> nameToObject = new HashMap<>();
+    private final Map<VerilogNamed, String> objectToName = new HashMap<>();
 
-    String assignFixedName(String name) {
-        if (!names.add(name)) {
+    void assignFixedName(String name, VerilogNamed object) {
+        if (nameToObject.putIfAbsent(name, object) != null) {
             throw new IllegalStateException("fixed name is already used: " + name);
         }
-        names.add(name);
+        objectToName.put(object, name);
         fixedNames.add(name);
-        return name;
     }
 
-    String assignGeneratedName(String prefix) {
+    String assignGeneratedName(String fallbackPrefix, VerilogNamed object) {
+        Item verilogNameSuggestionProvider = object.getVerilogNameSuggestionProvider();
+        String prefix = (verilogNameSuggestionProvider == null ? null : verilogNameSuggestionProvider.getName());
+        if (prefix == null) {
+            prefix = fallbackPrefix;
+        }
         MutableInt counter = prefixNameCounters.computeIfAbsent(prefix, p -> new MutableInt());
         while (true) {
             String name = prefix + "__" + counter.intValue();
@@ -42,22 +46,16 @@ class Names {
 
             // There may still be a collision in the odd case of counter prefixes like "foo" and "foo__1", so to
             // avoid edge cases, we have to check that too, hence the while loop.
-            if (names.add(name)) {
+            if (nameToObject.putIfAbsent(name, object) == null) {
+                objectToName.put(object, name);
                 return name;
             }
 
         }
     }
 
-    public String declareProceduralMemory(RtlProceduralMemory memory) {
-        String prefix = memory.getName() == null ? "mem" : memory.getName();
-        String globalName = assignGeneratedName(prefix);
-        memoryNames.put(memory, globalName);
-        return globalName;
-    }
-
-    String getMemoryName(RtlProceduralMemory memory) {
-        return memoryNames.get(memory);
+    String getName(VerilogNamed object) {
+        return objectToName.get(object);
     }
 
 }

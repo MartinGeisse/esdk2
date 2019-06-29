@@ -30,15 +30,16 @@ public class VerilogGenerator {
 	public VerilogGenerator(Writer out, RtlRealm realm, String toplevelModuleName, AuxiliaryFileFactory auxiliaryFileFactory) {
 		this.out = new VerilogWriter(out) {
 
+			// TODO merge these two methods
+
 			@Override
 			protected String getSignalName(RtlSignal signal) {
-				SignalDeclaration signalDeclaration = signalDeclarations.get(signal);
-				return (signalDeclaration == null) ? null : signalDeclaration.name;
+				return names.getName(signal);
 			}
 
 			@Override
 			protected String getMemoryName(RtlProceduralMemory memory) {
-			    return names.getMemoryName(memory);
+			    return names.getName(memory);
 			}
 
 		};
@@ -68,18 +69,26 @@ public class VerilogGenerator {
 			SynthesisPreparationContext synthesisPreparationContext = new SynthesisPreparationContext() {
 
 				@Override
+				public void assignFixedName(String name, VerilogNamed object) {
+					names.assignFixedName(name, object);
+				}
+
+				@Override
+				public String assignGeneratedName(String fallbackPrefix, VerilogNamed object) {
+					return names.assignGeneratedName(fallbackPrefix, object);
+				}
+
+				@Override
 				public void declareFixedNameSignal(RtlSignal signal, String name, VerilogSignalDeclarationKeyword keyword, boolean generateAssignment) {
-					reserveName(name, false);
+					names.assignFixedName(name, signal);
 					internalDeclareSignal(signal, name, keyword, generateAssignment);
 				}
 
 				@Override
 				public String declareSignal(RtlSignal signal, String fallbackPrefix, VerilogSignalDeclarationKeyword keyword, boolean generateAssignment) {
-					String signalName = signal.getRtlItem().getName();
-					String prefix = signalName == null ? fallbackPrefix : signalName;
-					String globalName = reserveName(prefix, true);
-					internalDeclareSignal(signal, globalName, keyword, generateAssignment);
-					return globalName;
+					String name = names.assignGeneratedName(fallbackPrefix, signal);
+					internalDeclareSignal(signal, name, keyword, generateAssignment);
+					return name;
 				}
 
 				private void internalDeclareSignal(RtlSignal signal, String name, VerilogSignalDeclarationKeyword keyword, boolean generateAssignment) {
@@ -88,16 +97,7 @@ public class VerilogGenerator {
 
 				@Override
 				public String declareProceduralMemory(RtlProceduralMemory memory) {
-					return names.declareProceduralMemory(memory);
-				}
-
-				@Override
-				public String reserveName(String nameOrPrefix, boolean appendCounterSuffix) {
-					if (appendCounterSuffix) {
-						return names.assignGeneratedName(nameOrPrefix);
-					} else {
-						return names.assignFixedName(nameOrPrefix);
-					}
+					return names.assignGeneratedName("mem", memory);
 				}
 
 				@Override
@@ -174,11 +174,8 @@ public class VerilogGenerator {
 
 				private void declareSignal(RtlSignal signal) {
 					if (signalDeclarations.get(signal) == null) {
-						String prefix = signal.getRtlItem().getName();
-						if (prefix == null) {
-							prefix = "s";
-						}
-						signalDeclarations.put(signal, new SignalDeclaration(signal, names.assignGeneratedName(prefix), VerilogSignalDeclarationKeyword.WIRE, true));
+						String name = names.assignGeneratedName("s", signal);
+						signalDeclarations.put(signal, new SignalDeclaration(signal, name, VerilogSignalDeclarationKeyword.WIRE, true));
 					}
 				}
 
@@ -306,7 +303,7 @@ public class VerilogGenerator {
 		final String name;
 		final Integer width;
 
-		public ToplevelPortContribution(String direction, String name, Integer width) {
+		ToplevelPortContribution(String direction, String name, Integer width) {
 			this.direction = direction;
 			this.name = name;
 			this.width = width;
