@@ -27,10 +27,12 @@ public class Design {
 		return items;
 	}
 
+	public DesignValidationResult validate() {
+		return new DesignValidator(this).validate();
+	}
+
 	public void validateOrException(boolean failOnWarnings) {
-		DesignValidator validator = new DesignValidator(this);
-		DesignValidationResult result = validator.validate();
-		for (ItemValidationResult itemResult : result.getItemResults().values()) {
+		for (ItemValidationResult itemResult : validate().getItemResults().values()) {
 			if (!itemResult.getErrors().isEmpty()) {
 				throw new IllegalStateException("validation failed with errors for item " + itemResult.getItem() + ": " + itemResult.getErrors());
 			}
