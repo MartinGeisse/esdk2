@@ -30,8 +30,6 @@ public class VerilogGenerator {
 	public VerilogGenerator(Writer out, RtlRealm realm, String toplevelModuleName, AuxiliaryFileFactory auxiliaryFileFactory) {
 		this.out = new VerilogWriter(out) {
 
-			// TODO merge these two methods
-
 			@Override
 			protected String getSignalName(RtlSignal signal) {
 				return names.getName(signal);
