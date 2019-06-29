@@ -6,8 +6,9 @@ package name.martingeisse.esdk.core.util.vector;
 
 import name.martingeisse.esdk.core.rtl.block.RtlProceduralMemory;
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionNesting;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.expression.RealVerilogExpressionWriter;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.expression.VerilogExpressionNesting;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.expression.VerilogExpressionWriter;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -234,39 +235,19 @@ public abstract class VectorValue {
 		return stringWriter.toString();
 	}
 
-	private static final class MyVerilogExpressionWriter implements VerilogExpressionWriter {
-
-		private final PrintWriter out;
+	private static final class MyVerilogExpressionWriter extends RealVerilogExpressionWriter {
 
 		MyVerilogExpressionWriter(PrintWriter out) {
-			this.out = out;
+			super(out);
 		}
 
 		@Override
-		public final VerilogExpressionWriter print(String s) {
-			out.print(s);
-			return this;
-		}
-
-		@Override
-		public final VerilogExpressionWriter print(int i) {
-			out.print(i);
-			return this;
-		}
-
-		@Override
-		public final VerilogExpressionWriter print(char c) {
-			out.print(c);
-			return this;
-		}
-
-		@Override
-		public VerilogExpressionWriter printSignal(RtlSignal signal, VerilogExpressionNesting nesting) {
+		public void internalPrintSignal(RtlSignal signal, VerilogExpressionNesting nesting) {
 			throw new UnsupportedOperationException();
 		}
 
 		@Override
-		public VerilogExpressionWriter printMemory(RtlProceduralMemory memory) {
+		public void internalPrintMemory(RtlProceduralMemory memory) {
 			throw new UnsupportedOperationException();
 		}
 

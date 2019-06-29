@@ -11,6 +11,9 @@ import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogContribution;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.expression.FakeVerilogExpressionWriter;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.expression.VerilogExpressionNesting;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.expression.VerilogExpressionWriter;
 
 import java.io.Writer;
 import java.util.*;
@@ -114,33 +117,17 @@ public class VerilogGenerator {
 			final Set<RtlSignal> analyzedSignals = new HashSet<>();
 			SignalUsageConsumer signalUsageConsumer = new SignalUsageConsumer() {
 
-				VerilogExpressionWriter fakeExpressionWriter = new VerilogExpressionWriter() {
+				VerilogExpressionWriter fakeExpressionWriter = new FakeVerilogExpressionWriter() {
 
 					@Override
-					public VerilogExpressionWriter print(String s) {
-						return this;
-					}
-
-					@Override
-					public VerilogExpressionWriter print(int i) {
-						return this;
-					}
-
-					@Override
-					public VerilogExpressionWriter print(char c) {
-						return this;
-					}
-
-					@Override
-					public VerilogExpressionWriter printSignal(RtlSignal subSignal, VerilogExpressionNesting subNesting) {
+					protected void visitSignal(RtlSignal subSignal, VerilogExpressionNesting subNesting) {
 						consumeSignalUsage(subSignal, subNesting);
-						return this;
 					}
 
 					@Override
-					public VerilogExpressionWriter printMemory(RtlProceduralMemory memory) {
-						return this;
+					protected void visitMemory(RtlProceduralMemory memory) {
 					}
+
 				};
 
 				@Override

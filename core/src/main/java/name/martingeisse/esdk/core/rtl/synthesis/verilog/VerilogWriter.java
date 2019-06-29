@@ -6,6 +6,8 @@ package name.martingeisse.esdk.core.rtl.synthesis.verilog;
 
 import name.martingeisse.esdk.core.rtl.block.RtlProceduralMemory;
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.expression.RealVerilogExpressionWriter;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.expression.VerilogExpressionNesting;
 
 import java.io.PrintWriter;
 import java.io.Writer;
@@ -73,36 +75,16 @@ public abstract class VerilogWriter extends PrintWriter {
 	 * it prints the defining expression, not the name.
 	 */
 	void printImplementationExpression(RtlSignal signal) {
-		signal.printVerilogImplementationExpression(new VerilogExpressionWriter() {
+		signal.printVerilogImplementationExpression(new RealVerilogExpressionWriter(this) {
 
 			@Override
-			public VerilogExpressionWriter print(String s) {
-				VerilogWriter.this.print(s);
-				return this;
-			}
-
-			@Override
-			public VerilogExpressionWriter print(int i) {
-				VerilogWriter.this.print(i);
-				return this;
-			}
-
-			@Override
-			public VerilogExpressionWriter print(char c) {
-				VerilogWriter.this.print(c);
-				return this;
-			}
-
-			@Override
-			public VerilogExpressionWriter printSignal(RtlSignal signal, VerilogExpressionNesting nesting) {
+			public void internalPrintSignal(RtlSignal signal, VerilogExpressionNesting nesting) {
 				VerilogWriter.this.printSignal(signal);
-				return this;
 			}
 
 			@Override
-			public VerilogExpressionWriter printMemory(RtlProceduralMemory memory) {
+			public void internalPrintMemory(RtlProceduralMemory memory) {
 				VerilogWriter.this.printMemory(memory);
-				return this;
 			}
 
 		});

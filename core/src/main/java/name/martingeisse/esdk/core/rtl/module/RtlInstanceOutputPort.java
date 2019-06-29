@@ -6,7 +6,7 @@ package name.martingeisse.esdk.core.rtl.module;
 
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.SignalUsageConsumer;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.expression.VerilogExpressionWriter;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
 
 /**

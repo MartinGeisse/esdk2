@@ -2,7 +2,7 @@
  * Copyright (c) 2018 Martin Geisse
  * This file is distributed under the terms of the MIT license.
  */
-package name.martingeisse.esdk.core.rtl.synthesis.verilog;
+package name.martingeisse.esdk.core.rtl.synthesis.verilog.expression;
 
 import name.martingeisse.esdk.core.rtl.block.RtlProceduralMemory;
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;

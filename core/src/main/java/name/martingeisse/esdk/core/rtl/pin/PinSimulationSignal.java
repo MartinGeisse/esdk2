@@ -10,7 +10,7 @@ import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.simulation.RtlSimulatedSettableBitSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.EmptyVerilogContribution;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogContribution;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.expression.VerilogExpressionWriter;
 
 /**
  * This similar to an {@link RtlSimulatedSettableBitSignal} except that won't complain about synthesis as long as it is not

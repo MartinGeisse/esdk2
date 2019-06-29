@@ -7,7 +7,7 @@ package name.martingeisse.esdk.core.rtl.block.statement;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.SignalUsageConsumer;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionNesting;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.expression.VerilogExpressionNesting;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
 
 /**

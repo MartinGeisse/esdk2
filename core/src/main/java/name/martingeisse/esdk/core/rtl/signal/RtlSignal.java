@@ -9,8 +9,8 @@ import name.martingeisse.esdk.core.rtl.RtlItemOwned;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.SignalUsageConsumer;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogNamed;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogContribution;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionNesting;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.expression.VerilogExpressionNesting;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.expression.VerilogExpressionWriter;
 
 /**
  * Note: If an implementation redefines equals() / hashCode(), then "equal" signals must be exchangeable without

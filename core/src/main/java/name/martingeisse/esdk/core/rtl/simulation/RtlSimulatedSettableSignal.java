@@ -7,7 +7,7 @@ import name.martingeisse.esdk.core.rtl.block.statement.RtlStatement;
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.EmptyVerilogContribution;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogContribution;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogExpressionWriter;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.expression.VerilogExpressionWriter;
 
 /**
  * A signal whose value can be set by high-level models. This is meant as a bridge to simulate high-level models and

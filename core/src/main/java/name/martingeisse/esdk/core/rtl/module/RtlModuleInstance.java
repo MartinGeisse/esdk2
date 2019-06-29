@@ -13,6 +13,7 @@ import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.*;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogContribution;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.expression.VerilogExpressionNesting;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 
 import java.util.HashMap;

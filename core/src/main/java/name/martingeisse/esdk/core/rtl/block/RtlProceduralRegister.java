@@ -11,6 +11,7 @@ import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.*;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.EmptyVerilogContribution;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogContribution;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.expression.VerilogExpressionWriter;
 
 /**
  *
