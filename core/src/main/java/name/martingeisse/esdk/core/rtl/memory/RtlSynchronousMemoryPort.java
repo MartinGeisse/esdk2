@@ -300,7 +300,7 @@ public final class RtlSynchronousMemoryPort extends RtlClockedItem implements Rt
 		// begin synchronous block
 		out.indent();
 		out.print("always @(posedge ");
-		out.print(getClockNetwork().getClockSignal());
+		out.printSignal(getClockNetwork().getClockSignal());
 		out.println(") begin");
 		out.startIndentation();
 
@@ -343,7 +343,7 @@ public final class RtlSynchronousMemoryPort extends RtlClockedItem implements Rt
 		if (enable != null) {
 			out.indent();
 			out.print("if (");
-			out.print(enable);
+			out.printSignal(enable);
 			out.println(") begin");
 			out.startIndentation();
 		}
@@ -359,29 +359,29 @@ public final class RtlSynchronousMemoryPort extends RtlClockedItem implements Rt
 
 	private void printReadStatement(VerilogWriter out) {
 		out.indent();
-		out.print(readDataSignal);
+		out.printSignal(readDataSignal);
 		out.print(" <= ");
-		out.print(memory.getMemorySignal());
+		out.printSignal(memory.getMemorySignal());
 		out.print('[');
-		out.print(getAddressSignal());
+		out.printSignal(getAddressSignal());
 		out.println("];");
 	}
 
 	private void printWriteStatement(VerilogWriter out) {
 		out.indent();
-		out.print(memory.getMemorySignal());
+		out.printSignal(memory.getMemorySignal());
 		out.print('[');
-		out.print(getAddressSignal());
+		out.printSignal(getAddressSignal());
 		out.print("] <= ");
-		out.print(writeDataSignal);
+		out.printSignal(writeDataSignal);
 		out.println(';');
 	}
 
 	private void printReadFromWriteStatement(VerilogWriter out) {
 		out.indent();
-		out.print(readDataSignal);
+		out.printSignal(readDataSignal);
 		out.print(" <= ");
-		out.print(writeDataSignal);
+		out.printSignal(writeDataSignal);
 		out.println("];");
 	}
 

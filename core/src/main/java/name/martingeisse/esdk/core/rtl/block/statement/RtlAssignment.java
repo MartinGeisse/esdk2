@@ -38,7 +38,7 @@ public abstract class RtlAssignment extends RtlStatement {
 		out.indent();
 		getDestination().printVerilogAssignmentTarget(out);
 		out.print(" <= ");
-		out.print(getSource());
+		out.printSignal(getSource());
 		out.println(";");
 	}
 

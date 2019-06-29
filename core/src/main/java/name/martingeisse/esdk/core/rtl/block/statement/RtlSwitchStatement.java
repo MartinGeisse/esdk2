@@ -103,7 +103,7 @@ public final class RtlSwitchStatement extends RtlStatement {
 	public void printVerilogStatements(VerilogWriter out) {
 		out.indent();
 		out.print("case (");
-		out.print(selector);
+		out.printSignal(selector);
 		out.println(")");
 		out.println();
 		out.startIndentation();

@@ -25,7 +25,7 @@ public abstract class RtlInstanceInputPort extends RtlInstancePort {
 			throw new IllegalStateException("input port " + getPortName() +
 					" of instance of module " + getModuleInstance().getModuleName() + " has no assigned signal");
 		}
-		out.print(getAssignedSignal());
+		out.printSignal(getAssignedSignal());
 		out.print(')');
 	}
 

@@ -41,7 +41,7 @@ public abstract class VerilogWriter extends PrintWriter {
 	/**
 	 * Prints the expression to use for a signal at a point where the signal gets used.
 	 */
-	public void print(RtlSignal signal) {
+	public void printSignal(RtlSignal signal) {
 		if (signal == null) {
 			throw new IllegalArgumentException("signal argument is null");
 		}
@@ -56,7 +56,7 @@ public abstract class VerilogWriter extends PrintWriter {
 	/**
 	 * Prints the expression to use for a procedural memory at a point where the memory gets used.
 	 */
-	public void print(RtlProceduralMemory memory) {
+	public void printMemory(RtlProceduralMemory memory) {
 		if (memory == null) {
 			throw new IllegalArgumentException("memory argument is null");
 		}
@@ -68,7 +68,7 @@ public abstract class VerilogWriter extends PrintWriter {
 	}
 
 	/**
-	 * This method should normally not be called directly since {@link #print(RtlSignal)}
+	 * This method should normally not be called directly since {@link #printSignal(RtlSignal)}
 	 * is usually the right method to use. This method works similarly, but for named signals,
 	 * it prints the defining expression, not the name.
 	 */
@@ -95,13 +95,13 @@ public abstract class VerilogWriter extends PrintWriter {
 
 			@Override
 			public VerilogExpressionWriter printSignal(RtlSignal signal, VerilogExpressionNesting nesting) {
-				VerilogWriter.this.print(signal);
+				VerilogWriter.this.printSignal(signal);
 				return this;
 			}
 
 			@Override
 			public VerilogExpressionWriter printMemory(RtlProceduralMemory memory) {
-				VerilogWriter.this.print(memory);
+				VerilogWriter.this.printMemory(memory);
 				return this;
 			}
 

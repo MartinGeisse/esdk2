@@ -50,7 +50,7 @@ public abstract class RtlProceduralRegister extends RtlItem implements RtlSignal
 
 	@Override
 	public final void printVerilogAssignmentTarget(VerilogWriter out) {
-		out.print(this);
+		out.printSignal(this);
 	}
 
 	@Override

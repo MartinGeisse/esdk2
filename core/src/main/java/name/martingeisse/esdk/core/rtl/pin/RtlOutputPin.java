@@ -53,7 +53,7 @@ public final class RtlOutputPin extends RtlPin {
 			@Override
 			public void printImplementation(VerilogWriter out) {
 				out.print("assign " + getNetName() + " = ");
-				out.print(outputSignal);
+				out.printSignal(outputSignal);
 				out.println(";");
 			}
 

@@ -64,7 +64,7 @@ public final class RtlMemoryTargetConstantIndexSelection extends RtlItem impleme
 
 	@Override
 	public final void printVerilogAssignmentTarget(VerilogWriter out) {
-		out.print(memory);
+		out.printMemory(memory);
 		out.print('[');
 		out.print(index);
 		out.print(']');

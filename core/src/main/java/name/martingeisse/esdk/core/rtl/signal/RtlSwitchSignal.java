@@ -130,7 +130,7 @@ public abstract class RtlSwitchSignal<B extends RtlSignal> extends RtlItem imple
 				out.startIndentation();
 				out.indent();
 				out.print("case (");
-				out.print(selector);
+				out.printSignal(selector);
 				out.println(")");
 				out.println();
 				out.startIndentation();
@@ -148,9 +148,9 @@ public abstract class RtlSwitchSignal<B extends RtlSignal> extends RtlItem imple
 					out.println(": begin");
 					out.startIndentation();
 					out.indent();
-					out.print(RtlSwitchSignal.this);
+					out.printSignal(RtlSwitchSignal.this);
 					out.print(" <= ");
-					out.print(aCase.branch);
+					out.printSignal(aCase.branch);
 					out.println(";");
 					out.endIndentation();
 					out.indent();
@@ -162,9 +162,9 @@ public abstract class RtlSwitchSignal<B extends RtlSignal> extends RtlItem imple
 					out.println("default: begin");
 					out.startIndentation();
 					out.indent();
-					out.print(RtlSwitchSignal.this);
+					out.printSignal(RtlSwitchSignal.this);
 					out.print(" <= ");
-					out.print(defaultSignal);
+					out.printSignal(defaultSignal);
 					out.println(";");
 					out.endIndentation();
 					out.indent();

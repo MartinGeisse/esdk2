@@ -66,9 +66,9 @@ public final class RtlMemoryTargetIndexSelection extends RtlItem implements RtlV
 
 	@Override
 	public final void printVerilogAssignmentTarget(VerilogWriter out) {
-		out.print(memory);
+		out.printMemory(memory);
 		out.print('[');
-		out.print(indexSignal);
+		out.printSignal(indexSignal);
 		out.print(']');
 	}
 

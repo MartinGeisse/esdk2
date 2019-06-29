@@ -33,7 +33,7 @@ public abstract class RtlInstanceOutputPort extends RtlInstancePort implements R
 	@Override
 	protected void printPortAssignment(VerilogWriter out) {
 		out.print("." + getPortName() + "(");
-		out.print(this);
+		out.printSignal(this);
 		out.print(')');
 	}
 

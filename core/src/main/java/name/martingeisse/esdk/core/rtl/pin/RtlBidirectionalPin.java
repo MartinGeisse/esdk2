@@ -91,9 +91,9 @@ public final class RtlBidirectionalPin extends RtlPin implements RtlBitSignal {
 			@Override
 			public void printImplementation(VerilogWriter out) {
 				out.print("assign " + getNetName() + " = ");
-				out.print(outputEnableSignal);
+				out.printSignal(outputEnableSignal);
 				out.println(" ? ");
-				out.print(outputSignal);
+				out.printSignal(outputSignal);
 				out.println(" : 1'bz;");
 			}
 

@@ -66,7 +66,7 @@ public final class RtlWhenStatement extends RtlStatement {
 	public void printVerilogStatements(VerilogWriter out) {
 		out.indent();
 		out.print("if (");
-		out.print(condition);
+		out.printSignal(condition);
 		out.println(") begin");
 		out.startIndentation();
 		thenBranch.printVerilogStatements(out);

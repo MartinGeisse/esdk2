@@ -179,7 +179,7 @@ public final class RtlClockedBlock extends RtlClockedItem {
 
 				out.indent();
 				out.print("always @(posedge ");
-				out.print(getClockNetwork().getClockSignal());
+				out.printSignal(getClockNetwork().getClockSignal());
 				out.println(") begin");
 				out.startIndentation();
 				statements.printVerilogStatements(out);
