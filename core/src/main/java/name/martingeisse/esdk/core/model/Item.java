@@ -14,7 +14,11 @@ import java.io.StringWriter;
  */
 public abstract class Item {
 
-	private static final boolean DEBUG_NONAME_ITEMS = false;
+	/**
+	 * Set this to true to generate a default name for each item that contains the stack trace where it was created.
+	 * This is super-slow and should only be enabled temporarily to assign a proper name to those items.
+	 */
+	public static boolean DEBUG_NONAME_ITEMS = false;
 
 	private final Design design;
 	private String name;
