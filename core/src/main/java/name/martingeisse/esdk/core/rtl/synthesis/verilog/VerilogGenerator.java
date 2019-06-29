@@ -29,7 +29,7 @@ public class VerilogGenerator {
 	private final Set<String> names = new HashSet<>();
 	private final Set<String> fixedNames = new HashSet<>();
 	private final Map<String, MutableInt> prefixNameCounters = new HashMap<>();
-	private final Map<RtlSignal, SignalDeclaration> namedSignals = new HashMap<>();
+	private final Map<RtlSignal, SignalDeclaration> signalDeclarations = new HashMap<>();
 	private final Map<RtlProceduralMemory, String> memoryNames = new HashMap<>();
 
 	public VerilogGenerator(Writer out, RtlRealm realm, String toplevelModuleName, AuxiliaryFileFactory auxiliaryFileFactory) {
@@ -37,7 +37,7 @@ public class VerilogGenerator {
 
 			@Override
 			protected String getSignalName(RtlSignal signal) {
-				SignalDeclaration signalDeclaration = namedSignals.get(signal);
+				SignalDeclaration signalDeclaration = signalDeclarations.get(signal);
 				return (signalDeclaration == null) ? null : signalDeclaration.name;
 			}
 
@@ -88,7 +88,7 @@ public class VerilogGenerator {
 				}
 
 				private void internalDeclareSignal(RtlSignal signal, String name, VerilogSignalKind signalKindForExplicitDeclarationOrNullForNoDeclaration, boolean generateAssignment) {
-					namedSignals.put(signal, new SignalDeclaration(signal, name,
+					signalDeclarations.put(signal, new SignalDeclaration(signal, name,
 						signalKindForExplicitDeclarationOrNullForNoDeclaration != null,
 						signalKindForExplicitDeclarationOrNullForNoDeclaration,
 						generateAssignment
@@ -185,12 +185,12 @@ public class VerilogGenerator {
 				}
 
 				private void declareSignal(RtlSignal signal) {
-					if (namedSignals.get(signal) == null) {
+					if (signalDeclarations.get(signal) == null) {
 						String prefix = signal.getRtlItem().getName();
 						if (prefix == null) {
 							prefix = "s";
 						}
-						namedSignals.put(signal, new SignalDeclaration(signal, assignGeneratedName(prefix), true, VerilogSignalKind.WIRE, true));
+						signalDeclarations.put(signal, new SignalDeclaration(signal, assignGeneratedName(prefix), true, VerilogSignalKind.WIRE, true));
 					}
 				}
 
@@ -244,7 +244,7 @@ public class VerilogGenerator {
 			out.println();
 		}
 		out.println();
-		for (Map.Entry<RtlSignal, SignalDeclaration> signalEntry : namedSignals.entrySet()) {
+		for (Map.Entry<RtlSignal, SignalDeclaration> signalEntry : signalDeclarations.entrySet()) {
 			RtlSignal signal = signalEntry.getKey();
 			SignalDeclaration signalDeclaration = signalEntry.getValue();
 			if (signalDeclaration.explicitDeclaration) {
@@ -268,7 +268,7 @@ public class VerilogGenerator {
 			contribution.printDeclarations(out);
 		}
 		out.println();
-		for (Map.Entry<RtlSignal, SignalDeclaration> signalEntry : namedSignals.entrySet()) {
+		for (Map.Entry<RtlSignal, SignalDeclaration> signalEntry : signalDeclarations.entrySet()) {
 			RtlSignal signal = signalEntry.getKey();
 			SignalDeclaration signalDeclaration = signalEntry.getValue();
 			if (signalDeclaration.assignment) {
