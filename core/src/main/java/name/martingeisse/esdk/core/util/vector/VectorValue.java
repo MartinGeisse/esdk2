@@ -266,7 +266,7 @@ public abstract class VectorValue {
 		}
 
 		@Override
-		public VerilogExpressionWriter print(RtlProceduralMemory memory) {
+		public VerilogExpressionWriter printMemory(RtlProceduralMemory memory) {
 			throw new UnsupportedOperationException();
 		}
 

@@ -152,7 +152,7 @@ public class VerilogGenerator {
 					}
 
 					@Override
-					public VerilogExpressionWriter print(RtlProceduralMemory memory) {
+					public VerilogExpressionWriter printMemory(RtlProceduralMemory memory) {
 						return this;
 					}
 				};

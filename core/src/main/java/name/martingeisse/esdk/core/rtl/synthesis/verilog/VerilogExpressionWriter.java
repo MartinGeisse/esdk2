@@ -24,5 +24,5 @@ public interface VerilogExpressionWriter {
 	VerilogExpressionWriter print(int i);
 	VerilogExpressionWriter print(char c);
 	VerilogExpressionWriter printSignal(RtlSignal signal, VerilogExpressionNesting nesting);
-	VerilogExpressionWriter print(RtlProceduralMemory memory);
+	VerilogExpressionWriter printMemory(RtlProceduralMemory memory);
 }

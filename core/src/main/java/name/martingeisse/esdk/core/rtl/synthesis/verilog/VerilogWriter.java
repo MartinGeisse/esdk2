@@ -100,7 +100,7 @@ public abstract class VerilogWriter extends PrintWriter {
 			}
 
 			@Override
-			public VerilogExpressionWriter print(RtlProceduralMemory memory) {
+			public VerilogExpressionWriter printMemory(RtlProceduralMemory memory) {
 				VerilogWriter.this.print(memory);
 				return this;
 			}

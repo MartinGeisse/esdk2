@@ -68,7 +68,7 @@ public final class RtlProceduralMemoryConstantIndexSelection extends RtlItem imp
 
 	@Override
 	public void printVerilogImplementationExpression(VerilogExpressionWriter out) {
-		out.print(memory);
+		out.printMemory(memory);
 		out.print('[');
 		out.print(index);
 		out.print(']');
