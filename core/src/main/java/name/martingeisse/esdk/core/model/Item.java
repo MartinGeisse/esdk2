@@ -21,6 +21,7 @@ public abstract class Item {
 	public static boolean DEBUG_NONAME_ITEMS = false;
 
 	private final Design design;
+	private Item hierarchyParent;
 	private String name;
 
 	public Item(Design design) {
@@ -39,16 +40,20 @@ public abstract class Item {
 		return design;
 	}
 
+	public Item getHierarchyParent() {
+		return hierarchyParent;
+	}
+
+	public void setHierarchyParent(Item hierarchyParent) {
+		this.hierarchyParent = hierarchyParent;
+	}
+
 	public final String getName() {
 		return name;
 	}
 
 	public final void setName(String name) {
 		this.name = name;
-		onNameChanged();
-	}
-
-	protected void onNameChanged() {
 	}
 
 	/**
