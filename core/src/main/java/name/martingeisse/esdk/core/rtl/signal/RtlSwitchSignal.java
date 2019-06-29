@@ -110,11 +110,9 @@ public abstract class RtlSwitchSignal<B extends RtlSignal> extends RtlItem imple
 	public VerilogContribution getVerilogContribution() {
 		return new VerilogContribution() {
 
-			private String name;
-
 			@Override
 			public void prepareSynthesis(SynthesisPreparationContext context) {
-				name = context.declareSignal(RtlSwitchSignal.this, "switch", VerilogSignalDeclarationKeyword.REG, false);
+				context.declareSignal(RtlSwitchSignal.this, "switch", VerilogSignalDeclarationKeyword.REG, false);
 			}
 
 			@Override
