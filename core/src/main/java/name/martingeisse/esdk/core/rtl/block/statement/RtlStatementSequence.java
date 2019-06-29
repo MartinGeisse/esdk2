@@ -81,12 +81,6 @@ public class RtlStatementSequence extends RtlStatement {
 		return whenStatement;
 	}
 
-	public final RtlConditionChainStatement conditionChain() {
-		RtlConditionChainStatement chain = new RtlConditionChainStatement(getRealm());
-		addStatement(chain);
-		return chain;
-	}
-
 	public final RtlSwitchStatement switchOn(RtlVectorSignal selector) {
 		RtlSwitchStatement switchStatement = new RtlSwitchStatement(getRealm(), selector);
 		addStatement(switchStatement);
