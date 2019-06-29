@@ -11,7 +11,6 @@ import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogContribution;
-import org.apache.commons.lang3.mutable.MutableInt;
 
 import java.io.Writer;
 import java.util.*;
@@ -25,12 +24,8 @@ public class VerilogGenerator {
 	private final RtlRealm realm;
 	private final String toplevelModuleName;
 	private final AuxiliaryFileFactory auxiliaryFileFactory;
-
-	private final Set<String> names = new HashSet<>();
-	private final Set<String> fixedNames = new HashSet<>();
-	private final Map<String, MutableInt> prefixNameCounters = new HashMap<>();
-	private final Map<RtlSignal, SignalDeclaration> signalDeclarations = new HashMap<>();
-	private final Map<RtlProceduralMemory, String> memoryNames = new HashMap<>();
+	private final Map<RtlSignal, VerilogGenerator.SignalDeclaration> signalDeclarations = new HashMap<>();
+	private final Names names = new Names();
 
 	public VerilogGenerator(Writer out, RtlRealm realm, String toplevelModuleName, AuxiliaryFileFactory auxiliaryFileFactory) {
 		this.out = new VerilogWriter(out) {
@@ -43,7 +38,7 @@ public class VerilogGenerator {
 
 			@Override
 			protected String getMemoryName(RtlProceduralMemory memory) {
-			    return memoryNames.get(memory);
+			    return names.getMemoryName(memory);
 			}
 
 		};
@@ -97,18 +92,15 @@ public class VerilogGenerator {
 
 				@Override
 				public String declareProceduralMemory(RtlProceduralMemory memory) {
-					String prefix = memory.getName() == null ? "mem" : memory.getName();
-					String globalName = reserveName(prefix, true);
-					memoryNames.put(memory, globalName);
-					return globalName;
+					return names.declareProceduralMemory(memory);
 				}
 
 				@Override
 				public String reserveName(String nameOrPrefix, boolean appendCounterSuffix) {
 					if (appendCounterSuffix) {
-						return VerilogGenerator.this.assignGeneratedName(nameOrPrefix);
+						return names.assignGeneratedName(nameOrPrefix);
 					} else {
-						return VerilogGenerator.this.assignFixedName(nameOrPrefix);
+						return names.assignFixedName(nameOrPrefix);
 					}
 				}
 
@@ -190,7 +182,7 @@ public class VerilogGenerator {
 						if (prefix == null) {
 							prefix = "s";
 						}
-						signalDeclarations.put(signal, new SignalDeclaration(signal, assignGeneratedName(prefix), true, VerilogSignalKind.WIRE, true));
+						signalDeclarations.put(signal, new SignalDeclaration(signal, names.assignGeneratedName(prefix), true, VerilogSignalKind.WIRE, true));
 					}
 				}
 
@@ -285,40 +277,6 @@ public class VerilogGenerator {
 		out.println("endmodule");
 		out.println();
 
-	}
-
-	//
-	// names and signals
-	//
-
-	private String assignFixedName(String name) {
-		if (!names.add(name)) {
-			throw new IllegalStateException("fixed name is already used: " + name);
-		}
-		fixedNames.add(name);
-		return name;
-	}
-
-	private String assignGeneratedName(String prefix) {
-		MutableInt counter = prefixNameCounters.computeIfAbsent(prefix, p -> new MutableInt());
-		while (true) {
-			String name = prefix + "__" + counter.intValue();
-			counter.increment();
-
-			// If the counter collides with a fixed name, we shouldn't just increment again because the order
-			// in which the fixed and assigned names get reserved should not be relevant -- and if the counter
-			// comes first, #assignFixedName throws an exception too.
-			if (fixedNames.contains(name)) {
-				throw new IllegalStateException("assigned name collides with fixed name: " + name);
-			}
-
-			// There may still be a collision in the odd case of counter prefixes like "foo" and "foo__1", so to
-			// avoid edge cases, we have to check that too, hence the while loop.
-			if (names.add(name)) {
-				return name;
-			}
-
-		}
 	}
 
 	static class SignalDeclaration {
