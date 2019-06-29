@@ -17,12 +17,10 @@ import java.util.List;
 public class Design {
 
 	private final List<Item> items = new ArrayList<>();
-	private final List<Item> itemsToMaterialize = new ArrayList<>();
 	private Simulation simulation;
 
 	void register(Item item) {
 		items.add(item);
-		itemsToMaterialize.add(item);
 	}
 
 	public Iterable<Item> getItems() {
@@ -52,22 +50,9 @@ public class Design {
 			throw new IllegalStateException("simulation already prepared");
 		}
 		validateOrException(false);
-		materialize();
 		simulation = new Simulation();
 		for (Item item : items) {
 			item.initializeSimulation();
-		}
-	}
-
-	public void materialize() {
-		List<Item> materializationChunk = new ArrayList<>();
-		while (!itemsToMaterialize.isEmpty()) {
-			materializationChunk.clear();
-			materializationChunk.addAll(itemsToMaterialize);
-			itemsToMaterialize.clear();
-			for (Item item : materializationChunk) {
-				item.materialize();
-			}
 		}
 	}
 

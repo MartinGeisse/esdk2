@@ -10,9 +10,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 /**
- * Materialization: items are asked to materialize before simulation or synthesis. This may produce new items, which
- * are in turn asked to materialize, and so on. All this may only affect the implementation of an item, NOT the
- * interaction with other items.
+ *
  */
 public abstract class Item {
 
@@ -53,9 +51,6 @@ public abstract class Item {
 	 * Validates this item. Does not have to validate linked items since we already know them from the {@link Design}.
 	 */
 	public void validate(ValidationContext context) {
-	}
-
-	protected void materialize() {
 	}
 
 	protected void initializeSimulation() {

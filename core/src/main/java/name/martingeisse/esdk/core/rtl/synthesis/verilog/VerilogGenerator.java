@@ -46,9 +46,8 @@ public class VerilogGenerator {
 
 	public void generate() {
 
-		// validate and materialize items
+		// validate items
 		realm.getDesign().validateOrException(false);
-		realm.getDesign().materialize();
 
 		// collect contributions from all items
 		List<VerilogContribution> contributions = new ArrayList<>();
