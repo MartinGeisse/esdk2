@@ -29,7 +29,7 @@ public class VerilogGenerator {
 	private final Set<String> names = new HashSet<>();
 	private final Set<String> fixedNames = new HashSet<>();
 	private final Map<String, MutableInt> prefixNameCounters = new HashMap<>();
-	private final Map<RtlSignal, NamedSignal> namedSignals = new HashMap<>();
+	private final Map<RtlSignal, SignalDeclaration> namedSignals = new HashMap<>();
 	private final Map<RtlProceduralMemory, String> memoryNames = new HashMap<>();
 
 	public VerilogGenerator(Writer out, RtlRealm realm, String toplevelModuleName, AuxiliaryFileFactory auxiliaryFileFactory) {
@@ -37,8 +37,8 @@ public class VerilogGenerator {
 
 			@Override
 			protected String getSignalName(RtlSignal signal) {
-				NamedSignal namedSignal = namedSignals.get(signal);
-				return (namedSignal == null) ? null : namedSignal.name;
+				SignalDeclaration signalDeclaration = namedSignals.get(signal);
+				return (signalDeclaration == null) ? null : signalDeclaration.name;
 			}
 
 			@Override
@@ -88,7 +88,7 @@ public class VerilogGenerator {
 				}
 
 				private void internalDeclareSignal(RtlSignal signal, String name, VerilogSignalKind signalKindForExplicitDeclarationOrNullForNoDeclaration, boolean generateAssignment) {
-					namedSignals.put(signal, new NamedSignal(signal, name,
+					namedSignals.put(signal, new SignalDeclaration(signal, name,
 						signalKindForExplicitDeclarationOrNullForNoDeclaration != null,
 						signalKindForExplicitDeclarationOrNullForNoDeclaration,
 						generateAssignment
@@ -190,7 +190,7 @@ public class VerilogGenerator {
 						if (prefix == null) {
 							prefix = "s";
 						}
-						namedSignals.put(signal, new NamedSignal(signal, assignGeneratedName(prefix), true, VerilogSignalKind.WIRE, true));
+						namedSignals.put(signal, new SignalDeclaration(signal, assignGeneratedName(prefix), true, VerilogSignalKind.WIRE, true));
 					}
 				}
 
@@ -244,11 +244,11 @@ public class VerilogGenerator {
 			out.println();
 		}
 		out.println();
-		for (Map.Entry<RtlSignal, NamedSignal> signalEntry : namedSignals.entrySet()) {
+		for (Map.Entry<RtlSignal, SignalDeclaration> signalEntry : namedSignals.entrySet()) {
 			RtlSignal signal = signalEntry.getKey();
-			NamedSignal namedSignal = signalEntry.getValue();
-			if (namedSignal.explicitDeclaration) {
-				out.print(namedSignal.kind.name().toLowerCase());
+			SignalDeclaration signalDeclaration = signalEntry.getValue();
+			if (signalDeclaration.explicitDeclaration) {
+				out.print(signalDeclaration.kind.name().toLowerCase());
 				if (signal instanceof RtlVectorSignal) {
 					RtlVectorSignal vectorSignal = (RtlVectorSignal) signal;
 					out.print('[');
@@ -259,7 +259,7 @@ public class VerilogGenerator {
 				} else {
 					throw new RuntimeException("signal is neither a bit signal nor a vector signal: " + signal);
 				}
-				out.print(namedSignal.name);
+				out.print(signalDeclaration.name);
 				out.println(';');
 			}
 		}
@@ -268,11 +268,11 @@ public class VerilogGenerator {
 			contribution.printDeclarations(out);
 		}
 		out.println();
-		for (Map.Entry<RtlSignal, NamedSignal> signalEntry : namedSignals.entrySet()) {
+		for (Map.Entry<RtlSignal, SignalDeclaration> signalEntry : namedSignals.entrySet()) {
 			RtlSignal signal = signalEntry.getKey();
-			NamedSignal namedSignal = signalEntry.getValue();
-			if (namedSignal.assignment) {
-				out.print("assign " + namedSignal.name + " = ");
+			SignalDeclaration signalDeclaration = signalEntry.getValue();
+			if (signalDeclaration.assignment) {
+				out.print("assign " + signalDeclaration.name + " = ");
 				out.printImplementationExpression(signal);
 				out.println(";");
 			}
@@ -321,7 +321,7 @@ public class VerilogGenerator {
 		}
 	}
 
-	static class NamedSignal {
+	static class SignalDeclaration {
 
 		final RtlSignal signal;
 		final String name;
@@ -329,7 +329,7 @@ public class VerilogGenerator {
 		final VerilogSignalKind kind;
 		final boolean assignment;
 
-		NamedSignal(RtlSignal signal, String name, boolean explicitDeclaration, VerilogSignalKind kind, boolean assignment) {
+		SignalDeclaration(RtlSignal signal, String name, boolean explicitDeclaration, VerilogSignalKind kind, boolean assignment) {
 			this.signal = signal;
 			this.name = name;
 			this.explicitDeclaration = explicitDeclaration;
