@@ -17,6 +17,7 @@ import name.martingeisse.esdk.core.rtl.pin.RtlBidirectionalPin;
 import name.martingeisse.esdk.core.rtl.pin.RtlOutputPin;
 import name.martingeisse.esdk.core.rtl.signal.*;
 import name.martingeisse.esdk.core.rtl.signal.connector.RtlSignalConnector;
+import name.martingeisse.esdk.core.rtl.synthesis.prettify.RtlPrettifier;
 import name.martingeisse.esdk.library.util.StringUtil;
 import org.apache.commons.lang3.StringUtils;
 
@@ -29,6 +30,7 @@ import java.util.Map;
  *
  * TODO this class currently sets names but should actually store them and leave the item's names alone
  * TODO take hierarchy parent into account
+ * TODO replace {@link RtlPrettifier} by this class
  */
 public class AbsoluteNames {
 
