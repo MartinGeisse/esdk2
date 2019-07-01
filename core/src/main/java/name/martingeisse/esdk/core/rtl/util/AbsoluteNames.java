@@ -225,7 +225,7 @@ public class AbsoluteNames {
         }
     }
 
-    public String getName(RtlItem item) {
+    public String getAbsoluteName(RtlItem item) {
         return absoluteNames.get(item);
     }
 
