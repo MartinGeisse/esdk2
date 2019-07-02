@@ -168,12 +168,20 @@ public class UsageBasedNameSuggestions {
 
 	public static final class PropagatingSuggestion {
 
-		RtlItem origin;
-		Function<String, String> nameTransformation;
+		private RtlItem origin;
+		private Function<String, String> nameTransformation;
 
 		public PropagatingSuggestion(RtlItem origin, Function<String, String> nameTransformation) {
 			this.origin = origin;
 			this.nameTransformation = nameTransformation;
+		}
+
+		public RtlItem getOrigin() {
+			return origin;
+		}
+
+		public Function<String, String> getNameTransformation() {
+			return nameTransformation;
 		}
 
 	}
