@@ -58,8 +58,8 @@ public class SynthesisMain {
 		design.getDdrClock90SignalConnector().setConnected(clkReset.createBitOutputPort("ddr_clk_90"));
 		design.getDdrClock180SignalConnector().setConnected(clkReset.createBitOutputPort("ddr_clk_180"));
 		design.getDdrClock270SignalConnector().setConnected(clkReset.createBitOutputPort("ddr_clk_270"));
-		// design.getClockSignalConnector().setConnected(design.getDdrClock0SignalConnector().getConnected());
-		design.getClockSignalConnector().setConnected(clkReset.createBitOutputPort("clk"));
+		design.getClockSignalConnector().setConnected(design.getDdrClock0SignalConnector().getConnected());
+		// design.getClockSignalConnector().setConnected(clkReset.createBitOutputPort("clk"));
 
 		// timing constraints for the CPU
 		{
