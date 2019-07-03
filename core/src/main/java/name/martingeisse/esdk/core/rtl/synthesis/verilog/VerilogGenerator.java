@@ -28,7 +28,7 @@ public class VerilogGenerator {
 	private final String toplevelModuleName;
 	private final AuxiliaryFileFactory auxiliaryFileFactory;
 	private final Map<RtlSignal, VerilogGenerator.SignalDeclaration> signalDeclarations = new HashMap<>();
-	private final Names names = new Names();
+	private final VerilogNames names = new VerilogNames();
 
 	public VerilogGenerator(Writer out, RtlRealm realm, String toplevelModuleName, AuxiliaryFileFactory auxiliaryFileFactory) {
 		this.out = new VerilogWriter(out) {

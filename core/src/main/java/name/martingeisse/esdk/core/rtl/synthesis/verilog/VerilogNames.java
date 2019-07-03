@@ -11,7 +11,7 @@ import java.util.Set;
 /**
  * Stores names for things in Verilog and performs assignment of generated names.
  */
-class Names {
+class VerilogNames {
 
     private final Set<String> fixedNames = new HashSet<>();
     private final Map<String, MutableInt> prefixNameCounters = new HashMap<>();
