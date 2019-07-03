@@ -32,6 +32,9 @@ public class UsageBasedNameSuggestions {
 		for (RtlItem item : realm.getItems()) {
 			if (item instanceof RtlSignalConnector) {
 				RtlSignalConnector connector = (RtlSignalConnector) item;
+				if (connector.getConnected() == null) {
+					throw new RuntimeException("no connected signal: " + connector);
+				}
 				suggest(connector.getConnected().getRtlItem(), connector, name -> name);
 			} else if (item instanceof RtlBitNotOperation) {
 				RtlBitNotOperation not = (RtlBitNotOperation) item;

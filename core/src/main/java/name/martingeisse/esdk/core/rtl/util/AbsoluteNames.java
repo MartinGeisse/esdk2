@@ -5,10 +5,8 @@ import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.block.RtlProceduralMemory;
 import name.martingeisse.esdk.core.rtl.block.RtlProceduralRegister;
 import name.martingeisse.esdk.core.rtl.memory.RtlMemory;
-import name.martingeisse.esdk.core.rtl.module.RtlInstanceOutputPort;
 import name.martingeisse.esdk.core.rtl.module.RtlModuleInstance;
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
-import name.martingeisse.esdk.core.rtl.synthesis.prettify.RtlPrettifier;
 import name.martingeisse.esdk.core.util.InfiniteRecursionDetector;
 import org.apache.commons.lang3.StringUtils;
 
@@ -20,7 +18,6 @@ import java.util.Map;
  * its class, and how it is used.
  * <p>
  * TODO take hierarchy parent into account
- * TODO replace {@link RtlPrettifier} by this class
  */
 public class AbsoluteNames {
 
