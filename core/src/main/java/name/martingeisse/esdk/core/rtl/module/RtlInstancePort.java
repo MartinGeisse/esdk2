@@ -22,6 +22,7 @@ public abstract class RtlInstancePort extends RtlItem {
 		this.moduleInstance = moduleInstance;
 		this.portName = portName;
 		moduleInstance.addPort(portName, this);
+		setName(portName);
 	}
 
 	public final RtlModuleInstance getModuleInstance() {

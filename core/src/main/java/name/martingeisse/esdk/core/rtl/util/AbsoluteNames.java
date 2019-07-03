@@ -84,9 +84,8 @@ public class AbsoluteNames {
 		} else if (item instanceof RtlSignal) {
 			return "signal";
 		} else if (item instanceof RtlModuleInstance) {
-			return "instance";
-		} else if (item instanceof RtlInstanceOutputPort) {
-			return "instancePort";
+			String moduleName = ((RtlModuleInstance) item).getModuleName();
+			return moduleName == null ? "instance" : StringUtils.uncapitalize(moduleName);
 		}
 		String className = item.getClass().getSimpleName();
 		if (className.startsWith("Rtl")) {
