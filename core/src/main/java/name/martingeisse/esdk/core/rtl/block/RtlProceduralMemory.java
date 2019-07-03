@@ -4,7 +4,6 @@ import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.block.statement.target.RtlMemoryTargetConstantIndexSelection;
 import name.martingeisse.esdk.core.rtl.block.statement.target.RtlMemoryTargetIndexSelection;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogNamed;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.EmptyVerilogContribution;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogContribution;
 import name.martingeisse.esdk.core.util.Matrix;
@@ -16,7 +15,7 @@ import java.util.List;
 /**
  *
  */
-public final class RtlProceduralMemory extends RtlItem implements VerilogNamed {
+public final class RtlProceduralMemory extends RtlItem {
 
 	private final RtlClockedBlock block;
 	private final Matrix matrix;
@@ -101,11 +100,6 @@ public final class RtlProceduralMemory extends RtlItem implements VerilogNamed {
 	public VerilogContribution getVerilogContribution() {
 		// procedural signals are synthesized as part of the block that defines them
 		return new EmptyVerilogContribution();
-	}
-
-	@Override
-	public RtlItem getVerilogNameSuggestionProvider() {
-		return this;
 	}
 
 }

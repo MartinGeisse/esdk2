@@ -4,6 +4,7 @@
  */
 package name.martingeisse.esdk.core.rtl.synthesis.verilog;
 
+import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.block.RtlProceduralMemory;
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
 
@@ -12,9 +13,9 @@ import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
  */
 public interface SynthesisPreparationContext {
 
-    void assignFixedName(String name, VerilogNamed object);
+    void assignFixedName(String name, RtlItem item);
 
-    void assignGeneratedName(VerilogNamed object);
+    void assignGeneratedName(RtlItem item);
 
     void declareFixedNameSignal(RtlSignal signal,
                                 String name,

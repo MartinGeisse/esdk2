@@ -10,7 +10,10 @@ import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.*;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.SignalUsageConsumer;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.SynthesisPreparationContext;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogSignalDeclarationKeyword;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogContribution;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.expression.VerilogExpressionNesting;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
@@ -21,7 +24,7 @@ import java.util.Map;
 /**
  *
  */
-public final class RtlModuleInstance extends RtlItem implements VerilogNamed {
+public final class RtlModuleInstance extends RtlItem {
 
 	private String moduleName;
 	private final Map<String, Object> parameters = new HashMap<>();
@@ -188,11 +191,6 @@ public final class RtlModuleInstance extends RtlItem implements VerilogNamed {
 			}
 
 		};
-	}
-
-	@Override
-	public RtlItem getVerilogNameSuggestionProvider() {
-		return this;
 	}
 
 }

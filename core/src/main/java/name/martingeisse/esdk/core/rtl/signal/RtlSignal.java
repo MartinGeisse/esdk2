@@ -4,10 +4,8 @@
  */
 package name.martingeisse.esdk.core.rtl.signal;
 
-import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlItemOwned;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.SignalUsageConsumer;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogNamed;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogContribution;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.expression.VerilogExpressionNesting;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.expression.VerilogExpressionWriter;
@@ -17,7 +15,7 @@ import name.martingeisse.esdk.core.rtl.synthesis.verilog.expression.VerilogExpre
  * changes to the RTL semantics. The Verilog code generator will use these methods, not object identity, to detect
  * re-use of signal objects.
  */
-public interface RtlSignal extends RtlItemOwned, VerilogNamed {
+public interface RtlSignal extends RtlItemOwned {
 
 	// ----------------------------------------------------------------------------------------------------------------
 	// factory methods
@@ -67,10 +65,5 @@ public interface RtlSignal extends RtlItemOwned, VerilogNamed {
 	 * means than an implementation expression (for example, switch-expressions and instance output ports).
 	 */
 	void printVerilogImplementationExpression(VerilogExpressionWriter out);
-
-	@Override
-	default RtlItem getVerilogNameSuggestionProvider() {
-		return getRtlItem();
-	}
 
 }

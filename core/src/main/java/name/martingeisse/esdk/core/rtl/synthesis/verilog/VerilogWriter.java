@@ -4,6 +4,7 @@
  */
 package name.martingeisse.esdk.core.rtl.synthesis.verilog;
 
+import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.block.RtlProceduralMemory;
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.expression.RealVerilogExpressionWriter;
@@ -37,12 +38,12 @@ public abstract class VerilogWriter extends PrintWriter {
 		}
 	}
 
-	protected abstract String getName(VerilogNamed namedObject);
+	protected abstract String getName(RtlItem item);
 
-	public void printName(VerilogNamed namedObject) {
-		String name = getName(namedObject);
+	public void printName(RtlItem item) {
+		String name = getName(item);
 		if (name == null) {
-			throw new IllegalArgumentException("no name has been assigned to object: " + namedObject);
+			throw new IllegalArgumentException("no verilog name has been assigned to item: " + item);
 		}
 		print(name);
 	}
@@ -54,7 +55,7 @@ public abstract class VerilogWriter extends PrintWriter {
 		if (signal == null) {
 			throw new IllegalArgumentException("signal argument is null");
 		}
-		String name = getName(signal);
+		String name = getName(signal.getRtlItem());
 		if (name == null) {
 			printImplementationExpression(signal);
 		} else {
@@ -71,7 +72,7 @@ public abstract class VerilogWriter extends PrintWriter {
 		}
 		String name = getName(memory);
 		if (name == null) {
-			throw new RuntimeException("could not determine name for memory");
+			throw new RuntimeException("could not determine verilog name for memory");
 		}
 		print(name);
 	}

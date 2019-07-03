@@ -35,8 +35,8 @@ public class VerilogGenerator {
 		this.out = new VerilogWriter(out) {
 
 			@Override
-			protected String getName(VerilogNamed namedObject) {
-				return names.getName(namedObject);
+			protected String getName(RtlItem item) {
+				return names.getName(item);
 			}
 
 		};
@@ -66,24 +66,24 @@ public class VerilogGenerator {
 			SynthesisPreparationContext synthesisPreparationContext = new SynthesisPreparationContext() {
 
 				@Override
-				public void assignFixedName(String name, VerilogNamed object) {
-					names.assignFixedName(name, object);
+				public void assignFixedName(String name, RtlItem item) {
+					names.assignFixedName(name, item);
 				}
 
 				@Override
-				public void assignGeneratedName(VerilogNamed object) {
-					names.assignGeneratedName(object);
+				public void assignGeneratedName(RtlItem item) {
+					names.assignGeneratedName(item);
 				}
 
 				@Override
 				public void declareFixedNameSignal(RtlSignal signal, String name, VerilogSignalDeclarationKeyword keyword, boolean generateAssignment) {
-					names.assignFixedName(name, signal);
+					names.assignFixedName(name, signal.getRtlItem());
 					internalDeclareSignal(signal, name, keyword, generateAssignment);
 				}
 
 				@Override
 				public String declareSignal(RtlSignal signal, VerilogSignalDeclarationKeyword keyword, boolean generateAssignment) {
-					String name = names.assignGeneratedName(signal);
+					String name = names.assignGeneratedName(signal.getRtlItem());
 					internalDeclareSignal(signal, name, keyword, generateAssignment);
 					return name;
 				}
@@ -155,7 +155,7 @@ public class VerilogGenerator {
 
 				private void declareSignal(RtlSignal signal) {
 					if (signalDeclarations.get(signal) == null) {
-						String name = names.assignGeneratedName(signal);
+						String name = names.assignGeneratedName(signal.getRtlItem());
 						signalDeclarations.put(signal, new SignalDeclaration(signal, name, VerilogSignalDeclarationKeyword.WIRE, true));
 					}
 				}

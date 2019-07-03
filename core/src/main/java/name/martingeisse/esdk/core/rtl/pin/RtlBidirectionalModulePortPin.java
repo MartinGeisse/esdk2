@@ -4,18 +4,20 @@
  */
 package name.martingeisse.esdk.core.rtl.pin;
 
-import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.module.RtlInstancePort;
 import name.martingeisse.esdk.core.rtl.module.RtlModuleInstance;
-import name.martingeisse.esdk.core.rtl.synthesis.verilog.*;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.SignalUsageConsumer;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.SynthesisPreparationContext;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.ToplevelPortConsumer;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogContribution;
 
 /**
  * This is a special case of a bidirectional pin that is directly connected to a bidirectional
  * module port.
  */
-public final class RtlBidirectionalModulePortPin extends RtlPin implements VerilogNamed {
+public final class RtlBidirectionalModulePortPin extends RtlPin {
 
 	private final RtlInstancePort port;
 
@@ -58,11 +60,6 @@ public final class RtlBidirectionalModulePortPin extends RtlPin implements Veril
 			}
 
 		};
-	}
-
-	@Override
-	public RtlItem getVerilogNameSuggestionProvider() {
-		return this;
 	}
 
 }
