@@ -119,11 +119,11 @@ public final class RtlModuleInstance extends RtlItem implements VerilogNamed {
 
 			@Override
 			public void prepareSynthesis(SynthesisPreparationContext context) {
-				context.assignGeneratedName("m", RtlModuleInstance.this);
+				context.assignGeneratedName(RtlModuleInstance.this);
 				for (RtlInstancePort port : ports.values()) {
 					if (port instanceof RtlInstanceOutputPort) {
 						RtlInstanceOutputPort outputPort = (RtlInstanceOutputPort) port;
-						context.declareSignal(outputPort, "mp", VerilogSignalDeclarationKeyword.WIRE, false);
+						context.declareSignal(outputPort, VerilogSignalDeclarationKeyword.WIRE, false);
 					}
 				}
 			}

@@ -112,7 +112,7 @@ public abstract class RtlSwitchSignal<B extends RtlSignal> extends RtlItem imple
 
 			@Override
 			public void prepareSynthesis(SynthesisPreparationContext context) {
-				context.declareSignal(RtlSwitchSignal.this, "switch", VerilogSignalDeclarationKeyword.REG, false);
+				context.declareSignal(RtlSwitchSignal.this, VerilogSignalDeclarationKeyword.REG, false);
 			}
 
 			@Override

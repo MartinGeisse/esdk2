@@ -122,7 +122,7 @@ public final class RtlClockedBlock extends RtlClockedItem {
 			@Override
 			public void prepareSynthesis(SynthesisPreparationContext context) {
 				for (RtlSignal signal : proceduralRegisters) {
-					context.declareSignal(signal, "r", VerilogSignalDeclarationKeyword.REG, false);
+					context.declareSignal(signal, VerilogSignalDeclarationKeyword.REG, false);
 				}
 				for (RtlProceduralMemory memory : proceduralMemories) {
 					String memoryName = context.declareProceduralMemory(memory);

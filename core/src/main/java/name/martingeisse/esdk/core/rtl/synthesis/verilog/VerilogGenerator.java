@@ -14,6 +14,7 @@ import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogCon
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.expression.FakeVerilogExpressionWriter;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.expression.VerilogExpressionNesting;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.expression.VerilogExpressionWriter;
+import name.martingeisse.esdk.core.rtl.util.AbsoluteNames;
 
 import java.io.Writer;
 import java.util.*;
@@ -28,7 +29,7 @@ public class VerilogGenerator {
 	private final String toplevelModuleName;
 	private final AuxiliaryFileFactory auxiliaryFileFactory;
 	private final Map<RtlSignal, VerilogGenerator.SignalDeclaration> signalDeclarations = new HashMap<>();
-	private final VerilogNames names = new VerilogNames();
+	private final VerilogNames names;
 
 	public VerilogGenerator(Writer out, RtlRealm realm, String toplevelModuleName, AuxiliaryFileFactory auxiliaryFileFactory) {
 		this.out = new VerilogWriter(out) {
@@ -42,6 +43,7 @@ public class VerilogGenerator {
 		this.realm = realm;
 		this.toplevelModuleName = toplevelModuleName;
 		this.auxiliaryFileFactory = auxiliaryFileFactory;
+		this.names = new VerilogNames(new AbsoluteNames(realm));
 	}
 
 	public void generate() {
@@ -69,8 +71,8 @@ public class VerilogGenerator {
 				}
 
 				@Override
-				public void assignGeneratedName(String fallbackPrefix, VerilogNamed object) {
-					names.assignGeneratedName(fallbackPrefix, object);
+				public void assignGeneratedName(VerilogNamed object) {
+					names.assignGeneratedName(object);
 				}
 
 				@Override
@@ -80,8 +82,8 @@ public class VerilogGenerator {
 				}
 
 				@Override
-				public String declareSignal(RtlSignal signal, String fallbackPrefix, VerilogSignalDeclarationKeyword keyword, boolean generateAssignment) {
-					String name = names.assignGeneratedName(fallbackPrefix, signal);
+				public String declareSignal(RtlSignal signal, VerilogSignalDeclarationKeyword keyword, boolean generateAssignment) {
+					String name = names.assignGeneratedName(signal);
 					internalDeclareSignal(signal, name, keyword, generateAssignment);
 					return name;
 				}
@@ -92,7 +94,7 @@ public class VerilogGenerator {
 
 				@Override
 				public String declareProceduralMemory(RtlProceduralMemory memory) {
-					return names.assignGeneratedName("mem", memory);
+					return names.assignGeneratedName(memory);
 				}
 
 				@Override
@@ -153,7 +155,7 @@ public class VerilogGenerator {
 
 				private void declareSignal(RtlSignal signal) {
 					if (signalDeclarations.get(signal) == null) {
-						String name = names.assignGeneratedName("s", signal);
+						String name = names.assignGeneratedName(signal);
 						signalDeclarations.put(signal, new SignalDeclaration(signal, name, VerilogSignalDeclarationKeyword.WIRE, true));
 					}
 				}

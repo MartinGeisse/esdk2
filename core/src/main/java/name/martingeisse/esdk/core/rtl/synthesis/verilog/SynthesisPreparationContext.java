@@ -14,7 +14,7 @@ public interface SynthesisPreparationContext {
 
     void assignFixedName(String name, VerilogNamed object);
 
-    void assignGeneratedName(String fallbackPrefix, VerilogNamed object);
+    void assignGeneratedName(VerilogNamed object);
 
     void declareFixedNameSignal(RtlSignal signal,
                                 String name,
@@ -22,7 +22,6 @@ public interface SynthesisPreparationContext {
                                 boolean generateAssignment);
 
     String declareSignal(RtlSignal signal,
-                         String fallbackPrefix,
                          VerilogSignalDeclarationKeyword keyword,
                          boolean generateAssignment);
 

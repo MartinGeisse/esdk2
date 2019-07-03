@@ -280,7 +280,7 @@ public final class RtlSynchronousMemoryPort extends RtlClockedItem implements Rt
 	@Override
 	public void prepareSynthesis(SynthesisPreparationContext context) {
 		if (readSupport == ReadSupport.SYNCHRONOUS) {
-			context.declareSignal(readDataSignal, "s", VerilogSignalDeclarationKeyword.REG, false);
+			context.declareSignal(readDataSignal, VerilogSignalDeclarationKeyword.REG, false);
 		}
 	}
 
