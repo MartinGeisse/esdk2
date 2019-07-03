@@ -4,7 +4,7 @@
  */
 package name.martingeisse.esdk.core.rtl.signal;
 
-import name.martingeisse.esdk.core.model.Item;
+import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlItemOwned;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.SignalUsageConsumer;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogNamed;
@@ -69,7 +69,7 @@ public interface RtlSignal extends RtlItemOwned, VerilogNamed {
 	void printVerilogImplementationExpression(VerilogExpressionWriter out);
 
 	@Override
-	default Item getVerilogNameSuggestionProvider() {
+	default RtlItem getVerilogNameSuggestionProvider() {
 		return getRtlItem();
 	}
 

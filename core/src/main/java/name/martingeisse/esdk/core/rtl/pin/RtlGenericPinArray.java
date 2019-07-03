@@ -5,7 +5,6 @@
 package name.martingeisse.esdk.core.rtl.pin;
 
 import com.google.common.collect.ImmutableList;
-import name.martingeisse.esdk.core.model.Item;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.*;
@@ -93,7 +92,7 @@ public final class RtlGenericPinArray extends RtlItem implements VerilogNamed {
 	}
 
 	@Override
-	public Item getVerilogNameSuggestionProvider() {
+	public RtlItem getVerilogNameSuggestionProvider() {
 		return this;
 	}
 

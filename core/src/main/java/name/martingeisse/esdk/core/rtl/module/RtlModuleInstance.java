@@ -4,7 +4,6 @@
  */
 package name.martingeisse.esdk.core.rtl.module;
 
-import name.martingeisse.esdk.core.model.Item;
 import name.martingeisse.esdk.core.rtl.RtlClockedItem;
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
@@ -192,7 +191,7 @@ public final class RtlModuleInstance extends RtlItem implements VerilogNamed {
 	}
 
 	@Override
-	public Item getVerilogNameSuggestionProvider() {
+	public RtlItem getVerilogNameSuggestionProvider() {
 		return this;
 	}
 

@@ -4,7 +4,7 @@
  */
 package name.martingeisse.esdk.core.rtl.pin;
 
-import name.martingeisse.esdk.core.model.Item;
+import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.module.RtlInstancePort;
 import name.martingeisse.esdk.core.rtl.module.RtlModuleInstance;
@@ -61,7 +61,7 @@ public final class RtlBidirectionalModulePortPin extends RtlPin implements Veril
 	}
 
 	@Override
-	public Item getVerilogNameSuggestionProvider() {
+	public RtlItem getVerilogNameSuggestionProvider() {
 		return this;
 	}
 

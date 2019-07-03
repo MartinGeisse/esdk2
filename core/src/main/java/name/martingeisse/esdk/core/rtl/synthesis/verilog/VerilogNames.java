@@ -1,6 +1,7 @@
 package name.martingeisse.esdk.core.rtl.synthesis.verilog;
 
-import name.martingeisse.esdk.core.model.Item;
+import name.martingeisse.esdk.core.rtl.RtlItem;
+import name.martingeisse.esdk.core.rtl.util.AbsoluteNames;
 import org.apache.commons.lang3.mutable.MutableInt;
 
 import java.util.HashMap;
@@ -13,10 +14,15 @@ import java.util.Set;
  */
 class VerilogNames {
 
+    private final AbsoluteNames absoluteNames;
     private final Set<String> fixedNames = new HashSet<>();
     private final Map<String, MutableInt> prefixNameCounters = new HashMap<>();
     private final Map<String, VerilogNamed> nameToObject = new HashMap<>();
     private final Map<VerilogNamed, String> objectToName = new HashMap<>();
+
+    public VerilogNames(AbsoluteNames absoluteNames) {
+        this.absoluteNames = absoluteNames;
+    }
 
     /**
      * Uses the specified name for an object, ignoring the object's own name.
@@ -32,11 +38,13 @@ class VerilogNames {
     /**
      * Generates a name based on the object's own name, possibly adding a number for disambiguation.
      */
-    String assignGeneratedName(String fallbackPrefix, VerilogNamed object) {
-        Item verilogNameSuggestionProvider = object.getVerilogNameSuggestionProvider();
-        String prefix = (verilogNameSuggestionProvider == null ? null : verilogNameSuggestionProvider.getName());
-        if (prefix == null) {
-            prefix = fallbackPrefix;
+    String assignGeneratedName(VerilogNamed object) {
+        RtlItem verilogNameSuggestionProvider = object.getVerilogNameSuggestionProvider();
+        String prefix;
+        if (verilogNameSuggestionProvider == null) {
+            prefix = "_object";
+        } else {
+            prefix = absoluteNames.getAbsoluteName(verilogNameSuggestionProvider);
         }
         MutableInt counter = prefixNameCounters.computeIfAbsent(prefix, p -> new MutableInt());
         while (true) {
