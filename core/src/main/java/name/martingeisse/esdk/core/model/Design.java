@@ -27,6 +27,16 @@ public class Design {
 		return items;
 	}
 
+	public <T extends Item> List<T> getItems(Class<T> itemClass) {
+		List<T> result = new ArrayList<>();
+		for (Item item : items) {
+			if (itemClass.isInstance(item)) {
+				result.add(itemClass.cast(item));
+			}
+		}
+		return result;
+	}
+
 	public DesignValidationResult validate() {
 		return new DesignValidator(this).validate();
 	}
