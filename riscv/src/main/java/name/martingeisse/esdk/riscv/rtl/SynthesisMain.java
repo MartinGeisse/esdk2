@@ -8,6 +8,7 @@ import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlConcatenation;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorConstant;
+import name.martingeisse.esdk.core.rtl.synthesis.xilinx.FromThruToConstraint;
 import name.martingeisse.esdk.core.rtl.synthesis.xilinx.ProjectGenerator;
 import name.martingeisse.esdk.core.rtl.synthesis.xilinx.XilinxPinConfiguration;
 import name.martingeisse.esdk.library.SignalLogger;
@@ -62,8 +63,8 @@ public class SynthesisMain {
 
 		// timing constraints for the CPU
 		{
-			// Multicycle.Implementation cpu = (Multicycle.Implementation)design.getComputerModule()._cpu;
-			// new FromThruToConstraint(realm).from(cpu._registerReadValue).to(cpu._registers).nanoseconds(10);
+			 Multicycle.Implementation cpu = (Multicycle.Implementation)design.getComputerModule()._cpu;
+			 new FromThruToConstraint(realm).from(cpu._registers).to(cpu._registers).nanoseconds(10);
 		}
 
 		// pixel display

@@ -81,25 +81,35 @@ public class FromThruToConstraint extends RtlItem implements UcfContributor {
     public void contributeToUcf(PrintWriter out, VerilogNames verilogNames) {
         String timespecName = verilogNames.assignGeneratedName(this);
         StringBuilder builder = new StringBuilder();
+
+        if (fromSignal != null) {
+            builder.append("NET \"").append(verilogNames.getName(fromSignal.getRtlItem()))
+                    .append("\" TNM = ").append(timespecName).append("_FROM;\n");
+        }
+        if (thruSignals != null) {
+            for (int i = 0; i < thruSignals.length; i++) {
+                builder.append("NET \"").append(verilogNames.getName(thruSignals[i].getRtlItem()))
+                        .append("\" TNM = ").append(timespecName).append("_THRU_").append(i).append(";\n");
+            }
+        }
+        if (toSignal != null) {
+            builder.append("NET \"").append(verilogNames.getName(toSignal.getRtlItem()))
+                    .append("\" TNM = ").append(timespecName).append("_TO;\n");
+        }
+
         builder.append("TIMESPEC \"TS_");
         builder.append(timespecName);
         builder.append("\" = ");
         if (fromSignal != null) {
-            builder.append("FROM \"");
-            builder.append(verilogNames.getName(fromSignal.getRtlItem()));
-            builder.append("\" ");
+            builder.append("FROM \"").append(timespecName).append("_FROM\" ");
         }
         if (thruSignals != null) {
-            for (RtlItem thruSignal : thruSignals) {
-                builder.append("THRU \"");
-                builder.append(verilogNames.getName(thruSignal.getRtlItem()));
-                builder.append("\" ");
+            for (int i = 0; i < thruSignals.length; i++) {
+                builder.append("THRU \"").append(timespecName).append("_THRU_").append(i).append("\" ");
             }
         }
         if (toSignal != null) {
-            builder.append("TO \"");
-            builder.append(verilogNames.getName(toSignal.getRtlItem()));
-            builder.append("\" ");
+            builder.append("TO \"").append(timespecName).append("_TO\" ");
         }
         builder.append(nanoseconds);
         builder.append(" ns;");
