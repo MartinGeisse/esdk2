@@ -18,6 +18,9 @@ class VerilogNames {
     private final Map<String, VerilogNamed> nameToObject = new HashMap<>();
     private final Map<VerilogNamed, String> objectToName = new HashMap<>();
 
+    /**
+     * Uses the specified name for an object, ignoring the object's own name.
+     */
     void assignFixedName(String name, VerilogNamed object) {
         if (nameToObject.putIfAbsent(name, object) != null) {
             throw new IllegalStateException("fixed name is already used: " + name);
@@ -26,6 +29,9 @@ class VerilogNames {
         fixedNames.add(name);
     }
 
+    /**
+     * Generates a name based on the object's own name, possibly adding a number for disambiguation.
+     */
     String assignGeneratedName(String fallbackPrefix, VerilogNamed object) {
         Item verilogNameSuggestionProvider = object.getVerilogNameSuggestionProvider();
         String prefix = (verilogNameSuggestionProvider == null ? null : verilogNameSuggestionProvider.getName());
