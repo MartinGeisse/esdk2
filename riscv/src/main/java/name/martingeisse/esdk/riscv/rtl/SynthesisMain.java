@@ -1,6 +1,5 @@
 package name.martingeisse.esdk.riscv.rtl;
 
-import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.module.RtlModuleInstance;
 import name.martingeisse.esdk.core.rtl.pin.RtlInputPin;
@@ -9,7 +8,6 @@ import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlConcatenation;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorConstant;
-import name.martingeisse.esdk.core.rtl.synthesis.prettify.RtlPrettifier;
 import name.martingeisse.esdk.core.rtl.synthesis.xilinx.ProjectGenerator;
 import name.martingeisse.esdk.core.rtl.synthesis.xilinx.XilinxPinConfiguration;
 import name.martingeisse.esdk.library.SignalLogger;
@@ -17,7 +15,10 @@ import name.martingeisse.esdk.library.SignalLoggerBusInterface;
 import name.martingeisse.esdk.riscv.rtl.ram.RamController;
 import name.martingeisse.esdk.riscv.rtl.ram.SdramConnector;
 import name.martingeisse.esdk.riscv.rtl.ram.SdramConnectorImpl;
-import name.martingeisse.esdk.riscv.rtl.terminal.*;
+import name.martingeisse.esdk.riscv.rtl.terminal.KeyboardController;
+import name.martingeisse.esdk.riscv.rtl.terminal.PixelDisplayController;
+import name.martingeisse.esdk.riscv.rtl.terminal.Ps2Connector;
+import name.martingeisse.esdk.riscv.rtl.terminal.VgaConnector;
 
 import java.io.File;
 
@@ -46,6 +47,7 @@ public class SynthesisMain {
 		ComputerModule.Implementation computerModule = design.getComputerModule();
 		RtlRealm realm = design.getRealm();
 
+		// clk / reset
 		RtlModuleInstance clkReset = new RtlModuleInstance(realm, "clk_reset");
 		RtlBitSignal reset = clkReset.createBitOutputPort("reset");
 		RtlBitSignal mainClockSignal = clkReset.createBitOutputPort("clk");
@@ -58,6 +60,13 @@ public class SynthesisMain {
 		design.getDdrClock180SignalConnector().setConnected(clkReset.createBitOutputPort("ddr_clk_180"));
 		design.getDdrClock270SignalConnector().setConnected(clkReset.createBitOutputPort("ddr_clk_270"));
 
+		// timing constraints for the CPU
+		{
+			// Multicycle.Implementation cpu = (Multicycle.Implementation)design.createComputerModule()._cpu;
+			// new FromThruToConstraint(realm).from(cpu._registerReadValue).to(cpu._execOpTemporaryResultAddSub).nanoseconds(10);
+		}
+
+		// pixel display
 		PixelDisplayController.Implementation displayController = (PixelDisplayController.Implementation)computerModule._display;
 		VgaConnector.Implementation vgaConnector = (VgaConnector.Implementation) displayController._vgaConnector;
 		vgaPin(realm, "H14", vgaConnector.getR());
@@ -66,6 +75,7 @@ public class SynthesisMain {
 		vgaPin(realm, "F15", vgaConnector.getHsync());
 		vgaPin(realm, "F14", vgaConnector.getVsync());
 
+		// keyboard
 		KeyboardController.Implementation keyboardController = (KeyboardController.Implementation)computerModule._keyboard;
 		Ps2Connector.Implementation ps2Connector = (Ps2Connector.Implementation)keyboardController._ps2;
 		ps2Connector.setClk(ps2Pin(realm, "G14"));
@@ -98,7 +108,6 @@ public class SynthesisMain {
 			buttonPin(realm, "D18") // west
 		));
 
-		new RtlPrettifier().prettify(design.getRealm());
 		ProjectGenerator projectGenerator = new ProjectGenerator(design.getRealm(), "TerminalTest", new File("ise/terminal_test"), "XC3S500E-FG320-4");
 		projectGenerator.addVerilogFile(new File("riscv/resource/hdl/clk_reset.v"));
 		projectGenerator.addUcfLine("NET \"pinC9\" PERIOD = 20.0ns HIGH 40%;");

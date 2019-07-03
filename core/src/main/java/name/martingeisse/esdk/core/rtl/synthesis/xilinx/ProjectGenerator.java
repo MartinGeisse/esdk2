@@ -4,6 +4,7 @@
  */
 package name.martingeisse.esdk.core.rtl.synthesis.xilinx;
 
+import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.pin.RtlPin;
 import name.martingeisse.esdk.core.rtl.pin.RtlPinConfiguration;
@@ -111,6 +112,11 @@ public class ProjectGenerator {
 			}
 			for (String additionalUcfLine : additionalUcfLines) {
 				out.println(additionalUcfLine);
+			}
+			for (RtlItem item : realm.getItems()) {
+				if (item instanceof UcfContributor) {
+					((UcfContributor) item).contributeToUcf(out, verilogNames);
+				}
 			}
 		});
 

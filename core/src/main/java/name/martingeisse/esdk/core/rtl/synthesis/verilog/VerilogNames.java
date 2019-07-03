@@ -27,7 +27,7 @@ public class VerilogNames {
 	/**
 	 * Uses the specified name for an object, ignoring the object's own name.
 	 */
-	void assignFixedName(String name, RtlItem item) {
+	public void assignFixedName(String name, RtlItem item) {
 		if (nameToItem.putIfAbsent(name, item) != null) {
 			throw new IllegalStateException("fixed name is already used: " + name);
 		}
@@ -38,7 +38,7 @@ public class VerilogNames {
 	/**
 	 * Generates a name based on the object's own name, possibly adding a number for disambiguation.
 	 */
-	String assignGeneratedName(RtlItem item) {
+	public String assignGeneratedName(RtlItem item) {
 		String prefix = absoluteNames.getAbsoluteName(item);
 		MutableInt counter = prefixNameCounters.computeIfAbsent(prefix, p -> new MutableInt());
 		while (true) {
