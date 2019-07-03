@@ -50,20 +50,20 @@ public class SynthesisMain {
 		// clk / reset
 		RtlModuleInstance clkReset = new RtlModuleInstance(realm, "clk_reset");
 		RtlBitSignal reset = clkReset.createBitOutputPort("reset");
-		RtlBitSignal mainClockSignal = clkReset.createBitOutputPort("clk");
 		clkReset.createBitInputPort("clk_in", clockPin(realm));
 		clkReset.createBitInputPort("reset_in", buttonPin(realm, "V16"));
-		design.getClockSignalConnector().setConnected(mainClockSignal);
 		computerModule.setReset(reset);
 		design.getDdrClock0SignalConnector().setConnected(clkReset.createBitOutputPort("ddr_clk_0"));
 		design.getDdrClock90SignalConnector().setConnected(clkReset.createBitOutputPort("ddr_clk_90"));
 		design.getDdrClock180SignalConnector().setConnected(clkReset.createBitOutputPort("ddr_clk_180"));
 		design.getDdrClock270SignalConnector().setConnected(clkReset.createBitOutputPort("ddr_clk_270"));
+		// design.getClockSignalConnector().setConnected(design.getDdrClock0SignalConnector().getConnected());
+		design.getClockSignalConnector().setConnected(clkReset.createBitOutputPort("clk"));
 
 		// timing constraints for the CPU
 		{
 			// Multicycle.Implementation cpu = (Multicycle.Implementation)design.getComputerModule()._cpu;
-			// new FromThruToConstraint(realm).from(cpu._registerReadValue).to(cpu._execOpTemporaryResultAddSub).nanoseconds(10);
+			// new FromThruToConstraint(realm).from(cpu._registerReadValue).to(cpu._registers).nanoseconds(10);
 		}
 
 		// pixel display

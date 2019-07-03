@@ -11,50 +11,50 @@ import java.io.PrintWriter;
 
 public class FromThruToConstraint extends RtlItem implements UcfContributor {
 
-    private RtlSignal fromSignal;
-    private RtlSignal[] thruSignals;
-    private RtlSignal toSignal;
+    private RtlItem fromSignal;
+    private RtlItem[] thruSignals;
+    private RtlItem toSignal;
     private int nanoseconds;
 
     public FromThruToConstraint(RtlRealm realm) {
         super(realm);
     }
 
-    public RtlSignal getFromSignal() {
+    public RtlItem getFromSignal() {
         return fromSignal;
     }
 
-    public void setFromSignal(RtlSignal fromSignal) {
+    public void setFromSignal(RtlItem fromSignal) {
         this.fromSignal = fromSignal;
     }
 
-    public FromThruToConstraint from(RtlSignal fromSignal) {
+    public FromThruToConstraint from(RtlItem fromSignal) {
         setFromSignal(fromSignal);
         return this;
     }
 
-    public RtlSignal[] getThruSignals() {
+    public RtlItem[] getThruSignals() {
         return thruSignals;
     }
 
-    public void setThruSignals(RtlSignal... thruSignals) {
+    public void setThruSignals(RtlItem... thruSignals) {
         this.thruSignals = thruSignals;
     }
 
-    public FromThruToConstraint thru(RtlSignal... thruSignals) {
+    public FromThruToConstraint thru(RtlItem... thruSignals) {
         setThruSignals(thruSignals);
         return this;
     }
 
-    public RtlSignal getToSignal() {
+    public RtlItem getToSignal() {
         return toSignal;
     }
 
-    public void setToSignal(RtlSignal toSignal) {
+    public void setToSignal(RtlItem toSignal) {
         this.toSignal = toSignal;
     }
 
-    public FromThruToConstraint to(RtlSignal toSignal) {
+    public FromThruToConstraint to(RtlItem toSignal) {
         setToSignal(toSignal);
         return this;
     }
@@ -90,7 +90,7 @@ public class FromThruToConstraint extends RtlItem implements UcfContributor {
             builder.append("\" ");
         }
         if (thruSignals != null) {
-            for (RtlSignal thruSignal : thruSignals) {
+            for (RtlItem thruSignal : thruSignals) {
                 builder.append("THRU \"");
                 builder.append(verilogNames.getName(thruSignal.getRtlItem()));
                 builder.append("\" ");
