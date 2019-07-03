@@ -12,7 +12,7 @@ import java.util.Set;
 /**
  * Stores names for things in Verilog and performs assignment of generated names.
  */
-class VerilogNames {
+public class VerilogNames {
 
 	private final AbsoluteNames absoluteNames;
 	private final Set<String> fixedNames = new HashSet<>();
@@ -20,7 +20,7 @@ class VerilogNames {
 	private final Map<String, RtlItem> nameToItem = new HashMap<>();
 	private final Map<RtlItem, String> itemToName = new HashMap<>();
 
-	public VerilogNames(AbsoluteNames absoluteNames) {
+	VerilogNames(AbsoluteNames absoluteNames) {
 		this.absoluteNames = absoluteNames;
 	}
 
@@ -62,7 +62,7 @@ class VerilogNames {
 		}
 	}
 
-	String getName(RtlItem item) {
+	public String getName(RtlItem item) {
 		return itemToName.get(item);
 	}
 

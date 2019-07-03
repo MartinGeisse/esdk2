@@ -9,6 +9,7 @@ import name.martingeisse.esdk.core.rtl.pin.RtlPin;
 import name.martingeisse.esdk.core.rtl.pin.RtlPinConfiguration;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.AuxiliaryFileFactory;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogGenerator;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogNames;
 import org.apache.commons.io.FileUtils;
 
 import java.io.*;
@@ -28,6 +29,7 @@ public class ProjectGenerator {
 	private final String fpgaPartId;
 	private final List<String> additionalUcfLines = new ArrayList<>();
 	private final List<File> additionalVerilogFiles = new ArrayList<>();
+	private VerilogNames verilogNames;
 
 	public ProjectGenerator(RtlRealm realm, String name, File outputFolder, String fpgaPartId) {
 		this.realm = realm;
@@ -55,7 +57,9 @@ public class ProjectGenerator {
 			filename -> new FileOutputStream(new File(outputFolder, filename));
 
 		generateFile(name + ".v", out -> {
-			new VerilogGenerator(out, realm, name, auxiliaryFileFactory).generate();
+			VerilogGenerator verilogGenerator = new VerilogGenerator(out, realm, name, auxiliaryFileFactory);
+			verilogGenerator.generate();
+			verilogNames = verilogGenerator.getNames();
 		});
 
 		generateFile("environment.sh", out -> {

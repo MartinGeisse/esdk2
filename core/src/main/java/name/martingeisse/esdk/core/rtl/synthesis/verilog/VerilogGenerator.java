@@ -253,6 +253,10 @@ public class VerilogGenerator {
 
 	}
 
+	public VerilogNames getNames() {
+		return names;
+	}
+
 	static class SignalDeclaration {
 
 		final RtlSignal signal;
