@@ -8,7 +8,6 @@ import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlConcatenation;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorConstant;
-import name.martingeisse.esdk.core.rtl.synthesis.xilinx.FromThruToConstraint;
 import name.martingeisse.esdk.core.rtl.synthesis.xilinx.ProjectGenerator;
 import name.martingeisse.esdk.core.rtl.synthesis.xilinx.XilinxPinConfiguration;
 import name.martingeisse.esdk.library.SignalLogger;
@@ -24,7 +23,7 @@ import name.martingeisse.esdk.riscv.rtl.terminal.VgaConnector;
 import java.io.File;
 
 /**
- * simple RAM test yields "35, 0, 35"
+ *
  */
 public class SynthesisMain {
 
