@@ -16,77 +16,83 @@ import java.util.List;
  */
 public class Design {
 
-	private final List<Item> items = new ArrayList<>();
-	private Simulation simulation;
+    private final List<Item> items = new ArrayList<>();
+    private Simulation simulation;
 
-	void register(Item item) {
-		items.add(item);
-	}
+    void register(Item item) {
+        items.add(item);
+    }
 
-	public Iterable<Item> getItems() {
-		return items;
-	}
+    public Iterable<Item> getItems() {
+        return items;
+    }
 
-	public <T extends Item> List<T> getItems(Class<T> itemClass) {
-		List<T> result = new ArrayList<>();
-		for (Item item : items) {
-			if (itemClass.isInstance(item)) {
-				result.add(itemClass.cast(item));
-			}
-		}
-		return result;
-	}
+    public <T extends Item> List<T> findItems(Class<T> itemClass) {
+        List<T> result = new ArrayList<>();
+        for (Item item : items) {
+            if (itemClass.isInstance(item)) {
+                result.add(itemClass.cast(item));
+            }
+        }
+        return result;
+    }
 
-	public DesignValidationResult validate() {
-		return new DesignValidator(this).validate();
-	}
+    public <T extends Item> List<T> findItems(Class<T> itemClass, String nameSubstring) {
+        List<T> result = findItems(itemClass);
+        result.removeIf(item -> item.getName() == null || !item.getName().contains(nameSubstring));
+        return result;
+    }
 
-	public void validateOrException(boolean failOnWarnings) {
-		for (ItemValidationResult itemResult : validate().getItemResults().values()) {
-			if (!itemResult.getErrors().isEmpty()) {
-				throw new IllegalStateException("validation failed with errors for item " + itemResult.getItem() + ": " + itemResult.getErrors());
-			}
-			if (failOnWarnings && !itemResult.getWarnings().isEmpty()) {
-				throw new IllegalStateException("validation failed with warnings for item " + itemResult.getItem() + ": " + itemResult.getErrors());
-			}
-		}
-	}
+    public DesignValidationResult validate() {
+        return new DesignValidator(this).validate();
+    }
 
-	public void simulate() {
-		prepareSimulation();
-		continueSimulation();
-	}
+    public void validateOrException(boolean failOnWarnings) {
+        for (ItemValidationResult itemResult : validate().getItemResults().values()) {
+            if (!itemResult.getErrors().isEmpty()) {
+                throw new IllegalStateException("validation failed with errors for item " + itemResult.getItem() + ": " + itemResult.getErrors());
+            }
+            if (failOnWarnings && !itemResult.getWarnings().isEmpty()) {
+                throw new IllegalStateException("validation failed with warnings for item " + itemResult.getItem() + ": " + itemResult.getErrors());
+            }
+        }
+    }
 
-	public void prepareSimulation() {
-		if (simulation != null) {
-			throw new IllegalStateException("simulation already prepared");
-		}
-		validateOrException(false);
-		simulation = new Simulation();
-		for (Item item : items) {
-			item.initializeSimulation();
-		}
-	}
+    public void simulate() {
+        prepareSimulation();
+        continueSimulation();
+    }
 
-	public void continueSimulation() {
-		needSimulation();
-		simulation.run();
-	}
+    public void prepareSimulation() {
+        if (simulation != null) {
+            throw new IllegalStateException("simulation already prepared");
+        }
+        validateOrException(false);
+        simulation = new Simulation();
+        for (Item item : items) {
+            item.initializeSimulation();
+        }
+    }
 
-	public void stopSimulation() {
-		needSimulation();
-		simulation.stop();
-	}
+    public void continueSimulation() {
+        needSimulation();
+        simulation.run();
+    }
 
-	public void fire(Runnable eventCallback, long ticks) {
-		needSimulation();
-		simulation.fire(eventCallback, ticks);
-	}
+    public void stopSimulation() {
+        needSimulation();
+        simulation.stop();
+    }
 
-	private void needSimulation() {
-		if (simulation == null) {
-			throw new IllegalStateException("simulation not prepared");
-		}
-	}
+    public void fire(Runnable eventCallback, long ticks) {
+        needSimulation();
+        simulation.fire(eventCallback, ticks);
+    }
+
+    private void needSimulation() {
+        if (simulation == null) {
+            throw new IllegalStateException("simulation not prepared");
+        }
+    }
 
 }

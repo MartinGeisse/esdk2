@@ -63,8 +63,8 @@ public class SynthesisMain {
 
 		// timing constraints for the CPU
 		{
-			Multicycle.Implementation cpu = (Multicycle.Implementation)design.createComputerModule()._cpu;
-			new FromThruToConstraint(realm).from(cpu._registerReadValue).to(cpu._execOpTemporaryResultAddSub).nanoseconds(10);
+			// Multicycle.Implementation cpu = (Multicycle.Implementation)design.getComputerModule()._cpu;
+			// new FromThruToConstraint(realm).from(cpu._registerReadValue).to(cpu._execOpTemporaryResultAddSub).nanoseconds(10);
 		}
 
 		// pixel display
