@@ -4,6 +4,9 @@ import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.block.RtlProceduralMemory;
 import name.martingeisse.esdk.core.rtl.block.RtlProceduralRegister;
+import name.martingeisse.esdk.core.rtl.memory.RtlMemory;
+import name.martingeisse.esdk.core.rtl.module.RtlInstanceOutputPort;
+import name.martingeisse.esdk.core.rtl.module.RtlModuleInstance;
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.prettify.RtlPrettifier;
 import name.martingeisse.esdk.core.util.InfiniteRecursionDetector;
@@ -21,11 +24,13 @@ import java.util.Map;
  */
 public class AbsoluteNames {
 
+	private final RtlRealm realm;
 	private UsageBasedNameSuggestions usageBasedNameSuggestions;
 	private InfiniteRecursionDetector<RtlItem> infiniteRecursionDetector;
 	private final Map<RtlItem, String> absoluteNames;
 
 	public AbsoluteNames(RtlRealm realm) {
+		this.realm = realm;
 		usageBasedNameSuggestions = new UsageBasedNameSuggestions(realm);
 		infiniteRecursionDetector = new InfiniteRecursionDetector<>();
 		absoluteNames = new HashMap<>();
@@ -61,6 +66,11 @@ public class AbsoluteNames {
 					absoluteName = getDefaultName(item);
 				}
 			}
+			if (absoluteName == null) {
+				// This should not happen, i.e. none of the above cases should produce null, but it case it happens
+				// anyway we want to catch the error early.
+				throw new RuntimeException("could not determine absolute name for item: " + item);
+			}
 			absoluteNames.put(item, absoluteName);
 		}
 		return absoluteName;
@@ -69,10 +79,14 @@ public class AbsoluteNames {
 	protected String getDefaultName(RtlItem item) {
 		if (item instanceof RtlProceduralRegister) {
 			return "register";
-		} else if (item instanceof RtlProceduralMemory) {
+		} else if (item instanceof RtlProceduralMemory || item instanceof RtlMemory) {
 			return "memory";
 		} else if (item instanceof RtlSignal) {
 			return "signal";
+		} else if (item instanceof RtlModuleInstance) {
+			return "instance";
+		} else if (item instanceof RtlInstanceOutputPort) {
+			return "instancePort";
 		}
 		String className = item.getClass().getSimpleName();
 		if (className.startsWith("Rtl")) {
@@ -82,7 +96,14 @@ public class AbsoluteNames {
 	}
 
 	public String getAbsoluteName(RtlItem item) {
-		return absoluteNames.get(item);
+		if (item.getRealm() != realm) {
+			throw new IllegalArgumentException("wrong realm for item: " + item);
+		}
+		String absoluteName = absoluteNames.get(item);
+		if (absoluteName == null) {
+			throw new IllegalArgumentException("no name for item: " + item);
+		}
+		return absoluteName;
 	}
 
 }
