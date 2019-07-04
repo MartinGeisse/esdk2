@@ -6,6 +6,8 @@ import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.block.RtlProceduralMemoryConstantIndexSelection;
 import name.martingeisse.esdk.core.rtl.block.RtlProceduralMemoryIndexSelection;
 import name.martingeisse.esdk.core.rtl.block.statement.RtlAssignment;
+import name.martingeisse.esdk.core.rtl.block.statement.RtlStatement;
+import name.martingeisse.esdk.core.rtl.block.statement.RtlStatementSequence;
 import name.martingeisse.esdk.core.rtl.block.statement.RtlWhenStatement;
 import name.martingeisse.esdk.core.rtl.memory.*;
 import name.martingeisse.esdk.core.rtl.module.RtlInstanceInputPort;
@@ -153,6 +155,21 @@ public class UsageBasedNameSuggestions {
 			} else if (item instanceof RtlWhenStatement) {
 				RtlWhenStatement when = (RtlWhenStatement) item;
 				independentSuggestions.put(when.getCondition().getRtlItem(), "condition");
+				improvedNaming: if (when.getOtherwiseBranch() == null) {
+					RtlStatement thenBranch = when.getThenBranch();
+					while (thenBranch instanceof RtlStatementSequence) {
+						RtlStatementSequence nestedSequence = (RtlStatementSequence)thenBranch;
+						if (nestedSequence.getStatements().size() == 1) {
+							thenBranch = nestedSequence.getStatements().get(0);
+						} else {
+							break improvedNaming;
+						}
+					}
+					if (thenBranch instanceof RtlAssignment) {
+						RtlItem destination = ((RtlAssignment) thenBranch).getDestination().getRtlItem();
+						suggest(when.getCondition().getRtlItem(), destination, name -> name + "_condition");
+					}
+				}
 			}
 		}
 	}

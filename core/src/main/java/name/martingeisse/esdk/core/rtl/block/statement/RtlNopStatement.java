@@ -17,6 +17,11 @@ public final class RtlNopStatement extends RtlStatement {
 		super(realm);
 	}
 
+	@Override
+	public boolean isEffectivelyNop() {
+		return true;
+	}
+
 	// ----------------------------------------------------------------------------------------------------------------
 	// simulation
 	// ----------------------------------------------------------------------------------------------------------------

@@ -74,6 +74,16 @@ public final class RtlSwitchStatement extends RtlStatement {
 	}
 
 	@Override
+	public boolean isEffectivelyNop() {
+		for (Case aCase : cases) {
+			if (!aCase.getBranch().isEffectivelyNop()) {
+				return false;
+			}
+		}
+		return (defaultBranch == null || defaultBranch.isEffectivelyNop());
+	}
+
+	@Override
 	public void execute() {
 		VectorValue actualSelectorValue = selector.getValue();
 		for (Case aCase : cases) {

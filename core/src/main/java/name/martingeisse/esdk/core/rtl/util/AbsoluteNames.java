@@ -54,14 +54,14 @@ public class AbsoluteNames {
 			if (item.getName() != null) {
 				absoluteName = item.getName();
 			} else {
-				String independentSuggestion = usageBasedNameSuggestions.getIndependentSuggestions().get(item);
-				if (independentSuggestion != null) {
-					absoluteName = independentSuggestion;
+				UsageBasedNameSuggestions.PropagatingSuggestion propagatingSuggestion = usageBasedNameSuggestions.getPropagatingSuggestions().get(item);
+				if (propagatingSuggestion != null) {
+					String originName = determineAbsoluteName(propagatingSuggestion.getOrigin());
+					absoluteName = propagatingSuggestion.getNameTransformation().apply(originName);
 				} else {
-					UsageBasedNameSuggestions.PropagatingSuggestion propagatingSuggestion = usageBasedNameSuggestions.getPropagatingSuggestions().get(item);
-					if (propagatingSuggestion != null) {
-						String originName = determineAbsoluteName(propagatingSuggestion.getOrigin());
-						absoluteName = propagatingSuggestion.getNameTransformation().apply(originName);
+					String independentSuggestion = usageBasedNameSuggestions.getIndependentSuggestions().get(item);
+					if (independentSuggestion != null) {
+						absoluteName = independentSuggestion;
 					} else {
 						absoluteName = getDefaultName(item);
 					}

@@ -38,6 +38,11 @@ public final class RtlWhenStatement extends RtlStatement {
 		return otherwiseBranch;
 	}
 
+	@Override
+	public boolean isEffectivelyNop() {
+		return thenBranch.isEffectivelyNop() && otherwiseBranch.isEffectivelyNop();
+	}
+
 	// ----------------------------------------------------------------------------------------------------------------
 	// simulation
 	// ----------------------------------------------------------------------------------------------------------------
@@ -70,7 +75,7 @@ public final class RtlWhenStatement extends RtlStatement {
 		out.println(") begin");
 		out.startIndentation();
 		thenBranch.printVerilogStatements(out);
-		if (!otherwiseBranch.isEmpty()) {
+		if (!otherwiseBranch.isEffectivelyNop()) {
 			out.endIndentation();
 			out.indent();
 			out.println("end else begin");

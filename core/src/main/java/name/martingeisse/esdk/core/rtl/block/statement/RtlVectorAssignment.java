@@ -35,6 +35,11 @@ public final class RtlVectorAssignment extends RtlAssignment {
 		return source;
 	}
 
+	@Override
+	public boolean isEffectivelyNop() {
+		return false;
+	}
+
 	// ----------------------------------------------------------------------------------------------------------------
 	// simulation
 	// ----------------------------------------------------------------------------------------------------------------

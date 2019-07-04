@@ -32,6 +32,11 @@ public final class RtlBitAssignment extends RtlAssignment {
 		return source;
 	}
 
+	@Override
+	public boolean isEffectivelyNop() {
+		return false;
+	}
+
 	// ----------------------------------------------------------------------------------------------------------------
 	// simulation
 	// ----------------------------------------------------------------------------------------------------------------

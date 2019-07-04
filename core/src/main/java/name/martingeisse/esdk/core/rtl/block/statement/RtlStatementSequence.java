@@ -4,6 +4,7 @@
  */
 package name.martingeisse.esdk.core.rtl.block.statement;
 
+import com.google.common.collect.ImmutableList;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.block.statement.target.RtlBitAssignmentTarget;
 import name.martingeisse.esdk.core.rtl.block.statement.target.RtlVectorAssignmentTarget;
@@ -29,12 +30,22 @@ public class RtlStatementSequence extends RtlStatement {
 		super(realm);
 	}
 
-	public boolean isEmpty() {
-		return statements.isEmpty();
-	}
-
 	public final void addStatement(RtlStatement statement) {
 		statements.add(checkSameRealm(statement));
+	}
+
+	public ImmutableList<RtlStatement> getStatements() {
+		return ImmutableList.copyOf(statements);
+	}
+
+	@Override
+	public boolean isEffectivelyNop() {
+		for (RtlStatement statement : statements) {
+			if (!statement.isEffectivelyNop()) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	// ----------------------------------------------------------------------------------------------------------------
