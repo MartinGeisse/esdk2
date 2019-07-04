@@ -42,7 +42,7 @@ public class VerilogNames {
 		String prefix = absoluteNames.getAbsoluteName(item);
 		MutableInt counter = prefixNameCounters.computeIfAbsent(prefix, p -> new MutableInt());
 		while (true) {
-			String name = prefix + "__" + counter.intValue();
+			String name = (counter.intValue() == 0) ? prefix : (prefix + "__" + counter.intValue());
 			counter.increment();
 
 			// If the counter collides with a fixed name, we could just increment again, but we shouldn't: The order

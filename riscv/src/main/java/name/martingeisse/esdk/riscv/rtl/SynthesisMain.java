@@ -1,5 +1,6 @@
 package name.martingeisse.esdk.riscv.rtl;
 
+import name.martingeisse.esdk.core.model.Item;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.module.RtlModuleInstance;
 import name.martingeisse.esdk.core.rtl.pin.RtlInputPin;
@@ -54,10 +55,10 @@ public class SynthesisMain {
 		clkReset.createBitInputPort("clk_in", clockPin(realm));
 		clkReset.createBitInputPort("reset_in", buttonPin(realm, "V16"));
 		computerModule.setReset(reset);
-		design.getDdrClock0SignalConnector().setConnected(clkReset.createBitOutputPort("ddr_clk_0"));
-		design.getDdrClock90SignalConnector().setConnected(clkReset.createBitOutputPort("ddr_clk_90"));
-		design.getDdrClock180SignalConnector().setConnected(clkReset.createBitOutputPort("ddr_clk_180"));
-		design.getDdrClock270SignalConnector().setConnected(clkReset.createBitOutputPort("ddr_clk_270"));
+		design.getDdrClock0SignalConnector().setConnected(withName(clkReset.createBitOutputPort("ddr_clk_0"), "ddr_clk_0"));
+		design.getDdrClock90SignalConnector().setConnected(withName(clkReset.createBitOutputPort("ddr_clk_90"), "ddr_clk_90"));
+		design.getDdrClock180SignalConnector().setConnected(withName(clkReset.createBitOutputPort("ddr_clk_180"), "ddr_clk_180"));
+		design.getDdrClock270SignalConnector().setConnected(withName(clkReset.createBitOutputPort("ddr_clk_270"), "ddr_clk_270"));
 		design.getClockSignalConnector().setConnected(design.getDdrClock0SignalConnector().getConnected());
 		// design.getClockSignalConnector().setConnected(clkReset.createBitOutputPort("clk"));
 
@@ -118,6 +119,11 @@ public class SynthesisMain {
 		projectGenerator.addUcfLine("CONFIG PROHIBIT = L5;");
 		projectGenerator.addUcfLine("CONFIG PROHIBIT = R4;");
 		projectGenerator.generate();
+	}
+
+	private static <T extends Item> T withName(T item, String name) {
+		item.setName(name);
+		return item;
 	}
 
 	private static RtlInputPin clockPin(RtlRealm realm) {
