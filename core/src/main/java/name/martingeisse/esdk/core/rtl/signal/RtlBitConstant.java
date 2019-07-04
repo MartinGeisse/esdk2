@@ -8,6 +8,7 @@ import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.EmptyVerilogContribution;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogContribution;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.expression.VerilogExpressionNesting;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.expression.VerilogExpressionWriter;
 
 /**
@@ -37,6 +38,11 @@ public final class RtlBitConstant extends RtlItem implements RtlBitSignal {
 	@Override
 	public VerilogContribution getVerilogContribution() {
 		return new EmptyVerilogContribution();
+	}
+
+	@Override
+	public boolean compliesWith(VerilogExpressionNesting nesting) {
+		return true;
 	}
 
 	@Override
