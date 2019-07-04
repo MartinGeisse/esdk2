@@ -10,6 +10,7 @@ import name.martingeisse.esdk.core.rtl.block.RtlProceduralMemory;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
+import name.martingeisse.esdk.core.rtl.signal.connector.RtlSignalConnector;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogContribution;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.expression.FakeVerilogExpressionWriter;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.expression.VerilogExpressionNesting;
@@ -132,6 +133,11 @@ public class VerilogGenerator {
 					// for convenience, so this "if" does not have to be repeated over and over again
 					if (signal == null) {
 						return;
+					}
+
+					// when a connector is used, it is actually the connected signal that is used
+					while (signal instanceof RtlSignalConnector) {
+						signal = ((RtlSignalConnector) signal).getConnected();
 					}
 
 					// Extract all signals that are used in more than one place. Those have been analyzed already when we found them
