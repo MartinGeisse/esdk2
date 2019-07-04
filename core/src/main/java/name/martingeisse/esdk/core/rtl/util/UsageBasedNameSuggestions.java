@@ -155,7 +155,7 @@ public class UsageBasedNameSuggestions {
 			} else if (item instanceof RtlWhenStatement) {
 				RtlWhenStatement when = (RtlWhenStatement) item;
 				independentSuggestions.put(when.getCondition().getRtlItem(), "condition");
-				improvedNaming: if (when.getOtherwiseBranch() == null) {
+				improvedNaming: if (when.getOtherwiseBranch().isEffectivelyNop()) {
 					RtlStatement thenBranch = when.getThenBranch();
 					while (thenBranch instanceof RtlStatementSequence) {
 						RtlStatementSequence nestedSequence = (RtlStatementSequence)thenBranch;
