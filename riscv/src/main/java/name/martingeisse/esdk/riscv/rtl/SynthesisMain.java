@@ -64,8 +64,9 @@ public class SynthesisMain {
 
 		// timing constraints for the CPU
 		{
-			 Multicycle.Implementation cpu = (Multicycle.Implementation)design.getComputerModule()._cpu;
-			 new FromThruToConstraint(realm).from(cpu._registers).to(cpu._registers).nanoseconds(10);
+			// Multicycle.Implementation cpu = (Multicycle.Implementation)design.getComputerModule()._cpu;
+			// new FromThruToConstraint(realm).from(cpu._registers).to(cpu._registers).nanoseconds(10);
+
 		}
 
 		// pixel display
@@ -118,6 +119,19 @@ public class SynthesisMain {
 		projectGenerator.addUcfLine("CONFIG PROHIBIT = J6;");
 		projectGenerator.addUcfLine("CONFIG PROHIBIT = L5;");
 		projectGenerator.addUcfLine("CONFIG PROHIBIT = R4;");
+
+		for (int i = 0; i < 32; i++) {
+			// XST renames the signals we want to constrain...
+			projectGenerator.addUcfLine("NET \"" + (i < 8 ? "memoryWriteData" : "registerReadValue") + "[" + i + "]\" TNM = aluIn1;");
+			if (i >= 2) {
+				projectGenerator.addUcfLine("NET \"instructionRegister[" + i + "]\" TNM = aluIn2a;");
+			}
+			projectGenerator.addUcfLine("NET \"sourceValue2[" + i + "]\" TPTHRU = aluIn2b;");
+			projectGenerator.addUcfLine("NET \"registerWriteValue[" + i + "]\" TNM = aluOut;");
+		}
+		projectGenerator.addUcfLine("TIMESPEC \"TS_alu1\" = FROM \"aluIn1\" TO \"aluOut\" 20 ns;");
+		projectGenerator.addUcfLine("TIMESPEC \"TS_alu2\" = FROM \"aluIn2a\" THRU \"aluIn2b\" TO \"aluOut\" 20 ns;");
+
 		projectGenerator.generate();
 	}
 
