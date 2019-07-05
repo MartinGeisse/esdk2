@@ -127,7 +127,7 @@ public final class RtlMemory extends RtlItem {
 			public void printImplementation(VerilogWriter out) {
 				Matrix matrix = getMatrix();
 				out.println("initial $readmemh(\"" + memoryName + ".mif\", " + memoryName + ", 0, " +
-					(matrix.getRowCount() - 1) + ");\n");
+					(matrix.getRowCount() - 1) + ");");
 				for (RtlMemoryPort port : ports) {
 					port.printImplementation(out);
 				}

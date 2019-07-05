@@ -171,7 +171,7 @@ public final class RtlClockedBlock extends RtlClockedItem {
 					String memoryName = memoryNames.get(memory);
 					Matrix matrix = memory.getMatrix();
 					out.println("\t$readmemh(\"" + memoryName + ".mif\", " + memoryName + ", 0, " +
-						(matrix.getRowCount() - 1) + ");\n");
+						(matrix.getRowCount() - 1) + ");");
 				}
 				out.endIndentation();
 				out.indent();
