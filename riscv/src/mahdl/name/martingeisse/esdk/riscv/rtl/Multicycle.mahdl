@@ -87,14 +87,30 @@ do (*) {
 // ALU logic
 // --------------------------------------------------------------------------------------------------------------------
 
-signal vector[32] execOpResult = switch(instructionRegister[14:12]) {
-	case 3d0: (opcode[3] & instructionRegister[30]) ? (sourceValue1 - sourceValue2) : (sourceValue1 + sourceValue2) // ADD / SUB
-	case 3d1: sourceValue1 << sourceValue2[4:0] // SLL
-	case 3d2, 3d3: (instructionRegister[12] ? isLTU : isLTS) ? 32d1 : 32d0 // SLT, SLTU
-	case 3d4: sourceValue1 ^ sourceValue2 // XOR
-	case 3d5: instructionRegister[30] ?
+// I am using a temporary result register for now. I might have used a from/to constraint to avoid extra registers
+// (though I would still have to add an extra state to the state machine to make the contraint correct), but since
+// the CPU should eventually be pipelined, an extra register will be needed anyway and will become a pipeline register
+// at that point.
+
+register vector[32] execOpTemporaryResultAddSub;
+register vector[32] execOpTemporaryResultShiftLeft;
+register bit execOpTemporaryResultLessThan;
+register vector[32] execOpTemporaryResultShiftRight;
+do(clk) {
+	execOpTemporaryResultAddSub = (opcode[3] & instructionRegister[30]) ? (sourceValue1 - sourceValue2) : (sourceValue1 + sourceValue2);
+	execOpTemporaryResultShiftLeft = sourceValue1 << sourceValue2[4:0];
+	execOpTemporaryResultLessThan = (instructionRegister[12] ? isLTU : isLTS);
+	execOpTemporaryResultShiftRight = instructionRegister[30] ?
 			((repeat(32, sourceValue1[31]) _ sourceValue1) >> sourceValue2[4:0])[31:0] // SRA
-			: (sourceValue1 >> sourceValue2[4:0]) // SRL, SRA
+			: (sourceValue1 >> sourceValue2[4:0]); // SRL
+}
+
+signal vector[32] execOpResult = switch(instructionRegister[14:12]) {
+	case 3d0: execOpTemporaryResultAddSub // ADD / SUB
+	case 3d1: execOpTemporaryResultShiftLeft // SLL
+	case 3d2, 3d3: execOpTemporaryResultLessThan ? 32d1 : 32d0 // SLT, SLTU
+	case 3d4: sourceValue1 ^ sourceValue2 // XOR
+	case 3d5: execOpTemporaryResultShiftRight // SRL, SRA
 	case 3d6: sourceValue1 | sourceValue2 // OR
 	case 3d7: sourceValue1 & sourceValue2 // AND
 };
