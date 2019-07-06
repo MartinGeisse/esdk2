@@ -30,14 +30,14 @@ do (*) {
 // PS2 clock / watchdog
 //
 register bit previousPs2Clock;
-register vector[13] ps2ClockWatchdogCounter;
-signal bit ps2ClockWatchdogCounterExpired = (ps2ClockWatchdogCounter == 13b1010000000000);
+register vector[14] ps2ClockWatchdogCounter;
+signal bit ps2ClockWatchdogCounterExpired = (ps2ClockWatchdogCounter == 14b10100000000000);
 do (clk) {
     previousPs2Clock = ps2Clock;
     if (ps2Clock != previousPs2Clock) {
         ps2ClockWatchdogCounter = 0;
     } else {
-        ps2ClockWatchdogCounter = ps2ClockWatchdogCounter + 13d1;
+        ps2ClockWatchdogCounter = ps2ClockWatchdogCounter + 14d1;
     }
 }
 

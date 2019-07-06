@@ -18,10 +18,11 @@ interface {
 // We need the v signals delayed by one row (compared to stage1y) since the Y position is used to fill the row buffer,
 // and that row will be displayed during the *next* monitor beam row. Hence stage1vblankDelayed / stage1vsyncDelayed.
 register vector[10] stage1x, stage1y;
-register bit stage1p, stage1hblank, stage1vblank, stage1vblankDelayed, stage1hsync, stage1vsync, stage1vsyncDelayed;
+register vector[2] stage1p;
+register bit stage1hblank, stage1vblank, stage1vblankDelayed, stage1hsync, stage1vsync, stage1vsyncDelayed;
 do (clk) {
-    stage1p = ~stage1p;
-    if (stage1p) {
+    stage1p = stage1p + 2d1;
+    if (stage1p == 2d0) {
         if (stage1x == 10d799) {
             stage1hblank = 0;
             stage1x = 0;

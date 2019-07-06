@@ -68,8 +68,6 @@ constant vector[6] SD_WR_CAS_WAIT = 18;
 constant vector[6] SD_WR_LATCH = 19;
 constant vector[6] SD_WR_LATCH1 = 20;
 constant vector[6] SD_WR_DONE = 21;
-constant vector[6] SD_RD_DONE_1 = 22;
-constant vector[6] SD_WR_DONE_1 = 23;
 
 // initialization state machine
 constant vector[4] SI_START = 0;
@@ -323,13 +321,8 @@ do (clk0) {
                 sd_state = SD_RD_DONE;
 
             case SD_RD_DONE:
-                busRegisterAcknowledge = ~isRamdacRequest;
-                ramdacRegisterAcknowledge = isRamdacRequest;
-                sd_state = SD_RD_DONE_1;
                 ddrRegisterDataStrobe = 0;
                 ddrRegisterDataStrobeEnable = 1;	// Set DQS back to output
-
-            case SD_RD_DONE_1:
                 busRegisterAcknowledge = 0;
                 ramdacRegisterAcknowledge = 0;
                 sd_state = SD_IDLE;
@@ -387,11 +380,6 @@ do (clk0) {
 
             case SD_WR_DONE:
                 ddrRegisterDataOutEnable = 0;
-                busRegisterAcknowledge = ~isRamdacRequest;
-                ramdacRegisterAcknowledge = isRamdacRequest;
-                sd_state = SD_WR_DONE_1;
-
-            case SD_WR_DONE_1:
                 busRegisterAcknowledge = 0;
                 ramdacRegisterAcknowledge = 0;
                 sd_state = SD_IDLE;

@@ -9,7 +9,6 @@ import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.signal.RtlConcatenation;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorConstant;
-import name.martingeisse.esdk.core.rtl.synthesis.xilinx.FromThruToConstraint;
 import name.martingeisse.esdk.core.rtl.synthesis.xilinx.ProjectGenerator;
 import name.martingeisse.esdk.core.rtl.synthesis.xilinx.XilinxPinConfiguration;
 import name.martingeisse.esdk.library.SignalLogger;
@@ -59,15 +58,7 @@ public class SynthesisMain {
 		design.getDdrClock90SignalConnector().setConnected(withName(clkReset.createBitOutputPort("ddr_clk_90"), "ddr_clk_90"));
 		design.getDdrClock180SignalConnector().setConnected(withName(clkReset.createBitOutputPort("ddr_clk_180"), "ddr_clk_180"));
 		design.getDdrClock270SignalConnector().setConnected(withName(clkReset.createBitOutputPort("ddr_clk_270"), "ddr_clk_270"));
-		// design.getClockSignalConnector().setConnected(design.getDdrClock0SignalConnector().getConnected());
-		design.getClockSignalConnector().setConnected(clkReset.createBitOutputPort("clk"));
-
-		// timing constraints for the CPU
-		{
-			// Multicycle.Implementation cpu = (Multicycle.Implementation)design.getComputerModule()._cpu;
-			// new FromThruToConstraint(realm).from(cpu._registers).to(cpu._registers).nanoseconds(10);
-
-		}
+		design.getClockSignalConnector().setConnected(design.getDdrClock0SignalConnector().getConnected());
 
 		// pixel display
 		PixelDisplayController.Implementation displayController = (PixelDisplayController.Implementation)computerModule._display;
