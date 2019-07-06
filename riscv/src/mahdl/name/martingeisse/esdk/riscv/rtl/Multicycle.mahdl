@@ -28,15 +28,16 @@ constant vector[4] STATE_DECODE_AND_READ1 = 2;
 constant vector[4] STATE_DECODE_AND_READ2 = 3;
 constant vector[4] STATE_EXEC_OP_1 = 4;
 constant vector[4] STATE_EXEC_OP_2 = 5;
-constant vector[4] STATE_PREPARE_BRANCH = 6;
-constant vector[4] STATE_EXEC_BRANCH = 7;
-constant vector[4] STATE_EXEC_LUI = 8;
-constant vector[4] STATE_EXEC_AUIPC = 9;
-constant vector[4] STATE_EXEC_JAL = 10;
-constant vector[4] STATE_EXEC_JALR = 11;
-constant vector[4] STATE_MEM_COMPUTE_ADDRESS = 12;
-constant vector[4] STATE_MEM_ACCESS = 13;
-constant vector[4] STATE_MEM_EXTEND = 14;
+constant vector[4] STATE_EXEC_OP_3 = 6;
+constant vector[4] STATE_PREPARE_BRANCH = 7;
+constant vector[4] STATE_EXEC_BRANCH = 8;
+constant vector[4] STATE_EXEC_LUI = 9;
+constant vector[4] STATE_EXEC_AUIPC = 10;
+constant vector[4] STATE_EXEC_JAL = 11;
+constant vector[4] STATE_EXEC_JALR = 12;
+constant vector[4] STATE_MEM_COMPUTE_ADDRESS = 13;
+constant vector[4] STATE_MEM_ACCESS = 14;
+constant vector[4] STATE_MEM_EXTEND = 15;
 
 // CPU state
 register vector[4] state = STATE_START;
@@ -100,20 +101,23 @@ register bit execOpTemporaryResultLessThan;
 register vector[32] execOpTemporaryResultShiftRight;
 do(clk) {
 	execOpTemporaryResultAddSub = (opcode[3] & instructionRegister[30]) ? (sourceValue1 - sourceValue2) : (sourceValue1 + sourceValue2);
-	execOpTemporaryResultShiftLeft = sourceValue1 << sourceValue2[4:0];
+	execOpTemporaryResultShiftLeft = sourceValue1 << sourceValue2[3:0];
 	execOpTemporaryResultLessThan = (instructionRegister[12] ? isLTU : isLTS);
-	execOpTemporaryResultShiftRight = ((repeat(32, rightShiftInBit) _ sourceValue1) >> sourceValue2[4:0])[31:0]; // SRA / SRL
+	execOpTemporaryResultShiftRight = ((repeat(16, rightShiftInBit) _ sourceValue1) >> sourceValue2[3:0])[31:0]; // SRA / SRL
 }
 
-signal vector[32] execOpResult = switch(instructionRegister[14:12]) {
-	case 3d0: execOpTemporaryResultAddSub // ADD / SUB
-	case 3d1: execOpTemporaryResultShiftLeft // SLL
-	case 3d2, 3d3: execOpTemporaryResultLessThan ? 32d1 : 32d0 // SLT, SLTU
-	case 3d4: sourceValue1 ^ sourceValue2 // XOR
-	case 3d5: execOpTemporaryResultShiftRight // SRL, SRA
-	case 3d6: sourceValue1 | sourceValue2 // OR
-	case 3d7: sourceValue1 & sourceValue2 // AND
-};
+register vector[32] execOpResult;
+do (clk) {
+	execOpResult = switch(instructionRegister[14:12]) {
+		case 3d0: execOpTemporaryResultAddSub // ADD / SUB
+		case 3d1: sourceValue2[4] ? (execOpTemporaryResultShiftLeft[15:0] _ repeat(16, bit(0))) : execOpTemporaryResultShiftLeft // SLL
+		case 3d2, 3d3: execOpTemporaryResultLessThan ? 32d1 : 32d0 // SLT, SLTU
+		case 3d4: sourceValue1 ^ sourceValue2 // XOR
+		case 3d5: sourceValue2[4] ? (repeat(16, rightShiftInBit) _ execOpTemporaryResultShiftRight[31:16]) : execOpTemporaryResultShiftRight // SRL, SRA
+		case 3d6: sourceValue1 | sourceValue2 // OR
+		case 3d7: sourceValue1 & sourceValue2 // AND
+	};
+}
 
 register bit partialBranchCondition;
 do (clk) {
@@ -217,6 +221,9 @@ do (clk) {
 				state = STATE_EXEC_OP_2;
 
 			case STATE_EXEC_OP_2:
+				state = STATE_EXEC_OP_3;
+
+			case STATE_EXEC_OP_3:
 				state = STATE_START;
 
 			case STATE_PREPARE_BRANCH:
@@ -267,10 +274,10 @@ do (clk) {
 // register file BlockRAM support
 signal vector[5] registersAddress = state == STATE_DECODE_AND_READ1 ? sourceRegisterIndex1 :
 		(state == STATE_DECODE_AND_READ2 | state == STATE_EXEC_OP_1) ? sourceRegisterIndex2 : destinationRegisterIndex;
-signal bit isRegisterWriteState = (state == STATE_EXEC_OP_2) | (state == STATE_EXEC_LUI) | (state == STATE_EXEC_AUIPC) |
+signal bit isRegisterWriteState = (state == STATE_EXEC_OP_3) | (state == STATE_EXEC_LUI) | (state == STATE_EXEC_AUIPC) |
 		(state == STATE_EXEC_JAL) | (state == STATE_EXEC_JALR) | (state == STATE_MEM_EXTEND);
 signal vector[32] registerWriteValue = switch(state) {
-	case STATE_EXEC_OP_2: execOpResult
+	case STATE_EXEC_OP_3: execOpResult
 	case STATE_EXEC_LUI: instructionRegister[31:12] _ 12d0
 	case STATE_EXEC_AUIPC: oldPc + (instructionRegister[31:12] _ 12d0)
 	case STATE_EXEC_JAL, STATE_EXEC_JALR: pc
