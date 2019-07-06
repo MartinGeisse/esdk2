@@ -87,10 +87,12 @@ do (*) {
 // ALU logic
 // --------------------------------------------------------------------------------------------------------------------
 
-// I am using a temporary result register for now. I might have used a from/to constraint to avoid extra registers
-// (though I would still have to add an extra state to the state machine to make the contraint correct), but since
-// the CPU should eventually be pipelined, an extra register will be needed anyway and will become a pipeline register
-// at that point.
+// this register is loaded even before the first execution state, so it is ready when computing temporary results
+register bit rightShiftInBit;
+
+// I am using a temporary result register for now. From/to constraints do not work well with Xilinx tools (one of the
+// worst UIs I have ever seen...) and since the CPU should eventually be pipelined, an extra register will be needed
+// anyway and will become a pipeline register at that point.
 
 register vector[32] execOpTemporaryResultAddSub;
 register vector[32] execOpTemporaryResultShiftLeft;
@@ -100,9 +102,7 @@ do(clk) {
 	execOpTemporaryResultAddSub = (opcode[3] & instructionRegister[30]) ? (sourceValue1 - sourceValue2) : (sourceValue1 + sourceValue2);
 	execOpTemporaryResultShiftLeft = sourceValue1 << sourceValue2[4:0];
 	execOpTemporaryResultLessThan = (instructionRegister[12] ? isLTU : isLTS);
-	execOpTemporaryResultShiftRight = instructionRegister[30] ?
-			((repeat(32, sourceValue1[31]) _ sourceValue1) >> sourceValue2[4:0])[31:0] // SRA
-			: (sourceValue1 >> sourceValue2[4:0]); // SRL
+	execOpTemporaryResultShiftRight = ((repeat(32, rightShiftInBit) _ sourceValue1) >> sourceValue2[4:0])[31:0]; // SRA / SRL
 }
 
 signal vector[32] execOpResult = switch(instructionRegister[14:12]) {
@@ -178,6 +178,7 @@ do (clk) {
 
 			case STATE_DECODE_AND_READ2:
 				firstRegisterValue = registerReadValue;
+				rightShiftInBit = (instructionRegister[30] ? registerReadValue[31] : bit(0));
 				switch (opcode) {
 
 					case 5d0: // LOAD
