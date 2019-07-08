@@ -51,7 +51,7 @@ do (clk) {
             sck = 0;
             commandWord = commandWord[22:0] _ bit(0);
             completedBits = completedBits + 5d1;
-            dacCs = (completedBits[4] & completedBits[3]);
+            dacCs = (completedBits == 5d23);
         } else {
             sck = 1;
         }
