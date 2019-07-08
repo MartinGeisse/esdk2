@@ -17,7 +17,7 @@ do (*) busAcknowledge = 1;
 
 // SPI connector
 name.martingeisse.esdk.riscv.rtl.spi.SpiConnector spiConnector;
-register bit dacCs, sck;
+register bit dacCs = 1, sck = 1;
 do (*) {
     spiConnector.dacCs = dacCs;
     spiConnector.sck = sck;
@@ -30,11 +30,6 @@ do (clk) {
     if (dacCs) {
         if (sck) {
 
-            // completing
-            sck = 1;
-
-        } else {
-
             // idle
             if (loadCommandWord) {
                 dacCs = 0;
@@ -43,13 +38,18 @@ do (clk) {
                 commandWord = busWriteData[23:0];
             }
 
+        } else {
+
+            // completing
+            sck = 1;
+
         }
     } else {
 
         // busy
         if (sck) {
             sck = 0;
-            commandWord = commandWord << 1;
+            commandWord = commandWord[22:0] _ bit(0);
             completedBits = completedBits + 5d1;
             dacCs = (completedBits[4] & completedBits[3]);
         } else {

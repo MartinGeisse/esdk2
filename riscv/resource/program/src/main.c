@@ -3,6 +3,8 @@
 #include "terminal.h"
 #include "draw.h"
 
+static int analogValue = 0;
+
 static void draw(int x, int y, int size) {
     if (size >= 4) {
         int s1 = size >> 2;
@@ -32,6 +34,12 @@ void main() {
     int x = 50, y = 240, dx = 1, dy = 0;
     unsigned char *screen = (unsigned char *)0x80000000;
     while (1) {
+
+        // analog value test
+        analogValue+=4;
+        int dacCommandWord = 0x00330000 | (analogValue & 0xffff);
+        *(int*)0x20000 = dacCommandWord;
+
         unsigned char *pixel = screen + y * 1024 + x;
         if (*pixel != 0) {
             dx = dy = 0;
@@ -57,6 +65,7 @@ void main() {
         x += dx;
         y += dy;
         delay(20);
+
     }
 
 
