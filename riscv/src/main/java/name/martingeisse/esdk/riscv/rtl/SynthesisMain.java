@@ -102,6 +102,18 @@ public class SynthesisMain {
 			buttonPin(realm, "D18") // west
 		));
 
+		// unused SPI devices
+		{
+			outputPin(realm, "P11", "LVCMOS33", 6, XilinxPinConfiguration.Slew.SLOW, false); // AD_CONV
+			outputPin(realm, "N7", "LVCMOS33", 6, XilinxPinConfiguration.Slew.SLOW, true); // AMP_CS
+			outputPin(realm, "N8", "LVCMOS33", 8, XilinxPinConfiguration.Slew.SLOW, true); // DAC_CS
+			outputPin(realm, "T3", "LVCMOS33", 4, XilinxPinConfiguration.Slew.SLOW, false); // FPGA_INIT_B
+			outputPin(realm, "M18", "LVCMOS33", 4, XilinxPinConfiguration.Slew.SLOW, false); // LCD_E
+			outputPin(realm, "L17", "LVCMOS33", 4, XilinxPinConfiguration.Slew.SLOW, false); // LCD_RW
+			outputPin(realm, "D16", "LVCMOS33", 4, XilinxPinConfiguration.Slew.SLOW, true); // SF_CE0
+			outputPin(realm, "U3", "LVCMOS33", 6, XilinxPinConfiguration.Slew.SLOW, true); // SPI_SS_B
+		}
+
 		ProjectGenerator projectGenerator = new ProjectGenerator(design.getRealm(), "TerminalTest", new File("ise/terminal_test"), "XC3S500E-FG320-4");
 		projectGenerator.addVerilogFile(new File("riscv/resource/hdl/clk_reset.v"));
 		projectGenerator.addUcfLine("NET \"pinC9\" PERIOD = 20.0ns HIGH 40%;");
@@ -168,6 +180,22 @@ public class SynthesisMain {
 		pin.setId(id);
 		pin.setConfiguration(configuration);
 		return pin;
+	}
+
+	private static RtlOutputPin outputPin(RtlRealm realm, String id, String ioStandard, Integer drive, XilinxPinConfiguration.Slew slew, RtlBitSignal outputSignal) {
+		XilinxPinConfiguration configuration = new XilinxPinConfiguration();
+		configuration.setIostandard(ioStandard);
+		configuration.setDrive(drive);
+		configuration.setSlew(slew);
+		RtlOutputPin pin = new RtlOutputPin(realm);
+		pin.setId(id);
+		pin.setConfiguration(configuration);
+		pin.setOutputSignal(outputSignal);
+		return pin;
+	}
+
+	private static RtlOutputPin outputPin(RtlRealm realm, String id, String ioStandard, Integer drive, XilinxPinConfiguration.Slew slew, boolean constant) {
+		return outputPin(realm, id, ioStandard, drive, slew, new RtlBitConstant(realm, constant));
 	}
 
 }
