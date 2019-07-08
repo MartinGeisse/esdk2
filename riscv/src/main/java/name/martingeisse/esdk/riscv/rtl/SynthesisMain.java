@@ -16,6 +16,9 @@ import name.martingeisse.esdk.library.SignalLoggerBusInterface;
 import name.martingeisse.esdk.riscv.rtl.ram.RamController;
 import name.martingeisse.esdk.riscv.rtl.ram.SdramConnector;
 import name.martingeisse.esdk.riscv.rtl.ram.SdramConnectorImpl;
+import name.martingeisse.esdk.riscv.rtl.ram.SpiConnectorImpl;
+import name.martingeisse.esdk.riscv.rtl.spi.SpiConnector;
+import name.martingeisse.esdk.riscv.rtl.spi.SpiInterface;
 import name.martingeisse.esdk.riscv.rtl.terminal.KeyboardController;
 import name.martingeisse.esdk.riscv.rtl.terminal.PixelDisplayController;
 import name.martingeisse.esdk.riscv.rtl.terminal.Ps2Connector;
@@ -33,6 +36,7 @@ public class SynthesisMain {
 			@Override
 			protected ComputerModule.Implementation createComputerModule() {
 				return new ComputerModule.Implementation(getRealm(), getClock(), getDdrClock0(), getDdrClock180(), getDdrClock270(), getDdrClock90()) {
+
 					@Override
 					protected RamController createBigRam() {
 						return new name.martingeisse.esdk.riscv.rtl.ram.RamController.Implementation(getRealm(), _ddrClock0, _ddrClock180, _ddrClock270, _ddrClock90) {
@@ -42,6 +46,17 @@ public class SynthesisMain {
 							}
 						};
 					}
+
+					@Override
+					protected SpiInterface createSpiInterface() {
+						return new SpiInterface.Implementation(getRealm(), _clk) {
+							@Override
+							protected SpiConnector createSpiConnector() {
+								return new SpiConnectorImpl(getRealm());
+							}
+						};
+					}
+
 				};
 			}
 		};
@@ -102,11 +117,25 @@ public class SynthesisMain {
 			buttonPin(realm, "D18") // west
 		));
 
+		// SPI
+		{
+			SpiInterface.Implementation spiInterface = (SpiInterface.Implementation)design.getComputerModule()._spiInterface;
+			SpiConnectorImpl connector = (SpiConnectorImpl)spiInterface._spiConnector;
+
+			// general
+			outputPin(realm, "U16", "LVCMOS33", 6, XilinxPinConfiguration.Slew.SLOW, connector.getSck()); // SCK
+			outputPin(realm, "T4", "LVCMOS33", 6, XilinxPinConfiguration.Slew.SLOW, connector.getMosi()); // MOSI
+
+			// DAC
+		 	outputPin(realm, "N8", "LVCMOS33", 8, XilinxPinConfiguration.Slew.SLOW, connector.getDacCs()); // DAC_CS
+		 	outputPin(realm, "P8", "LVCMOS33", 8, XilinxPinConfiguration.Slew.SLOW, true); // DAC_CLR
+
+		}
+
 		// unused SPI devices
 		{
 			outputPin(realm, "P11", "LVCMOS33", 6, XilinxPinConfiguration.Slew.SLOW, false); // AD_CONV
 			outputPin(realm, "N7", "LVCMOS33", 6, XilinxPinConfiguration.Slew.SLOW, true); // AMP_CS
-			outputPin(realm, "N8", "LVCMOS33", 8, XilinxPinConfiguration.Slew.SLOW, true); // DAC_CS
 			outputPin(realm, "T3", "LVCMOS33", 4, XilinxPinConfiguration.Slew.SLOW, false); // FPGA_INIT_B
 			outputPin(realm, "M18", "LVCMOS33", 4, XilinxPinConfiguration.Slew.SLOW, false); // LCD_E
 			outputPin(realm, "L17", "LVCMOS33", 4, XilinxPinConfiguration.Slew.SLOW, false); // LCD_RW

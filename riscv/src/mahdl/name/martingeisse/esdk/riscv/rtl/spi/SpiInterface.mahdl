@@ -1,0 +1,60 @@
+module name.martingeisse.esdk.riscv.rtl.spi.SpiInterface;
+
+interface {
+    in clock clk;
+
+    in bit busEnable;
+    in bit busWrite;
+    in vector[32] busWriteData;
+    out bit busAcknowledge;
+
+}
+
+// bus interface
+register vector[24] commandWord;
+signal bit loadCommandWord = (busEnable & busWrite);
+do (*) busAcknowledge = 1;
+
+// SPI connector
+name.martingeisse.esdk.riscv.rtl.spi.SpiConnector spiConnector;
+register bit dacCs, sck;
+do (*) {
+    spiConnector.dacCs = dacCs;
+    spiConnector.sck = sck;
+    spiConnector.mosi = commandWord[23];
+}
+
+// SPI logic
+register vector[5] completedBits;
+do (clk) {
+    if (dacCs) {
+        if (sck) {
+
+            // completing
+            sck = 1;
+
+        } else {
+
+            // idle
+            if (loadCommandWord) {
+                dacCs = 0;
+                sck = 0;
+                completedBits = 0;
+                commandWord = busWriteData[23:0];
+            }
+
+        }
+    } else {
+
+        // busy
+        if (sck) {
+            sck = 0;
+            commandWord = commandWord << 1;
+            completedBits = completedBits + 5d1;
+            dacCs = (completedBits[4] & completedBits[3]);
+        } else {
+            sck = 1;
+        }
+
+    }
+}

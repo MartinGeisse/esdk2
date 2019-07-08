@@ -15,6 +15,7 @@ signal bit bigRamSelected = cpu.memoryWordAddress[29];
 signal bit terminalSelected = cpu.memoryWordAddress[12] & ~bigRamSelected;
 signal bit signalLoggerSelected = cpu.memoryWordAddress[13] & ~bigRamSelected;
 signal bit gpioSelected = cpu.memoryWordAddress[14] & ~bigRamSelected;
+signal bit spiSelected = cpu.memoryWordAddress[15] & ~bigRamSelected;
 
 // Memory: the number indicates the significance inside a word, NOT the position of a byte in a byte buffer (these
 // are different since RISC-V is little-endian).
@@ -27,6 +28,7 @@ name.martingeisse.esdk.riscv.rtl.terminal.PixelDisplayController display;
 name.martingeisse.esdk.riscv.rtl.terminal.KeyboardController keyboard;
 name.martingeisse.esdk.riscv.rtl.ram.RamController bigRam;
 name.martingeisse.esdk.library.SignalLoggerBusInterface signalLogger;
+name.martingeisse.esdk.riscv.rtl.spi.SpiInterface spiInterface;
 
 do (*) {
 
@@ -40,12 +42,14 @@ do (*) {
             terminalSelected ? (24d0 _ keyboard.inputData) :
                     signalLoggerSelected ? signalLogger.busReadData :
                             gpioSelected ? (24d0 _ buttonsAndSwitches) :
-                                memoryReadData;
+                                spiSelected ? 32d0 :
+                                    memoryReadData;
     cpu.memoryAcknowledge = bigRamSelected ? bigRam.busAcknowledge :
             terminalSelected ? bit(1) :
                     signalLoggerSelected ? signalLogger.busAcknowledge :
                             gpioSelected ? bit(1) :
-                                (cpu.memoryWrite | secondReadCycle);
+                                spiSelected ? spiInterface.busAcknowledge :
+                                    (cpu.memoryWrite | secondReadCycle);
 
     display.clk = clk;
 //    display.clockEnable = 1;
@@ -77,6 +81,11 @@ do (*) {
     display.ramdacReadData = bigRam.ramdacReadData;
     display.ramdacAcknowledge = bigRam.ramdacAcknowledge;
 
+    spiInterface.clk = clk;
+    spiInterface.busEnable = cpu.memoryEnable & spiSelected;
+    spiInterface.busWrite = cpu.memoryWrite;
+    spiInterface.busWriteData = cpu.memoryWriteData;
+
 }
 
 register vector[8] memoryReadData0, memoryReadData1, memoryReadData2, memoryReadData3;
@@ -86,7 +95,7 @@ do (clk) {
     memoryReadData1 = memory1[memoryDataWordAddress];
     memoryReadData2 = memory2[memoryDataWordAddress];
     memoryReadData3 = memory3[memoryDataWordAddress];
-    if (cpu.memoryEnable & cpu.memoryWrite & ~bigRamSelected & ~terminalSelected & ~signalLoggerSelected) {
+    if (cpu.memoryEnable & cpu.memoryWrite & ~bigRamSelected & ~terminalSelected & ~signalLoggerSelected & ~spiSelected) {
         if (cpu.memoryWriteMask[0]) {
             memory0[memoryDataWordAddress] = cpu.memoryWriteData[7:0];
         }
