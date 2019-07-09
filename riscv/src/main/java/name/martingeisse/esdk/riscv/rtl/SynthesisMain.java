@@ -76,12 +76,12 @@ public class SynthesisMain {
 
 		// pixel display
 		PixelDisplayController.Implementation displayController = (PixelDisplayController.Implementation)computerModule._display;
-		VgaConnector.Implementation vgaConnector = (VgaConnector.Implementation) displayController._vgaConnector;
-		vgaPin(realm, "H14", vgaConnector.getR());
-		vgaPin(realm, "H15", vgaConnector.getG());
-		vgaPin(realm, "G15", vgaConnector.getB());
-		vgaPin(realm, "F15", vgaConnector.getHsync());
-		vgaPin(realm, "F14", vgaConnector.getVsync());
+		VgaConnector.Connector vgaConnector = (VgaConnector.Connector) displayController._vgaConnector;
+		vgaPin(realm, "H14", vgaConnector.getRSocket());
+		vgaPin(realm, "H15", vgaConnector.getGSocket());
+		vgaPin(realm, "G15", vgaConnector.getBSocket());
+		vgaPin(realm, "F15", vgaConnector.getHsyncSocket());
+		vgaPin(realm, "F14", vgaConnector.getVsyncSocket());
 
 		// keyboard
 		KeyboardController.Implementation keyboardController = (KeyboardController.Implementation)computerModule._keyboard;
