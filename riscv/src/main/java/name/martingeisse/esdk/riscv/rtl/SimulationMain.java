@@ -46,16 +46,16 @@ public class SimulationMain {
 		// prepareHighlevelDisplaySimulation(design);
 		// prepareHdlDisplaySimulation(design);
 
-		SignalLoggerBusInterface.Implementation loggerInterface = (SignalLoggerBusInterface.Implementation)computerModule._signalLogger;
+		SignalLoggerBusInterface.Connector loggerInterface = (SignalLoggerBusInterface.Connector)computerModule._signalLogger;
 		RtlVectorSignal logData = RtlVectorConstant.of(realm, 32, 0);
 		SignalLogger signalLogger = new SignalLogger.Implementation(realm, design.getClock(), design.getClock());
 		signalLogger.setLogEnable(new RtlBitConstant(realm, false));
 		signalLogger.setLogData(RtlVectorConstant.of(realm, 32 - logData.getWidth(), 0).concat(logData));
-		signalLogger.setBusEnable(loggerInterface.getBusEnable());
-		signalLogger.setBusWrite(loggerInterface.getBusWrite());
-		signalLogger.setBusWriteData(loggerInterface.getBusWriteData());
-		loggerInterface.setBusReadData(signalLogger.getBusReadData());
-		loggerInterface.setBusAcknowledge(signalLogger.getBusAcknowledge());
+		signalLogger.setBusEnable(loggerInterface.getBusEnableSocket());
+		signalLogger.setBusWrite(loggerInterface.getBusWriteSocket());
+		signalLogger.setBusWriteData(loggerInterface.getBusWriteDataSocket());
+		loggerInterface.setBusReadDataSocket(signalLogger.getBusReadData());
+		loggerInterface.setBusAcknowledgeSocket(signalLogger.getBusAcknowledge());
 
 		design.simulate();
 	}

@@ -92,15 +92,15 @@ public class SynthesisMain {
         //
 		// signal logger
 		//
-		SignalLoggerBusInterface.Implementation loggerInterface = (SignalLoggerBusInterface.Implementation)computerModule._signalLogger;
+		SignalLoggerBusInterface.Connector loggerInterface = (SignalLoggerBusInterface.Connector)computerModule._signalLogger;
 		SignalLogger signalLogger = new SignalLogger.Implementation(realm, design.getClock(), design.getClock());
 		signalLogger.setLogEnable(new RtlBitConstant(realm, false));
 		signalLogger.setLogData(RtlVectorConstant.of(realm, 32, 0));
-		signalLogger.setBusEnable(loggerInterface.getBusEnable());
-		signalLogger.setBusWrite(loggerInterface.getBusWrite());
-		signalLogger.setBusWriteData(loggerInterface.getBusWriteData());
-		loggerInterface.setBusReadData(signalLogger.getBusReadData());
-		loggerInterface.setBusAcknowledge(signalLogger.getBusAcknowledge());
+		signalLogger.setBusEnable(loggerInterface.getBusEnableSocket());
+		signalLogger.setBusWrite(loggerInterface.getBusWriteSocket());
+		signalLogger.setBusWriteData(loggerInterface.getBusWriteDataSocket());
+		loggerInterface.setBusReadDataSocket(signalLogger.getBusReadData());
+		loggerInterface.setBusAcknowledgeSocket(signalLogger.getBusAcknowledge());
 
 		//
 		// GPIO (buttons and switches; LEDs not yet implemented)
