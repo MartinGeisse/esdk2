@@ -16,7 +16,6 @@ import name.martingeisse.esdk.library.SignalLoggerBusInterface;
 import name.martingeisse.esdk.riscv.rtl.ram.RamController;
 import name.martingeisse.esdk.riscv.rtl.ram.SdramConnector;
 import name.martingeisse.esdk.riscv.rtl.ram.SdramConnectorImpl;
-import name.martingeisse.esdk.riscv.rtl.ram.SpiConnectorImpl;
 import name.martingeisse.esdk.riscv.rtl.spi.SpiConnector;
 import name.martingeisse.esdk.riscv.rtl.spi.SpiInterface;
 import name.martingeisse.esdk.riscv.rtl.terminal.KeyboardController;
@@ -52,7 +51,7 @@ public class SynthesisMain {
 						return new SpiInterface.Implementation(getRealm(), _clk) {
 							@Override
 							protected SpiConnector createSpiConnector() {
-								return new SpiConnectorImpl(getRealm());
+								return new SpiConnector.Connector(getRealm());
 							}
 						};
 					}
@@ -120,14 +119,14 @@ public class SynthesisMain {
 		// SPI
 		{
 			SpiInterface.Implementation spiInterface = (SpiInterface.Implementation)design.getComputerModule()._spiInterface;
-			SpiConnectorImpl connector = (SpiConnectorImpl)spiInterface._spiConnector;
+			SpiConnector.Connector connector = (SpiConnector.Connector)spiInterface._spiConnector;
 
 			// general
-			outputPin(realm, "U16", "LVCMOS33", 6, XilinxPinConfiguration.Slew.SLOW, connector.getSck()); // SCK
-			outputPin(realm, "T4", "LVCMOS33", 6, XilinxPinConfiguration.Slew.SLOW, connector.getMosi()); // MOSI
+			outputPin(realm, "U16", "LVCMOS33", 6, XilinxPinConfiguration.Slew.SLOW, connector.getSckSocket()); // SCK
+			outputPin(realm, "T4", "LVCMOS33", 6, XilinxPinConfiguration.Slew.SLOW, connector.getMosiSocket()); // MOSI
 
 			// DAC
-		 	outputPin(realm, "N8", "LVCMOS33", 8, XilinxPinConfiguration.Slew.SLOW, connector.getDacCs()); // DAC_CS
+		 	outputPin(realm, "N8", "LVCMOS33", 8, XilinxPinConfiguration.Slew.SLOW, connector.getDacCsSocket()); // DAC_CS
 		 	outputPin(realm, "P8", "LVCMOS33", 8, XilinxPinConfiguration.Slew.SLOW, true); // DAC_CLR
 
 		}

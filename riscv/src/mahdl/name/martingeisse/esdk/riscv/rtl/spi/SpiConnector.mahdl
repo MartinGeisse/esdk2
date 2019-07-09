@@ -1,4 +1,4 @@
-module name.martingeisse.esdk.riscv.rtl.spi.SpiConnector;
+native module name.martingeisse.esdk.riscv.rtl.spi.SpiConnector;
 
 // currently always writes to the DAC
 interface {
