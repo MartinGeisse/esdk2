@@ -28,11 +28,11 @@ public class SimulationMain {
 //						// return super.createTextDisplay();
 //					}
 
-					@Override
-					protected KeyboardController createKeyboard() {
-						return new SimulatedKeyboardController(getRealm(), getClock());
-						// return new UnconnectedKeyboard(getRealm());
-					}
+//					@Override
+//					protected KeyboardController createKeyboard() {
+//						return new SimulatedKeyboardController(getRealm(), getClock());
+//						// return new UnconnectedKeyboard(getRealm());
+//					}
 
 				};
 			}

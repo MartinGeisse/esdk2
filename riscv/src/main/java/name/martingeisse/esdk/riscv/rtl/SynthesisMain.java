@@ -1,6 +1,7 @@
 package name.martingeisse.esdk.riscv.rtl;
 
 import name.martingeisse.esdk.core.model.Item;
+import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.module.RtlModuleInstance;
 import name.martingeisse.esdk.core.rtl.pin.RtlInputPin;
@@ -37,21 +38,46 @@ public class SynthesisMain {
 				return new ComputerModule.Implementation(getRealm(), getClock(), getDdrClock0(), getDdrClock180(), getDdrClock270(), getDdrClock90()) {
 
 					@Override
-					protected RamController createBigRam() {
-						return new name.martingeisse.esdk.riscv.rtl.ram.RamController.Implementation(getRealm(), _ddrClock0, _ddrClock180, _ddrClock270, _ddrClock90) {
+					protected RamController createBigRam(RtlRealm realm, RtlClockNetwork ddrClock0, RtlClockNetwork ddrClock180, RtlClockNetwork ddrClock270, RtlClockNetwork ddrClock90) {
+						return new name.martingeisse.esdk.riscv.rtl.ram.RamController.Implementation(realm, ddrClock0, ddrClock180, ddrClock270, ddrClock90) {
 							@Override
-							protected SdramConnector createSdram() {
-								return new SdramConnectorImpl(getRealm(), _clk0, _clk180, _clk270, _clk90);
+							protected SdramConnector createSdram(RtlRealm realm, RtlClockNetwork clk0, RtlClockNetwork clk180, RtlClockNetwork clk270, RtlClockNetwork clk90) {
+								return new SdramConnectorImpl(realm, clk0, clk180, clk270, clk90);
 							}
 						};
 					}
 
 					@Override
-					protected SpiInterface createSpiInterface() {
-						return new SpiInterface.Implementation(getRealm(), _clk) {
+					protected PixelDisplayController createDisplay(RtlRealm realm, RtlClockNetwork clk) {
+						return new PixelDisplayController.Implementation(realm, clk) {
 							@Override
-							protected SpiConnector createSpiConnector() {
-								return new SpiConnector.Connector(getRealm());
+							protected VgaConnector createVgaConnector(RtlRealm realm) {
+								return new VgaConnector.Connector(realm);
+							}
+						};
+					}
+
+					@Override
+					protected KeyboardController createKeyboard(RtlRealm realm, RtlClockNetwork clk) {
+						return new KeyboardController.Implementation(realm, clk) {
+							@Override
+							protected Ps2Connector createPs2(RtlRealm realm) {
+								return new Ps2Connector.Connector(realm);
+							}
+						};
+					}
+
+					@Override
+					protected SignalLoggerBusInterface createSignalLogger(RtlRealm realm) {
+						return new SignalLoggerBusInterface.Connector(realm);
+					}
+
+					@Override
+					protected SpiInterface createSpiInterface(RtlRealm realm, RtlClockNetwork clk) {
+						return new SpiInterface.Implementation(getRealm(), clk) {
+							@Override
+							protected SpiConnector createSpiConnector(RtlRealm realm) {
+								return new SpiConnector.Connector(realm);
 							}
 						};
 					}
