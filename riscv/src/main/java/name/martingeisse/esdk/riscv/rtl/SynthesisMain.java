@@ -85,9 +85,9 @@ public class SynthesisMain {
 
 		// keyboard
 		KeyboardController.Implementation keyboardController = (KeyboardController.Implementation)computerModule._keyboard;
-		Ps2Connector.Implementation ps2Connector = (Ps2Connector.Implementation)keyboardController._ps2;
-		ps2Connector.setClk(ps2Pin(realm, "G14"));
-		ps2Connector.setData(ps2Pin(realm, "G13"));
+		Ps2Connector.Connector ps2Connector = (Ps2Connector.Connector)keyboardController._ps2;
+		ps2Connector.setClkSocket(ps2Pin(realm, "G14"));
+		ps2Connector.setDataSocket(ps2Pin(realm, "G13"));
 
         //
 		// signal logger
