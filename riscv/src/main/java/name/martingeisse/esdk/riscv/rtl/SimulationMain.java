@@ -9,8 +9,7 @@ import name.martingeisse.esdk.core.rtl.simulation.RtlClockGenerator;
 import name.martingeisse.esdk.library.SignalLogger;
 import name.martingeisse.esdk.library.SignalLoggerBusInterface;
 import name.martingeisse.esdk.riscv.rtl.ram.RamController;
-import name.martingeisse.esdk.riscv.rtl.ram.SdramConnector;
-import name.martingeisse.esdk.riscv.rtl.ram.SdramConnectorImpl;
+import name.martingeisse.esdk.riscv.rtl.ram.SimulatedRamAdapterWithoutRamdacSupport;
 import name.martingeisse.esdk.riscv.rtl.spi.SpiConnector;
 import name.martingeisse.esdk.riscv.rtl.spi.SpiInterface;
 import name.martingeisse.esdk.riscv.rtl.terminal.KeyboardController;
@@ -31,12 +30,7 @@ public class SimulationMain {
 
 					@Override
 					protected RamController createBigRam(RtlRealm realm, RtlClockNetwork ddrClock0, RtlClockNetwork ddrClock180, RtlClockNetwork ddrClock270, RtlClockNetwork ddrClock90) {
-						return new name.martingeisse.esdk.riscv.rtl.ram.RamController.Implementation(realm, ddrClock0, ddrClock180, ddrClock270, ddrClock90) {
-							@Override
-							protected SdramConnector createSdram(RtlRealm realm, RtlClockNetwork clk0, RtlClockNetwork clk180, RtlClockNetwork clk270, RtlClockNetwork clk90) {
-								return new SdramConnectorImpl(realm, clk0, clk180, clk270, clk90);
-							}
-						};
+						return new SimulatedRamAdapterWithoutRamdacSupport(realm, ddrClock0);
 					}
 
 					@Override
