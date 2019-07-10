@@ -8,6 +8,7 @@ import name.martingeisse.esdk.core.rtl.signal.RtlVectorConstant;
 import name.martingeisse.esdk.core.rtl.simulation.RtlClockGenerator;
 import name.martingeisse.esdk.library.SignalLogger;
 import name.martingeisse.esdk.library.SignalLoggerBusInterface;
+import name.martingeisse.esdk.riscv.rtl.pixel.SimulatedPixelDisplayPanel;
 import name.martingeisse.esdk.riscv.rtl.ram.RamController;
 import name.martingeisse.esdk.riscv.rtl.ram.SimulatedRamAdapterWithoutRamdacSupport;
 import name.martingeisse.esdk.riscv.rtl.spi.SpiConnector;
@@ -15,7 +16,8 @@ import name.martingeisse.esdk.riscv.rtl.spi.SpiInterface;
 import name.martingeisse.esdk.riscv.rtl.terminal.KeyboardController;
 import name.martingeisse.esdk.riscv.rtl.terminal.PixelDisplayController;
 import name.martingeisse.esdk.riscv.rtl.terminal.Ps2Connector;
-import name.martingeisse.esdk.riscv.rtl.terminal.VgaConnector;
+
+import javax.swing.*;
 
 /**
  *
@@ -35,12 +37,10 @@ public class SimulationMain {
 
 					@Override
 					protected PixelDisplayController createDisplay(RtlRealm realm, RtlClockNetwork clk) {
-						return new PixelDisplayController.Implementation(realm, clk) {
-							@Override
-							protected VgaConnector createVgaConnector(RtlRealm realm) {
-								return new VgaConnector.Connector(realm);
-							}
-						};
+                        PixelDisplayController.Connector dummy = new PixelDisplayController.Connector(realm, clk);
+                        dummy.setRamdacEnableSocket(new RtlBitConstant(realm, false));
+                        dummy.setRamdacWordAddressSocket(RtlVectorConstant.of(realm, 24, 0));
+                        return dummy;
 					}
 
 					@Override
@@ -83,19 +83,23 @@ public class SimulationMain {
 		design.getClockSignalConnector().setConnected(new RtlBitConstant(realm, false));
 
 		// pixel display
-		PixelDisplayController.Implementation displayController = (PixelDisplayController.Implementation)computerModule._display;
-		VgaConnector.Connector vgaConnector = (VgaConnector.Connector) displayController._vgaConnector;
-		vgaPin(realm, "H14", vgaConnector.getRSocket());
-		vgaPin(realm, "H15", vgaConnector.getGSocket());
-		vgaPin(realm, "G15", vgaConnector.getBSocket());
-		vgaPin(realm, "F15", vgaConnector.getHsyncSocket());
-		vgaPin(realm, "F14", vgaConnector.getVsyncSocket());
+        SimulatedRamAdapterWithoutRamdacSupport ramAdapter = (SimulatedRamAdapterWithoutRamdacSupport)computerModule._bigRam;
+        SimulatedPixelDisplayPanel displayPanel = new SimulatedPixelDisplayPanel(ramAdapter.getRam());
 
-		// keyboard
+		JFrame frame = new JFrame("Terminal");
+		frame.add(displayPanel);
+		frame.pack();
+		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		frame.setResizable(false);
+		frame.setVisible(true);
+		new Timer(500, event -> displayPanel.repaint()).start();
+
+
+		// keyboard (disable for now)
 		KeyboardController.Implementation keyboardController = (KeyboardController.Implementation)computerModule._keyboard;
 		Ps2Connector.Connector ps2Connector = (Ps2Connector.Connector)keyboardController._ps2;
-		ps2Connector.setClkSocket(ps2Pin(realm, "G14"));
-		ps2Connector.setDataSocket(ps2Pin(realm, "G13"));
+		ps2Connector.setClkSocket(new RtlBitConstant(realm, true));
+		ps2Connector.setDataSocket(new RtlBitConstant(realm, true));
 
 		//
 		// signal logger
@@ -124,7 +128,7 @@ public class SimulationMain {
 			new RtlBitConstant(realm, false) // west
 		));
 
-		// SPI
+		// SPI (output only; unused for now)
 		{
 			SpiInterface.Implementation spiInterface = (SpiInterface.Implementation)design.getComputerModule()._spiInterface;
 			SpiConnector.Connector connector = (SpiConnector.Connector)spiInterface._spiConnector;

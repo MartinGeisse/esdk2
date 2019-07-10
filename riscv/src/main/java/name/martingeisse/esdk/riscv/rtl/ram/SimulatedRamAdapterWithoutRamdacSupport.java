@@ -16,7 +16,7 @@ import name.martingeisse.esdk.core.rtl.simulation.RtlSimulationItem;
  */
 public class SimulatedRamAdapterWithoutRamdacSupport extends RtlSimulationItem implements RamController {
 
-    private final SimulatedRam ram;
+    private final SimulatedRam.Implementation ram;
     private final RtlBitSignal dummyBit;
     private final RtlVectorSignal dummyVector32;
 
@@ -25,6 +25,10 @@ public class SimulatedRamAdapterWithoutRamdacSupport extends RtlSimulationItem i
         this.ram = new SimulatedRam.Implementation(realm, clk);
         this.dummyBit = new RtlBitConstant(realm, false);
         this.dummyVector32 = RtlVectorConstant.of(realm, 32, 0);
+    }
+
+    public SimulatedRam.Implementation getRam() {
+        return ram;
     }
 
     //
