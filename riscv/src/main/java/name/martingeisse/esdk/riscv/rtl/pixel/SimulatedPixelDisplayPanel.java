@@ -43,9 +43,9 @@ public class SimulatedPixelDisplayPanel extends JPanel {
     }
 
     private static int expandRgb(int value) {
-        return (((value & 4) != 0) ? 0x00ff0000 : 0x000000) |
-                (((value & 2) != 0) ? 0x0000ff00 : 0x000000) |
-                (((value & 1) != 0) ? 0x000000ff : 0x000000);
+        return (((value & 4) != 0) ? 0xffff0000 : 0xff000000) |
+                (((value & 2) != 0) ? 0xff00ff00 : 0xff000000) |
+                (((value & 1) != 0) ? 0xff0000ff : 0xff000000);
     }
 
 }
