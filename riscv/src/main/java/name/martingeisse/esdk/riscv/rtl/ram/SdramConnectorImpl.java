@@ -16,7 +16,7 @@ import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogCon
 import name.martingeisse.esdk.core.rtl.synthesis.xilinx.XilinxPinConfiguration;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 
-public class SdramConnectorImpl extends SdramConnector.Implementation {
+public class SdramConnectorImpl extends SdramConnector.Connector {
 
     public SdramConnectorImpl(RtlRealm realm,
                               RtlClockNetwork clk0,
