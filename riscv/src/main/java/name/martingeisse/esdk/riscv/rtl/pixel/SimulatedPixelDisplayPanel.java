@@ -30,7 +30,7 @@ public class SimulatedPixelDisplayPanel extends JPanel {
         Matrix matrix2 = simulatedRam._memory2.getMatrix();
         Matrix matrix3 = simulatedRam._memory3.getMatrix();
         for (int y = 0; y < 480; y++) {
-            int baseWordAddress = y * 160;
+            int baseWordAddress = y * 256;
             for (int x = 0; x < 640; x += 4) {
                 int wordAddress = baseWordAddress + (x >> 2);
                 image.setRGB(x, y, expandRgb(matrix0.getRow(wordAddress).getAsUnsignedInt()));
