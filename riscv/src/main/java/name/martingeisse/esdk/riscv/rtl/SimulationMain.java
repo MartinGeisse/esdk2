@@ -32,7 +32,8 @@ public class SimulationMain {
 
 					@Override
 					protected RamController createBigRam(RtlRealm realm, RtlClockNetwork ddrClock0, RtlClockNetwork ddrClock180, RtlClockNetwork ddrClock270, RtlClockNetwork ddrClock90) {
-						return new SimulatedRamAdapterWithoutRamdacSupport(realm, ddrClock0);
+						// do NOT use any DDR clock here -- those won't get driven by the simulation
+						return new SimulatedRamAdapterWithoutRamdacSupport(realm, _clk);
 					}
 
 					@Override
@@ -134,19 +135,10 @@ public class SimulationMain {
 			SpiConnector.Connector connector = (SpiConnector.Connector)spiInterface._spiConnector;
 		}
 
-
-
-
-
-
-
-		design.getClockSignalConnector().setConnected(new RtlBitConstant(realm, false));
+		// simulate
 		new RtlClockGenerator(design.getClock(), 10);
-		computerModule.setReset(new RtlBitConstant(realm, false));
-		// prepareHighlevelDisplaySimulation(design);
-		// prepareHdlDisplaySimulation(design);
-
 		design.simulate();
+
 	}
 
 //	private static void prepareHighlevelDisplaySimulation(ComputerDesign design) {
