@@ -9,26 +9,35 @@ interface {
     in vector[8] buttonsAndSwitches;
 }
 
+// CPU
 name.martingeisse.esdk.riscv.rtl.Multicycle cpu;
-signal vector[10] memoryDataWordAddress;
+
+// peripherals
+name.martingeisse.esdk.riscv.rtl.ram.RamController bigRam;
+name.martingeisse.esdk.riscv.rtl.simulation.SimulationDevice simulationDevice;
+name.martingeisse.esdk.riscv.rtl.terminal.PixelDisplayController display;
+name.martingeisse.esdk.riscv.rtl.terminal.KeyboardController keyboard;
+name.martingeisse.esdk.library.SignalLoggerBusInterface signalLogger;
+name.martingeisse.esdk.riscv.rtl.spi.SpiInterface spiInterface;
+
+// bus decoder: big devices
 signal bit bigRamSelected = cpu.memoryWordAddress[29];
-signal bit terminalSelected = cpu.memoryWordAddress[12] & ~bigRamSelected;
-signal bit signalLoggerSelected = cpu.memoryWordAddress[13] & ~bigRamSelected;
-signal bit gpioSelected = cpu.memoryWordAddress[14] & ~bigRamSelected;
-signal bit spiSelected = cpu.memoryWordAddress[15] & ~bigRamSelected;
+signal bit simulationDeviceSelected = cpu.memoryWordAddress[28];
+signal bit smallDeviceRegionSelected = ~bigRamSelected & ~simulationDeviceSelected;
+
+// bus decoder: small devices
+signal bit terminalSelected = smallDeviceRegionSelected & cpu.memoryWordAddress[12];
+signal bit signalLoggerSelected = smallDeviceRegionSelected & cpu.memoryWordAddress[13];
+signal bit gpioSelected = smallDeviceRegionSelected & cpu.memoryWordAddress[14];
+signal bit spiSelected = smallDeviceRegionSelected & cpu.memoryWordAddress[15];
+signal bit internalMemorySelected = smallDeviceRegionSelected & ~terminalSelected & ~signalLoggerSelected & ~gpioSelected & ~spiSelected;
 
 // Memory: the number indicates the significance inside a word, NOT the position of a byte in a byte buffer (these
 // are different since RISC-V is little-endian).
 register matrix[1024][8] memory0, memory1, memory2, memory3;
 signal vector[32] memoryReadData;
-register bit secondReadCycle = 0;
+register bit internalMemorySecondReadCycle = 0;
 
-// peripherals
-name.martingeisse.esdk.riscv.rtl.terminal.PixelDisplayController display;
-name.martingeisse.esdk.riscv.rtl.terminal.KeyboardController keyboard;
-name.martingeisse.esdk.riscv.rtl.ram.RamController bigRam;
-name.martingeisse.esdk.library.SignalLoggerBusInterface signalLogger;
-name.martingeisse.esdk.riscv.rtl.spi.SpiInterface spiInterface;
 
 do (*) {
 
@@ -37,19 +46,20 @@ do (*) {
     cpu.reset = reset;
 
     // data interface
-    memoryDataWordAddress = cpu.memoryWordAddress[9:0];
     cpu.memoryReadData = bigRamSelected ? bigRam.busReadData :
+        simulationDeviceSelected ? simulationDevice.busReadData :
             terminalSelected ? (24d0 _ keyboard.inputData) :
-                    signalLoggerSelected ? signalLogger.busReadData :
-                            gpioSelected ? (24d0 _ buttonsAndSwitches) :
-                                spiSelected ? 32d0 :
-                                    memoryReadData;
+                signalLoggerSelected ? signalLogger.busReadData :
+                    gpioSelected ? (24d0 _ buttonsAndSwitches) :
+                        spiSelected ? 32d0 :
+                            memoryReadData;
     cpu.memoryAcknowledge = bigRamSelected ? bigRam.busAcknowledge :
+        simulationDeviceSelected ? simulationDevice.busAcknowledge :
             terminalSelected ? bit(1) :
-                    signalLoggerSelected ? signalLogger.busAcknowledge :
-                            gpioSelected ? bit(1) :
-                                spiSelected ? spiInterface.busAcknowledge :
-                                    (cpu.memoryWrite | secondReadCycle);
+                signalLoggerSelected ? signalLogger.busAcknowledge :
+                    gpioSelected ? bit(1) :
+                        spiSelected ? spiInterface.busAcknowledge :
+                            (cpu.memoryWrite | internalMemorySecondReadCycle);
 
     display.clk = clk;
 //    display.clockEnable = 1;
@@ -86,8 +96,15 @@ do (*) {
     spiInterface.busWrite = cpu.memoryWrite;
     spiInterface.busWriteData = cpu.memoryWriteData;
 
+    simulationDevice.busEnable = cpu.memoryEnable & simulationDeviceSelected;
+    simulationDevice.busWrite = cpu.memoryWrite;
+    simulationDevice.busWordAddress = cpu.memoryWordAddress[23:0];
+    simulationDevice.busWriteData = cpu.memoryWriteData;
+    simulationDevice.busWriteMask = cpu.memoryWriteMask;
+
 }
 
+signal vector[10] memoryDataWordAddress = cpu.memoryWordAddress[9:0];
 register vector[8] memoryReadData0, memoryReadData1, memoryReadData2, memoryReadData3;
 do (*) memoryReadData = memoryReadData3 _ memoryReadData2 _ memoryReadData1 _ memoryReadData0;
 do (clk) {
@@ -95,7 +112,7 @@ do (clk) {
     memoryReadData1 = memory1[memoryDataWordAddress];
     memoryReadData2 = memory2[memoryDataWordAddress];
     memoryReadData3 = memory3[memoryDataWordAddress];
-    if (cpu.memoryEnable & cpu.memoryWrite & ~bigRamSelected & ~terminalSelected & ~signalLoggerSelected & ~spiSelected) {
+    if (cpu.memoryEnable & cpu.memoryWrite & internalMemorySelected) {
         if (cpu.memoryWriteMask[0]) {
             memory0[memoryDataWordAddress] = cpu.memoryWriteData[7:0];
         }
@@ -110,8 +127,8 @@ do (clk) {
         }
     }
     if (cpu.memoryEnable & ~cpu.memoryWrite) {
-        secondReadCycle = ~secondReadCycle;
+        internalMemorySecondReadCycle = ~internalMemorySecondReadCycle;
     } else {
-        secondReadCycle = 0;
+        internalMemorySecondReadCycle = 0;
     }
 }
