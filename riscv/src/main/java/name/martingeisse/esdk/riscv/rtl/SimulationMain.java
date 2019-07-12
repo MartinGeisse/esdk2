@@ -27,137 +27,145 @@ import javax.swing.*;
  */
 public class SimulationMain {
 
-	public static void main(String[] args) throws Exception {
-		ComputerDesign design = new ComputerDesign() {
-			@Override
-			protected ComputerModule.Implementation createComputerModule() {
-				return new ComputerModule.Implementation(getRealm(), getClock(), getDdrClock0(), getDdrClock180(), getDdrClock270(), getDdrClock90()) {
+    private final ComputerDesign design;
+    private final ComputerModule.Implementation computerModule;
+    private final RtlRealm realm;
+    private final SimulatedRamAdapterWithoutRamdacSupport ramAdapter;
+    private final SimulatedPixelDisplayPanel displayPanel;
+    private final KeyboardController.Implementation keyboardController;
+    private final Ps2Connector.Connector ps2Connector;
+    private final SignalLoggerBusInterface.Connector loggerInterface;
+    private final SignalLogger signalLogger;
 
-					@Override
-					protected RamController createBigRam(RtlRealm realm, RtlClockNetwork ddrClock0, RtlClockNetwork ddrClock180, RtlClockNetwork ddrClock270, RtlClockNetwork ddrClock90) {
-						// do NOT use any DDR clock here -- those won't get driven by the simulation
-						return new SimulatedRamAdapterWithoutRamdacSupport(realm, _clk);
-					}
+    public SimulationMain() throws Exception {
+        design = new ComputerDesign() {
+            @Override
+            protected ComputerModule.Implementation createComputerModule() {
+                return new ComputerModule.Implementation(getRealm(), getClock(), getDdrClock0(), getDdrClock180(), getDdrClock270(), getDdrClock90()) {
 
-					@Override
-					protected PixelDisplayController createDisplay(RtlRealm realm, RtlClockNetwork clk) {
+                    @Override
+                    protected RamController createBigRam(RtlRealm realm, RtlClockNetwork ddrClock0, RtlClockNetwork ddrClock180, RtlClockNetwork ddrClock270, RtlClockNetwork ddrClock90) {
+                        // do NOT use any DDR clock here -- those won't get driven by the simulation
+                        return new SimulatedRamAdapterWithoutRamdacSupport(realm, _clk);
+                    }
+
+                    @Override
+                    protected PixelDisplayController createDisplay(RtlRealm realm, RtlClockNetwork clk) {
                         PixelDisplayController.Connector dummy = new PixelDisplayController.Connector(realm, clk);
                         dummy.setRamdacEnableSocket(new RtlBitConstant(realm, false));
                         dummy.setRamdacWordAddressSocket(RtlVectorConstant.of(realm, 24, 0));
                         return dummy;
-					}
+                    }
 
-					@Override
-					protected KeyboardController createKeyboard(RtlRealm realm, RtlClockNetwork clk) {
-						return new KeyboardController.Implementation(realm, clk) {
-							@Override
-							protected Ps2Connector createPs2(RtlRealm realm) {
-								return new Ps2Connector.Connector(realm);
-							}
-						};
-					}
+                    @Override
+                    protected KeyboardController createKeyboard(RtlRealm realm, RtlClockNetwork clk) {
+                        return new KeyboardController.Implementation(realm, clk) {
+                            @Override
+                            protected Ps2Connector createPs2(RtlRealm realm) {
+                                return new Ps2Connector.Connector(realm);
+                            }
+                        };
+                    }
 
-					@Override
-					protected SignalLoggerBusInterface createSignalLogger(RtlRealm realm) {
-						return new SignalLoggerBusInterface.Connector(realm);
-					}
+                    @Override
+                    protected SignalLoggerBusInterface createSignalLogger(RtlRealm realm) {
+                        return new SignalLoggerBusInterface.Connector(realm);
+                    }
 
-					@Override
-					protected SpiInterface createSpiInterface(RtlRealm realm, RtlClockNetwork clk) {
-						return new SpiInterface.Implementation(getRealm(), clk) {
-							@Override
-							protected SpiConnector createSpiConnector(RtlRealm realm) {
-								return new SpiConnector.Connector(realm);
-							}
-						};
-					}
+                    @Override
+                    protected SpiInterface createSpiInterface(RtlRealm realm, RtlClockNetwork clk) {
+                        return new SpiInterface.Implementation(getRealm(), clk) {
+                            @Override
+                            protected SpiConnector createSpiConnector(RtlRealm realm) {
+                                return new SpiConnector.Connector(realm);
+                            }
+                        };
+                    }
 
-					@Override
-					protected SimulationDevice createSimulationDevice(RtlRealm realm, RtlClockNetwork clk) {
-						return new SimulationDeviceImpl(realm, clk, new SimulationDeviceDelegate() {
+                    @Override
+                    protected SimulationDevice createSimulationDevice(RtlRealm realm, RtlClockNetwork clk) {
+                        return new SimulationDeviceImpl(realm, clk, new SimulationDeviceDelegate() {
 
-							@Override
-							public int read(int wordAddress) {
-								return 0;
-							}
+                            @Override
+                            public int read(int wordAddress) {
+                                return 0;
+                            }
 
-							@Override
-							public void write(int wordAddress, int byteMask) {
-							}
+                            @Override
+                            public void write(int wordAddress, int byteMask) {
+                            }
 
-						});
-					}
-				};
-			}
-		};
-		ComputerModule.Implementation computerModule = design.getComputerModule();
-		RtlRealm realm = design.getRealm();
+                        });
+                    }
+                };
+            }
+        };
+        computerModule = design.getComputerModule();
+        realm = design.getRealm();
 
-		// clk / reset
-		computerModule.setReset(new RtlBitConstant(realm, false));
-		design.getDdrClock0SignalConnector().setConnected(new RtlBitConstant(realm, false));
-		design.getDdrClock90SignalConnector().setConnected(new RtlBitConstant(realm, false));
-		design.getDdrClock180SignalConnector().setConnected(new RtlBitConstant(realm, false));
-		design.getDdrClock270SignalConnector().setConnected(new RtlBitConstant(realm, false));
-		design.getClockSignalConnector().setConnected(new RtlBitConstant(realm, false));
+        // clk / reset
+        computerModule.setReset(new RtlBitConstant(realm, false));
+        design.getDdrClock0SignalConnector().setConnected(new RtlBitConstant(realm, false));
+        design.getDdrClock90SignalConnector().setConnected(new RtlBitConstant(realm, false));
+        design.getDdrClock180SignalConnector().setConnected(new RtlBitConstant(realm, false));
+        design.getDdrClock270SignalConnector().setConnected(new RtlBitConstant(realm, false));
+        design.getClockSignalConnector().setConnected(new RtlBitConstant(realm, false));
 
-		// pixel display
-        SimulatedRamAdapterWithoutRamdacSupport ramAdapter = (SimulatedRamAdapterWithoutRamdacSupport)computerModule._bigRam;
-        SimulatedPixelDisplayPanel displayPanel = new SimulatedPixelDisplayPanel(ramAdapter.getRam());
+        // pixel display
+        ramAdapter = (SimulatedRamAdapterWithoutRamdacSupport) computerModule._bigRam;
+        displayPanel = new SimulatedPixelDisplayPanel(ramAdapter.getRam());
 
-		JFrame frame = new JFrame("Terminal");
-		frame.add(displayPanel);
-		frame.pack();
-		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		frame.setResizable(false);
-		frame.setVisible(true);
-		new Timer(500, event -> displayPanel.repaint()).start();
+        JFrame frame = new JFrame("Terminal");
+        frame.add(displayPanel);
+        frame.pack();
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        frame.setResizable(false);
+        frame.setVisible(true);
+        new Timer(500, event -> displayPanel.repaint()).start();
 
+        // keyboard (disable for now)
+        keyboardController = (KeyboardController.Implementation) computerModule._keyboard;
+        ps2Connector = (Ps2Connector.Connector) keyboardController._ps2;
+        ps2Connector.setClkSocket(new RtlBitConstant(realm, true));
+        ps2Connector.setDataSocket(new RtlBitConstant(realm, true));
 
-		// keyboard (disable for now)
-		KeyboardController.Implementation keyboardController = (KeyboardController.Implementation)computerModule._keyboard;
-		Ps2Connector.Connector ps2Connector = (Ps2Connector.Connector)keyboardController._ps2;
-		ps2Connector.setClkSocket(new RtlBitConstant(realm, true));
-		ps2Connector.setDataSocket(new RtlBitConstant(realm, true));
+        //
+        // signal logger
+        //
+        loggerInterface = (SignalLoggerBusInterface.Connector) computerModule._signalLogger;
+        signalLogger = new SignalLogger.Implementation(realm, design.getClock(), design.getClock());
+        signalLogger.setLogEnable(new RtlBitConstant(realm, false));
+        signalLogger.setLogData(RtlVectorConstant.of(realm, 32, 0));
+        signalLogger.setBusEnable(loggerInterface.getBusEnableSocket());
+        signalLogger.setBusWrite(loggerInterface.getBusWriteSocket());
+        signalLogger.setBusWriteData(loggerInterface.getBusWriteDataSocket());
+        loggerInterface.setBusReadDataSocket(signalLogger.getBusReadData());
+        loggerInterface.setBusAcknowledgeSocket(signalLogger.getBusAcknowledge());
 
-		//
-		// signal logger
-		//
-		SignalLoggerBusInterface.Connector loggerInterface = (SignalLoggerBusInterface.Connector)computerModule._signalLogger;
-		SignalLogger signalLogger = new SignalLogger.Implementation(realm, design.getClock(), design.getClock());
-		signalLogger.setLogEnable(new RtlBitConstant(realm, false));
-		signalLogger.setLogData(RtlVectorConstant.of(realm, 32, 0));
-		signalLogger.setBusEnable(loggerInterface.getBusEnableSocket());
-		signalLogger.setBusWrite(loggerInterface.getBusWriteSocket());
-		signalLogger.setBusWriteData(loggerInterface.getBusWriteDataSocket());
-		loggerInterface.setBusReadDataSocket(signalLogger.getBusReadData());
-		loggerInterface.setBusAcknowledgeSocket(signalLogger.getBusAcknowledge());
+        //
+        // GPIO (buttons and switches; LEDs not yet implemented)
+        //
+        computerModule.setButtonsAndSwitches(new RtlConcatenation(realm,
+                new RtlBitConstant(realm, false), // switch 3
+                new RtlBitConstant(realm, false), // switch 2
+                new RtlBitConstant(realm, false), // switch 1
+                new RtlBitConstant(realm, false), // switch 0
+                new RtlBitConstant(realm, false), // north
+                new RtlBitConstant(realm, false), // east
+                new RtlBitConstant(realm, false), // south
+                new RtlBitConstant(realm, false) // west
+        ));
 
-		//
-		// GPIO (buttons and switches; LEDs not yet implemented)
-		//
-		computerModule.setButtonsAndSwitches(new RtlConcatenation(realm,
-			new RtlBitConstant(realm, false), // switch 3
-			new RtlBitConstant(realm, false), // switch 2
-			new RtlBitConstant(realm, false), // switch 1
-			new RtlBitConstant(realm, false), // switch 0
-			new RtlBitConstant(realm, false), // north
-			new RtlBitConstant(realm, false), // east
-			new RtlBitConstant(realm, false), // south
-			new RtlBitConstant(realm, false) // west
-		));
+        // SPI (output only; unused for now)
+        {
+            SpiInterface.Implementation spiInterface = (SpiInterface.Implementation) design.getComputerModule()._spiInterface;
+            SpiConnector.Connector connector = (SpiConnector.Connector) spiInterface._spiConnector;
+        }
 
-		// SPI (output only; unused for now)
-		{
-			SpiInterface.Implementation spiInterface = (SpiInterface.Implementation)design.getComputerModule()._spiInterface;
-			SpiConnector.Connector connector = (SpiConnector.Connector)spiInterface._spiConnector;
-		}
+        // simulate
+        new RtlClockGenerator(design.getClock(), 10);
 
-		// simulate
-		new RtlClockGenerator(design.getClock(), 10);
-		design.simulate();
-
-	}
+    }
 
 //	private static void prepareHighlevelDisplaySimulation(ComputerDesign design) {
 //		TerminalPanel terminalPanel = new TerminalPanel(design.getClock());
@@ -185,5 +193,9 @@ public class SimulationMain {
 //		frame.setVisible(true);
 //		new Timer(500, event -> monitorPanel.repaint()).start();
 //	}
+
+    public static void main(String[] args) throws Exception {
+        new SimulationMain().design.simulate();
+    }
 
 }

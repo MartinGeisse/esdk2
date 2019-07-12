@@ -15,7 +15,7 @@ public final class RtlSimulatedVectorRegister extends RtlSimulatedRegister imple
 
     public RtlSimulatedVectorRegister(RtlClockNetwork clock, int width) {
         super(clock);
-        this.width = 0;
+        this.width = width;
         this.value = VectorValue.of(width, 0);
     }
 
