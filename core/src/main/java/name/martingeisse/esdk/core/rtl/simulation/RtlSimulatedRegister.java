@@ -1,32 +1,27 @@
 package name.martingeisse.esdk.core.rtl.simulation;
 
-import name.martingeisse.esdk.core.rtl.RtlItem;
-import name.martingeisse.esdk.core.rtl.RtlRealm;
-import name.martingeisse.esdk.core.rtl.block.RtlProceduralRegister;
-import name.martingeisse.esdk.core.rtl.block.statement.RtlStatement;
+import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
+import name.martingeisse.esdk.core.rtl.RtlClockedItem;
 import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.EmptyVerilogContribution;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogContribution;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.expression.VerilogExpressionWriter;
 
 /**
- * A signal whose value can be set by high-level models. This is meant as a bridge to simulate high-level models and
- * RTL models together.
+ * A register whose input can be set via a setter method during simulation. This is useful to implement the RTL
+ * interface of a simulated component.
  *
- * NOTE: The signal must NOT be changed during the computeNextState() phase of a clock cycle. Use
- * {@link RtlSimulatedRegister} to change simulated signals synchronously to a clock edge.
+ * Unlike {@link RtlSimulatedSettableSignal}, this class is used to update a signal synchronously to a clock edge.
  *
- * Unlike {@link RtlProceduralRegister}, this class does not work together with {@link RtlStatement}. This makes it
- * easier to use, but it cannot be synthesized. Also, changes to the value are reflected directly, so it is not
- * possible to update multiple settable signals synchronously to a clock edge.
+ * Usage: call setNextValue() during computeNextState().
  *
  * Using this signal in a way that is not relevant to synthesis, such as a simulation replacement signal of instance
  * ports, is allowed.
  */
-public abstract class RtlSimulatedSettableSignal extends RtlItem implements RtlSignal {
+public abstract class RtlSimulatedRegister extends RtlClockedItem implements RtlSignal {
 
-	RtlSimulatedSettableSignal(RtlRealm realm) {
-		super(realm);
+	RtlSimulatedRegister(RtlClockNetwork clock) {
+		super(clock);
 	}
 
 	// ----------------------------------------------------------------------------------------------------------------

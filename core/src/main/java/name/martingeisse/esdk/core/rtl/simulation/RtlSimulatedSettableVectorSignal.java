@@ -34,7 +34,7 @@ public final class RtlSimulatedSettableVectorSignal extends RtlSimulatedSettable
 
 	public void setValue(VectorValue value) {
 		if (value.getWidth() != width) {
-			throw new IllegalArgumentException("get vector value of wrong width " + value.getWidth() + ", expected " + width);
+			throw new IllegalArgumentException("got vector value of wrong width " + value.getWidth() + ", expected " + width);
 		}
 		this.value = value;
 	}
