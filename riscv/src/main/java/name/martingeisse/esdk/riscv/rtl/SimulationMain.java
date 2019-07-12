@@ -88,11 +88,12 @@ public class SimulationMain {
 
                             @Override
                             public int read(int wordAddress) {
-                                return 0;
+                                return readFromSimulationDevice(wordAddress);
                             }
 
                             @Override
                             public void write(int wordAddress, int byteMask) {
+                                writeToSimulationDevice(wordAddress, byteMask);
                             }
 
                         });
@@ -196,6 +197,29 @@ public class SimulationMain {
 
     public static void main(String[] args) throws Exception {
         new SimulationMain().design.simulate();
+    }
+
+    public int readFromSimulationDevice(int wordAddress) {
+        switch (wordAddress) {
+
+            case 0:
+                // return 1 to show that this is a simulation
+                return 1;
+
+            default:
+                return 0;
+
+        }
+    }
+
+    public void writeToSimulationDevice(int wordAddress, int byteMask) {
+        switch (wordAddress) {
+
+            case 0:
+                design.stopSimulation();
+                break;
+
+        }
     }
 
 }

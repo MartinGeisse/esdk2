@@ -3,6 +3,8 @@
 #include "terminal.h"
 #include "draw.h"
 
+volatile int *simulationDevice = (volatile int *)0x40000000;
+
 static int analogValue = 0;
 
 static void draw(int x, int y, int size) {
@@ -27,23 +29,27 @@ static void draw(int x, int y, int size) {
 
 void main() {
 
-    // wait for SDRAM reset
-    delay(500);
+    // wait for SDRAM reset, but only on real hardware
+    if (!*simulationDevice) {
+        delay(500);
+    }
 
-    clearScreen(0);
+    // clearScreen(0);
     int x = 50, y = 240, dx = 1, dy = 0;
-    unsigned char *screen = (unsigned char *)0x80000000;
+    volatile unsigned char *screen = (volatile unsigned char *)0x80000000;
     while (1) {
-        delay(20);
+        if (!*simulationDevice) {
+            delay(20);
+        }
 
-        unsigned char *pixel = screen + y * 1024 + x;
+        volatile unsigned char *pixel = screen + y * 1024 + x;
         if (*pixel != 0) {
             dx = dy = 0;
             continue;
         }
         *pixel = 2;
 
-        int buttons = *(int*)0x10000;
+        int buttons = *(volatile int*)0x10000;
         if (buttons & 8) {
             dx = 0;
             dy = -1;
