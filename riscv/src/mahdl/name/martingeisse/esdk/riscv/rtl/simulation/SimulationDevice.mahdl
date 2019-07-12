@@ -1,6 +1,7 @@
 module name.martingeisse.esdk.riscv.rtl.simulation.SimulationDevice;
 
 interface {
+    in clock clk;
     in vector[24] busWordAddress;
     in bit busEnable, busWrite;
     in vector[32] busWriteData;

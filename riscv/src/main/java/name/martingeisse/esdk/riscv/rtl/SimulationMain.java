@@ -11,6 +11,9 @@ import name.martingeisse.esdk.library.SignalLoggerBusInterface;
 import name.martingeisse.esdk.riscv.rtl.pixel.SimulatedPixelDisplayPanel;
 import name.martingeisse.esdk.riscv.rtl.ram.RamController;
 import name.martingeisse.esdk.riscv.rtl.ram.SimulatedRamAdapterWithoutRamdacSupport;
+import name.martingeisse.esdk.riscv.rtl.simulation.SimulationDevice;
+import name.martingeisse.esdk.riscv.rtl.simulation.SimulationDeviceDelegate;
+import name.martingeisse.esdk.riscv.rtl.simulation.SimulationDeviceImpl;
 import name.martingeisse.esdk.riscv.rtl.spi.SpiConnector;
 import name.martingeisse.esdk.riscv.rtl.spi.SpiInterface;
 import name.martingeisse.esdk.riscv.rtl.terminal.KeyboardController;
@@ -69,6 +72,21 @@ public class SimulationMain {
 						};
 					}
 
+					@Override
+					protected SimulationDevice createSimulationDevice(RtlRealm realm, RtlClockNetwork clk) {
+						return new SimulationDeviceImpl(realm, clk, new SimulationDeviceDelegate() {
+
+							@Override
+							public int read(int wordAddress) {
+								return 0;
+							}
+
+							@Override
+							public void write(int wordAddress, int byteMask) {
+							}
+
+						});
+					}
 				};
 			}
 		};
