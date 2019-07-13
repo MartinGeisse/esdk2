@@ -4,8 +4,6 @@
 #include "draw.h"
 #include "simdev.h"
 
-static volatile int *simulationDevice;
-
 static int analogValue = 0;
 
 static void draw(int x, int y, int size) {
@@ -29,12 +27,11 @@ static void draw(int x, int y, int size) {
 }
 
 void main() {
-    simulationDevice = (volatile int *)0x40000000;
     simdevInitialize();
     simdevMessage("Hello World!");
 
     // wait for SDRAM reset, but only on real hardware
-    if (!*simulationDevice) {
+    if (!simdevIsSimulation()) {
         delay(500);
     }
 
@@ -42,7 +39,7 @@ void main() {
     int x = 50, y = 240, dx = 1, dy = 0;
     volatile unsigned char *screen = (volatile unsigned char *)0x80000000;
     while (1) {
-        if (!*simulationDevice) {
+        if (!simdevIsSimulation()) {
             delay(20);
         }
 
