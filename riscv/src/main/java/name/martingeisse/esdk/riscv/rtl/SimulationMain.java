@@ -225,6 +225,7 @@ public class SimulationMain {
                 break;
 
             case 1:
+                // TODO won't work because the string to print is not actually stored in the "big" memory but in the "small" memory!
                 System.out.println(cpu._registers.getMatrix().getRow(10).getBitsAsInt());
                 System.out.println(Integer.toHexString(cpu._registers.getMatrix().getRow(10).getBitsAsInt()));
                 System.out.println("OUT: " + readZeroTerminatedMemoryString(cpu._registers.getMatrix().getRow(10).getBitsAsInt()));
