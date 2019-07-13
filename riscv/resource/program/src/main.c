@@ -5,13 +5,6 @@
 #include "simdev.h"
 
 static int analogValue = 0;
-static volatile int *foo = (volatile int *)0x12345678; // TODO if this is 0x40000000 then the simdev stops working, but if it is 0 it works !???
-                                // 0x12345678 also does NOT WORK
-                                // info: analogValue and foo are compiled in a totally different way!
-                                // if foo = 0 then it gets compiled like analogValue.
-                                // If foo = 4 then it gets compiled differently.
-                                // The problem seems to happen when both symbols have a NONZERO value and are therefore
-                                // compiled differently, e.g. that both go to the .sdata section
 
 static void draw(int x, int y, int size) {
     if (size >= 4) {
