@@ -2,6 +2,7 @@ package name.martingeisse.esdk.riscv.rtl;
 
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
+import name.martingeisse.esdk.core.rtl.block.RtlProceduralMemory;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
 import name.martingeisse.esdk.core.rtl.signal.RtlConcatenation;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorConstant;
@@ -10,6 +11,7 @@ import name.martingeisse.esdk.library.SignalLogger;
 import name.martingeisse.esdk.library.SignalLoggerBusInterface;
 import name.martingeisse.esdk.riscv.rtl.pixel.SimulatedPixelDisplayPanel;
 import name.martingeisse.esdk.riscv.rtl.ram.RamController;
+import name.martingeisse.esdk.riscv.rtl.ram.SimulatedRam;
 import name.martingeisse.esdk.riscv.rtl.ram.SimulatedRamAdapterWithoutRamdacSupport;
 import name.martingeisse.esdk.riscv.rtl.simulation.SimulationDevice;
 import name.martingeisse.esdk.riscv.rtl.simulation.SimulationDeviceDelegate;
@@ -21,6 +23,8 @@ import name.martingeisse.esdk.riscv.rtl.terminal.PixelDisplayController;
 import name.martingeisse.esdk.riscv.rtl.terminal.Ps2Connector;
 
 import javax.swing.*;
+import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
 
 /**
  *
@@ -213,6 +217,7 @@ public class SimulationMain {
     }
 
     public void writeToSimulationDevice(int wordAddress, int byteMask, int data) {
+        Multicycle.Implementation cpu = (Multicycle.Implementation)computerModule._cpu;
         switch (wordAddress) {
 
             case 0:
@@ -220,10 +225,45 @@ public class SimulationMain {
                 break;
 
             case 1:
-                System.out.println("simdev syscall " + data);
+                System.out.println(cpu._registers.getMatrix().getRow(10).getBitsAsInt());
+                System.out.println(Integer.toHexString(cpu._registers.getMatrix().getRow(10).getBitsAsInt()));
+                System.out.println("OUT: " + readZeroTerminatedMemoryString(cpu._registers.getMatrix().getRow(10).getBitsAsInt()));
                 break;
 
         }
+    }
+
+    public byte readMemoryByte(int address) {
+        int wordAddress = (address & 0x0fffffff) >> 2;
+        int byteOffset = (address & 3);
+        SimulatedRam.Implementation ram = ramAdapter.getRam();
+        RtlProceduralMemory memory = (byteOffset == 0 ? ram._memory0 : byteOffset == 1 ? ram._memory1 :
+                byteOffset == 2 ? ram._memory2 : ram._memory3);
+        return (byte)memory.getMatrix().getRow(wordAddress).getAsUnsignedInt();
+    }
+
+    public byte[] readMemoryBytes(int startAddress, int count) {
+        byte[] result = new byte[count];
+        for (int i = 0; i < count; i++) {
+            result[i] = readMemoryByte(startAddress + i);
+        }
+        return result;
+    }
+
+    public String readMemoryString(int startAddress, int count) {
+        return new String(readMemoryBytes(startAddress, count), StandardCharsets.ISO_8859_1);
+    }
+
+    public String readZeroTerminatedMemoryString(int startAddress) {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        while (true) {
+            byte b = readMemoryByte(startAddress);
+            if (b == 0) {
+                break;
+            }
+            stream.write(b);
+        }
+        return new String(stream.toByteArray(), StandardCharsets.ISO_8859_1);
     }
 
 }

@@ -4,6 +4,7 @@
 static volatile int *simulationDevice;
 
 void simdevInitialize() {
+    // TODO why doesn't this work when assigning statically?
     simulationDevice = (volatile int *)0x40000000;
 }
 
