@@ -1,21 +1,21 @@
+        new RtlClockedSimulationItem(design.getClock()) {
 
-new RtlClockedSimulationItem(design.getClock()) {
-
-    @Override
-    public void computeNextState() {
-        Multicycle.Implementation cpu = (Multicycle.Implementation)computerModule._cpu;
-        if (cpu.getMemoryEnable().getValue() && cpu._memoryAcknowledge.getValue()) {
-            System.out.print("PC = " + Integer.toHexString(cpu._pc.getValue().getBitsAsInt()) + " ");
-            if (cpu.getMemoryWrite().getValue()) {
-                System.out.println("READ " + Integer.toHexString(4*cpu.getMemoryWordAddress().getValue().getBitsAsInt()));
-            } else {
-                System.out.println("WRITE " + Integer.toHexString(4*cpu.getMemoryWordAddress().getValue().getBitsAsInt()));
+            @Override
+            public void computeNextState() {
+                Multicycle.Implementation cpu = (Multicycle.Implementation)computerModule._cpu;
+                if (cpu._state.getValue().equals(Multicycle.Implementation._STATE_MEM_ACCESS) &&
+                        cpu.getMemoryEnable().getValue() && cpu._memoryAcknowledge.getValue()) {
+                    System.out.print("PC = " + Integer.toHexString(cpu._pc.getValue().getBitsAsInt()) + " ");
+                    if (cpu.getMemoryWrite().getValue()) {
+                        System.out.println("WRITE " + Integer.toHexString(4*cpu.getMemoryWordAddress().getValue().getBitsAsInt()));
+                    } else {
+                        System.out.println("READ " + Integer.toHexString(4*cpu.getMemoryWordAddress().getValue().getBitsAsInt()));
+                    }
+                }
             }
-        }
-    }
 
-    @Override
-    public void updateState() {
-    }
+            @Override
+            public void updateState() {
+            }
 
-};
+        };
