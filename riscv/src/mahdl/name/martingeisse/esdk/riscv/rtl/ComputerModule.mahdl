@@ -96,13 +96,13 @@ do (*) {
     spiInterface.busWrite = cpu.memoryWrite;
     spiInterface.busWriteData = cpu.memoryWriteData;
 
+    simulationDevice.clk = clk;
     simulationDevice.busEnable = cpu.memoryEnable & simulationDeviceSelected;
     simulationDevice.busWrite = cpu.memoryWrite;
     simulationDevice.busWordAddress = cpu.memoryWordAddress[23:0];
     simulationDevice.busWriteData = cpu.memoryWriteData;
     simulationDevice.busWriteMask = cpu.memoryWriteMask;
 
-    simulationDevice.clk = clk;
 }
 
 signal vector[10] memoryDataWordAddress = cpu.memoryWordAddress[9:0];

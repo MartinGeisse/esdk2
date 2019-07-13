@@ -92,8 +92,8 @@ public class SimulationMain {
                             }
 
                             @Override
-                            public void write(int wordAddress, int byteMask) {
-                                writeToSimulationDevice(wordAddress, byteMask);
+                            public void write(int wordAddress, int byteMask, int data) {
+                                writeToSimulationDevice(wordAddress, byteMask, data);
                             }
 
                         });
@@ -212,11 +212,15 @@ public class SimulationMain {
         }
     }
 
-    public void writeToSimulationDevice(int wordAddress, int byteMask) {
+    public void writeToSimulationDevice(int wordAddress, int byteMask, int data) {
         switch (wordAddress) {
 
             case 0:
                 design.stopSimulation();
+                break;
+
+            case 1:
+                System.out.println("simdev syscall " + data);
                 break;
 
         }

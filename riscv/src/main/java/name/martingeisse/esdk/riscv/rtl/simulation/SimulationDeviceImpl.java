@@ -85,7 +85,8 @@ public class SimulationDeviceImpl extends RtlClockedSimulationItem implements Si
         secondCycle.setNextValue(false);
         if (busEnable.getValue()) {
             if (busWrite.getValue()) {
-                delegate.write(busWordAddress.getValue().getAsUnsignedInt(), busWriteMask.getValue().getAsUnsignedInt());
+                delegate.write(busWordAddress.getValue().getAsUnsignedInt(),
+                        busWriteMask.getValue().getAsUnsignedInt(), busWriteData.getValue().getBitsAsInt());
             } else {
                 if (!secondCycle.getValue()) {
                     readData.setNextValue(VectorValue.of(32, delegate.read(busWordAddress.getValue().getAsUnsignedInt())));

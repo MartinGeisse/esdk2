@@ -2,8 +2,9 @@
 #include "system.h"
 #include "terminal.h"
 #include "draw.h"
+#include "simdev.h"
 
-volatile int *simulationDevice = (volatile int *)0x40000000;
+static volatile int *simulationDevice;
 
 static int analogValue = 0;
 
@@ -28,6 +29,9 @@ static void draw(int x, int y, int size) {
 }
 
 void main() {
+    simulationDevice = (volatile int *)0x40000000;
+    simdevInitialize();
+    simdevMessage("Hello World!");
 
     // wait for SDRAM reset, but only on real hardware
     if (!*simulationDevice) {
