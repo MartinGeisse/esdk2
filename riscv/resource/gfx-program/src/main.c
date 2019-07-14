@@ -169,6 +169,7 @@ void main() {
     // test code
     // drawHalfTriangle(100, 200, 50, 120, 190, 1);
     // drawHalfTriangle(100, 200, 190, 120, 50, -1);
+    clearScreen(1);
     drawTriangle(50, 150, 300, 70, 200, 200);
     simdevMessage("DONE!");
 
