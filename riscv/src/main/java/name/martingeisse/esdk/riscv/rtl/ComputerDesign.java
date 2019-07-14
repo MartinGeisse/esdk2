@@ -41,7 +41,8 @@ public class ComputerDesign extends Design {
         this.ddrClock270SignalConnector = new RtlBitSignalConnector(realm);
         this.ddrClock270 = realm.createClockNetwork(ddrClock270SignalConnector);
         this.computerModule = createComputerModule();
-        try (FileInputStream in = new FileInputStream("riscv/resource/program/build/program.bin")) {
+        // try (FileInputStream in = new FileInputStream("riscv/resource/program/build/program.bin")) {
+        try (FileInputStream in = new FileInputStream("riscv/resource/gfx-program/build/program.bin")) {
             int index = 0;
             while (true) {
                 int first = in.read();
