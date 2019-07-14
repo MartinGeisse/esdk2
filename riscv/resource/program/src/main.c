@@ -28,6 +28,7 @@ static void draw(int x, int y, int size) {
 
 void main() {
     simdevMessage("Hello World!");
+    simdevShowInt("Test Value", 99);
 
     // wait for SDRAM reset, but only on real hardware
     if (!simdevIsSimulation()) {

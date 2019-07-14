@@ -10,3 +10,7 @@ int simdevIsSimulation() {
 void simdevMessage(char *message) {
     simulationDevice[1] = 0;
 }
+
+void simdevShowInt(char *label, int value) {
+    simulationDevice[1] = 1;
+}

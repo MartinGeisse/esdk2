@@ -217,7 +217,6 @@ public class SimulationMain {
     }
 
     public void writeToSimulationDevice(int wordAddress, int byteMask, int data) {
-        Multicycle.Implementation cpu = (Multicycle.Implementation)computerModule._cpu;
         switch (wordAddress) {
 
             case 0:
@@ -225,9 +224,30 @@ public class SimulationMain {
                 break;
 
             case 1:
-                System.out.println("OUT: " + readZeroTerminatedMemoryString(cpu._registers.getMatrix().getRow(10).getBitsAsInt()));
+                debugPrint(data);
                 break;
 
+        }
+    }
+
+    private void debugPrint(int subcode) {
+        Multicycle.Implementation cpu = (Multicycle.Implementation)computerModule._cpu;
+        System.out.print("OUT:        ");
+        int a0 = cpu._registers.getMatrix().getRow(10).getBitsAsInt();
+        int a1 = cpu._registers.getMatrix().getRow(11).getBitsAsInt();
+        switch (subcode) {
+
+            case 0:
+                System.out.println(readZeroTerminatedMemoryString(a0));
+                break;
+
+            case 1: {
+                System.out.println(readZeroTerminatedMemoryString(a0) + ": " + a1 + " (0x" + Integer.toHexString(a1) + ")");
+                break;
+            }
+
+            default:
+                System.out.println("???");
         }
     }
 
