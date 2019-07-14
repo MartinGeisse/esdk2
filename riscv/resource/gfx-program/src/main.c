@@ -7,6 +7,53 @@
 static unsigned char drawColor = 7;
 static volatile unsigned char *screen = (volatile unsigned char *)0x80000000;
 
+static int mul(int x, int y) {
+    int result = 0;
+    for (int bit = 1; bit != 0; bit <<= 1) {
+        if (y & bit) {
+            result += x;
+        }
+        x <<= 1;
+    }
+    return result;
+}
+
+static unsigned int udivrem(unsigned int x, unsigned int y, int rem) {
+    unsigned int quotient = 0, remainder = 0;
+    for (int i = 0; i < 32; i++) {
+        remainder = (remainder << 1) | (x >> 31);
+        x = x << 1;
+        quotient = (quotient << 1);
+        if (remainder >= y) {
+            remainder -= y;
+            quotient++;
+        }
+    }
+    return rem ? remainder : quotient;
+}
+
+static unsigned int udiv(unsigned int x, unsigned int y) {
+    return udivrem(x, y, 0);
+}
+
+static unsigned int urem(unsigned int x, unsigned int y) {
+    return udivrem(x, y, 1);
+}
+
+static int div(int x, int y) {
+    int negative = 0;
+    if (x < 0) {
+        x = -x;
+        negative = !negative;
+    }
+    if (y < 0) {
+        y = -y;
+        negative = !negative;
+    }
+    int result = udiv(x, y);
+    return negative ? -result : result;
+}
+
 static void drawHalfTriangle(int x1a, int x1b, int y1, int x2, int y2, int dy) {
 
     // sort vertically aligned points by X
@@ -87,8 +134,7 @@ static void drawTriangle(int x1, int y1, int x2, int y2, int x3, int y3) {
     }
 
     // find the split point of the point 1 / point 3 line
-    // TODO division does not work yet!
-    int splitX = (x3 - x1) / (y3 - y1) * (y2 - y1);
+    int splitX = mul(div(x3 - x1, y3 - y1), y2 - y1);
 
     // draw the two halves
     drawColor = 2;
@@ -99,6 +145,23 @@ static void drawTriangle(int x1, int y1, int x2, int y2, int x3, int y3) {
 }
 
 void main() {
+
+//    simdevShowInt("a", mul(3, 0));
+//    simdevShowInt("b", mul(0, 3));
+//    simdevShowInt("c", mul(3, 5));
+//    simdevShowInt("d", mul(5, 3));
+//    simdevShowInt("e", mul(-7, 8));
+//    simdevShowInt("f", mul( 9, -5));
+
+//    simdevShowInt("a", div(15, 3));
+//    simdevShowInt("a", div(15, 5));
+//    simdevShowInt("a", div(15, -3));
+//    simdevShowInt("a", div(15, -5));
+//    simdevShowInt("a", div(-15, 3));
+//    simdevShowInt("a", div(-15, 5));
+//    simdevShowInt("a", div(-15, -3));
+//    simdevShowInt("a", div(-15, -5));
+//    simdevShowInt("a", div(10, 0));
 
     // wait for SDRAM reset, but only on real hardware
     if (!simdevIsSimulation()) {
