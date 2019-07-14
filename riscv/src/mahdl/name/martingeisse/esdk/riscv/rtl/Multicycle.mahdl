@@ -39,6 +39,7 @@ constant vector[5] STATE_EXEC_JALR = 13;
 constant vector[5] STATE_MEM_COMPUTE_ADDRESS = 14;
 constant vector[5] STATE_MEM_ACCESS = 15;
 constant vector[5] STATE_MEM_EXTEND = 16;
+constant vector[5] STATE_EXCEPTION = 17;
 
 // CPU state
 register vector[5] state = STATE_START;
@@ -219,7 +220,7 @@ do (clk) {
 						state = STATE_EXEC_JAL;
 
 					default: // includes MISC-MEM (=NOP) and SYSTEM
-						state = STATE_START;
+						state = STATE_EXCEPTION;
 
 				}
 
@@ -274,6 +275,10 @@ do (clk) {
 				}
 
 			case STATE_MEM_EXTEND:
+				state = STATE_START;
+
+			case STATE_EXCEPTION:
+				pc = 4;
 				state = STATE_START;
 
 		}

@@ -34,6 +34,11 @@ void main() {
         delay(500);
     }
 
+    // test for exceptions
+    int code[2] = {0xffffffff, 0x00008067};
+    void (*func)() = code;
+    func();
+
     // clearScreen(0);
     int x = 50, y = 240, dx = 1, dy = 0;
     volatile unsigned char *screen = (volatile unsigned char *)0x80000000;
@@ -140,4 +145,8 @@ void main() {
 //    }
 //    terminalWriteChar('\n');
 
+}
+
+void exception() {
+    simdevMessage("EXCEPTION!");
 }
