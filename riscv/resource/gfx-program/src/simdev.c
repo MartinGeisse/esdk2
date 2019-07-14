@@ -14,3 +14,7 @@ void simdevMessage(char *message) {
 void simdevShowInt(char *label, int value) {
     simulationDevice[1] = 1;
 }
+
+void simdevFillWordsShowInt(void *pointer, int value, int wordCount) {
+    simulationDevice[2] = 0;
+}

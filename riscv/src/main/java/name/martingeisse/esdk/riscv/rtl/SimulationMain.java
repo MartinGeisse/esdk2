@@ -7,6 +7,7 @@ import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
 import name.martingeisse.esdk.core.rtl.signal.RtlConcatenation;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorConstant;
 import name.martingeisse.esdk.core.rtl.simulation.RtlClockGenerator;
+import name.martingeisse.esdk.core.util.vector.VectorValue;
 import name.martingeisse.esdk.library.SignalLogger;
 import name.martingeisse.esdk.library.SignalLoggerBusInterface;
 import name.martingeisse.esdk.riscv.rtl.pixel.SimulatedPixelDisplayPanel;
@@ -227,6 +228,10 @@ public class SimulationMain {
                 debugPrint(data);
                 break;
 
+            case 2:
+                memoryHelper(data);
+                break;
+
         }
     }
 
@@ -248,6 +253,29 @@ public class SimulationMain {
 
             default:
                 System.out.println("???");
+        }
+    }
+
+    private void memoryHelper(int subcode) {
+        Multicycle.Implementation cpu = (Multicycle.Implementation)computerModule._cpu;
+        int a0 = cpu._registers.getMatrix().getRow(10).getBitsAsInt() & 0x0fffffff;
+        int a1 = cpu._registers.getMatrix().getRow(11).getBitsAsInt();
+        int a2 = cpu._registers.getMatrix().getRow(12).getBitsAsInt();
+        SimulatedRam.Implementation ram = ramAdapter.getRam();
+        switch (subcode) {
+
+            // fill words
+            case 0: {
+                int wordAddress = (a0 >> 2);
+                ram._memory0.getMatrix().setRows(wordAddress, wordAddress + a2, VectorValue.of(8, a1 & 0xff));
+                ram._memory1.getMatrix().setRows(wordAddress, wordAddress + a2, VectorValue.of(8, (a1 >> 8) & 0xff));
+                ram._memory2.getMatrix().setRows(wordAddress, wordAddress + a2, VectorValue.of(8, (a1 >> 16) & 0xff));
+                ram._memory3.getMatrix().setRows(wordAddress, wordAddress + a2, VectorValue.of(8, (a1 >> 24) & 0xff));
+                break;
+            }
+
+            default:
+                System.out.println("invalid memoryHelper subcode: " + subcode);
         }
     }
 

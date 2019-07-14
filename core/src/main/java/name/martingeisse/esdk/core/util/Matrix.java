@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.regex.Pattern;
 
 /**
@@ -47,6 +48,12 @@ public final class Matrix {
 		}
 	}
 
+	private void checkRowIndexRange(int fromRowIndex, int toRowIndex) {
+		if (fromRowIndex < 0 || toRowIndex > rowCount || fromRowIndex > toRowIndex) {
+			throw new IllegalArgumentException("invalid row index range " + fromRowIndex + ".." + toRowIndex + " for row count " + rowCount);
+		}
+	}
+
 	public VectorValue getRow(int rowIndex) {
 		checkRowIndex(rowIndex);
 		VectorValue row = rows[rowIndex];
@@ -62,6 +69,17 @@ public final class Matrix {
 			throw new IllegalArgumentException("row has wrong width " + row.getWidth() + ", expected " + columnCount);
 		}
 		rows[rowIndex] = row;
+	}
+
+	public void setRows(int fromRowIndex, int toRowIndex, VectorValue row) {
+		checkRowIndexRange(fromRowIndex, toRowIndex);
+		if (row == null) {
+			throw new IllegalArgumentException("row cannot be null");
+		}
+		if (row.getWidth() != columnCount) {
+			throw new IllegalArgumentException("row has wrong width " + row.getWidth() + ", expected " + columnCount);
+		}
+		Arrays.fill(rows, fromRowIndex, toRowIndex, row);
 	}
 
 	public void writeToMif(PrintWriter out) {
