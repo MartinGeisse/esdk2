@@ -3,6 +3,7 @@
 #include "terminal.h"
 #include "draw.h"
 #include "simdev.h"
+#include "cpu.h"
 
 static int analogValue = 0;
 
@@ -150,4 +151,5 @@ void main() {
 
 void exception() {
     simdevMessage("EXCEPTION!");
+    simdevShowInt("Exception code", cpuGetExceptionCode());
 }

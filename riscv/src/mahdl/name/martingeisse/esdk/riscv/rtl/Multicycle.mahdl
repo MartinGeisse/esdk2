@@ -40,6 +40,9 @@ constant vector[5] STATE_MEM_COMPUTE_ADDRESS = 14;
 constant vector[5] STATE_MEM_ACCESS = 15;
 constant vector[5] STATE_MEM_EXTEND = 16;
 constant vector[5] STATE_EXCEPTION = 17;
+constant vector[5] STATE_SYSTEM_INSTRUCTION = 18;
+constant vector[5] STATE_CSR_INSTRUCTION = 19;
+constant vector[5] STATE_WRITE_MISC_VALUE_TO_REGISTER = 20;
 
 // CPU state
 register vector[5] state = STATE_START;
@@ -52,6 +55,12 @@ register vector[32] firstRegisterValue; // first read value is stored here on se
 register vector[32] aluImmediate;
 register vector[32] memoryAddressRegister;
 register vector[32] memoryReadDataRegister;
+register vector[32] miscRegisterWriteValue;
+
+// special registers including CSRs
+constant vector[5] EXCEPTION_NONE = 0;
+constant vector[5] EXCEPTION_INVALID_INSTRUCTION = 1;
+register vector[5] exceptionCode = 0;
 
 // --------------------------------------------------------------------------------------------------------------------
 // derived signals
@@ -195,6 +204,9 @@ do (clk) {
 					case 5d0: // LOAD
 						state = STATE_MEM_COMPUTE_ADDRESS;
 
+					case 5d3: // MISC-MEM
+						state = STATE_START;
+
 					case 5d4: // OP-IMM
 						state = instructionRegister[14:12] == 3d1 ? STATE_EXEC_OP_SHIFT_LEFT_0 : STATE_EXEC_OP_1;
 
@@ -219,8 +231,12 @@ do (clk) {
 					case 5d27: // JAL
 						state = STATE_EXEC_JAL;
 
+					case 5d28: // SYSTEM
+						state = STATE_SYSTEM_INSTRUCTION;
+
 					default: // includes MISC-MEM (=NOP) and SYSTEM
 						state = STATE_EXCEPTION;
+						exceptionCode = EXCEPTION_INVALID_INSTRUCTION;
 
 				}
 
@@ -281,6 +297,25 @@ do (clk) {
 				pc = 4;
 				state = STATE_START;
 
+			case STATE_SYSTEM_INSTRUCTION:
+				switch(instructionRegister[14:12]) {
+
+					case 3b000, 3b100:
+						state = STATE_EXCEPTION;
+						exceptionCode = EXCEPTION_INVALID_INSTRUCTION;
+
+					default:
+						state = STATE_CSR_INSTRUCTION;
+
+				}
+
+			case STATE_CSR_INSTRUCTION:
+				miscRegisterWriteValue = 32h11335577;
+				state = STATE_WRITE_MISC_VALUE_TO_REGISTER;
+
+			case STATE_WRITE_MISC_VALUE_TO_REGISTER:
+				state = STATE_START;
+
 		}
 	}
 }
@@ -289,7 +324,7 @@ do (clk) {
 signal vector[5] registersAddress = state == STATE_DECODE_AND_READ1 ? sourceRegisterIndex1 :
 		(state == STATE_DECODE_AND_READ2 | state == STATE_EXEC_OP_SHIFT_LEFT_0 | state == STATE_EXEC_OP_1 | state == STATE_EXEC_OP_2) ? sourceRegisterIndex2 : destinationRegisterIndex;
 signal bit isRegisterWriteState = (state == STATE_EXEC_OP_3) | (state == STATE_EXEC_LUI) | (state == STATE_EXEC_AUIPC) |
-		(state == STATE_EXEC_JAL) | (state == STATE_EXEC_JALR) | (state == STATE_MEM_EXTEND);
+		(state == STATE_EXEC_JAL) | (state == STATE_EXEC_JALR) | (state == STATE_MEM_EXTEND) | (state == STATE_WRITE_MISC_VALUE_TO_REGISTER);
 signal vector[32] registerWriteValue = switch(state) {
 	case STATE_EXEC_OP_3: execOpResult
 	case STATE_EXEC_LUI: instructionRegister[31:12] _ 12d0
@@ -297,7 +332,7 @@ signal vector[32] registerWriteValue = switch(state) {
 	case STATE_EXEC_JAL, STATE_EXEC_JALR: pc
 	case STATE_MEM_EXTEND: instructionRegister[13] ? memoryReadDataRegister : instructionRegister[12] ?
 			(halfwordToWordExtension _ halfwordToWordData) : (byteToWordExtension _ byteToWordData)
-	default: 32d0
+	default: miscRegisterWriteValue
 };
 do(clk) {
 	if (state != STATE_MEM_COMPUTE_ADDRESS & state != STATE_MEM_ACCESS) {
