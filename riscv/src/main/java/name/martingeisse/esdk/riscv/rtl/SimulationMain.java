@@ -225,9 +225,6 @@ public class SimulationMain {
                 break;
 
             case 1:
-                // TODO won't work because the string to print is not actually stored in the "big" memory but in the "small" memory!
-                System.out.println(cpu._registers.getMatrix().getRow(10).getBitsAsInt());
-                System.out.println(Integer.toHexString(cpu._registers.getMatrix().getRow(10).getBitsAsInt()));
                 System.out.println("OUT: " + readZeroTerminatedMemoryString(cpu._registers.getMatrix().getRow(10).getBitsAsInt()));
                 break;
 
@@ -237,10 +234,16 @@ public class SimulationMain {
     public byte readMemoryByte(int address) {
         int wordAddress = (address & 0x0fffffff) >> 2;
         int byteOffset = (address & 3);
-        SimulatedRam.Implementation ram = ramAdapter.getRam();
-        RtlProceduralMemory memory = (byteOffset == 0 ? ram._memory0 : byteOffset == 1 ? ram._memory1 :
-                byteOffset == 2 ? ram._memory2 : ram._memory3);
-        return (byte)memory.getMatrix().getRow(wordAddress).getAsUnsignedInt();
+        if (address < 0) {
+            SimulatedRam.Implementation ram = ramAdapter.getRam();
+            RtlProceduralMemory memory = (byteOffset == 0 ? ram._memory0 : byteOffset == 1 ? ram._memory1 :
+                    byteOffset == 2 ? ram._memory2 : ram._memory3);
+            return (byte)memory.getMatrix().getRow(wordAddress).getAsUnsignedInt();
+        } else {
+            RtlProceduralMemory memory = (byteOffset == 0 ? computerModule._memory0 : byteOffset == 1 ? computerModule._memory1 :
+                    byteOffset == 2 ? computerModule._memory2 : computerModule._memory3);
+            return (byte)memory.getMatrix().getRow(wordAddress).getAsUnsignedInt();
+        }
     }
 
     public byte[] readMemoryBytes(int startAddress, int count) {
@@ -263,6 +266,7 @@ public class SimulationMain {
                 break;
             }
             stream.write(b);
+            startAddress++;
         }
         return new String(stream.toByteArray(), StandardCharsets.ISO_8859_1);
     }
