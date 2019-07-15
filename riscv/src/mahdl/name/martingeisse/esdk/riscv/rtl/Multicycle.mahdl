@@ -71,6 +71,7 @@ signal vector[5] opcode = instructionRegister[6:2];
 signal vector[5] sourceRegisterIndex1 = instructionRegister[19:15];
 signal vector[5] sourceRegisterIndex2 = instructionRegister[24:20];
 signal vector[5] destinationRegisterIndex = instructionRegister[11:7];
+signal bit operationIsMulDev = (opcode[3] & instructionRegister[25]);
 
 // execution helpers
 signal vector[32] sourceValue1 = firstRegisterValue;
@@ -115,24 +116,30 @@ register vector[32] execOpTemporaryResultAddSub;
 register vector[32] execOpTemporaryResultShiftLeft;
 register bit execOpTemporaryResultLessThan;
 register vector[32] execOpTemporaryResultShiftRight;
+register vector[32] execOpTemporaryResultMul;
 do(clk) {
 	execOpTemporaryResultAddSub = (opcode[3] & instructionRegister[30]) ? (sourceValue1 - sourceValue2) : (sourceValue1 + sourceValue2);
 	execOpTemporaryResultShiftLeft = sourceValue2[3] ? (leftShiftPreparationResult[23:0] _ repeat(8, bit(0))) : leftShiftPreparationResult;
 	execOpTemporaryResultLessThan = (instructionRegister[12] ? isLTU : isLTS);
 	execOpTemporaryResultShiftRight = ((repeat(16, rightShiftInBit) _ sourceValue1) >> sourceValue2[3:0])[31:0]; // SRA / SRL
+	execOpTemporaryResultMul = sourceValue1 * sourceValue2;
 }
 
 register vector[32] execOpResult;
 do (clk) {
-	execOpResult = switch(instructionRegister[14:12]) {
-		case 3d0: execOpTemporaryResultAddSub // ADD / SUB
-		case 3d1: sourceValue2[4] ? (execOpTemporaryResultShiftLeft[15:0] _ repeat(16, bit(0))) : execOpTemporaryResultShiftLeft // SLL
-		case 3d2, 3d3: execOpTemporaryResultLessThan ? 32d1 : 32d0 // SLT, SLTU
-		case 3d4: sourceValue1 ^ sourceValue2 // XOR
-		case 3d5: sourceValue2[4] ? (repeat(16, rightShiftInBit) _ execOpTemporaryResultShiftRight[31:16]) : execOpTemporaryResultShiftRight // SRL, SRA
-		case 3d6: sourceValue1 | sourceValue2 // OR
-		case 3d7: sourceValue1 & sourceValue2 // AND
-	};
+	if (~operationIsMulDev) {
+		execOpResult = switch(instructionRegister[14:12]) {
+			case 3d0: execOpTemporaryResultAddSub // ADD / SUB
+			case 3d1: sourceValue2[4] ? (execOpTemporaryResultShiftLeft[15:0] _ repeat(16, bit(0))) : execOpTemporaryResultShiftLeft // SLL
+			case 3d2, 3d3: execOpTemporaryResultLessThan ? 32d1 : 32d0 // SLT, SLTU
+			case 3d4: sourceValue1 ^ sourceValue2 // XOR
+			case 3d5: sourceValue2[4] ? (repeat(16, rightShiftInBit) _ execOpTemporaryResultShiftRight[31:16]) : execOpTemporaryResultShiftRight // SRL, SRA
+			case 3d6: sourceValue1 | sourceValue2 // OR
+			case 3d7: sourceValue1 & sourceValue2 // AND
+		};
+	} else {
+		execOpResult = execOpTemporaryResultMul;
+	}
 }
 
 register bit partialBranchCondition;
@@ -208,7 +215,7 @@ do (clk) {
 						state = STATE_START;
 
 					case 5d4: // OP-IMM
-						state = instructionRegister[14:12] == 3d1 ? STATE_EXEC_OP_SHIFT_LEFT_0 : STATE_EXEC_OP_1;
+						state = (~operationIsMulDev & instructionRegister[14:12] == 3d1) ? STATE_EXEC_OP_SHIFT_LEFT_0 : STATE_EXEC_OP_1;
 
 					case 5d5: // AUIPC
 						state = STATE_EXEC_AUIPC;
@@ -217,7 +224,7 @@ do (clk) {
 						state = STATE_MEM_COMPUTE_ADDRESS;
 
 					case 5d12: // OP
-						state = instructionRegister[14:12] == 3d1 ? STATE_EXEC_OP_SHIFT_LEFT_0 : STATE_EXEC_OP_1;
+						state = (~operationIsMulDev & instructionRegister[14:12] == 3d1) ? STATE_EXEC_OP_SHIFT_LEFT_0 : STATE_EXEC_OP_1;
 
 					case 5d13: // LUI
 						state = STATE_EXEC_LUI;
