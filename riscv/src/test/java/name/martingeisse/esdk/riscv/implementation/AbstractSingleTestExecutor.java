@@ -25,7 +25,7 @@ public abstract class AbstractSingleTestExecutor {
 	private final RtlRealm realm;
 	private final RtlClockNetwork clock;
 	private final MulticycleTestbench.Implementation testbench;
-	private final Multicycle cpu;
+	private final Multicycle.Implementation cpu;
 
 	public AbstractSingleTestExecutor(File textSegmentFile) {
 		this.textSegmentFile = textSegmentFile;
@@ -33,7 +33,8 @@ public abstract class AbstractSingleTestExecutor {
 		realm = new RtlRealm(design);
 		clock = new RtlClockNetwork(realm);
 		testbench = new MulticycleTestbench.Implementation(realm, clock);
-		cpu = testbench._cpu;
+		cpu = (Multicycle.Implementation)testbench._cpu;
+
 		new RtlClockedSimulationItem(clock) {
 
 			private VectorValue outputData;
