@@ -30,5 +30,6 @@ hang:
 
 // interrupt logic
 interruptEntry:
+    .word 00000000000000000000010100001011 // load instruction location (== return address) into a0
     call exception
     j hang

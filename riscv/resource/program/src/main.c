@@ -156,7 +156,9 @@ void main() {
 
 }
 
-void exception() {
+void exception(int instructionAddress) {
     simdevMessage("EXCEPTION!");
     simdevShowInt("Exception code", cpuGetExceptionCode());
+    simdevShowInt("location", instructionAddress);
+    simdevShowInt("instruction", *(unsigned int *)instructionAddress);
 }

@@ -43,6 +43,7 @@ constant vector[5] STATE_EXCEPTION = 17;
 constant vector[5] STATE_SYSTEM_INSTRUCTION = 18;
 constant vector[5] STATE_CSR_INSTRUCTION = 19;
 constant vector[5] STATE_WRITE_MISC_VALUE_TO_REGISTER = 20;
+constant vector[5] STATE_OMEGA_INSTRUCTION = 21;
 
 // CPU state
 register vector[5] state = STATE_START;
@@ -56,6 +57,10 @@ register vector[32] aluImmediate;
 register vector[32] memoryAddressRegister;
 register vector[32] memoryReadDataRegister;
 register vector[32] miscRegisterWriteValue;
+
+// omega-mode related state
+register bit omegaMode = 0;
+register vector[32] omegaReturnAddress;
 
 // special registers including CSRs
 constant vector[5] EXCEPTION_NONE = 0;
@@ -189,6 +194,9 @@ do (clk) {
 
 			case STATE_START:
 				memoryAddressRegister = pc;
+				if (~omegaMode) {
+					omegaReturnAddress = pc;
+				}
 				state = STATE_FETCH;
 
 			case STATE_FETCH:
@@ -210,6 +218,14 @@ do (clk) {
 
 					case 5d0: // LOAD
 						state = STATE_MEM_COMPUTE_ADDRESS;
+
+					case 5d2: // custom-0: omega-mode instructions
+						if (omegaMode) {
+							state = STATE_OMEGA_INSTRUCTION;
+						} else {
+							state = STATE_EXCEPTION;
+							exceptionCode = EXCEPTION_INVALID_INSTRUCTION;
+						}
 
 					case 5d3: // MISC-MEM
 						state = STATE_START;
@@ -307,6 +323,7 @@ do (clk) {
 
 			case STATE_EXCEPTION:
 				pc = 4;
+				omegaMode = 1;
 				state = STATE_START;
 
 			case STATE_SYSTEM_INSTRUCTION:
@@ -327,6 +344,10 @@ do (clk) {
 
 			case STATE_WRITE_MISC_VALUE_TO_REGISTER:
 				state = STATE_START;
+
+			case STATE_OMEGA_INSTRUCTION:
+				miscRegisterWriteValue = omegaReturnAddress;
+				state = STATE_WRITE_MISC_VALUE_TO_REGISTER;
 
 		}
 	}
