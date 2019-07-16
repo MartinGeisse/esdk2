@@ -31,6 +31,13 @@ void main() {
     simdevMessage("Hello World!");
     simdevShowInt("Test Value", 99);
 
+    int a = 4;
+    int b = 12;
+    int c = 15;
+    int d = 3;
+    simdevShowInt("Test Value", a * b);
+    simdevShowInt("Test Value", c / d);
+
     // wait for SDRAM reset, but only on real hardware
     if (!simdevIsSimulation()) {
         delay(500);

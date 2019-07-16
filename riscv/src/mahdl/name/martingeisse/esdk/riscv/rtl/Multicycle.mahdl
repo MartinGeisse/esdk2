@@ -251,7 +251,12 @@ do (clk) {
 				state = STATE_EXEC_OP_1;
 
 			case STATE_EXEC_OP_1:
-				state = STATE_EXEC_OP_2;
+				if (operationIsMulDev & instructionRegister[14:12] != 3d0) {
+					state = STATE_EXCEPTION;
+					exceptionCode = EXCEPTION_INVALID_INSTRUCTION;
+				} else {
+					state = STATE_EXEC_OP_2;
+				}
 
 			case STATE_EXEC_OP_2:
 				state = STATE_EXEC_OP_3;
