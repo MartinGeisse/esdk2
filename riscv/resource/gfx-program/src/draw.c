@@ -158,7 +158,7 @@ void drawTriangle(int x1, int y1, int x2, int y2, int x3, int y3) {
     }
 
     // find the split point of the point 1 / point 3 line
-    int splitX = x1 + div(mul(x3 - x1, y2 - y1), y3 - y1);
+    int splitX = x1 + div((x3 - x1) * (y2 - y1), y3 - y1);
 
     // draw the two halves
     drawHalfTriangle(x2, splitX, y2, x1, y1, -1);

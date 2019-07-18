@@ -26,7 +26,7 @@ constant vector[5] STATE_START = 0;
 constant vector[5] STATE_FETCH = 1;
 constant vector[5] STATE_DECODE_AND_READ1 = 2;
 constant vector[5] STATE_DECODE_AND_READ2 = 3;
-constant vector[5] STATE_EXEC_OP_SHIFT_LEFT_0 = 4;
+constant vector[5] STATE_EXEC_OP_0 = 4;
 constant vector[5] STATE_EXEC_OP_1 = 5;
 constant vector[5] STATE_EXEC_OP_2 = 6;
 constant vector[5] STATE_EXEC_OP_3 = 7;
@@ -108,10 +108,16 @@ do (*) {
 // this register is loaded even before the first execution state, so it is ready when computing temporary results
 register bit rightShiftInBit;
 
-// state STATE_EXEC_OP_SHIFT_LEFT_0 is used to perform this step
+// state STATE_EXEC_OP_0 is used to perform this step
 register vector[32] leftShiftPreparationResult;
+register vector[32] multiplierPreparationResultLowLow;
+register vector[32] multiplierPreparationResultLowHigh;
+register vector[32] multiplierPreparationResultHighLow;
 do (clk) {
 	leftShiftPreparationResult = sourceValue1 << sourceValue2[2:0];
+	multiplierPreparationResultLowLow = (16d0 _ firstRegisterValue[15:0]) * (16d0 _ registerReadValue[15:0]);
+	multiplierPreparationResultLowHigh = (16d0 _ firstRegisterValue[15:0]) * (16d0 _ registerReadValue[31:16]);
+	multiplierPreparationResultHighLow = (16d0 _ firstRegisterValue[31:16]) * (16d0 _ registerReadValue[15:0]);
 }
 
 // I am using a temporary result register for now. From/to constraints do not work well with Xilinx tools (one of the
@@ -127,7 +133,7 @@ do(clk) {
 	execOpTemporaryResultShiftLeft = sourceValue2[3] ? (leftShiftPreparationResult[23:0] _ repeat(8, bit(0))) : leftShiftPreparationResult;
 	execOpTemporaryResultLessThan = (instructionRegister[12] ? isLTU : isLTS);
 	execOpTemporaryResultShiftRight = ((repeat(16, rightShiftInBit) _ sourceValue1) >> sourceValue2[3:0])[31:0]; // SRA / SRL
-	execOpTemporaryResultMul = sourceValue1 * sourceValue2;
+	execOpTemporaryResultMul = multiplierPreparationResultLowLow + (multiplierPreparationResultLowHigh[15:0] _ 16d0) + (multiplierPreparationResultHighLow[15:0] _ 16d0);
 }
 
 register vector[32] execOpResult;
@@ -231,7 +237,7 @@ do (clk) {
 						state = STATE_START;
 
 					case 5d4: // OP-IMM
-						state = (~operationIsMulDev & instructionRegister[14:12] == 3d1) ? STATE_EXEC_OP_SHIFT_LEFT_0 : STATE_EXEC_OP_1;
+						state = (instructionRegister[14:12] == 3d1) ? STATE_EXEC_OP_0 : STATE_EXEC_OP_1;
 
 					case 5d5: // AUIPC
 						state = STATE_EXEC_AUIPC;
@@ -240,7 +246,11 @@ do (clk) {
 						state = STATE_MEM_COMPUTE_ADDRESS;
 
 					case 5d12: // OP
-						state = (~operationIsMulDev & instructionRegister[14:12] == 3d1) ? STATE_EXEC_OP_SHIFT_LEFT_0 : STATE_EXEC_OP_1;
+						if (operationIsMulDev) {
+							state = (instructionRegister[14:12] == 3d0) ? STATE_EXEC_OP_0 : STATE_EXEC_OP_1;
+						} else {
+							state = (instructionRegister[14:12] == 3d1) ? STATE_EXEC_OP_0 : STATE_EXEC_OP_1;
+						}
 
 					case 5d13: // LUI
 						state = STATE_EXEC_LUI;
@@ -263,7 +273,7 @@ do (clk) {
 
 				}
 
-			case STATE_EXEC_OP_SHIFT_LEFT_0:
+			case STATE_EXEC_OP_0:
 				state = STATE_EXEC_OP_1;
 
 			case STATE_EXEC_OP_1:
@@ -355,7 +365,7 @@ do (clk) {
 
 // register file BlockRAM support
 signal vector[5] registersAddress = state == STATE_DECODE_AND_READ1 ? sourceRegisterIndex1 :
-		(state == STATE_DECODE_AND_READ2 | state == STATE_EXEC_OP_SHIFT_LEFT_0 | state == STATE_EXEC_OP_1 | state == STATE_EXEC_OP_2) ? sourceRegisterIndex2 : destinationRegisterIndex;
+		(state == STATE_DECODE_AND_READ2 | state == STATE_EXEC_OP_0 | state == STATE_EXEC_OP_1 | state == STATE_EXEC_OP_2) ? sourceRegisterIndex2 : destinationRegisterIndex;
 signal bit isRegisterWriteState = (state == STATE_EXEC_OP_3) | (state == STATE_EXEC_LUI) | (state == STATE_EXEC_AUIPC) |
 		(state == STATE_EXEC_JAL) | (state == STATE_EXEC_JALR) | (state == STATE_MEM_EXTEND) | (state == STATE_WRITE_MISC_VALUE_TO_REGISTER);
 signal vector[32] registerWriteValue = switch(state) {
