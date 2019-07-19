@@ -1,16 +1,17 @@
 .option norvc
 
+.globl	biosMain
+.type	biosMain, @function
+.globl	biosInterruptEntry
+.type	biosInterruptEntry, @function
+
 // helper for GP initialization, see below
 .section .sdata
 sdata:
 .text
 
-// startup / interrupt entry switch
-    j startup
-    j interruptEntry
-
 // startup logic
-startup:
+biosMain:
     // Initialize the GP register in a way that fools the ld tool, disallowing link-time optimization (specifically,
     // section relaxation) so it doesn't try to use GP to initialize GP. To do that, we load an address that has a
     // distance greater than 0x800 from the assumed / intended value of GP; 0x800 is the largest possible immediate
@@ -29,7 +30,7 @@ hang:
     j hang
 
 // interrupt logic
-interruptEntry:
+biosInterruptEntry:
     .word 00000000000000000000010100001011 // load instruction location (== return address) into a0
     call exception
     j hang
