@@ -356,8 +356,43 @@ do (clk) {
 				state = STATE_START;
 
 			case STATE_OMEGA_INSTRUCTION:
-				miscRegisterWriteValue = omegaReturnAddress;
-				state = STATE_WRITE_MISC_VALUE_TO_REGISTER;
+				switch (instructionRegister[29:26]) {
+
+					// read special register
+					case 4d0:
+						state = STATE_WRITE_MISC_VALUE_TO_REGISTER;
+						switch (instructionRegister[24:20]) {
+
+							case 5d0:
+								miscRegisterWriteValue = omegaReturnAddress;
+
+							default:
+								state = STATE_EXCEPTION;
+								exceptionCode = EXCEPTION_INVALID_INSTRUCTION;
+
+						}
+
+					// write special register
+					case 4d1:
+						state = STATE_START;
+						switch (instructionRegister[24:20]) {
+
+							case 5d0:
+								omegaReturnAddress = firstRegisterValue;
+
+						}
+
+					// leave omega mode (e.g. return from interrupt)
+					case 4d2:
+						state = STATE_START;
+						pc = omegaReturnAddress;
+						omegaMode = 0;
+
+					default:
+						state = STATE_EXCEPTION;
+						exceptionCode = EXCEPTION_INVALID_INSTRUCTION;
+
+				}
 
 		}
 	}
