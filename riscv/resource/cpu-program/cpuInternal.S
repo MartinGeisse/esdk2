@@ -11,5 +11,9 @@ cpuInternalMain:
 // interrupt logic
 cpuInternalInterruptEntry:
 
-    // TODO before moving to OS code, copy the GP register to the omega-GP register!
+// TODO test this
+    // since we're using the omega general purpose register set, copy the GP from the regular set
+    .word 0x00018191 // ADDI gp, other_gp, 0
+
+    // go to normal interrupt service routine
     j biosInterruptEntry
