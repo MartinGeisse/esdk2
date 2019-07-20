@@ -10,4 +10,6 @@ cpuInternalMain:
 
 // interrupt logic
 cpuInternalInterruptEntry:
+
+    // TODO before moving to OS code, copy the GP register to the omega-GP register!
     j biosInterruptEntry

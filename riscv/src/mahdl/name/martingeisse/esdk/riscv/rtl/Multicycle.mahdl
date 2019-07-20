@@ -73,9 +73,9 @@ register vector[5] exceptionCode = 0;
 
 // decoding
 signal vector[5] opcode = instructionRegister[6:2];
-signal vector[6] sourceRegisterIndex1 = instructionRegister[1] _ instructionRegister[19:15];
-signal vector[6] sourceRegisterIndex2 = instructionRegister[1] _ instructionRegister[24:20];
-signal vector[6] destinationRegisterIndex = instructionRegister[0] _ instructionRegister[11:7];
+signal vector[6] sourceRegisterIndex1 = (omegaMode ^ instructionRegister[1]) _ instructionRegister[19:15];
+signal vector[6] sourceRegisterIndex2 = (omegaMode ^ instructionRegister[1]) _ instructionRegister[24:20];
+signal vector[6] destinationRegisterIndex = (omegaMode ^ instructionRegister[0]) _ instructionRegister[11:7];
 signal bit operationIsMulDev = (opcode[3] & instructionRegister[25]);
 
 // execution helpers
@@ -415,7 +415,7 @@ signal vector[32] registerWriteValue = switch(state) {
 do(clk) {
 	if (state != STATE_MEM_COMPUTE_ADDRESS & state != STATE_MEM_ACCESS) {
 		registerReadValue = registers[registersAddress];
-		if (isRegisterWriteState & destinationRegisterIndex != 6d32) {
+		if (isRegisterWriteState & destinationRegisterIndex[4:0] != 5d0) {
 			registers[registersAddress] = registerWriteValue;
 		}
 	}
