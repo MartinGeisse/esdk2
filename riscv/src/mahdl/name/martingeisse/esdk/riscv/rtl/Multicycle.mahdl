@@ -48,7 +48,7 @@ constant vector[5] STATE_OMEGA_INSTRUCTION = 21;
 // CPU state
 register vector[5] state = STATE_START;
 register vector[32] pc = 0;
-register matrix[32][32] registers;
+register matrix[64][32] registers;
 register vector[32] instructionRegister; // TODO consider prefixing module ports with (interface.)portName to avoid these ugly local names (but sucks for clk)
 register vector[32] oldPc = 0;
 register vector[32] registerReadValue; // register reads go here
@@ -73,9 +73,9 @@ register vector[5] exceptionCode = 0;
 
 // decoding
 signal vector[5] opcode = instructionRegister[6:2];
-signal vector[5] sourceRegisterIndex1 = instructionRegister[19:15];
-signal vector[5] sourceRegisterIndex2 = instructionRegister[24:20];
-signal vector[5] destinationRegisterIndex = instructionRegister[11:7];
+signal vector[6] sourceRegisterIndex1 = instructionRegister[1] _ instructionRegister[19:15];
+signal vector[6] sourceRegisterIndex2 = instructionRegister[1] _ instructionRegister[24:20];
+signal vector[6] destinationRegisterIndex = instructionRegister[0] _ instructionRegister[11:7];
 signal bit operationIsMulDev = (opcode[3] & instructionRegister[25]);
 
 // execution helpers
@@ -399,7 +399,7 @@ do (clk) {
 }
 
 // register file BlockRAM support
-signal vector[5] registersAddress = state == STATE_DECODE_AND_READ1 ? sourceRegisterIndex1 :
+signal vector[6] registersAddress = state == STATE_DECODE_AND_READ1 ? sourceRegisterIndex1 :
 		(state == STATE_DECODE_AND_READ2 | state == STATE_EXEC_OP_0 | state == STATE_EXEC_OP_1 | state == STATE_EXEC_OP_2) ? sourceRegisterIndex2 : destinationRegisterIndex;
 signal bit isRegisterWriteState = (state == STATE_EXEC_OP_3) | (state == STATE_EXEC_LUI) | (state == STATE_EXEC_AUIPC) |
 		(state == STATE_EXEC_JAL) | (state == STATE_EXEC_JALR) | (state == STATE_MEM_EXTEND) | (state == STATE_WRITE_MISC_VALUE_TO_REGISTER);
@@ -415,7 +415,7 @@ signal vector[32] registerWriteValue = switch(state) {
 do(clk) {
 	if (state != STATE_MEM_COMPUTE_ADDRESS & state != STATE_MEM_ACCESS) {
 		registerReadValue = registers[registersAddress];
-		if (isRegisterWriteState & destinationRegisterIndex != 5d0) {
+		if (isRegisterWriteState & destinationRegisterIndex != 6d32) {
 			registers[registersAddress] = registerWriteValue;
 		}
 	}
