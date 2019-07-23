@@ -58,9 +58,11 @@ register vector[32] memoryAddressRegister;
 register vector[32] memoryReadDataRegister;
 register vector[32] miscRegisterWriteValue;
 
-// omega-mode related state
+// exception / interrupt handling
+register vector[32] exceptionHandlerReturnAddress;
+
+// omega-mode related state TODO refactor
 register bit omegaMode = 0;
-register vector[32] omegaReturnAddress;
 
 // special registers including CSRs
 constant vector[5] EXCEPTION_NONE = 0;
@@ -326,7 +328,7 @@ do (clk) {
 			case STATE_EXCEPTION:
 				pc = 4;
 				omegaMode = 1;
-                omegaReturnAddress = oldPc;
+				exceptionHandlerReturnAddress = oldPc;
                 state = STATE_START;
 
 			case STATE_SYSTEM_INSTRUCTION:
@@ -357,7 +359,7 @@ do (clk) {
 						switch (instructionRegister[24:20]) {
 
 							case 5d0:
-								miscRegisterWriteValue = omegaReturnAddress;
+								miscRegisterWriteValue = exceptionHandlerReturnAddress;
 
 							default:
 								state = STATE_EXCEPTION;
@@ -371,14 +373,14 @@ do (clk) {
 						switch (instructionRegister[24:20]) {
 
 							case 5d0:
-								omegaReturnAddress = firstRegisterValue;
+								exceptionHandlerReturnAddress = firstRegisterValue;
 
 						}
 
-					// leave omega mode (e.g. return from interrupt)
+					// leave exception handler
 					case 4d2:
 						state = STATE_START;
-						pc = omegaReturnAddress;
+						pc = exceptionHandlerReturnAddress;
 						omegaMode = 0;
 
 					default:
