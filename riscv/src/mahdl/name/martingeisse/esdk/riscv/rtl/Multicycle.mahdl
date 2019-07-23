@@ -43,7 +43,7 @@ constant vector[5] STATE_EXCEPTION = 17;
 constant vector[5] STATE_SYSTEM_INSTRUCTION = 18;
 constant vector[5] STATE_CSR_INSTRUCTION = 19;
 constant vector[5] STATE_WRITE_MISC_VALUE_TO_REGISTER = 20;
-constant vector[5] STATE_OMEGA_INSTRUCTION = 21;
+constant vector[5] STATE_CUSTOM_INSTRUCTION = 21;
 
 // CPU state
 register vector[5] state = STATE_START;
@@ -225,7 +225,7 @@ do (clk) {
 						state = STATE_MEM_COMPUTE_ADDRESS;
 
 					case 5d2: // custom-0: omega-mode instructions
-						state = STATE_OMEGA_INSTRUCTION;
+						state = STATE_CUSTOM_INSTRUCTION;
 
 					case 5d3: // MISC-MEM
 						state = STATE_START;
@@ -350,7 +350,7 @@ do (clk) {
 			case STATE_WRITE_MISC_VALUE_TO_REGISTER:
 				state = STATE_START;
 
-			case STATE_OMEGA_INSTRUCTION:
+			case STATE_CUSTOM_INSTRUCTION:
 				switch (instructionRegister[29:26]) {
 
 					// read special register
