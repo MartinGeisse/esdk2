@@ -226,12 +226,7 @@ do (clk) {
 						state = STATE_MEM_COMPUTE_ADDRESS;
 
 					case 5d2: // custom-0: omega-mode instructions
-						if (omegaMode) {
-							state = STATE_OMEGA_INSTRUCTION;
-						} else {
-							state = STATE_EXCEPTION;
-							exceptionCode = EXCEPTION_INVALID_INSTRUCTION;
-						}
+						state = STATE_OMEGA_INSTRUCTION;
 
 					case 5d3: // MISC-MEM
 						state = STATE_START;
