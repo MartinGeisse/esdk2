@@ -60,9 +60,7 @@ register vector[32] miscRegisterWriteValue;
 
 // exception / interrupt handling
 register vector[32] exceptionHandlerReturnAddress;
-
-// omega-mode related state TODO refactor
-register bit omegaMode = 0;
+register bit registerSetSelector = 0;
 
 // special registers including CSRs
 constant vector[5] EXCEPTION_NONE = 0;
@@ -75,9 +73,9 @@ register vector[5] exceptionCode = 0;
 
 // decoding
 signal vector[5] opcode = instructionRegister[6:2];
-signal vector[6] sourceRegisterIndex1 = (omegaMode == instructionRegister[1]) _ instructionRegister[19:15];
-signal vector[6] sourceRegisterIndex2 = (omegaMode == instructionRegister[1]) _ instructionRegister[24:20];
-signal vector[6] destinationRegisterIndex = (omegaMode == instructionRegister[0]) _ instructionRegister[11:7];
+signal vector[6] sourceRegisterIndex1 = (registerSetSelector == instructionRegister[1]) _ instructionRegister[19:15];
+signal vector[6] sourceRegisterIndex2 = (registerSetSelector == instructionRegister[1]) _ instructionRegister[24:20];
+signal vector[6] destinationRegisterIndex = (registerSetSelector == instructionRegister[0]) _ instructionRegister[11:7];
 signal bit operationIsMulDev = (opcode[3] & instructionRegister[25]);
 
 // execution helpers
@@ -224,7 +222,7 @@ do (clk) {
 					case 5d0: // LOAD
 						state = STATE_MEM_COMPUTE_ADDRESS;
 
-					case 5d2: // custom-0: omega-mode instructions
+					case 5d2: // custom-0
 						state = STATE_CUSTOM_INSTRUCTION;
 
 					case 5d3: // MISC-MEM
@@ -327,7 +325,7 @@ do (clk) {
 
 			case STATE_EXCEPTION:
 				pc = 4;
-				omegaMode = 1;
+				registerSetSelector = 1;
 				exceptionHandlerReturnAddress = oldPc;
                 state = STATE_START;
 
@@ -381,7 +379,7 @@ do (clk) {
 					case 4d2:
 						state = STATE_START;
 						pc = exceptionHandlerReturnAddress;
-						omegaMode = 0;
+						registerSetSelector = 0;
 
 					default:
 						state = STATE_EXCEPTION;
