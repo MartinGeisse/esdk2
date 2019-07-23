@@ -199,10 +199,8 @@ do (clk) {
 		switch (state) {
 
 			case STATE_START:
+                oldPc = pc;
 				memoryAddressRegister = pc;
-				if (~omegaMode) {
-					omegaReturnAddress = pc;
-				}
 				state = STATE_FETCH;
 
 			case STATE_FETCH:
@@ -212,7 +210,6 @@ do (clk) {
 				}
 
 			case STATE_DECODE_AND_READ1:
-				oldPc = pc;
 				pc = pc + 32d4;
 				aluImmediate = repeat(20, instructionRegister[31]) _ instructionRegister[31:20];
 				state = STATE_DECODE_AND_READ2;
@@ -329,7 +326,8 @@ do (clk) {
 			case STATE_EXCEPTION:
 				pc = 4;
 				omegaMode = 1;
-				state = STATE_START;
+                omegaReturnAddress = oldPc;
+                state = STATE_START;
 
 			case STATE_SYSTEM_INSTRUCTION:
 				switch(instructionRegister[14:12]) {
