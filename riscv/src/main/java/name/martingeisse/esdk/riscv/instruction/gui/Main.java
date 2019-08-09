@@ -44,6 +44,9 @@ public class Main {
 
 		simulator.loop();
 
+		frame.setVisible(false);
+		System.exit(0);
+
 	}
 
 	private void loadProgram(File file) throws Exception {
@@ -128,6 +131,8 @@ public class Main {
 	private void ioWrite(int wordAddress, int data, int byteMask) {
 		if (wordAddress == -1) {
 			stopped = true;
+		} else if (wordAddress == -2) {
+			System.out.println("debugWrite: " + data);
 		} else {
 			int x = wordAddress & 127;
 			int y = (wordAddress >> 7) & 31;
