@@ -12,6 +12,8 @@ import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.simulation.RtlClockedSimulationItem;
 import name.martingeisse.esdk.core.rtl.simulation.RtlSimulatedComputedVectorSignal;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
+import name.martingeisse.esdk.riscv.common.terminal.CharacterGenerator;
+import name.martingeisse.esdk.riscv.common.terminal.KeyCodeTranslator;
 
 import javax.swing.*;
 import java.awt.*;
