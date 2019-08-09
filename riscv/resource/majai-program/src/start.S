@@ -27,7 +27,9 @@ start:
     lui sp, 0x00001
 
     // main program
-    call main
+    li t0, 0x80000000
+    li t1, 'A'
+    sw t1, 0(t0)
 
 hang:
     j hang
