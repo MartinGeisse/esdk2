@@ -29,7 +29,7 @@ public class TerminalPanel extends JPanel {
 		image = new BufferedImage(640, 480, BufferedImage.TYPE_INT_RGB);
 		setSize(640, 480);
 		setPreferredSize(new Dimension(640, 480));
-		characterMatrix = new byte[80 * 30];
+		characterMatrix = new byte[128 * 32];
 		addKeyListener(new KeyAdapter() {
 
 			private final KeyCodeTranslator translator = new KeyCodeTranslator();
@@ -58,8 +58,9 @@ public class TerminalPanel extends JPanel {
 	@Override
 	protected void paintComponent(Graphics g) {
 		for (int matrixY = 0; matrixY < 30; matrixY++) {
+			int matrixRowBase = matrixY << 7;
 			for (int matrixX = 0; matrixX < 80; matrixX++) {
-				int asciiCode = characterMatrix[matrixY * 80 + matrixX] & 0xff;
+				int asciiCode = characterMatrix[matrixRowBase + matrixX] & 0xff;
 				byte[] characterPixels = CharacterGenerator.CHARACTER_DATA[asciiCode];
 				for (int pixelY = 0; pixelY < 16; pixelY++) {
 					byte pixelRow = characterPixels[pixelY];
@@ -75,10 +76,10 @@ public class TerminalPanel extends JPanel {
 	}
 
 	public void setCharacter(int x, int y, byte b) {
-		if (x < 0 || x >= 80 || y < 0 || y >= 30) {
+		if (x < 0 || x >= 128 || y < 0 || y >= 32) {
 			throw new RuntimeException("invalid character position: " + x + ", " + y);
 		}
-		characterMatrix[y * 80 + x] = b;
+		characterMatrix[(y << 7) + x] = b;
 	}
 
 	public byte readInput() {
