@@ -1,4 +1,4 @@
-package name.martingeisse.esdk.riscv.implementation;
+package name.martingeisse.esdk.riscv.rtl;
 
 import java.io.File;
 

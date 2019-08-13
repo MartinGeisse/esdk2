@@ -1,4 +1,4 @@
-package name.martingeisse.esdk.riscv.simulator.program;
+package name.martingeisse.esdk.riscv.instruction.program;
 
 import name.martingeisse.esdk.riscv.instruction.InstructionLevelRiscv;
 import name.martingeisse.esdk.riscv.instruction.io.IoUnit;

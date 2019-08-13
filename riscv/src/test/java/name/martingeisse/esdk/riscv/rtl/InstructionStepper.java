@@ -1,8 +1,7 @@
-package name.martingeisse.esdk.riscv.implementation;
+package name.martingeisse.esdk.riscv.rtl;
 
 import name.martingeisse.esdk.core.rtl.simulation.RtlSimulationItem;
 import name.martingeisse.esdk.library.util.ClockStepper;
-import name.martingeisse.esdk.riscv.rtl.Multicycle;
 
 /**
  * Allows to single-step (instruction-wise) through a RISC-V design.

@@ -1,4 +1,4 @@
-package name.martingeisse.esdk.riscv.simulator.program;
+package name.martingeisse.esdk.riscv.instruction.program;
 
 import java.io.File;
 
