@@ -29,16 +29,22 @@ public class MajaiSelfTestMain {
 	}
 
 	public static void main(String[] args) throws Exception {
-
-		// run test code
 		MajaiSelfTestMain simulator = new MajaiSelfTestMain();
 		simulator.loadProgram(new File("riscv/resource/majai-self-test/build/program.bin"));
 		simulator.loop();
+		simulator.verify();
+	}
 
-		// verify output
-		Assert.assertEquals(1, simulator.output.size());
-		Assert.assertEquals(99, simulator.output.removeFirst());
+	public void verify() {
+		check(-2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
+		check(100, 1_000, 1_000_000);
+		check(99);
+	}
 
+	private void check(int... expectedValues) {
+		for (int value : expectedValues) {
+			Assert.assertEquals(value, output.removeFirst());
+		}
 	}
 
 	private void loadProgram(File file) throws Exception {
