@@ -36,11 +36,12 @@ public class MajaiSelfTestMain {
 	}
 
 	public void verify() {
-		check(-2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
-		check(100, 1_000, 1_000_000);
-		check(99);
-		check(2, 3, 11, 12);
-		check(3, 5);
+		check(-2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9); // push tiny constants
+		check(100, 1_000, 1_000_000); // push larger constants
+		check(99); // return int
+		check(2, 3, 11, 12); // reference equality / null
+		check(3, 5); // constructor (super/sub)
+		check(0, 2, 4); // arrays
 		Assert.assertTrue(output.isEmpty());
 	}
 
