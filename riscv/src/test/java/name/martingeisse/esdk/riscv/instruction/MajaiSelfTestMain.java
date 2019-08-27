@@ -40,6 +40,8 @@ public class MajaiSelfTestMain {
 		check(100, 1_000, 1_000_000);
 		check(99);
 		check(2, 3, 11, 12);
+		check(3, 5);
+		Assert.assertTrue(output.isEmpty());
 	}
 
 	private void check(int... expectedValues) {
