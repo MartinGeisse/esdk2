@@ -32,13 +32,14 @@ public class Main {
 		Main simulator = new Main();
 		simulator.loadProgram(new File("riscv/resource/TODO/build/program.bin"));
 
+		PixelPanel pixelPanel = new PixelPanel(simulator.memory);
 		JFrame frame = new JFrame("Terminal");
-		// frame.add(simulator.terminalPanel);
+		frame.add(pixelPanel);
 		frame.pack();
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		frame.setResizable(false);
 		frame.setVisible(true);
-		// TODO new Timer(500, event -> simulator.terminalPanel.repaint()).start();
+		new Timer(500, event -> pixelPanel.repaint()).start();
 
 		simulator.loop();
 
