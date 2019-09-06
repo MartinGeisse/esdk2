@@ -17,6 +17,8 @@ import name.martingeisse.esdk.riscv.instruction.io.IoUnit;
  */
 public abstract class InstructionLevelRiscv {
 
+	private static final int WORD_ADDRESS_MASK = 0x3fff_ffff;
+
 	private IoUnit ioUnit;
 	private MultiplyDivideUnit multiplyDivideUnit;
 	private FloatingPointUnit floatingPointUnit;
@@ -97,7 +99,7 @@ public abstract class InstructionLevelRiscv {
 			triggerException(ExceptionType.INSTRUCTION_ADDRESS_MISALIGNED);
 			return;
 		}
-		int instruction = ioUnit.fetchInstruction(pc >> 2);
+		int instruction = ioUnit.fetchInstruction((pc >> 2) & WORD_ADDRESS_MASK);
 		int oldPc = pc;
 		pc += 4;
 		if ((instruction & 3) != 3) {
@@ -116,12 +118,12 @@ public abstract class InstructionLevelRiscv {
 				switch (widthCode) {
 
 					case 0: // byte
-						convertedData = ioUnit.read(wordAddress) >> ((address & 3) * 8);
+						convertedData = ioUnit.read(wordAddress & WORD_ADDRESS_MASK) >> ((address & 3) * 8);
 						convertedData = (unsigned ? (convertedData & 0xff) : (byte) convertedData);
 						break;
 
 					case 1: { // half-word
-						int word = ioUnit.read(wordAddress);
+						int word = ioUnit.read(wordAddress & WORD_ADDRESS_MASK);
 						int shiftedData;
 						switch (address & 3) {
 
@@ -144,7 +146,7 @@ public abstract class InstructionLevelRiscv {
 
 							case 3:
 								if (supportsMisalignedIo) {
-									shiftedData = (word >>> 24) | (ioUnit.read(wordAddress + 1) << 8);
+									shiftedData = (word >>> 24) | (ioUnit.read((wordAddress + 1) & WORD_ADDRESS_MASK) << 8);
 								} else {
 									triggerException(ExceptionType.DATA_ADDRESS_MISALIGNED);
 									break mainOpcodeSwitch;
@@ -166,11 +168,11 @@ public abstract class InstructionLevelRiscv {
 						}
 						int lowBits = (address & 3);
 						if (lowBits == 0) {
-							convertedData = ioUnit.read(wordAddress);
+							convertedData = ioUnit.read(wordAddress & WORD_ADDRESS_MASK);
 						} else if (supportsMisalignedIo) {
 							int shift = lowBits << 3;
-							int part1 = ioUnit.read(wordAddress) >>> shift;
-							int part2 = ioUnit.read(wordAddress + 1) << (32 - shift);
+							int part1 = ioUnit.read(wordAddress & WORD_ADDRESS_MASK) >>> shift;
+							int part2 = ioUnit.read((wordAddress + 1) & WORD_ADDRESS_MASK) << (32 - shift);
 							convertedData = part1 | part2;
 						} else {
 							triggerException(ExceptionType.DATA_ADDRESS_MISALIGNED);
@@ -223,7 +225,7 @@ public abstract class InstructionLevelRiscv {
 
 					case 0: { // byte
 						int byteOffset = (address & 3);
-						ioUnit.write(wordAddress, data << (byteOffset * 8), 1 << byteOffset);
+						ioUnit.write(wordAddress & WORD_ADDRESS_MASK, data << (byteOffset * 8), 1 << byteOffset);
 						break;
 					}
 
@@ -231,12 +233,12 @@ public abstract class InstructionLevelRiscv {
 						switch (address & 3) {
 
 							case 0:
-								ioUnit.write(wordAddress, data, 3);
+								ioUnit.write(wordAddress & WORD_ADDRESS_MASK, data, 3);
 								break;
 
 							case 1:
 								if (supportsMisalignedIo) {
-									ioUnit.write(wordAddress, data, 6);
+									ioUnit.write(wordAddress & WORD_ADDRESS_MASK, data, 6);
 								} else {
 									triggerException(ExceptionType.DATA_ADDRESS_MISALIGNED);
 									break mainOpcodeSwitch;
@@ -244,13 +246,13 @@ public abstract class InstructionLevelRiscv {
 								break;
 
 							case 2:
-								ioUnit.write(wordAddress, data << 16, 12);
+								ioUnit.write(wordAddress & WORD_ADDRESS_MASK, data << 16, 12);
 								break;
 
 							case 3:
 								if (supportsMisalignedIo) {
-									ioUnit.write(wordAddress, data << 24, 8);
-									ioUnit.write(wordAddress + 1, data >> 8, 1);
+									ioUnit.write(wordAddress & WORD_ADDRESS_MASK, data << 24, 8);
+									ioUnit.write((wordAddress + 1) & WORD_ADDRESS_MASK, data >> 8, 1);
 								} else {
 									triggerException(ExceptionType.DATA_ADDRESS_MISALIGNED);
 									break mainOpcodeSwitch;
@@ -273,22 +275,22 @@ public abstract class InstructionLevelRiscv {
 						switch (lowBits) {
 
 							case 0:
-								ioUnit.write(wordAddress, data, 15);
+								ioUnit.write(wordAddress & WORD_ADDRESS_MASK, data, 15);
 								break;
 
 							case 1:
-								ioUnit.write(wordAddress, data << 8, 14);
-								ioUnit.write(wordAddress + 1, data >>> 24, 1);
+								ioUnit.write(wordAddress & WORD_ADDRESS_MASK, data << 8, 14);
+								ioUnit.write((wordAddress + 1) & WORD_ADDRESS_MASK, data >>> 24, 1);
 								break;
 
 							case 2:
-								ioUnit.write(wordAddress, data << 16, 12);
-								ioUnit.write(wordAddress + 1, data >>> 16, 3);
+								ioUnit.write(wordAddress & WORD_ADDRESS_MASK, data << 16, 12);
+								ioUnit.write((wordAddress + 1) & WORD_ADDRESS_MASK, data >>> 16, 3);
 								break;
 
 							case 3:
-								ioUnit.write(wordAddress, data << 24, 8);
-								ioUnit.write(wordAddress + 1, data >>> 8, 7);
+								ioUnit.write(wordAddress & WORD_ADDRESS_MASK, data << 24, 8);
+								ioUnit.write((wordAddress + 1) & WORD_ADDRESS_MASK, data >>> 8, 7);
 
 							default:
 								throw new RuntimeException("wtf");
