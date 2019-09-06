@@ -4,12 +4,9 @@
  */
 package name.martingeisse.esdk.riscv.instruction.gui;
 
-import name.martingeisse.esdk.core.rtl.block.RtlProceduralMemory;
-import name.martingeisse.esdk.core.util.vector.VectorValue;
 import name.martingeisse.esdk.riscv.instruction.InstructionLevelRiscv;
 import name.martingeisse.esdk.riscv.instruction.io.IoUnit;
-import name.martingeisse.esdk.riscv.rtl.Multicycle;
-import name.martingeisse.esdk.riscv.rtl.ram.SimulatedRam;
+import name.martingeisse.esdk.riscv.instruction.muldiv.HardwareMultiplyDivideUnit;
 
 import javax.swing.*;
 import java.io.*;
@@ -27,6 +24,7 @@ public class Main {
 
 	private Main() {
 		this.cpu = new MyCpu();
+		this.cpu.setMultiplyDivideUnit(new HardwareMultiplyDivideUnit(cpu));
 		this.smallMemory = new int[4 * 1024];
 		this.bigMemory = new int[16 * 1024 * 1024];
 	}
@@ -102,12 +100,12 @@ public class Main {
 
 	private int busRead(int wordAddress) {
 		try {
-			if (wordAddress < 0) {
-				return bigMemory[wordAddress & 0x7fffffff];
-			} else if (wordAddress < 0x40000000) {
-				return smallMemory[wordAddress & 0x3fffffff];
+			if ((wordAddress & 0x2000_0000) != 0) {
+				return bigMemory[wordAddress & 0x1fff_ffff];
+			} else if ((wordAddress & 0x1000_0000) == 0) {
+				return smallMemory[wordAddress & 0x0fff_ffff];
 			} else {
-				return readSimulationDevice(wordAddress & 0x3fffffff);
+				return readSimulationDevice(wordAddress & 0x0fff_ffff);
 			}
 		} catch (Exception e) {
 			throw new RuntimeException("error reading from word address 0x" + Integer.toHexString(wordAddress), e);
@@ -116,12 +114,12 @@ public class Main {
 
 	private void busWrite(int wordAddress, int data, int byteMask) {
 		try {
-			if (wordAddress < 0) {
-				writeMemory(bigMemory, wordAddress ^ 0x80000000, data, byteMask);
-			} else if (wordAddress < 0x40000000) {
-				writeMemory(smallMemory, wordAddress, data, byteMask);
+			if ((wordAddress & 0x2000_0000) != 0) {
+				writeMemory(bigMemory, wordAddress & 0x1fff_ffff, data, byteMask);
+			} else if ((wordAddress & 0x1000_0000) == 0) {
+				writeMemory(smallMemory, wordAddress & 0x0fff_ffff, data, byteMask);
 			} else {
-				writeSimulationDevice(wordAddress & 0x3fffffff, data);
+				writeSimulationDevice(wordAddress & 0x0fff_ffff, data);
 			}
 		} catch (Exception e) {
 			throw new RuntimeException("error writing to word address 0x" + Integer.toHexString(wordAddress), e);
