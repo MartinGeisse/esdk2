@@ -48,7 +48,7 @@ public class Main {
 		try {
 			simulator.loop();
 		} catch (Exception e) {
-			throw new RuntimeException("error at PC = 0x" + Integer.toHexString(simulator.cpu.getPc()));
+			throw new RuntimeException("error at PC = 0x" + Integer.toHexString(simulator.cpu.getPc()), e);
 		}
 
 		frame.setVisible(false);
@@ -101,22 +101,30 @@ public class Main {
 	}
 
 	private int busRead(int wordAddress) {
-		if (wordAddress < 0) {
-			return bigMemory[wordAddress & 0x7fffffff];
-		} else if (wordAddress < 0x40000000) {
-			return smallMemory[wordAddress & 0x3fffffff];
-		} else {
-			return readSimulationDevice(wordAddress & 0x3fffffff);
+		try {
+			if (wordAddress < 0) {
+				return bigMemory[wordAddress & 0x7fffffff];
+			} else if (wordAddress < 0x40000000) {
+				return smallMemory[wordAddress & 0x3fffffff];
+			} else {
+				return readSimulationDevice(wordAddress & 0x3fffffff);
+			}
+		} catch (Exception e) {
+			throw new RuntimeException("error reading from word address 0x" + Integer.toHexString(wordAddress), e);
 		}
 	}
 
 	private void busWrite(int wordAddress, int data, int byteMask) {
-		if (wordAddress < 0) {
-			writeMemory(bigMemory, wordAddress ^ 0x80000000, data, byteMask);
-		} else if (wordAddress < 0x40000000) {
-			writeMemory(smallMemory, wordAddress, data, byteMask);
-		} else {
-			writeSimulationDevice(wordAddress & 0x3fffffff, data);
+		try {
+			if (wordAddress < 0) {
+				writeMemory(bigMemory, wordAddress ^ 0x80000000, data, byteMask);
+			} else if (wordAddress < 0x40000000) {
+				writeMemory(smallMemory, wordAddress, data, byteMask);
+			} else {
+				writeSimulationDevice(wordAddress & 0x3fffffff, data);
+			}
+		} catch (Exception e) {
+			throw new RuntimeException("error writing to word address 0x" + Integer.toHexString(wordAddress), e);
 		}
 	}
 
