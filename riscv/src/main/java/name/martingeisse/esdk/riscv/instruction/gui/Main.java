@@ -30,10 +30,10 @@ public class Main {
 	public static void main(String[] args) throws Exception {
 
 		Main simulator = new Main();
-		simulator.loadProgram(new File("riscv/resource/TODO/build/program.bin"));
+		simulator.loadProgram(new File("riscv/resource/gfx-program/build/program.bin"));
 
 		PixelPanel pixelPanel = new PixelPanel(simulator.memory);
-		JFrame frame = new JFrame("Terminal");
+		JFrame frame = new JFrame("Pixel Display");
 		frame.add(pixelPanel);
 		frame.pack();
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -132,10 +132,6 @@ public class Main {
 			stopped = true;
 		} else if (wordAddress == -2) {
 			System.out.println("debugWrite: " + data);
-		} else {
-			int x = wordAddress & 127;
-			int y = (wordAddress >> 7) & 31;
-			// terminalPanel.setCharacter(x, y, (byte)data);
 		}
 	}
 
