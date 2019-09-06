@@ -20,27 +20,25 @@ public class Main {
 
 	private final MyCpu cpu;
 	private final int[] memory;
-	private final TerminalPanel terminalPanel;
 	private boolean stopped = false;
 
 	private Main() {
 		this.cpu = new MyCpu();
 		this.memory = new int[64 * 1024 * 1024];
-		this.terminalPanel = new TerminalPanel();
 	}
 
 	public static void main(String[] args) throws Exception {
 
 		Main simulator = new Main();
-		simulator.loadProgram(new File("riscv/resource/majai-program/build/program.bin"));
+		simulator.loadProgram(new File("riscv/resource/TODO/build/program.bin"));
 
 		JFrame frame = new JFrame("Terminal");
-		frame.add(simulator.terminalPanel);
+		// frame.add(simulator.terminalPanel);
 		frame.pack();
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		frame.setResizable(false);
 		frame.setVisible(true);
-		new Timer(500, event -> simulator.terminalPanel.repaint()).start();
+		// TODO new Timer(500, event -> simulator.terminalPanel.repaint()).start();
 
 		simulator.loop();
 
@@ -136,7 +134,7 @@ public class Main {
 		} else {
 			int x = wordAddress & 127;
 			int y = (wordAddress >> 7) & 31;
-			terminalPanel.setCharacter(x, y, (byte)data);
+			// terminalPanel.setCharacter(x, y, (byte)data);
 		}
 	}
 
