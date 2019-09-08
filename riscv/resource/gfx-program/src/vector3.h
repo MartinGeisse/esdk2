@@ -6,9 +6,9 @@
 
 struct Vector3 {
 
-    int x, y, z;
+    Fixed x, y, z;
 
-    Vector3(int x, int y, int z): x(x), y(y), z(z) {
+    Vector3(Fixed x, Fixed y, Fixed z): x(x), y(y), z(z) {
     }
 
     Vector3(const Vector3 &other): x(other.x), y(other.y), z(other.z) {
@@ -22,7 +22,7 @@ struct Vector3 {
         return Vector3(x - other.x, y - other.y, z - other.z);
     }
 
-    int operator*(const Vector3 &other) {
+    Fixed operator*(const Vector3 &other) {
         return x * other.x + y * other.y + z * other.z;
     }
 
@@ -30,8 +30,8 @@ struct Vector3 {
         return Vector3(y * other.z - z * other.y, z * other.x - x * other.z, x * other.y - y * other.x);
     }
 
-    int norm() {
-
+    Fixed norm() {
+        return x * x + y * y + z * z;
     }
 
 };

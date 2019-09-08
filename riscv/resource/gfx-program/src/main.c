@@ -4,7 +4,6 @@
 #include "simdev.h"
 #include "cpu.h"
 
-
 void main() {
 
 //    simdevShowInt("a", mul(3, 0));
