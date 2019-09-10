@@ -31,6 +31,13 @@ public class Main {
 
 	public static void main(String[] args) throws Exception {
 
+		{
+			int buildScriptErrorCode = Runtime.getRuntime().exec("./build.php", null, new File("riscv/resource/gfx-program")).waitFor();
+			if (buildScriptErrorCode != 0) {
+				throw new RuntimeException("build script returned error code ");
+			}
+		}
+
 		Main simulator = new Main();
 		simulator.loadProgram(new File("riscv/resource/gfx-program/build/program.bin"));
 
