@@ -1,8 +1,8 @@
 
-#include "system.h"
-#include "draw.h"
-#include "simdev.h"
-#include "cpu.h"
+#include "system/system.h"
+#include "system/draw.h"
+#include "system/simdev.h"
+#include "system/cpu.h"
 
 void main() {
 
