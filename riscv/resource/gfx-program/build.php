@@ -34,9 +34,9 @@ $paths = array(
     'src/system/system.S' => 'build/system.o',
     'src/system/simdev.c' => 'build/simdev.o',
     'src/system/cpu.S' => 'build/cpu.o',
+    'src/engine/engine.cpp' => 'build/engine.o',
     'src/main.c' => 'build/main.o',
     'src/vec3test.cpp' => 'build/vec3test.o',
-    'src/engine.cpp' => 'build/engine.o',
 );
 foreach ($paths as $inputPath => $outputPath) {
     buildFile($inputPath, $outputPath);
