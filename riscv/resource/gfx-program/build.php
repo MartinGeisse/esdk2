@@ -13,8 +13,8 @@ function buildFile($inputPath, $outputPath) {
 
 function linkFiles() {
     global $objectFiles;
-    $objectFilesList = implode(' ', $objectFilesList);
-    system(TOOL . 'ld -Map=build/program.map -A rv32im -N -Ttext 0 -o build/program.elf -e 0 ' . objectFilesList);
+    $objectFilesList = implode(' ', $objectFiles);
+    system(TOOL . 'ld -Map=build/program.map -A rv32im -N -Ttext 0 -o build/program.elf -e 0 ' . $objectFilesList);
 }
 
 function convertExecutable() {
@@ -30,13 +30,13 @@ system('mkdir build');
 
 $paths = array(
     'src/system/start.S' => 'build/start.o',
-    'src/system/draw.o' => 'build/draw.c',
-    'src/system/system.o' => 'build/system.S',
-    'src/system/simdev.o' => 'build/simdev.c',
-    'src/system/cpu.o' => 'build/cpu.S',
-    'src/main.o' => 'build/main.c',
-    'src/vec3dtest.o' => 'build/vec3dtest.cpp',
-    'src/engine.o' => 'build/engine.cpp',
+    'src/system/draw.c' => 'build/draw.o',
+    'src/system/system.S' => 'build/system.o',
+    'src/system/simdev.c' => 'build/simdev.o',
+    'src/system/cpu.S' => 'build/cpu.o',
+    'src/main.c' => 'build/main.o',
+    'src/vec3test.cpp' => 'build/vec3test.o',
+    'src/engine.cpp' => 'build/engine.o',
 );
 foreach ($paths as $inputPath => $outputPath) {
     buildFile($inputPath, $outputPath);
