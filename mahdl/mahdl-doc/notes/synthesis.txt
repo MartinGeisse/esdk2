@@ -1,0 +1,30 @@
+
+Problem: Xilinx XST chokes on some kinds of memory:
+- when not using the exact syntactical templates
+- on Nx1 bit memories
+
+Solution: Partially synthesize myself, especially procedural code.
+
+This could happen in MaHDL or ESDK.
+- pro ESDK: Could procedurally build procedural code, e.g. with varying bit widths, in ESDK
+- pro MaHDL: ESDK will be very complex when it also has to support asynchronous blocks, i.e. there will be many
+    different kinds of vectors and memories.
+
+Procedurally built procedural code with varying bit widths = YAGNI. Better implement do-blocks entirely in MaHDL and
+remove clocked blocks from ESDK.
+
+Next problems:
+- How to synthesize memories in MaHDL.
+    Have to infer read / write ports. Probably easier with a subsequent port merging step.
+- How to synthesize procedural bit/vector clock-enable vs. loading the same value as before
+    - no semantic difference
+    - downstream synthesis tools may make a difference
+    - downstream synthesis tools may expect procedural input
+    - simple solution: Only synthesize memories in MaHDL. But then we still need clocked blocks in ESDK, so the
+        difference compared to now shrinks (good or bad?)
+- How to represent memories in ESDK.
+    Simple solutions: All ESDK memories are async-read, sync-write. The verilog generation step will have to find
+    data-out registers when synthesizing BlockRAM.
+
+
+

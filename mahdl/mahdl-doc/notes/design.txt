@@ -1,0 +1,19 @@
+
+data types:
+- which data types can be used for hardware constructs (wires, registers, ports)?
+	- which cannot? those that have no canonical representation as bits!
+	- integer: no, because this data type is unbounded
+	- text: no, because this data type is unbounded
+	- bit, vector: yes
+	- matrix: yes. This decision was not totally clear at first, because
+			hardware does not allow to read/write the whole matrix at once
+		- matrix is treated as a data type, not as an implementation item.
+			This type has a well-defined representation as bits -- a two-dimensional
+			array (vs. vector, which is one-dimensional).
+		- this means we can have matrix constants, matrix wires, matrix registers and
+			matrix ports in principle.
+		- matrix ports have no useful meaning in hardware (would mean: R/W whole matrix at once)
+		- matrix registers represent synchronous RAM or ROM
+		- asynchronous ROM could be represented as either constants or signals.
+		- decision: we don't want to prevent ALL nonsense at language level. That's impossible.
+			So we allow both matrix wires and matrix constants.
