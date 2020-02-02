@@ -1,0 +1,16 @@
+should show an error that "selector" is not assigned to:
+
+
+
+
+module tests.Counter;
+
+interface {
+    in clock clk;
+    in bit selector;
+    out vector[3] output;
+}
+
+register vector[3] counter = 0;
+do(clk) counter = counter + 3d1;
+do(*) output = counter;

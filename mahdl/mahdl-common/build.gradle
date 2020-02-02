@@ -1,0 +1,62 @@
+
+apply plugin: 'java'
+apply plugin: 'maven-publish'
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+compileJava {
+    if (JavaVersion.current() != JavaVersion.VERSION_1_8) {
+        options.compilerArgs << '--release'
+        options.compilerArgs << '8'
+    }
+}
+
+group 'name.martingeisse.mahdl'
+version '1.0'
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src/main/java'
+            srcDir 'src/generated/java'
+        }
+        resources {
+            srcDir 'src/main/java'
+            srcDir 'src/main/resources'
+            srcDir 'src/generated/java'
+            srcDir 'src/generated/resources'
+        }
+    }
+    test {
+        java {
+            srcDir 'src/test/java'
+        }
+        resources {
+            srcDir 'src/test/java'
+            srcDir 'src/test/resources'
+        }
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+
+    compile 'org.apache.commons:commons-lang3:3.0'
+    compile 'com.google.guava:guava:27.1-jre'
+    compile 'org.jetbrains:annotations:16.0.2'
+
+    testCompile 'junit:junit:4.12'
+    testCompile 'com.tngtech.java:junit-dataprovider:1.13.1'
+    
+}

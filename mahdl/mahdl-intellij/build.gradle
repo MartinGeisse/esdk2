@@ -1,0 +1,57 @@
+plugins {
+    id "org.jetbrains.intellij" version "0.4.8"
+}
+
+apply plugin: 'org.jetbrains.intellij'
+apply plugin: 'java'
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+compileJava {
+    if (JavaVersion.current() != JavaVersion.VERSION_1_8) {
+        options.compilerArgs << '--release'
+        options.compilerArgs << '8'
+    }
+}
+
+intellij {
+    version '191.6707.61'
+    pluginName 'MaHDL IntelliJ Plugin'
+}
+
+group 'name.martingeisse.mahdl'
+version '1.0'
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src/main/java'
+            srcDir 'src/generated/java'
+        }
+        resources {
+            srcDir 'src/main/java'
+            srcDir 'src/main/resources'
+            srcDir 'src/generated/java'
+            srcDir 'src/generated/resources'
+        }
+    }
+    test {
+        java {
+            srcDir 'src/test/java'
+        }
+        resources {
+            srcDir 'src/test/java'
+            srcDir 'src/test/resources'
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+
+    compile project(':mahdl-common')
+
+}
