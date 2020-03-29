@@ -20,7 +20,7 @@ start:
     addi gp, gp, 0x7ff
 
     // initialize the SP register
-    lui sp, 0x00001
+    lui sp, 0x00004
 
     // main program
     call main

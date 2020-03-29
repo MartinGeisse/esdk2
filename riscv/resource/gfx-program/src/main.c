@@ -29,11 +29,33 @@ void main() {
     }
 
     // test code
-    // drawHalfTriangle(100, 200, 50, 120, 190, 1);
-    // drawHalfTriangle(100, 200, 190, 120, 50, -1);
-    clearScreen(1);
-    drawTriangle(50, 150, 300, 70, 200, 200);
-    simdevMessage("DONE!");
+//    clearScreen(1);
+//    drawTriangle(50, 150, 300, 70, 200, 200);
+
+    int growing = 1;
+    int size = 50;
+    while (1) {
+        clearScreen(1);
+        int x1 = 320 - size;
+        int x2 = 320 + size;
+        int y1 = 240 - size;
+        int y2 = 240 + size;
+        drawTriangle(x1, y1, x2, y1, x1, y2);
+        drawTriangle(x1, y2, x2, y1, x2, y2);
+        if (growing) {
+            size = size + (size >> 1);
+            if (size > 100) {
+                growing = 0;
+            }
+        } else {
+            size = size - (size >> 2);
+            if (size < 30) {
+                growing = 1;
+            }
+        }
+    }
+
+    // simdevMessage("DONE!");
 
 }
 

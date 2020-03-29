@@ -34,7 +34,7 @@ signal bit internalMemorySelected = smallDeviceRegionSelected & ~terminalSelecte
 
 // Memory: the number indicates the significance inside a word, NOT the position of a byte in a byte buffer (these
 // are different since RISC-V is little-endian).
-register matrix[1024][8] memory0, memory1, memory2, memory3;
+register matrix[4096][8] memory0, memory1, memory2, memory3;
 signal vector[32] memoryReadData;
 register bit internalMemorySecondReadCycle = 0;
 
@@ -105,7 +105,7 @@ do (*) {
 
 }
 
-signal vector[10] memoryDataWordAddress = cpu.memoryWordAddress[9:0];
+signal vector[12] memoryDataWordAddress = cpu.memoryWordAddress[11:0];
 register vector[8] memoryReadData0, memoryReadData1, memoryReadData2, memoryReadData3;
 do (*) memoryReadData = memoryReadData3 _ memoryReadData2 _ memoryReadData1 _ memoryReadData0;
 do (clk) {
