@@ -36,7 +36,6 @@ do (*) {
 }
 
 // timing
-constant vector[5] WAIT_TIME = 5d5;
 constant vector[15] INIT_WAIT = 15h3000;
 constant vector[15] INIT_CLK_EN_WAIT = 15h10;
 constant vector[6] WAIT_CMD_MAX = 6b100000;
