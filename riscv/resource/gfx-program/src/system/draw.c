@@ -1,16 +1,31 @@
 
 #include "simdev.h"
 
-#define SCREEN_WORDS ((int *)0x80000000)
-#define SCREEN ((unsigned char *)0x80000000)
+#define DISPLAY_CONTROL_BASE_ADDRESS 0x00040000
+#define PLANE0_BASE_ADDRESS 0x80000000
+
+static unsigned char *drawPlane = (unsigned char *)PLANE0_BASE_ADDRESS;
 
 static unsigned char drawColor = 7;
 static unsigned int drawColorWord = 0x07070707;
 
+void selectDrawPlane(int plane) {
+    int offset = (plane & 1) << 20;
+    drawPlane = (unsigned char *)(PLANE0_BASE_ADDRESS + offset);
+}
+
+void selectDisplayPlane(int plane) {
+    if (simdevIsSimulation()) {
+        simdevSelectDisplayPlane(plane);
+    } else {
+        *(int*)DISPLAY_CONTROL_BASE_ADDRESS = plane;
+    }
+}
+
 void clearScreen(unsigned char color) {
     int isSimulation = simdevIsSimulation();
     int fourPixels = color | (color << 8) | (color << 16) | (color << 24);
-    int *rowPointer = SCREEN_WORDS;
+    int *rowPointer = (int*)drawPlane;
     int *screenEnd = rowPointer + 256 * 480;
     while (rowPointer < screenEnd) {
         if (isSimulation) {
@@ -28,7 +43,7 @@ void clearScreen(unsigned char color) {
 }
 
 void drawPixel(int x, int y, unsigned char color) {
-    SCREEN[(y << 10) + x] = color;
+    drawPlane[(y << 10) + x] = color;
 }
 
 
@@ -96,7 +111,7 @@ static void drawHorizontalLine(int x1, int x2, int y) {
     }
 
     // convert x-values to pointers
-    unsigned char *screenRow = SCREEN + y * 1024;
+    unsigned char *screenRow = drawPlane + y * 1024;
     unsigned char *p1 = screenRow + x1;
     unsigned char *p2 = screenRow + x2;
 

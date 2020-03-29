@@ -3,6 +3,9 @@ module name.martingeisse.esdk.riscv.rtl.terminal.PixelDisplayController;
 interface {
     in clock clk;
 
+    in bit registerWriteEnable;
+    in bit registerWriteData;
+
     out vector[24] ramdacWordAddress;
     out bit ramdacEnable;
     in vector[32] ramdacReadData;
@@ -10,6 +13,15 @@ interface {
 
 }
 
+//
+// control registers
+//
+register bit planeSelector = 0;
+do (clk) {
+    if (registerWriteEnable) {
+        planeSelector = registerWriteData;
+    }
+}
 
 //
 // stage 1: VGA timing
@@ -76,7 +88,7 @@ do (clk) {
 register vector[8] refillPointer;
 register bit refillInProgress, refillFinished;
 do (*) {
-    ramdacWordAddress = 6d0 _ stage1y _ refillPointer;
+    ramdacWordAddress = 5d0 _ planeSelector _ stage1y _ refillPointer;
     ramdacEnable = refillInProgress;
 }
 do (clk) {

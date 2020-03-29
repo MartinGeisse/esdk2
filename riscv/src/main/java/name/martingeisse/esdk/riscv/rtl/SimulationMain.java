@@ -232,6 +232,11 @@ public class SimulationMain {
                 memoryHelper(data);
                 break;
 
+            case 3:
+                displayPanel.setDisplayPlane(data & 1);
+                break;
+
+
         }
     }
 

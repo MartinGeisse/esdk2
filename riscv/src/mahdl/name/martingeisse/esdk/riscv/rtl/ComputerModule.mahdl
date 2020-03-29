@@ -30,7 +30,9 @@ signal bit terminalSelected = smallDeviceRegionSelected & cpu.memoryWordAddress[
 signal bit signalLoggerSelected = smallDeviceRegionSelected & cpu.memoryWordAddress[13];
 signal bit gpioSelected = smallDeviceRegionSelected & cpu.memoryWordAddress[14];
 signal bit spiSelected = smallDeviceRegionSelected & cpu.memoryWordAddress[15];
-signal bit internalMemorySelected = smallDeviceRegionSelected & ~terminalSelected & ~signalLoggerSelected & ~gpioSelected & ~spiSelected;
+signal bit displayControllerSelected = smallDeviceRegionSelected & cpu.memoryWordAddress[16];
+signal bit internalMemorySelected = smallDeviceRegionSelected &
+        ~terminalSelected & ~signalLoggerSelected & ~gpioSelected & ~spiSelected & ~displayControllerSelected;
 
 // Memory: the number indicates the significance inside a word, NOT the position of a byte in a byte buffer (these
 // are different since RISC-V is little-endian).
@@ -52,20 +54,20 @@ do (*) {
                 signalLoggerSelected ? signalLogger.busReadData :
                     gpioSelected ? (24d0 _ buttonsAndSwitches) :
                         spiSelected ? 32d0 :
-                            memoryReadData;
+                            displayControllerSelected ? 32d0 :
+                                memoryReadData;
     cpu.memoryAcknowledge = bigRamSelected ? bigRam.busAcknowledge :
         simulationDeviceSelected ? simulationDevice.busAcknowledge :
             terminalSelected ? bit(1) :
                 signalLoggerSelected ? signalLogger.busAcknowledge :
                     gpioSelected ? bit(1) :
                         spiSelected ? spiInterface.busAcknowledge :
-                            (cpu.memoryWrite | internalMemorySecondReadCycle);
+                            displayControllerSelected ? bit(1) :
+                                (cpu.memoryWrite | internalMemorySecondReadCycle);
 
     display.clk = clk;
-//    display.clockEnable = 1;
-//    display.writeEnable = cpu.memoryEnable & cpu.memoryWrite & terminalSelected;
-//    display.address = cpu.memoryWordAddress[11:0];
-//    display.writeData = cpu.memoryWriteData[7:0];
+    display.registerWriteEnable = cpu.memoryEnable & cpu.memoryWrite & displayControllerSelected;
+    display.registerWriteData = cpu.memoryWriteData[0];
 
     keyboard.clk = clk;
     keyboard.inputAcknowledge = cpu.memoryEnable & ~cpu.memoryWrite & terminalSelected;
@@ -90,6 +92,8 @@ do (*) {
     bigRam.ramdacEnable = display.ramdacEnable;
     display.ramdacReadData = bigRam.ramdacReadData;
     display.ramdacAcknowledge = bigRam.ramdacAcknowledge;
+
+
 
     spiInterface.clk = clk;
     spiInterface.busEnable = cpu.memoryEnable & spiSelected;

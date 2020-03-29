@@ -34,7 +34,11 @@ void main() {
 
     int growing = 1;
     int size = 50;
+    int drawPlane = 0;
     while (1) {
+        drawPlane = 1 - drawPlane;
+        selectDrawPlane(drawPlane);
+        selectDisplayPlane(1 - drawPlane);
         clearScreen(1);
         int x1 = 320 - size;
         int x2 = 320 + size;

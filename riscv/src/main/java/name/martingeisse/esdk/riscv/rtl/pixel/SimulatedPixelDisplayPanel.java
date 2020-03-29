@@ -14,6 +14,7 @@ public class SimulatedPixelDisplayPanel extends JPanel {
 
     private final SimulatedRam.Implementation simulatedRam;
     private final BufferedImage image;
+    private int displayPlane;
 
     public SimulatedPixelDisplayPanel(SimulatedRam.Implementation simulatedRam) {
         super(false);
@@ -23,14 +24,19 @@ public class SimulatedPixelDisplayPanel extends JPanel {
         setPreferredSize(new Dimension(640, 480));
     }
 
+    public void setDisplayPlane(int displayPlane) {
+        this.displayPlane = displayPlane;
+    }
+
     @Override
     protected void paintComponent(Graphics g) {
         Matrix matrix0 = simulatedRam._memory0.getMatrix();
         Matrix matrix1 = simulatedRam._memory1.getMatrix();
         Matrix matrix2 = simulatedRam._memory2.getMatrix();
         Matrix matrix3 = simulatedRam._memory3.getMatrix();
+        int planeBaseAddress = displayPlane * 1024 * 256;
         for (int y = 0; y < 480; y++) {
-            int baseWordAddress = y * 256;
+            int baseWordAddress = planeBaseAddress + y * 256;
             for (int x = 0; x < 640; x += 4) {
                 int wordAddress = baseWordAddress + (x >> 2);
                 image.setRGB(x, y, expandRgb(matrix0.getRow(wordAddress).getAsUnsignedInt()));

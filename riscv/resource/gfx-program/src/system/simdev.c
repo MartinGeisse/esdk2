@@ -18,3 +18,7 @@ void simdevShowInt(char *label, int value) {
 void simdevFillWordsShowInt(void *pointer, int value, int wordCount) {
     simulationDevice[2] = 0;
 }
+
+void simdevSelectDisplayPlane(int plane) {
+    simulationDevice[3] = plane;
+}
