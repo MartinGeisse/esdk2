@@ -5,6 +5,7 @@
 #define SCREEN ((unsigned char *)0x80000000)
 
 static unsigned char drawColor = 7;
+static unsigned int drawColorWord = 0x07070707;
 
 void clearScreen(unsigned char color) {
     int isSimulation = simdevIsSimulation();
@@ -78,6 +79,64 @@ static int div(int x, int y) {
     return negative ? -result : result;
 }
 
+// note: expects x1 <= x2
+static void drawHorizontalLine(int x1, int x2, int y) {
+
+    // clip vertically
+    if (y < 0 || y >= 480) {
+        return;
+    }
+
+    // clip horizontally
+    if (x1 < 0) {
+        x1 = 0;
+    }
+    if (x2 > 640) {
+        x2 = 640;
+    }
+
+    // convert x-values to pointers
+    unsigned char *screenRow = SCREEN + y * 1024;
+    unsigned char *p1 = screenRow + x1;
+    unsigned char *p2 = screenRow + x2;
+
+    // avoid complications with word alignment in short rows
+    if (p2 - p1 >= 8) {
+
+        // draw initial word fraction
+        while ((int)p1 & 3) {
+            *p1 = drawColor;
+            *p1++;
+        }
+
+        // draw full words
+        unsigned int word = drawColorWord;
+        int fourPixels = word | (word << 8) | (word << 16) | (word << 24);
+        if (simdevIsSimulation()) {
+            int wordCount = ((int)(p2 - p1)) >> 2;
+            simdevFillWordsShowInt(p1, word, wordCount);
+            p1 += wordCount << 2;
+        } else {
+            while (1) {
+                unsigned char *nextP1 = p1 + 4;
+                if (nextP1 > p2) {
+                    break;
+                }
+                *(unsigned int *)p1 = fourPixels;
+                p1 = nextP1;
+            }
+        }
+
+    }
+
+    // draw final word fraction (or whole line if less than 8 pixels)
+    while (p1 < p2) {
+        *p1 = drawColor;
+        *p1++;
+    }
+
+}
+
 static void drawHalfTriangle(int x1a, int x1b, int y1, int x2, int y2, int dy) {
 
     // sort vertically aligned points by X
@@ -96,10 +155,11 @@ static void drawHalfTriangle(int x1a, int x1b, int y1, int x2, int y2, int dy) {
     }
     int partialXa = 0, partialXb = 0;
     while (y1 != y2) {
-        unsigned char *screenRow = SCREEN + y1 * 1024;
-        for (int x = x1a; x < x1b; x++) {
-            screenRow[x] = drawColor;
-        }
+
+        // draw row
+        drawHorizontalLine(x1a, x1b, y1);
+
+        // adjust left endpoint
         partialXa += deltaXa;
         while (partialXa >= deltaY) {
             partialXa -= deltaY;
@@ -109,6 +169,8 @@ static void drawHalfTriangle(int x1a, int x1b, int y1, int x2, int y2, int dy) {
             partialXa += deltaY;
             x1a--;
         }
+
+        // adjust right endpoint
         partialXb += deltaXb;
         while (partialXb >= deltaY) {
             partialXb -= deltaY;
@@ -118,7 +180,10 @@ static void drawHalfTriangle(int x1a, int x1b, int y1, int x2, int y2, int dy) {
             partialXb += deltaY;
             x1b--;
         }
+
+        // move to next row
         y1 += dy;
+
     }
 
 }
