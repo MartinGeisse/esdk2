@@ -1,5 +1,5 @@
 plugins {
-    id "org.jetbrains.intellij" version "0.4.8"
+    id "org.jetbrains.intellij" version "0.4.16"
 }
 
 apply plugin: 'org.jetbrains.intellij'
@@ -15,7 +15,7 @@ compileJava {
 }
 
 intellij {
-    version '191.6707.61'
+    version '193.6015.39'
     pluginName 'MaHDL IntelliJ Plugin'
 }
 
@@ -52,6 +52,6 @@ repositories {
 
 dependencies {
 
-    compile project(':mahdl-common')
+    compile project(':mahdl:mahdl-common')
 
 }
