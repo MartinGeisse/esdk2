@@ -106,8 +106,8 @@ do (*) {
 
     ramdacRequestAcknowledge = (inflightReadQueueStage4Type == INFLIGHT_READ_QUEUE_TYPE_RAMDAC); // TODO
     ramdacResponseEnable = (inflightReadQueueStage4Type == INFLIGHT_READ_QUEUE_TYPE_RAMDAC);
-    ramdacResponseWordAddress = ramdacRequestWordAddress;
-    ramdacResponseData = ddrRegisterDataIn; // this signal is actually shared
+    ramdacResponseWordAddress = currentRowAddress _ inflightReadQueueStage4Address;
+    ramdacResponseData = ddrRegisterDataIn;
 }
 
 // output registers for DDR signals
@@ -172,6 +172,10 @@ do (clk0) {
     inflightReadQueueStage4Address = inflightReadQueueStage3Address;
 }
 
+// this row address is sent to the SDRAM and also sent back in the response. It need not be queued since it has to be
+// stable for the length of the queue, but is actually stable over the time between the last CAS and a subsequent RAS,
+// with a PRECHARGE in between.
+signal vector[15] currentRowAddress = (isRamdacRequest ? ramdacRequestWordAddress[23:9] : busWordAddress[23:9]);
 
 // main and init state machines
 register bit refreshAcknowledge;
@@ -324,8 +328,8 @@ do (clk0) {
                 sdramRegisterCAS = 1;
                 sdramRegisterWE = 1;
                 sdramRegisterCS = 0;
-                sdramRegisterBA[1:0] = isRamdacRequest ? ramdacRequestWordAddress[23:22] : busWordAddress[23:22];
-                sdramRegisterA[12:0] = isRamdacRequest ? ramdacRequestWordAddress[21:9] : busWordAddress[21:9];
+                sdramRegisterBA[1:0] = currentRowAddress[14:13];
+                sdramRegisterA[12:0] = currentRowAddress[12:0];
                 wait_count = ACCESS_WAIT;
                 ddrRegisterDataOutEnable = 0;						// Not driving the bus
                 ddrRegisterDataStrobe = 0;
@@ -373,8 +377,8 @@ do (clk0) {
                 sdramRegisterCAS = 1;
                 sdramRegisterWE = 1;
                 sdramRegisterCS = 0;
-                sdramRegisterBA[1:0] = isRamdacRequest ? ramdacRequestWordAddress[23:22] : busWordAddress[23:22];
-                sdramRegisterA[12:0] = isRamdacRequest ? ramdacRequestWordAddress[21:9] : busWordAddress[21:9];
+                sdramRegisterBA[1:0] = currentRowAddress[14:13];
+                sdramRegisterA[12:0] = currentRowAddress[12:0];
                 ddrRegisterDataOut = busWriteData;
                 ddrRegisterDataOutMask = ~busWriteMask;
                 wait_count = ACCESS_WAIT;
