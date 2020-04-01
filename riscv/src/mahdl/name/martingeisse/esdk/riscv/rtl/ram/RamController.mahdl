@@ -61,8 +61,6 @@ constant vector[6] SD_LD_MODE1 = 9;
 constant vector[6] SD_RD_START = 10;
 constant vector[6] SD_RD_COL = 11;
 constant vector[6] SD_RD_CAS_WAIT = 12;
-constant vector[6] SD_RD_LATCH = 13;
-constant vector[6] SD_RD_LATCH1 = 14;
 constant vector[6] SD_RD_DONE = 15;
 constant vector[6] SD_WR_START = 16;
 constant vector[6] SD_WR_COL = 17;
@@ -102,15 +100,14 @@ do (*) {
 
 // Wishbone output registers for the main and init state machine
 register bit busRegisterAcknowledge, ramdacRegisterResponseEnable;
-register vector[32] busRegisterReadData;
 do (*) {
     busAcknowledge = busRegisterAcknowledge;
-    busReadData = busRegisterReadData;
+    busReadData = ddrRegisterDataIn;
 
     ramdacRequestAcknowledge = ramdacRegisterResponseEnable; // TODO
     ramdacResponseEnable = ramdacRegisterResponseEnable;
     ramdacResponseWordAddress = ramdacRequestWordAddress;
-    ramdacResponseData = busRegisterReadData; // this signal is actually shared
+    ramdacResponseData = ddrRegisterDataIn; // this signal is actually shared
 }
 
 // output registers for DDR signals
@@ -127,20 +124,21 @@ do (*) {
     sdram.ddrInterfaceDataOutMask = ddrRegisterDataOutMask;
 }
 
-/* DDR data sampling that is synchronous to the main clock.
+/* DDR data sampling whose output can be used synchronous to the main clock (though with only half a cycle of logic).
  *
  * The DDR interface samples the lower and upper 16 data-in bits in alternation, so full 32 bits per main clock cycle.
- * There is no additional register so far beyond sampling itself, so we see a half-word changing at a time.
+ * Up till here, there is no additional register so far beyond sampling itself, so we see a half-word changing at a
+ * time.
  *
- * It might seem at first that we can copy those 32 bits to the bus at the right time, and that any additional register
- * like the ddrRegisterDataIn declared here unnecessarily delays data by one cycle. That is not true however, because
- * the "right" time would be at a negative edge of the main clock -- by the time we sample it at a positive edge, one
- * half-word has changed again. So we add this register at that edge (positive edge at 180 degree clock) to make the
- * full 32 bits stable for a full, though 180 degree shifted, clock cycle. At the next positive edge of the main clock,
- * the data is copied to the bus output register. Since there is no logic in between, that half-cycle is enough.
+ * The right time to sample this changing data is at a negative edge of the main clock, i.e. a positive edge of the
+ * clk180. This makes a consistent 32-bit word available at the next positive edge of the main clock. In other words,
+ * the value from ddrRegisterDataIn can be used synchronously to the main clock, but only half a cycle is available
+ * for logic in between.
  *
- * With respect to delaying the data: This register delays data by a half-cycle only, so we could not process it
- * earlier anyway (at least not using the main clock).
+ * Right now, this is possible. The logic that has only half a cycle is the bus read data mux, which is quite large,
+ * but barely fits into that half-cycle. If this is no longer the case, either an additional register must be introduced
+ * for the data read here, or the bus mux must be re-arranged. The latter is preferred since memory access is already
+ * a bottleneck for everything.
  */
 register vector[32] ddrRegisterDataIn;
 do (clk180) {
@@ -330,14 +328,10 @@ do (clk0) {
                     sdramRegisterCAS = 1;
                     sdramRegisterWE = 1;
                 } else {
-                    sd_state = SD_RD_LATCH;
+                    busRegisterAcknowledge = ~isRamdacRequest;
+                    ramdacRegisterResponseEnable = isRamdacRequest;
+                    sd_state = SD_RD_DONE;
                 }
-
-            case SD_RD_LATCH:
-                busRegisterReadData = ddrRegisterDataIn;
-                busRegisterAcknowledge = ~isRamdacRequest;
-                ramdacRegisterResponseEnable = isRamdacRequest;
-                sd_state = SD_RD_DONE;
 
             case SD_RD_DONE:
                 ddrRegisterDataStrobe = 0;
