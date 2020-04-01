@@ -348,24 +348,30 @@ do (clk0) {
                     sdramRegisterWE = 1;
                     sd_state = SD_RD_SEND_PRECHARGE;
                     sdramRegisterA[9:1] = isRamdacRequest ? ramdacRequestWordAddress[8:0] : busWordAddress[8:0];
-                    sdramRegisterA[10] = 1;			// use auto-precharge
+                    sdramRegisterA[10] = 0;			// don't use auto-precharge
                     sdramRegisterA[0] = 0;
-                    // wait_count = CAS_WAIT;
                     ddrRegisterDataStrobeEnable = 0;			// Set DQS for input
                     inflightReadQueueStage0Type = isRamdacRequest ? INFLIGHT_READ_QUEUE_TYPE_RAMDAC : INFLIGHT_READ_QUEUE_TYPE_BUS;
                 }
 
             case SD_RD_SEND_PRECHARGE:
-                sdramRegisterCS = 1;				// NOP command during access wait
-                sdramRegisterRAS = 1;
+                // PRECHARGE
+                sdramRegisterCS = 0;
+                sdramRegisterRAS = 0;
                 sdramRegisterCAS = 1;
-                sdramRegisterWE = 1;
+                sdramRegisterWE = 0;
                 inflightReadQueueStage0Type = INFLIGHT_READ_QUEUE_TYPE_NOP;
                 wait_count = CAS_WAIT;
                 sd_state = SD_RD_CAS_WAIT;
 
             case SD_RD_CAS_WAIT:
-                if (wait_count[5]) {
+                if (~wait_count[5]) {
+                    // NOP
+                    sdramRegisterCS = 1;
+                    sdramRegisterRAS = 1;
+                    sdramRegisterCAS = 1;
+                    sdramRegisterWE = 1;
+                } else {
                     sd_state = SD_RD_DONE;
                 }
 
