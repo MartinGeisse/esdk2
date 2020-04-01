@@ -6,10 +6,11 @@ interface {
     in bit registerWriteEnable;
     in bit registerWriteData;
 
-    out vector[24] ramdacWordAddress;
-    out bit ramdacEnable;
-    in vector[32] ramdacReadData;
-    in bit ramdacAcknowledge;
+    out bit ramdacRequestEnable;
+    out vector[24] ramdacRequestWordAddress;
+    in bit ramdacResponseEnable;
+    in vector[24] ramdacResponseWordAddress;
+    in vector[32] ramdacResponseData;
 
 }
 
@@ -84,16 +85,16 @@ do (clk) {
     stage2byteSelector = stage1x[1:0];
 }
 
-// refill
+// refill TODO use response address
 register vector[8] refillPointer;
 register bit refillInProgress, refillFinished;
 do (*) {
-    ramdacWordAddress = 5d0 _ planeSelector _ stage1y _ refillPointer;
-    ramdacEnable = refillInProgress;
+    ramdacRequestEnable = refillInProgress;
+    ramdacRequestWordAddress = 5d0 _ planeSelector _ stage1y _ refillPointer;
 }
 do (clk) {
     if (refillInProgress) {
-        rowBuffer[stage1y[0] _ refillPointer] = ramdacReadData;
+        rowBuffer[stage1y[0] _ refillPointer] = ramdacResponseData;
     }
 }
 do (clk) {
@@ -102,7 +103,7 @@ do (clk) {
             refillInProgress = 0;
             refillFinished = 1;
         }
-        if (ramdacAcknowledge) {
+        if (ramdacResponseEnable) {
             refillPointer = refillPointer + 8d1;
         }
     } else if (refillFinished) {

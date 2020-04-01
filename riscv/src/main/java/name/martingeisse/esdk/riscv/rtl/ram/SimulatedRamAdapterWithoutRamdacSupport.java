@@ -18,12 +18,14 @@ public class SimulatedRamAdapterWithoutRamdacSupport extends RtlSimulationItem i
 
     private final SimulatedRam.Implementation ram;
     private final RtlBitSignal dummyBit;
+    private final RtlVectorSignal dummyVector24;
     private final RtlVectorSignal dummyVector32;
 
     public SimulatedRamAdapterWithoutRamdacSupport(RtlRealm realm, RtlClockNetwork clk) {
         super(realm);
         this.ram = new SimulatedRam.Implementation(realm, clk);
         this.dummyBit = new RtlBitConstant(realm, false);
+        this.dummyVector24 = RtlVectorConstant.of(realm, 24, 0);
         this.dummyVector32 = RtlVectorConstant.of(realm, 32, 0);
     }
 
@@ -84,23 +86,28 @@ public class SimulatedRamAdapterWithoutRamdacSupport extends RtlSimulationItem i
     //
 
     @Override
-    public RtlBitSignal getRamdacAcknowledge() {
-        return dummyBit;
-    }
-
-    @Override
-    public void setRamdacEnable(RtlBitSignal ramdacEnable) {
+    public void setRamdacRequestEnable(RtlBitSignal ramdacRequestEnable) {
         // ignored
     }
 
     @Override
-    public RtlVectorSignal getRamdacReadData() {
+    public void setRamdacRequestWordAddress(RtlVectorSignal ramdacRequestWordAddress) {
+        // ignored
+    }
+
+    @Override
+    public RtlVectorSignal getRamdacResponseData() {
         return dummyVector32;
     }
 
     @Override
-    public void setRamdacWordAddress(RtlVectorSignal ramdacWordAddress) {
-        // ignored
+    public RtlBitSignal getRamdacResponseEnable() {
+        return dummyBit;
+    }
+
+    @Override
+    public RtlVectorSignal getRamdacResponseWordAddress() {
+        return dummyVector24;
     }
 
 }

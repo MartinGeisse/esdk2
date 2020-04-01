@@ -57,8 +57,8 @@ public class SimulationMain {
                     @Override
                     protected PixelDisplayController createDisplay(RtlRealm realm, RtlClockNetwork clk) {
                         PixelDisplayController.Connector dummy = new PixelDisplayController.Connector(realm, clk);
-                        dummy.setRamdacEnableSocket(new RtlBitConstant(realm, false));
-                        dummy.setRamdacWordAddressSocket(RtlVectorConstant.of(realm, 24, 0));
+                        dummy.setRamdacRequestEnableSocket(new RtlBitConstant(realm, false));
+                        dummy.setRamdacRequestWordAddressSocket(RtlVectorConstant.of(realm, 24, 0));
                         return dummy;
                     }
 

@@ -88,12 +88,11 @@ do (*) {
     signalLogger.busWriteData = cpu.memoryWriteData;
 
     // RAMDAC connections
-    bigRam.ramdacWordAddress = display.ramdacWordAddress;
-    bigRam.ramdacEnable = display.ramdacEnable;
-    display.ramdacReadData = bigRam.ramdacReadData;
-    display.ramdacAcknowledge = bigRam.ramdacAcknowledge;
-
-
+    bigRam.ramdacRequestEnable = display.ramdacRequestEnable;
+    bigRam.ramdacRequestWordAddress = display.ramdacRequestWordAddress;
+    display.ramdacResponseEnable = bigRam.ramdacResponseEnable;
+    display.ramdacResponseWordAddress = bigRam.ramdacResponseWordAddress;
+    display.ramdacResponseData = bigRam.ramdacResponseData;
 
     spiInterface.clk = clk;
     spiInterface.busEnable = cpu.memoryEnable & spiSelected;

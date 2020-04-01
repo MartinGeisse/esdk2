@@ -18,10 +18,12 @@ interface {
     out bit busAcknowledge;
 
     // Additional read port for the RAMDAC
-    in vector[24] ramdacWordAddress;
-    in bit ramdacEnable;
-    out vector[32] ramdacReadData;
-    out bit ramdacAcknowledge;
+    in bit ramdacRequestEnable;
+    in vector[24] ramdacRequestWordAddress;
+    out bit ramdacResponseEnable;
+    out vector[24] ramdacResponseWordAddress;
+    out vector[32] ramdacResponseData;
+
 
 
 }
@@ -102,9 +104,11 @@ register bit busRegisterAcknowledge, ramdacRegisterAcknowledge;
 register vector[32] busRegisterReadData;
 do (*) {
     busAcknowledge = busRegisterAcknowledge;
-    ramdacAcknowledge = ramdacRegisterAcknowledge;
     busReadData = busRegisterReadData;
-    ramdacReadData = busRegisterReadData; // this signal is actually shared
+
+    ramdacResponseEnable = ramdacRegisterAcknowledge;
+    ramdacResponseWordAddress = ramdacRequestWordAddress;
+    ramdacResponseData = busRegisterReadData; // this signal is actually shared
 }
 
 // output registers for DDR signals
@@ -292,8 +296,8 @@ do (clk0) {
                 sdramRegisterCAS = 1;
                 sdramRegisterWE = 1;
                 sdramRegisterCS = 0;
-                sdramRegisterBA[1:0] = isRamdacRequest ? ramdacWordAddress[23:22] : busWordAddress[23:22];
-                sdramRegisterA[12:0] = isRamdacRequest ? ramdacWordAddress[21:9] : busWordAddress[21:9];
+                sdramRegisterBA[1:0] = isRamdacRequest ? ramdacRequestWordAddress[23:22] : busWordAddress[23:22];
+                sdramRegisterA[12:0] = isRamdacRequest ? ramdacRequestWordAddress[21:9] : busWordAddress[21:9];
                 wait_count = ACCESS_WAIT;
                 ddrRegisterDataOutEnable = 0;						// Not driving the bus
                 ddrRegisterDataStrobe = 0;
@@ -310,7 +314,7 @@ do (clk0) {
                     sdramRegisterCAS = 0;
                     sdramRegisterWE = 1;
                     sd_state = SD_RD_CAS_WAIT;
-                    sdramRegisterA[9:1] = isRamdacRequest ? ramdacWordAddress[8:0] : busWordAddress[8:0];
+                    sdramRegisterA[9:1] = isRamdacRequest ? ramdacRequestWordAddress[8:0] : busWordAddress[8:0];
                     sdramRegisterA[10] = 1;			// Use auto-precharge
                     sdramRegisterA[0] = 0;
                     wait_count = CAS_WAIT;
@@ -347,8 +351,8 @@ do (clk0) {
                 sdramRegisterCAS = 1;
                 sdramRegisterWE = 1;
                 sdramRegisterCS = 0;
-                sdramRegisterBA[1:0] = isRamdacRequest ? ramdacWordAddress[23:22] : busWordAddress[23:22];
-                sdramRegisterA[12:0] = isRamdacRequest ? ramdacWordAddress[21:9] : busWordAddress[21:9];
+                sdramRegisterBA[1:0] = isRamdacRequest ? ramdacRequestWordAddress[23:22] : busWordAddress[23:22];
+                sdramRegisterA[12:0] = isRamdacRequest ? ramdacRequestWordAddress[21:9] : busWordAddress[21:9];
                 ddrRegisterDataOut = busWriteData;
                 ddrRegisterDataOutMask = ~busWriteMask;
                 wait_count = ACCESS_WAIT;
@@ -367,7 +371,7 @@ do (clk0) {
                     sdramRegisterWE = 0;
                     ddrRegisterDataStrobeEnable = 1;
                     sd_state = SD_WR_CAS_WAIT;
-                    sdramRegisterA[9:1] = isRamdacRequest ? ramdacWordAddress[8:0] : busWordAddress[8:0];
+                    sdramRegisterA[9:1] = isRamdacRequest ? ramdacRequestWordAddress[8:0] : busWordAddress[8:0];
                     sdramRegisterA[10] = 1;		// Use auto-precharge
                     sdramRegisterA[0] = 0;
                 }
@@ -403,10 +407,10 @@ do (clk0) {
                 sdramRegisterCAS = 1;
                 sdramRegisterWE = 1;
                 sdramRegisterCS = 1;
-                isRamdacRequest = ramdacEnable;
+                isRamdacRequest = ramdacRequestEnable;
                 if (init_state != SI_DONE) {
                     sd_state = SD_INIT;
-                } else if (ramdacEnable) {
+                } else if (ramdacRequestEnable) {
                     sd_state = SD_RD_START;
                 } else if (busEnable & ~busWrite) {
                     sd_state = SD_RD_START;
