@@ -57,6 +57,7 @@ void main() {
                 growing = 1;
             }
         }
+        delay(500);
     }
 
     // simdevMessage("DONE!");
