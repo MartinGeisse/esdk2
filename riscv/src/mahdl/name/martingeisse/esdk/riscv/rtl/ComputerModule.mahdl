@@ -90,6 +90,7 @@ do (*) {
     // RAMDAC connections
     bigRam.ramdacRequestEnable = display.ramdacRequestEnable;
     bigRam.ramdacRequestWordAddress = display.ramdacRequestWordAddress;
+    display.ramdacRequestAcknowledge = bigRam.ramdacRequestAcknowledge;
     display.ramdacResponseEnable = bigRam.ramdacResponseEnable;
     display.ramdacResponseWordAddress = bigRam.ramdacResponseWordAddress;
     display.ramdacResponseData = bigRam.ramdacResponseData;

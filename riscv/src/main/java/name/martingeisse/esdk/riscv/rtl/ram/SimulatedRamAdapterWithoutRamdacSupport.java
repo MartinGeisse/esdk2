@@ -96,6 +96,11 @@ public class SimulatedRamAdapterWithoutRamdacSupport extends RtlSimulationItem i
     }
 
     @Override
+    public RtlBitSignal getRamdacRequestAcknowledge() {
+        return dummyBit;
+    }
+
+    @Override
     public RtlVectorSignal getRamdacResponseData() {
         return dummyVector32;
     }

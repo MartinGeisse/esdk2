@@ -20,6 +20,7 @@ interface {
     // Additional read port for the RAMDAC
     in bit ramdacRequestEnable;
     in vector[24] ramdacRequestWordAddress;
+    out bit ramdacRequestAcknowledge;
     out bit ramdacResponseEnable;
     out vector[24] ramdacResponseWordAddress;
     out vector[32] ramdacResponseData;
@@ -100,13 +101,14 @@ do (*) {
 }
 
 // Wishbone output registers for the main and init state machine
-register bit busRegisterAcknowledge, ramdacRegisterAcknowledge;
+register bit busRegisterAcknowledge, ramdacRegisterResponseEnable;
 register vector[32] busRegisterReadData;
 do (*) {
     busAcknowledge = busRegisterAcknowledge;
     busReadData = busRegisterReadData;
 
-    ramdacResponseEnable = ramdacRegisterAcknowledge;
+    ramdacRequestAcknowledge = ramdacRegisterResponseEnable; // TODO
+    ramdacResponseEnable = ramdacRegisterResponseEnable;
     ramdacResponseWordAddress = ramdacRequestWordAddress;
     ramdacResponseData = busRegisterReadData; // this signal is actually shared
 }
@@ -334,14 +336,14 @@ do (clk0) {
             case SD_RD_LATCH:
                 busRegisterReadData = ddrRegisterDataIn;
                 busRegisterAcknowledge = ~isRamdacRequest;
-                ramdacRegisterAcknowledge = isRamdacRequest;
+                ramdacRegisterResponseEnable = isRamdacRequest;
                 sd_state = SD_RD_DONE;
 
             case SD_RD_DONE:
                 ddrRegisterDataStrobe = 0;
                 ddrRegisterDataStrobeEnable = 1;	// Set DQS back to output
                 busRegisterAcknowledge = 0;
-                ramdacRegisterAcknowledge = 0;
+                ramdacRegisterResponseEnable = 0;
                 sd_state = SD_IDLE;
 
             // ** Write cycle *********************************************
@@ -393,12 +395,12 @@ do (clk0) {
                 sd_state = SD_WR_DONE;
                 ddrRegisterDataStrobe = 0;
                 busRegisterAcknowledge = ~isRamdacRequest;
-                ramdacRegisterAcknowledge = isRamdacRequest;
+                ramdacRegisterResponseEnable = isRamdacRequest;
 
             case SD_WR_DONE:
                 ddrRegisterDataOutEnable = 0;
                 busRegisterAcknowledge = 0;
-                ramdacRegisterAcknowledge = 0;
+                ramdacRegisterResponseEnable = 0;
                 sd_state = SD_IDLE;
 
             // Wishbone transfer is done during idle time
