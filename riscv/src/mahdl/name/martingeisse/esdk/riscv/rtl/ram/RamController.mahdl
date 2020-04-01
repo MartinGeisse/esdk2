@@ -121,7 +121,21 @@ do (*) {
     sdram.ddrInterfaceDataOutMask = ddrRegisterDataOutMask;
 }
 
-// DDR data sampling
+/* DDR data sampling that is synchronous to the main clock.
+ *
+ * The DDR interface samples the lower and upper 16 data-in bits in alternation, so full 32 bits per main clock cycle.
+ * There is no additional register so far beyond sampling itself, so we see a half-word changing at a time.
+ *
+ * It might seem at first that we can copy those 32 bits to the bus at the right time, and that any additional register
+ * like the ddrRegisterDataIn declared here unnecessarily delays data by one cycle. That is not true however, because
+ * the "right" time would be at a negative edge of the main clock -- by the time we sample it at a positive edge, one
+ * half-word has changed again. So we add this register at that edge (positive edge at 180 degree clock) to make the
+ * full 32 bits stable for a full, though 180 degree shifted, clock cycle. At the next positive edge of the main clock,
+ * the data is copied to the bus output register. Since there is no logic in between, that half-cycle is enough.
+ *
+ * With respect to delaying the data: This register delays data by a half-cycle only, so we could not process it
+ * earlier anyway (at least not using the main clock).
+ */
 register vector[32] ddrRegisterDataIn;
 do (clk180) {
     ddrRegisterDataIn = sdram.ddrInterfaceDataIn;

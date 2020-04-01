@@ -1,0 +1,22 @@
+
+RAMDAC:
+- It would be easy here to use two counters, one for generating RAM requests and the second one to save RAM responses
+    to the row buffer. This does not answer the question whether two counters are better, or a built-in counter in
+    the RAM controller, or returning request addresses with the response data.
+    - Returning request addresses is probably not easy because even once the RAM controller has sent an address to the
+        RAM, it takes a few cycles for the data to be returned.
+        --> this may actually be quite easy:
+        - RAS the highest-priority request (if needed according to row address equality check), but don't ACK anything
+        - CAS, accept and send the highest-priority request (no buffering needed here, just load the request directly
+            into the DDR output registers)
+        - for read requests, also insert the address into a queue with (CAS delay) slots
+            - maybe insert it anyway because it won't harm and logic to ignore the queue output is needed anyway
+        - for read requests, take elements at the end of the queue, combine them with the data just arriving, and
+            hand data and address back to the client
+            - needs to mark queue slots as empty/filled so empty slots won't be passed back
+            - needs a client ID to distinguish between the bus and the RAMDAC (+ empty -> 3 codes)
+            - writes should insert empty slots
+                - must not "not insert" because the queue must move since it may contain other requests, and moving
+                    without inserting duplicates the first entry. Since insert NOPs instead.
+        - queue has (CAS delay) entries and each entry is (column address) wide
+        - might use a fourth code (besides bus, RAMDAC and empty) for timing the CAS-to-precharge delay
