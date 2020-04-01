@@ -99,13 +99,13 @@ do (*) {
 }
 
 // Wishbone output registers for the main and init state machine
-register bit busRegisterAcknowledge, ramdacRegisterResponseEnable;
+register bit busRegisterWriteAcknowledge;
 do (*) {
-    busAcknowledge = busRegisterAcknowledge;
+    busAcknowledge = busRegisterWriteAcknowledge | (inflightReadQueueStage4Type == INFLIGHT_READ_QUEUE_TYPE_BUS);
     busReadData = ddrRegisterDataIn;
 
-    ramdacRequestAcknowledge = ramdacRegisterResponseEnable; // TODO
-    ramdacResponseEnable = ramdacRegisterResponseEnable;
+    ramdacRequestAcknowledge = (inflightReadQueueStage4Type == INFLIGHT_READ_QUEUE_TYPE_RAMDAC); // TODO
+    ramdacResponseEnable = (inflightReadQueueStage4Type == INFLIGHT_READ_QUEUE_TYPE_RAMDAC);
     ramdacResponseWordAddress = ramdacRequestWordAddress;
     ramdacResponseData = ddrRegisterDataIn; // this signal is actually shared
 }
@@ -144,6 +144,34 @@ register vector[32] ddrRegisterDataIn;
 do (clk180) {
     ddrRegisterDataIn = sdram.ddrInterfaceDataIn;
 }
+
+/* The in-flight read queue mirrors read requests that have been sent to the SDRAM but have not been responded to yet.
+ * Stage 0 of the queue is special in that the (column) address is stored in the low bits of sdramRegisterA and so is
+ * the same as is being sent to the SDRAM. The final stage is fed asynchronously to the bus / ramdac interfaces. It
+ * implicitly includes the returned data that is stored in the ddrRegisterDataIn.
+ *
+ * The address in stage 0 is set by the main state machine. To make the code more expressive, the same is true for
+ * all stage 0 registers. All other stages are simply shifted here.
+ */
+constant vector[2] INFLIGHT_READ_QUEUE_TYPE_NOP = 2b00;
+constant vector[2] INFLIGHT_READ_QUEUE_TYPE_BUS = 2b01;
+constant vector[2] INFLIGHT_READ_QUEUE_TYPE_RAMDAC = 2b10;
+
+register vector[2] inflightReadQueueStage0Type, inflightReadQueueStage1Type, inflightReadQueueStage2Type,
+        inflightReadQueueStage3Type, inflightReadQueueStage4Type;
+register vector[9] inflightReadQueueStage1Address, inflightReadQueueStage2Address, inflightReadQueueStage3Address,
+        inflightReadQueueStage4Address;
+do (clk0) {
+    inflightReadQueueStage1Type = inflightReadQueueStage0Type;
+    inflightReadQueueStage1Address = sdramRegisterA[9:1];
+    inflightReadQueueStage2Type = inflightReadQueueStage1Type;
+    inflightReadQueueStage2Address = inflightReadQueueStage1Address;
+    inflightReadQueueStage3Type = inflightReadQueueStage2Type;
+    inflightReadQueueStage3Address = inflightReadQueueStage2Address;
+    inflightReadQueueStage4Type = inflightReadQueueStage3Type;
+    inflightReadQueueStage4Address = inflightReadQueueStage3Address;
+}
+
 
 // main and init state machines
 register bit refreshAcknowledge;
@@ -319,6 +347,7 @@ do (clk0) {
                     sdramRegisterA[0] = 0;
                     wait_count = CAS_WAIT;
                     ddrRegisterDataStrobeEnable = 0;			// Set DQS for input
+                    inflightReadQueueStage0Type = isRamdacRequest ? INFLIGHT_READ_QUEUE_TYPE_RAMDAC : INFLIGHT_READ_QUEUE_TYPE_BUS;
                 }
 
             case SD_RD_CAS_WAIT:
@@ -327,17 +356,14 @@ do (clk0) {
                     sdramRegisterRAS = 1;
                     sdramRegisterCAS = 1;
                     sdramRegisterWE = 1;
+                    inflightReadQueueStage0Type = INFLIGHT_READ_QUEUE_TYPE_NOP;
                 } else {
-                    busRegisterAcknowledge = ~isRamdacRequest;
-                    ramdacRegisterResponseEnable = isRamdacRequest;
                     sd_state = SD_RD_DONE;
                 }
 
             case SD_RD_DONE:
                 ddrRegisterDataStrobe = 0;
                 ddrRegisterDataStrobeEnable = 1;	// Set DQS back to output
-                busRegisterAcknowledge = 0;
-                ramdacRegisterResponseEnable = 0;
                 sd_state = SD_IDLE;
 
             // ** Write cycle *********************************************
@@ -388,13 +414,11 @@ do (clk0) {
             case SD_WR_LATCH1:
                 sd_state = SD_WR_DONE;
                 ddrRegisterDataStrobe = 0;
-                busRegisterAcknowledge = ~isRamdacRequest;
-                ramdacRegisterResponseEnable = isRamdacRequest;
+                busRegisterWriteAcknowledge = 1;
 
             case SD_WR_DONE:
                 ddrRegisterDataOutEnable = 0;
-                busRegisterAcknowledge = 0;
-                ramdacRegisterResponseEnable = 0;
+                busRegisterWriteAcknowledge = 0;
                 sd_state = SD_IDLE;
 
             // Wishbone transfer is done during idle time
