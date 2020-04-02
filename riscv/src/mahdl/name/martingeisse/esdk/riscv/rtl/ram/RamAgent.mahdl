@@ -47,5 +47,5 @@ do (*) {
     ramRequestWriteData = cpuWriteData;
     ramRequestWriteMask = cpuWriteMask;
     cpuReadData = ramResponseReadData;
-    cpuAcknowledge = ramResponseEnable;
+    cpuAcknowledge = cpuWrite ? ramRequestAcknowledge : ramResponseEnable;
 }

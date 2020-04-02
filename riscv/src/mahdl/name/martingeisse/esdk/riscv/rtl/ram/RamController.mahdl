@@ -103,8 +103,9 @@ do (*) {
 // Wishbone output registers for the main and init state machine
 register bit busRegisterWriteAcknowledge;
 do (*) {
-    busRequestAcknowledge = busResponseEnable; // TODO
-    busResponseEnable = busRegisterWriteAcknowledge | (inflightReadQueueStage4Type == INFLIGHT_READ_QUEUE_TYPE_BUS);
+    busRequestAcknowledge = busRegisterWriteAcknowledge |
+            ((sd_state == SD_RD_SEND_CAS | sd_state == SD_RD_SEND_ANOTHER_CAS_OR_PRECHARGE) & ~isRamdacRequest & busRequestEnable & isRequestingCurrentRow);
+    busResponseEnable = (inflightReadQueueStage4Type == INFLIGHT_READ_QUEUE_TYPE_BUS);
     busResponseReadData = ddrRegisterDataIn;
 
     ramdacRequestAcknowledge = (sd_state == SD_RD_SEND_CAS | sd_state == SD_RD_SEND_ANOTHER_CAS_OR_PRECHARGE)
