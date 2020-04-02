@@ -14,6 +14,7 @@ name.martingeisse.esdk.riscv.rtl.Multicycle cpu;
 
 // peripherals
 name.martingeisse.esdk.riscv.rtl.ram.RamController bigRam;
+name.martingeisse.esdk.riscv.rtl.ram.RamAgent ramAgent;
 name.martingeisse.esdk.riscv.rtl.simulation.SimulationDevice simulationDevice;
 name.martingeisse.esdk.riscv.rtl.terminal.PixelDisplayController display;
 name.martingeisse.esdk.riscv.rtl.terminal.KeyboardController keyboard;
@@ -21,9 +22,9 @@ name.martingeisse.esdk.library.SignalLoggerBusInterface signalLogger;
 name.martingeisse.esdk.riscv.rtl.spi.SpiInterface spiInterface;
 
 // bus decoder: big devices
-signal bit bigRamSelected = cpu.memoryWordAddress[29];
+signal bit ramAgentSelected = cpu.memoryWordAddress[29];
 signal bit simulationDeviceSelected = cpu.memoryWordAddress[28];
-signal bit smallDeviceRegionSelected = ~bigRamSelected & ~simulationDeviceSelected;
+signal bit smallDeviceRegionSelected = ~ramAgentSelected & ~simulationDeviceSelected;
 
 // bus decoder: small devices
 signal bit terminalSelected = smallDeviceRegionSelected & cpu.memoryWordAddress[12];
@@ -48,7 +49,7 @@ do (*) {
     cpu.reset = reset;
 
     // data interface
-    cpu.memoryReadData = bigRamSelected ? bigRam.busReadData :
+    cpu.memoryReadData = ramAgentSelected ? ramAgent.cpuReadData :
         simulationDeviceSelected ? simulationDevice.busReadData :
             terminalSelected ? (24d0 _ keyboard.inputData) :
                 signalLoggerSelected ? signalLogger.busReadData :
@@ -56,7 +57,7 @@ do (*) {
                         spiSelected ? 32d0 :
                             displayControllerSelected ? 32d0 :
                                 memoryReadData;
-    cpu.memoryAcknowledge = bigRamSelected ? bigRam.busAcknowledge :
+    cpu.memoryAcknowledge = ramAgentSelected ? ramAgent.cpuAcknowledge :
         simulationDeviceSelected ? simulationDevice.busAcknowledge :
             terminalSelected ? bit(1) :
                 signalLoggerSelected ? signalLogger.busAcknowledge :
@@ -72,16 +73,26 @@ do (*) {
     keyboard.clk = clk;
     keyboard.inputAcknowledge = cpu.memoryEnable & ~cpu.memoryWrite & terminalSelected;
 
+    ramAgent.clk = clk;
+    ramAgent.reset = reset;
+    ramAgent.cpuWordAddress = cpu.memoryWordAddress[23:0];
+    ramAgent.cpuEnable = cpu.memoryEnable & ramAgentSelected;
+    ramAgent.cpuWrite = cpu.memoryWrite;
+    ramAgent.cpuWriteData = cpu.memoryWriteData;
+    ramAgent.cpuWriteMask = cpu.memoryWriteMask;
+    ramAgent.ramReadData = bigRam.busReadData;
+    ramAgent.ramAcknowledge = bigRam.busAcknowledge;
+
     bigRam.clk0 = ddrClock0;
     bigRam.clk90 = ddrClock90;
     bigRam.clk180 = ddrClock180;
     bigRam.clk270 = ddrClock270;
     bigRam.reset = reset;
-    bigRam.busEnable = cpu.memoryEnable & bigRamSelected;
-    bigRam.busWrite = cpu.memoryWrite;
-    bigRam.busWordAddress = cpu.memoryWordAddress[23:0];
-    bigRam.busWriteData = cpu.memoryWriteData;
-    bigRam.busWriteMask = cpu.memoryWriteMask;
+    bigRam.busEnable = ramAgent.ramEnable;
+    bigRam.busWrite = ramAgent.ramWrite;
+    bigRam.busWordAddress = ramAgent.ramWordAddress;
+    bigRam.busWriteData = ramAgent.ramWriteData;
+    bigRam.busWriteMask = ramAgent.ramWriteMask;
 
     signalLogger.busEnable = cpu.memoryEnable & signalLoggerSelected;
     signalLogger.busWrite = cpu.memoryWrite;

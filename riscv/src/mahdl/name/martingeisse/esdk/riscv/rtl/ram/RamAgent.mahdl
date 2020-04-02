@@ -1,0 +1,34 @@
+module name.martingeisse.esdk.riscv.rtl.ram.RamAgent;
+
+interface {
+
+    in clock clk;
+    in bit reset;
+
+    // CPU interface
+    in vector[24] cpuWordAddress;
+    in bit cpuEnable, cpuWrite;
+    in vector[32] cpuWriteData;
+    in vector[4] cpuWriteMask;
+    out vector[32] cpuReadData;
+    out bit cpuAcknowledge;
+
+    // RAM controller interface
+    out vector[24] ramWordAddress;
+    out bit ramEnable, ramWrite;
+    out vector[32] ramWriteData;
+    out vector[4] ramWriteMask;
+    in vector[32] ramReadData;
+    in bit ramAcknowledge;
+
+}
+
+do (*) {
+    ramWordAddress = cpuWordAddress;
+    ramEnable = cpuEnable;
+    ramWrite = cpuWrite;
+    ramWriteData = cpuWriteData;
+    ramWriteMask = cpuWriteMask;
+    cpuReadData = ramReadData;
+    cpuAcknowledge = ramAcknowledge;
+}
