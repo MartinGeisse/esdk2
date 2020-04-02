@@ -107,7 +107,7 @@ do (*) {
     busAcknowledge = busRegisterWriteAcknowledge | (inflightReadQueueStage4Type == INFLIGHT_READ_QUEUE_TYPE_BUS);
     busReadData = ddrRegisterDataIn;
 
-    ramdacRequestAcknowledge = ramdacRequestAcknowledgeIfRequested & ramdacRequestEnable;
+    ramdacRequestAcknowledge = ramdacRequestAcknowledgeIfRequested & ramdacRequestEnable & followupRequestHasSameAddress;
     ramdacResponseEnable = (inflightReadQueueStage4Type == INFLIGHT_READ_QUEUE_TYPE_RAMDAC);
     ramdacResponseWordAddress = currentRowAddressRegister _ inflightReadQueueStage4Address;
     ramdacResponseData = ddrRegisterDataIn;
@@ -178,7 +178,17 @@ do (clk0) {
 // This row address is sent to the SDRAM and also sent back in the response. It is copied from the request so it
 // remains the same even after the request has been acknowledged and the requested address may be invalid or may
 // indicate a different row.
+//
+// Note that until the first request of a "combo" has been acknowledged, the "current" and "followup" row addresses
+// are the same. This is exploited in the logic that generates the request acknowledge.
+//
+// TODO: Currently only requests by the same client (indicated by isRamdacRequest) can be followup requests, and so
+// this address mux is different from the initial address mux. It may be more useful to allow followup requests by
+// arbitrary clients and prioritize the RAMDAC per request (not per "combo" with the same row), since it simplifies
+// the logic. The only downside (if it's a downside at all) is that the RAMDAC will break combos made by the bus.
 register vector[15] currentRowAddressRegister;
+signal vector[15] followupRequestRowAddress = (isRamdacRequest ? ramdacRequestWordAddress[23:9] : busWordAddress[23:9]);
+signal bit followupRequestHasSameAddress = (followupRequestRowAddress == currentRowAddressRegister);
 
 // main and init state machines
 register bit refreshAcknowledge;
