@@ -14,21 +14,21 @@ interface {
     out bit cpuAcknowledge;
 
     // RAM controller interface
-    out vector[24] ramWordAddress;
-    out bit ramEnable, ramWrite;
-    out vector[32] ramWriteData;
-    out vector[4] ramWriteMask;
-    in vector[32] ramReadData;
-    in bit ramAcknowledge;
+    out vector[24] ramRequestWordAddress;
+    out bit ramRequestEnable, ramRequestWrite;
+    out vector[32] ramRequestWriteData;
+    out vector[4] ramRequestWriteMask;
+    in vector[32] ramResponseReadData;
+    in bit ramResponseAcknowledge;
 
 }
 
 do (*) {
-    ramWordAddress = cpuWordAddress;
-    ramEnable = cpuEnable;
-    ramWrite = cpuWrite;
-    ramWriteData = cpuWriteData;
-    ramWriteMask = cpuWriteMask;
-    cpuReadData = ramReadData;
-    cpuAcknowledge = ramAcknowledge;
+    ramRequestWordAddress = cpuWordAddress;
+    ramRequestEnable = cpuEnable;
+    ramRequestWrite = cpuWrite;
+    ramRequestWriteData = cpuWriteData;
+    ramRequestWriteMask = cpuWriteMask;
+    cpuReadData = ramResponseReadData;
+    cpuAcknowledge = ramResponseAcknowledge;
 }

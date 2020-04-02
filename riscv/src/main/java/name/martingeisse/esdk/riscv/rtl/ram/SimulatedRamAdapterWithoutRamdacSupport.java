@@ -46,38 +46,39 @@ public class SimulatedRamAdapterWithoutRamdacSupport extends RtlSimulationItem i
     // bus signals
     //
 
+
     @Override
-    public RtlBitSignal getBusAcknowledge() {
+    public RtlBitSignal getBusResponseEnable() {
         return ram.getAcknowledge();
     }
 
     @Override
-    public void setBusEnable(RtlBitSignal busEnable) {
-        ram.setEnable(busEnable);
+    public void setBusRequestEnable(RtlBitSignal busRequestEnable) {
+        ram.setEnable(busRequestEnable);
     }
 
     @Override
-    public RtlVectorSignal getBusReadData() {
+    public RtlVectorSignal getBusResponseReadData() {
         return ram.getReadData();
     }
 
     @Override
-    public void setBusWordAddress(RtlVectorSignal busWordAddress) {
+    public void setBusRequestWordAddress(RtlVectorSignal busWordAddress) {
         ram.setWordAddress(busWordAddress);
     }
 
     @Override
-    public void setBusWrite(RtlBitSignal busWrite) {
+    public void setBusRequestWrite(RtlBitSignal busWrite) {
         ram.setWrite(busWrite);
     }
 
     @Override
-    public void setBusWriteData(RtlVectorSignal busWriteData) {
+    public void setBusRequestWriteData(RtlVectorSignal busWriteData) {
         ram.setWriteData(busWriteData);
     }
 
     @Override
-    public void setBusWriteMask(RtlVectorSignal busWriteMask) {
+    public void setBusRequestWriteMask(RtlVectorSignal busWriteMask) {
         ram.setWriteMask(busWriteMask);
     }
 

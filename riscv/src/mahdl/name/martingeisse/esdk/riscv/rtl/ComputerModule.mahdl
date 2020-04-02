@@ -80,19 +80,19 @@ do (*) {
     ramAgent.cpuWrite = cpu.memoryWrite;
     ramAgent.cpuWriteData = cpu.memoryWriteData;
     ramAgent.cpuWriteMask = cpu.memoryWriteMask;
-    ramAgent.ramReadData = bigRam.busReadData;
-    ramAgent.ramAcknowledge = bigRam.busAcknowledge;
+    ramAgent.ramResponseReadData = bigRam.busResponseReadData;
+    ramAgent.ramResponseAcknowledge = bigRam.busResponseEnable;
 
     bigRam.clk0 = ddrClock0;
     bigRam.clk90 = ddrClock90;
     bigRam.clk180 = ddrClock180;
     bigRam.clk270 = ddrClock270;
     bigRam.reset = reset;
-    bigRam.busEnable = ramAgent.ramEnable;
-    bigRam.busWrite = ramAgent.ramWrite;
-    bigRam.busWordAddress = ramAgent.ramWordAddress;
-    bigRam.busWriteData = ramAgent.ramWriteData;
-    bigRam.busWriteMask = ramAgent.ramWriteMask;
+    bigRam.busRequestEnable = ramAgent.ramRequestEnable;
+    bigRam.busRequestWrite = ramAgent.ramRequestWrite;
+    bigRam.busRequestWordAddress = ramAgent.ramRequestWordAddress;
+    bigRam.busRequestWriteData = ramAgent.ramRequestWriteData;
+    bigRam.busRequestWriteMask = ramAgent.ramRequestWriteMask;
 
     signalLogger.busEnable = cpu.memoryEnable & signalLoggerSelected;
     signalLogger.busWrite = cpu.memoryWrite;

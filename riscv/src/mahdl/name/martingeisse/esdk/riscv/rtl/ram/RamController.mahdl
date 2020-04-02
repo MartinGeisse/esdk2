@@ -10,12 +10,13 @@ interface {
     in bit reset;
 
     // Wishbone interface
-    in vector[24] busWordAddress;
-    in bit busEnable, busWrite;
-    in vector[32] busWriteData;
-    in vector[4] busWriteMask;
-    out vector[32] busReadData;
-    out bit busAcknowledge;
+    in bit busRequestEnable;
+    in vector[24] busRequestWordAddress;
+    in bit busRequestWrite;
+    in vector[32] busRequestWriteData;
+    in vector[4] busRequestWriteMask;
+    out bit busResponseEnable;
+    out vector[32] busResponseReadData;
 
     // Additional read port for the RAMDAC
     in bit ramdacRequestEnable;
@@ -24,8 +25,6 @@ interface {
     out bit ramdacResponseEnable;
     out vector[24] ramdacResponseWordAddress;
     out vector[32] ramdacResponseData;
-
-
 
 }
 
@@ -103,8 +102,8 @@ do (*) {
 // Wishbone output registers for the main and init state machine
 register bit busRegisterWriteAcknowledge;
 do (*) {
-    busAcknowledge = busRegisterWriteAcknowledge | (inflightReadQueueStage4Type == INFLIGHT_READ_QUEUE_TYPE_BUS);
-    busReadData = ddrRegisterDataIn;
+    busResponseEnable = busRegisterWriteAcknowledge | (inflightReadQueueStage4Type == INFLIGHT_READ_QUEUE_TYPE_BUS);
+    busResponseReadData = ddrRegisterDataIn;
 
     ramdacRequestAcknowledge = (sd_state == SD_RD_SEND_CAS | sd_state == SD_RD_SEND_ANOTHER_CAS_OR_PRECHARGE)
             & isRamdacRequest & ramdacRequestEnable & isRequestingCurrentRow;
@@ -187,7 +186,7 @@ do (clk0) {
 // arbitrary clients and prioritize the RAMDAC per request (not per "combo" with the same row), since it simplifies
 // the logic. The only downside (if it's a downside at all) is that the RAMDAC will break combos made by the bus.
 register vector[15] currentRowAddressRegister;
-signal vector[15] requestingRowAddress = (isRamdacRequest ? ramdacRequestWordAddress[23:9] : busWordAddress[23:9]);
+signal vector[15] requestingRowAddress = (isRamdacRequest ? ramdacRequestWordAddress[23:9] : busRequestWordAddress[23:9]);
 signal bit isRequestingCurrentRow = (requestingRowAddress == currentRowAddressRegister);
 
 // main and init state machines
@@ -358,7 +357,7 @@ do (clk0) {
                 sdramRegisterCAS = 0;
                 sdramRegisterWE = 1;
                 sd_state = SD_RD_SEND_ANOTHER_CAS_OR_PRECHARGE;
-                sdramRegisterA[9:1] = isRamdacRequest ? ramdacRequestWordAddress[8:0] : busWordAddress[8:0];
+                sdramRegisterA[9:1] = isRamdacRequest ? ramdacRequestWordAddress[8:0] : busRequestWordAddress[8:0];
                 sdramRegisterA[10] = 0;			// don't use auto-precharge
                 sdramRegisterA[0] = 0;
                 ddrRegisterDataStrobeEnable = 0;			// Set DQS for input
@@ -369,7 +368,7 @@ do (clk0) {
                 if (ramdacRequestAcknowledge) {
                     // leave CAS command intact and stay at this state, just update the address being sent to the
                     // SDRAM and the in-flight read queue. Also, leave the type being inserted into the queue the same.
-                    sdramRegisterA[9:1] = isRamdacRequest ? ramdacRequestWordAddress[8:0] : busWordAddress[8:0];
+                    sdramRegisterA[9:1] = isRamdacRequest ? ramdacRequestWordAddress[8:0] : busRequestWordAddress[8:0];
                 } else {
                     // PRECHARGE and change to inserting NOPs into the queue
                     sdramRegisterCS = 0;
@@ -406,8 +405,8 @@ do (clk0) {
                 sdramRegisterCS = 0;
                 sdramRegisterBA[1:0] = currentRowAddressRegister[14:13];
                 sdramRegisterA[12:0] = currentRowAddressRegister[12:0];
-                ddrRegisterDataOut = busWriteData;
-                ddrRegisterDataOutMask = ~busWriteMask;
+                ddrRegisterDataOut = busRequestWriteData;
+                ddrRegisterDataOutMask = ~busRequestWriteMask;
                 wait_count = ACCESS_WAIT;
                 ddrRegisterDataStrobe = 0;
 
@@ -424,7 +423,7 @@ do (clk0) {
                     sdramRegisterWE = 0;
                     ddrRegisterDataStrobeEnable = 1;
                     sd_state = SD_WR_CAS_WAIT;
-                    sdramRegisterA[9:1] = isRamdacRequest ? ramdacRequestWordAddress[8:0] : busWordAddress[8:0];
+                    sdramRegisterA[9:1] = isRamdacRequest ? ramdacRequestWordAddress[8:0] : busRequestWordAddress[8:0];
                     sdramRegisterA[10] = 1;		// Use auto-precharge
                     sdramRegisterA[0] = 0;
                 }
@@ -464,12 +463,12 @@ do (clk0) {
                 } else if (ramdacRequestEnable) {
                     sd_state = SD_RD_START;
                     currentRowAddressRegister = ramdacRequestWordAddress[23:9];
-                } else if (busEnable & ~busWrite) {
+                } else if (busRequestEnable & ~busRequestWrite) {
                     sd_state = SD_RD_START;
-                    currentRowAddressRegister = busWordAddress[23:9];
-                } else if (busEnable & busWrite) {
+                    currentRowAddressRegister = busRequestWordAddress[23:9];
+                } else if (busRequestEnable & busRequestWrite) {
                     sd_state = SD_WR_START;
-                    currentRowAddressRegister = busWordAddress[23:9];
+                    currentRowAddressRegister = busRequestWordAddress[23:9];
                 } else if (refreshRequest) {
                     sd_state = SD_AUTO_REF;
                 }
