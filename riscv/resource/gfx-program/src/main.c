@@ -4,6 +4,24 @@
 #include "system/simdev.h"
 #include "system/cpu.h"
 
+#define SQUARE_COUNT 7
+#define SPEED 20
+static int xs[SQUARE_COUNT];
+static int ys[SQUARE_COUNT];
+static int dxs[SQUARE_COUNT];
+static int dys[SQUARE_COUNT];
+static int sizes[SQUARE_COUNT];
+
+static void moveSquare(int *pp, int *dp, int max) {
+    *pp += *dp;
+    if (*pp < 0) {
+        *dp = SPEED;
+    }
+    if (*pp > max) {
+        *dp = -SPEED;
+    }
+}
+
 void main() {
 
 //    simdevShowInt("a", mul(3, 0));
@@ -32,6 +50,7 @@ void main() {
 //    clearScreen(1);
 //    drawTriangle(50, 150, 300, 70, 200, 200);
 
+/*
     int growing = 1;
     int size = 50;
     int drawPlane = 0;
@@ -58,6 +77,29 @@ void main() {
             }
         }
         delay(500);
+    }
+*/
+
+    for (int i = 0, size = 30; i < SQUARE_COUNT; i++, size += 23) {
+        xs[i] = 0;
+        ys[i] = 0;
+        dxs[i] = SPEED;
+        dys[i] = SPEED;
+        sizes[i] = size;
+    }
+
+    int drawPlane = 0;
+    while (1) {
+        drawPlane = 1 - drawPlane;
+        selectDrawPlane(drawPlane);
+        selectDisplayPlane(1 - drawPlane);
+        clearScreen(0);
+        for (int i = SQUARE_COUNT - 1; i >= 0; i--) {
+            setDrawColor(i + 1);
+            drawAxisAlignedRectangle(xs[i], ys[i], sizes[i], sizes[i]);
+            moveSquare(xs + i, dxs + i, 640 - sizes[i]);
+            moveSquare(ys + i, dys + i, 480 - sizes[i]);
+        }
     }
 
     // simdevMessage("DONE!");

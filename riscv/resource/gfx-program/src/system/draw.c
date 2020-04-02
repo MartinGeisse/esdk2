@@ -46,7 +46,6 @@ void drawPixel(int x, int y, unsigned char color) {
     drawPlane[(y << 10) + x] = color;
 }
 
-
 static int mul(int x, int y) {
     int result = 0;
     for (int bit = 1; bit != 0; bit <<= 1) {
@@ -92,6 +91,37 @@ static int div(int x, int y) {
     }
     int result = udiv(x, y);
     return negative ? -result : result;
+}
+
+void setDrawColor(int color) {
+    drawColor = color;
+    drawColorWord = (color << 8) | color;
+    drawColorWord = (drawColorWord << 16) | drawColorWord;
+}
+
+void drawAxisAlignedRectangle(int x, int y, int w, int h) {
+    if (x < 0) {
+        w += x;
+        x = 0;
+    }
+    if (y < 0) {
+        h += y;
+        y = 0;
+    }
+    if (x + w > 640) {
+        w = 640 - x;
+    }
+    if (y + h > 480) {
+        h = 480 - y;
+    }
+    unsigned char *startPointer = drawPlane + y * 1024 + x;
+    while (h > 0) {
+        for (int i = 0; i < w; i++) {
+            startPointer[i] = drawColor;
+        }
+        h--;
+        startPointer += 1024;
+    }
 }
 
 // note: expects x1 <= x2
