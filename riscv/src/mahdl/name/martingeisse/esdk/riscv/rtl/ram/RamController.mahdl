@@ -368,7 +368,7 @@ do (clk0) {
 
             // TODO when bus reads and RAMDAC reads are treated the same, this state might be merged with SEND_CAS
             case SD_RD_SEND_ANOTHER_CAS_OR_PRECHARGE:
-                if (ramdacRequestAcknowledge) {
+                if (ramdacRequestAcknowledge | busRequestAcknowledge) {
                     // leave CAS command intact and stay at this state, just update the address being sent to the
                     // SDRAM and the in-flight read queue. Also, leave the type being inserted into the queue the same.
                     sdramRegisterA[9:1] = isRamdacRequest ? ramdacRequestWordAddress[8:0] : busRequestWordAddress[8:0];
