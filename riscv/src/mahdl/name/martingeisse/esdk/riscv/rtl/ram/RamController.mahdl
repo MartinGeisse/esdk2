@@ -106,7 +106,8 @@ do (*) {
     busAcknowledge = busRegisterWriteAcknowledge | (inflightReadQueueStage4Type == INFLIGHT_READ_QUEUE_TYPE_BUS);
     busReadData = ddrRegisterDataIn;
 
-    ramdacRequestAcknowledge = (sd_state == SD_RD_SEND_CAS) & isRamdacRequest & ramdacRequestEnable & isRequestingCurrentRow;
+    ramdacRequestAcknowledge = (sd_state == SD_RD_SEND_CAS | sd_state == SD_RD_SEND_ANOTHER_CAS_OR_PRECHARGE)
+            & isRamdacRequest & ramdacRequestEnable & isRequestingCurrentRow;
     ramdacResponseEnable = (inflightReadQueueStage4Type == INFLIGHT_READ_QUEUE_TYPE_RAMDAC);
     ramdacResponseWordAddress = currentRowAddressRegister _ inflightReadQueueStage4Address;
     ramdacResponseData = ddrRegisterDataIn;
@@ -363,15 +364,22 @@ do (clk0) {
                 ddrRegisterDataStrobeEnable = 0;			// Set DQS for input
                 inflightReadQueueStage0Type = isRamdacRequest ? INFLIGHT_READ_QUEUE_TYPE_RAMDAC : INFLIGHT_READ_QUEUE_TYPE_BUS;
 
+            // TODO when bus reads and RAMDAC reads are treated the same, this state might be merged with SEND_CAS
             case SD_RD_SEND_ANOTHER_CAS_OR_PRECHARGE:
-                // PRECHARGE
-                sdramRegisterCS = 0;
-                sdramRegisterRAS = 0;
-                sdramRegisterCAS = 1;
-                sdramRegisterWE = 0;
-                inflightReadQueueStage0Type = INFLIGHT_READ_QUEUE_TYPE_NOP;
-                wait_count = CAS_WAIT;
-                sd_state = SD_RD_WAIT_FOR_PRECHARGE;
+                if (ramdacRequestAcknowledge) {
+                    // leave CAS command intact and stay at this state, just update the address being sent to the
+                    // SDRAM and the in-flight read queue. Also, leave the type being inserted into the queue the same.
+                    sdramRegisterA[9:1] = isRamdacRequest ? ramdacRequestWordAddress[8:0] : busWordAddress[8:0];
+                } else {
+                    // PRECHARGE and change to inserting NOPs into the queue
+                    sdramRegisterCS = 0;
+                    sdramRegisterRAS = 0;
+                    sdramRegisterCAS = 1;
+                    sdramRegisterWE = 0;
+                    inflightReadQueueStage0Type = INFLIGHT_READ_QUEUE_TYPE_NOP;
+                    wait_count = CAS_WAIT;
+                    sd_state = SD_RD_WAIT_FOR_PRECHARGE;
+                }
 
             case SD_RD_WAIT_FOR_PRECHARGE:
                 if (~wait_count[5]) {
