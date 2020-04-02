@@ -61,7 +61,7 @@ constant vector[6] SD_LD_MODE1 = 9;
 constant vector[6] SD_RD_START = 10;
 constant vector[6] SD_RD_WAIT_FOR_RAS_THEN_SEND_CAS = 11;
 constant vector[6] SD_RD_SEND_ANOTHER_CAS_OR_PRECHARGE = 12;
-constant vector[6] SD_RD_CAS_WAIT = 13;
+constant vector[6] SD_RD_WAIT_FOR_PRECHARGE = 13;
 constant vector[6] SD_RD_DONE = 15;
 constant vector[6] SD_WR_START = 16;
 constant vector[6] SD_WR_COL = 17;
@@ -362,9 +362,9 @@ do (clk0) {
                 sdramRegisterWE = 0;
                 inflightReadQueueStage0Type = INFLIGHT_READ_QUEUE_TYPE_NOP;
                 wait_count = CAS_WAIT;
-                sd_state = SD_RD_CAS_WAIT;
+                sd_state = SD_RD_WAIT_FOR_PRECHARGE;
 
-            case SD_RD_CAS_WAIT:
+            case SD_RD_WAIT_FOR_PRECHARGE:
                 if (~wait_count[5]) {
                     // NOP
                     sdramRegisterCS = 1;
