@@ -6,7 +6,8 @@ interface {
     in bit reset;
 
     // CPU interface
-    in vector[5] cpuCommandCode;
+    in bit cpuSelectCommandEngine;
+    in vector[4] cpuCommandCode;
     in vector[24] cpuWordAddress;
     in bit cpuEnable, cpuWrite;
     in vector[32] cpuWriteData;

@@ -75,7 +75,8 @@ do (*) {
 
     ramAgent.clk = clk;
     ramAgent.reset = reset;
-    ramAgent.cpuCommandCode = cpu.memoryWordAddress[28:24];
+    ramAgent.cpuSelectCommandEngine = cpu.memoryWordAddress[28];
+    ramAgent.cpuCommandCode = cpu.memoryWordAddress[27:24];
     ramAgent.cpuWordAddress = cpu.memoryWordAddress[23:0];
     ramAgent.cpuEnable = cpu.memoryEnable & ramAgentSelected;
     ramAgent.cpuWrite = cpu.memoryWrite;
