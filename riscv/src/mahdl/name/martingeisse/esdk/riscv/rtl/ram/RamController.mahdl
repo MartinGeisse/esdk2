@@ -109,7 +109,7 @@ do (*) {
 
     ramdacRequestAcknowledge = ramdacRequestAcknowledgeIfRequested & ramdacRequestEnable;
     ramdacResponseEnable = (inflightReadQueueStage4Type == INFLIGHT_READ_QUEUE_TYPE_RAMDAC);
-    ramdacResponseWordAddress = currentRowAddress _ inflightReadQueueStage4Address;
+    ramdacResponseWordAddress = currentRowAddressRegister _ inflightReadQueueStage4Address;
     ramdacResponseData = ddrRegisterDataIn;
 }
 
@@ -175,10 +175,10 @@ do (clk0) {
     inflightReadQueueStage4Address = inflightReadQueueStage3Address;
 }
 
-// this row address is sent to the SDRAM and also sent back in the response. It need not be queued since it has to be
-// stable for the length of the queue, but is actually stable over the time between the last CAS and a subsequent RAS,
-// with a PRECHARGE in between.
-signal vector[15] currentRowAddress = (isRamdacRequest ? ramdacRequestWordAddress[23:9] : busWordAddress[23:9]);
+// This row address is sent to the SDRAM and also sent back in the response. It is copied from the request so it
+// remains the same even after the request has been acknowledged and the requested address may be invalid or may
+// indicate a different row.
+register vector[15] currentRowAddressRegister;
 
 // main and init state machines
 register bit refreshAcknowledge;
@@ -332,8 +332,8 @@ do (clk0) {
                 sdramRegisterCAS = 1;
                 sdramRegisterWE = 1;
                 sdramRegisterCS = 0;
-                sdramRegisterBA[1:0] = currentRowAddress[14:13];
-                sdramRegisterA[12:0] = currentRowAddress[12:0];
+                sdramRegisterBA[1:0] = currentRowAddressRegister[14:13];
+                sdramRegisterA[12:0] = currentRowAddressRegister[12:0];
                 ddrRegisterDataOutEnable = 0; // Not driving the bus
                 ddrRegisterDataStrobe = 0;
                 sd_state = SD_RD_WAIT_FOR_RAS;
@@ -389,8 +389,8 @@ do (clk0) {
                 sdramRegisterCAS = 1;
                 sdramRegisterWE = 1;
                 sdramRegisterCS = 0;
-                sdramRegisterBA[1:0] = currentRowAddress[14:13];
-                sdramRegisterA[12:0] = currentRowAddress[12:0];
+                sdramRegisterBA[1:0] = currentRowAddressRegister[14:13];
+                sdramRegisterA[12:0] = currentRowAddressRegister[12:0];
                 ddrRegisterDataOut = busWriteData;
                 ddrRegisterDataOutMask = ~busWriteMask;
                 wait_count = ACCESS_WAIT;
@@ -448,10 +448,13 @@ do (clk0) {
                     sd_state = SD_INIT;
                 } else if (ramdacRequestEnable) {
                     sd_state = SD_RD_START;
+                    currentRowAddressRegister = ramdacRequestWordAddress[23:9];
                 } else if (busEnable & ~busWrite) {
                     sd_state = SD_RD_START;
+                    currentRowAddressRegister = busWordAddress[23:9];
                 } else if (busEnable & busWrite) {
                     sd_state = SD_WR_START;
+                    currentRowAddressRegister = busWordAddress[23:9];
                 } else if (refreshRequest) {
                     sd_state = SD_AUTO_REF;
                 }
