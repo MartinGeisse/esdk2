@@ -18,17 +18,34 @@ interface {
     out bit ramRequestEnable, ramRequestWrite;
     out vector[32] ramRequestWriteData;
     out vector[4] ramRequestWriteMask;
+    in bit ramRequestAcknowledge;
     in vector[32] ramResponseReadData;
-    in bit ramResponseAcknowledge;
+    in bit ramResponseEnable;
 
+}
+
+// The RAM wants to acknowledge a read request and send the response later, but the CPU wants the response immediately.
+// So we only acknowledge to the CPU when the response is available. However, we must still stop requesting once the
+// RAM acknowledges the request, otherwise it interprets it as a second request, so this register remembers whether
+// the request has been acknowledged.
+register bit requestAcknowledgedRegister;
+do (clk) {
+    if (reset) {
+        requestAcknowledgedRegister = 0;
+    } else if (cpuAcknowledge) {
+        // cpuAcknowledge indicates that a cpuEnable in the next cycle belongs to a new request
+        requestAcknowledgedRegister = 0;
+    } else if (ramRequestAcknowledge) {
+        requestAcknowledgedRegister = 1;
+    }
 }
 
 do (*) {
     ramRequestWordAddress = cpuWordAddress;
-    ramRequestEnable = cpuEnable;
+    ramRequestEnable = cpuEnable & ~requestAcknowledgedRegister;
     ramRequestWrite = cpuWrite;
     ramRequestWriteData = cpuWriteData;
     ramRequestWriteMask = cpuWriteMask;
     cpuReadData = ramResponseReadData;
-    cpuAcknowledge = ramResponseAcknowledge;
+    cpuAcknowledge = ramResponseEnable;
 }

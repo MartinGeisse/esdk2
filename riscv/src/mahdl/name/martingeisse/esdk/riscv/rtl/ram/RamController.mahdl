@@ -15,6 +15,7 @@ interface {
     in bit busRequestWrite;
     in vector[32] busRequestWriteData;
     in vector[4] busRequestWriteMask;
+    out bit busRequestAcknowledge;
     out bit busResponseEnable;
     out vector[32] busResponseReadData;
 
@@ -102,6 +103,7 @@ do (*) {
 // Wishbone output registers for the main and init state machine
 register bit busRegisterWriteAcknowledge;
 do (*) {
+    busRequestAcknowledge = busResponseEnable; // TODO
     busResponseEnable = busRegisterWriteAcknowledge | (inflightReadQueueStage4Type == INFLIGHT_READ_QUEUE_TYPE_BUS);
     busResponseReadData = ddrRegisterDataIn;
 

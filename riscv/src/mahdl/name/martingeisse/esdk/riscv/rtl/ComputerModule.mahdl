@@ -80,8 +80,9 @@ do (*) {
     ramAgent.cpuWrite = cpu.memoryWrite;
     ramAgent.cpuWriteData = cpu.memoryWriteData;
     ramAgent.cpuWriteMask = cpu.memoryWriteMask;
+    ramAgent.ramRequestAcknowledge = bigRam.busRequestAcknowledge;
     ramAgent.ramResponseReadData = bigRam.busResponseReadData;
-    ramAgent.ramResponseAcknowledge = bigRam.busResponseEnable;
+    ramAgent.ramResponseEnable = bigRam.busResponseEnable;
 
     bigRam.clk0 = ddrClock0;
     bigRam.clk90 = ddrClock90;
