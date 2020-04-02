@@ -61,7 +61,6 @@ constant vector[6] SD_LD_MODE1 = 9;
 constant vector[6] SD_RD_START = 10;
 constant vector[6] SD_RD_WAIT_FOR_RAS = 11;
 constant vector[6] SD_RD_SEND_CAS = 12;
-constant vector[6] SD_RD_SEND_ANOTHER_CAS_OR_PRECHARGE = 13;
 constant vector[6] SD_RD_WAIT_FOR_PRECHARGE = 14;
 constant vector[6] SD_RD_DONE = 15;
 constant vector[6] SD_WR_START = 16;
@@ -104,11 +103,11 @@ do (*) {
 register bit busRegisterWriteAcknowledge;
 do (*) {
     busRequestAcknowledge = busRegisterWriteAcknowledge |
-            ((sd_state == SD_RD_SEND_CAS | sd_state == SD_RD_SEND_ANOTHER_CAS_OR_PRECHARGE) & ~isRamdacRequest & busRequestEnable & isRequestingCurrentRow);
+            ((sd_state == SD_RD_SEND_CAS) & ~isRamdacRequest & busRequestEnable & isRequestingCurrentRow);
     busResponseEnable = (inflightReadQueueStage4Type == INFLIGHT_READ_QUEUE_TYPE_BUS);
     busResponseReadData = ddrRegisterDataIn;
 
-    ramdacRequestAcknowledge = (sd_state == SD_RD_SEND_CAS | sd_state == SD_RD_SEND_ANOTHER_CAS_OR_PRECHARGE)
+    ramdacRequestAcknowledge = (sd_state == SD_RD_SEND_CAS)
             & isRamdacRequest & ramdacRequestEnable & isRequestingCurrentRow;
     ramdacResponseEnable = (inflightReadQueueStage4Type == INFLIGHT_READ_QUEUE_TYPE_RAMDAC);
     ramdacResponseWordAddress = currentRowAddressRegister _ inflightReadQueueStage4Address;
@@ -354,24 +353,17 @@ do (clk0) {
                 sd_state = SD_RD_SEND_CAS;
 
             case SD_RD_SEND_CAS:
-                // CAS
-                sdramRegisterCS = 0;
-                sdramRegisterRAS = 1;
-                sdramRegisterCAS = 0;
-                sdramRegisterWE = 1;
-                sd_state = SD_RD_SEND_ANOTHER_CAS_OR_PRECHARGE;
-                sdramRegisterA[9:1] = isRamdacRequest ? ramdacRequestWordAddress[8:0] : busRequestWordAddress[8:0];
-                sdramRegisterA[10] = 0;			// don't use auto-precharge
-                sdramRegisterA[0] = 0;
-                ddrRegisterDataStrobeEnable = 0;			// Set DQS for input
-                inflightReadQueueStage0Type = isRamdacRequest ? INFLIGHT_READ_QUEUE_TYPE_RAMDAC : INFLIGHT_READ_QUEUE_TYPE_BUS;
-
-            // TODO when bus reads and RAMDAC reads are treated the same, this state might be merged with SEND_CAS
-            case SD_RD_SEND_ANOTHER_CAS_OR_PRECHARGE:
                 if (ramdacRequestAcknowledge | busRequestAcknowledge) {
-                    // leave CAS command intact and stay at this state, just update the address being sent to the
-                    // SDRAM and the in-flight read queue. Also, leave the type being inserted into the queue the same.
+                    // CAS
+                    sdramRegisterCS = 0;
+                    sdramRegisterRAS = 1;
+                    sdramRegisterCAS = 0;
+                    sdramRegisterWE = 1;
+                    inflightReadQueueStage0Type = isRamdacRequest ? INFLIGHT_READ_QUEUE_TYPE_RAMDAC : INFLIGHT_READ_QUEUE_TYPE_BUS;
+                    sdramRegisterA[10] = 0; // don't use auto-precharge
                     sdramRegisterA[9:1] = isRamdacRequest ? ramdacRequestWordAddress[8:0] : busRequestWordAddress[8:0];
+                    sdramRegisterA[0] = 0;
+                    ddrRegisterDataStrobeEnable = 0; // Set DQS for input
                 } else {
                     // PRECHARGE and change to inserting NOPs into the queue
                     sdramRegisterCS = 0;
