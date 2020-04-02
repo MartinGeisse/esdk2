@@ -102,11 +102,12 @@ do (*) {
 
 // Wishbone output registers for the main and init state machine
 register bit busRegisterWriteAcknowledge;
+register bit ramdacRequestAcknowledgeIfRequested;
 do (*) {
     busAcknowledge = busRegisterWriteAcknowledge | (inflightReadQueueStage4Type == INFLIGHT_READ_QUEUE_TYPE_BUS);
     busReadData = ddrRegisterDataIn;
 
-    ramdacRequestAcknowledge = (inflightReadQueueStage4Type == INFLIGHT_READ_QUEUE_TYPE_RAMDAC); // TODO
+    ramdacRequestAcknowledge = ramdacRequestAcknowledgeIfRequested & ramdacRequestEnable;
     ramdacResponseEnable = (inflightReadQueueStage4Type == INFLIGHT_READ_QUEUE_TYPE_RAMDAC);
     ramdacResponseWordAddress = currentRowAddress _ inflightReadQueueStage4Address;
     ramdacResponseData = ddrRegisterDataIn;
@@ -338,6 +339,7 @@ do (clk0) {
                 sd_state = SD_RD_WAIT_FOR_RAS;
 
             case SD_RD_WAIT_FOR_RAS:
+                ramdacRequestAcknowledgeIfRequested = 1;
                 sd_state = SD_RD_SEND_CAS;
 
             case SD_RD_SEND_CAS:
@@ -352,6 +354,7 @@ do (clk0) {
                 sdramRegisterA[0] = 0;
                 ddrRegisterDataStrobeEnable = 0;			// Set DQS for input
                 inflightReadQueueStage0Type = isRamdacRequest ? INFLIGHT_READ_QUEUE_TYPE_RAMDAC : INFLIGHT_READ_QUEUE_TYPE_BUS;
+                ramdacRequestAcknowledgeIfRequested = 0;
 
             case SD_RD_SEND_ANOTHER_CAS_OR_PRECHARGE:
                 // PRECHARGE
