@@ -60,12 +60,12 @@ constant vector[6] SD_LD_MODE = 8;
 constant vector[6] SD_LD_MODE1 = 9;
 constant vector[6] SD_RD_START = 10;
 constant vector[6] SD_RD_WAIT_FOR_RAS = 11;
-constant vector[6] SD_RD_SEND_CAS = 12;
+constant vector[6] SD_RD_SEND_CAS_OR_PRECHARGE = 12;
 constant vector[6] SD_RD_WAIT_FOR_PRECHARGE = 13;
 constant vector[6] SD_RD_DONE = 14;
 constant vector[6] SD_WR_START = 15;
 constant vector[6] SD_WR_WAIT_FOR_RAS = 16;
-constant vector[6] SD_WR_COL = 17;
+constant vector[6] SD_WR_SEND_CAS = 17;
 constant vector[6] SD_WR_CAS_WAIT = 18;
 constant vector[6] SD_WR_LATCH = 19;
 constant vector[6] SD_WR_LATCH1 = 20;
@@ -104,11 +104,11 @@ do (*) {
 register bit busRegisterWriteAcknowledge;
 do (*) {
     busRequestAcknowledge = busRegisterWriteAcknowledge |
-            ((sd_state == SD_RD_SEND_CAS) & ~isRamdacRequest & busRequestEnable & isRequestingCurrentRow);
+            ((sd_state == SD_RD_SEND_CAS_OR_PRECHARGE) & ~isRamdacRequest & busRequestEnable & isRequestingCurrentRow);
     busResponseEnable = (inflightReadQueueStage4Type == INFLIGHT_READ_QUEUE_TYPE_BUS);
     busResponseReadData = ddrRegisterDataIn;
 
-    ramdacRequestAcknowledge = (sd_state == SD_RD_SEND_CAS)
+    ramdacRequestAcknowledge = (sd_state == SD_RD_SEND_CAS_OR_PRECHARGE)
             & isRamdacRequest & ramdacRequestEnable & isRequestingCurrentRow;
     ramdacResponseEnable = (inflightReadQueueStage4Type == INFLIGHT_READ_QUEUE_TYPE_RAMDAC);
     ramdacResponseWordAddress = currentRowAddressRegister _ inflightReadQueueStage4Address;
@@ -356,9 +356,9 @@ do (clk0) {
                 sdramRegisterRAS = 1;
                 sdramRegisterCAS = 1;
                 sdramRegisterWE = 1;
-                sd_state = SD_RD_SEND_CAS;
+                sd_state = SD_RD_SEND_CAS_OR_PRECHARGE;
 
-            case SD_RD_SEND_CAS:
+            case SD_RD_SEND_CAS_OR_PRECHARGE:
                 if (ramdacRequestAcknowledge | busRequestAcknowledge) {
                     // CAS
                     sdramRegisterCS = 0;
@@ -417,9 +417,9 @@ do (clk0) {
                 sdramRegisterRAS = 1;
                 sdramRegisterCAS = 1;
                 sdramRegisterWE = 1;
-                sd_state = SD_WR_COL;
+                sd_state = SD_WR_SEND_CAS;
 
-            case SD_WR_COL:
+            case SD_WR_SEND_CAS:
                 sdramRegisterCS = 0;			// Access column
                 sdramRegisterRAS = 1;
                 sdramRegisterCAS = 0;
