@@ -61,9 +61,10 @@ constant vector[6] SD_LD_MODE1 = 9;
 constant vector[6] SD_RD_START = 10;
 constant vector[6] SD_RD_WAIT_FOR_RAS = 11;
 constant vector[6] SD_RD_SEND_CAS = 12;
-constant vector[6] SD_RD_WAIT_FOR_PRECHARGE = 14;
-constant vector[6] SD_RD_DONE = 15;
-constant vector[6] SD_WR_START = 16;
+constant vector[6] SD_RD_WAIT_FOR_PRECHARGE = 13;
+constant vector[6] SD_RD_DONE = 14;
+constant vector[6] SD_WR_START = 15;
+constant vector[6] SD_WR_WAIT_FOR_RAS = 16;
 constant vector[6] SD_WR_COL = 17;
 constant vector[6] SD_WR_CAS_WAIT = 18;
 constant vector[6] SD_WR_LATCH = 19;
@@ -350,6 +351,11 @@ do (clk0) {
                 sd_state = SD_RD_WAIT_FOR_RAS;
 
             case SD_RD_WAIT_FOR_RAS:
+                // NOP
+                sdramRegisterCS = 1;
+                sdramRegisterRAS = 1;
+                sdramRegisterCAS = 1;
+                sdramRegisterWE = 1;
                 sd_state = SD_RD_SEND_CAS;
 
             case SD_RD_SEND_CAS:
@@ -393,35 +399,36 @@ do (clk0) {
 
             // ** Write cycle *********************************************
             case SD_WR_START:
-                sd_state = SD_WR_COL;
+                // RAS
+                sdramRegisterCS = 0;
                 sdramRegisterRAS = 0;
                 sdramRegisterCAS = 1;
                 sdramRegisterWE = 1;
-                sdramRegisterCS = 0;
                 sdramRegisterBA[1:0] = currentRowAddressRegister[14:13];
                 sdramRegisterA[12:0] = currentRowAddressRegister[12:0];
                 ddrRegisterDataOut = busRequestWriteData;
                 ddrRegisterDataOutMask = ~busRequestWriteMask;
-                wait_count = ACCESS_WAIT;
                 ddrRegisterDataStrobe = 0;
+                sd_state = SD_WR_WAIT_FOR_RAS;
+
+            case SD_WR_WAIT_FOR_RAS:
+                // NOP
+                sdramRegisterCS = 1;
+                sdramRegisterRAS = 1;
+                sdramRegisterCAS = 1;
+                sdramRegisterWE = 1;
+                sd_state = SD_WR_COL;
 
             case SD_WR_COL:
-                if (~wait_count[5]) {
-                    sdramRegisterCS = 1;			// NOP command during access wait
-                    sdramRegisterRAS = 1;
-                    sdramRegisterCAS = 1;
-                    sdramRegisterWE = 1;
-                } else {
-                    sdramRegisterCS = 0;			// Access column
-                    sdramRegisterRAS = 1;
-                    sdramRegisterCAS = 0;
-                    sdramRegisterWE = 0;
-                    ddrRegisterDataStrobeEnable = 1;
-                    sd_state = SD_WR_CAS_WAIT;
-                    sdramRegisterA[9:1] = isRamdacRequest ? ramdacRequestWordAddress[8:0] : busRequestWordAddress[8:0];
-                    sdramRegisterA[10] = 1;		// Use auto-precharge
-                    sdramRegisterA[0] = 0;
-                }
+                sdramRegisterCS = 0;			// Access column
+                sdramRegisterRAS = 1;
+                sdramRegisterCAS = 0;
+                sdramRegisterWE = 0;
+                ddrRegisterDataStrobeEnable = 1;
+                sd_state = SD_WR_CAS_WAIT;
+                sdramRegisterA[9:1] = isRamdacRequest ? ramdacRequestWordAddress[8:0] : busRequestWordAddress[8:0];
+                sdramRegisterA[10] = 1;		// Use auto-precharge
+                sdramRegisterA[0] = 0;
 
             case SD_WR_CAS_WAIT:
                 sd_state = SD_WR_LATCH;
