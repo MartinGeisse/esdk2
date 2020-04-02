@@ -59,8 +59,8 @@ constant vector[6] SD_AUTO_REF_ACK = 7;
 constant vector[6] SD_LD_MODE = 8;
 constant vector[6] SD_LD_MODE1 = 9;
 constant vector[6] SD_RD_START = 10;
-constant vector[6] SD_RD_COL = 11;
-constant vector[6] SD_RD_SEND_PRECHARGE = 12;
+constant vector[6] SD_RD_WAIT_FOR_RAS_THEN_SEND_CAS = 11;
+constant vector[6] SD_RD_SEND_ANOTHER_CAS_OR_PRECHARGE = 12;
 constant vector[6] SD_RD_CAS_WAIT = 13;
 constant vector[6] SD_RD_DONE = 15;
 constant vector[6] SD_WR_START = 16;
@@ -324,7 +324,7 @@ do (clk0) {
 
             // ** Read cycle **********************************************
             case SD_RD_START:
-                sd_state = SD_RD_COL;
+                sd_state = SD_RD_WAIT_FOR_RAS_THEN_SEND_CAS;
                 sdramRegisterRAS = 0;
                 sdramRegisterCAS = 1;
                 sdramRegisterWE = 1;
@@ -335,7 +335,7 @@ do (clk0) {
                 ddrRegisterDataOutEnable = 0;						// Not driving the bus
                 ddrRegisterDataStrobe = 0;
 
-            case SD_RD_COL:
+            case SD_RD_WAIT_FOR_RAS_THEN_SEND_CAS:
                 if (~wait_count[5]) {
                     sdramRegisterCS = 1;			// NOP command during access wait
                     sdramRegisterRAS = 1;
@@ -346,7 +346,7 @@ do (clk0) {
                     sdramRegisterRAS = 1;
                     sdramRegisterCAS = 0;
                     sdramRegisterWE = 1;
-                    sd_state = SD_RD_SEND_PRECHARGE;
+                    sd_state = SD_RD_SEND_ANOTHER_CAS_OR_PRECHARGE;
                     sdramRegisterA[9:1] = isRamdacRequest ? ramdacRequestWordAddress[8:0] : busWordAddress[8:0];
                     sdramRegisterA[10] = 0;			// don't use auto-precharge
                     sdramRegisterA[0] = 0;
@@ -354,7 +354,7 @@ do (clk0) {
                     inflightReadQueueStage0Type = isRamdacRequest ? INFLIGHT_READ_QUEUE_TYPE_RAMDAC : INFLIGHT_READ_QUEUE_TYPE_BUS;
                 }
 
-            case SD_RD_SEND_PRECHARGE:
+            case SD_RD_SEND_ANOTHER_CAS_OR_PRECHARGE:
                 // PRECHARGE
                 sdramRegisterCS = 0;
                 sdramRegisterRAS = 0;
