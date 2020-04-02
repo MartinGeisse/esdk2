@@ -59,9 +59,10 @@ constant vector[6] SD_AUTO_REF_ACK = 7;
 constant vector[6] SD_LD_MODE = 8;
 constant vector[6] SD_LD_MODE1 = 9;
 constant vector[6] SD_RD_START = 10;
-constant vector[6] SD_RD_WAIT_FOR_RAS_THEN_SEND_CAS = 11;
-constant vector[6] SD_RD_SEND_ANOTHER_CAS_OR_PRECHARGE = 12;
-constant vector[6] SD_RD_WAIT_FOR_PRECHARGE = 13;
+constant vector[6] SD_RD_WAIT_FOR_RAS = 11;
+constant vector[6] SD_RD_SEND_CAS = 12;
+constant vector[6] SD_RD_SEND_ANOTHER_CAS_OR_PRECHARGE = 13;
+constant vector[6] SD_RD_WAIT_FOR_PRECHARGE = 14;
 constant vector[6] SD_RD_DONE = 15;
 constant vector[6] SD_WR_START = 16;
 constant vector[6] SD_WR_COL = 17;
@@ -323,36 +324,34 @@ do (clk0) {
                 refreshAcknowledge = 0;
 
             // ** Read cycle **********************************************
+
             case SD_RD_START:
-                sd_state = SD_RD_WAIT_FOR_RAS_THEN_SEND_CAS;
+                // RAS
                 sdramRegisterRAS = 0;
                 sdramRegisterCAS = 1;
                 sdramRegisterWE = 1;
                 sdramRegisterCS = 0;
                 sdramRegisterBA[1:0] = currentRowAddress[14:13];
                 sdramRegisterA[12:0] = currentRowAddress[12:0];
-                wait_count = ACCESS_WAIT;
-                ddrRegisterDataOutEnable = 0;						// Not driving the bus
+                ddrRegisterDataOutEnable = 0; // Not driving the bus
                 ddrRegisterDataStrobe = 0;
+                sd_state = SD_RD_WAIT_FOR_RAS;
 
-            case SD_RD_WAIT_FOR_RAS_THEN_SEND_CAS:
-                if (~wait_count[5]) {
-                    sdramRegisterCS = 1;			// NOP command during access wait
-                    sdramRegisterRAS = 1;
-                    sdramRegisterCAS = 1;
-                    sdramRegisterWE = 1;
-                } else {
-                    sdramRegisterCS = 0;				// Access column
-                    sdramRegisterRAS = 1;
-                    sdramRegisterCAS = 0;
-                    sdramRegisterWE = 1;
-                    sd_state = SD_RD_SEND_ANOTHER_CAS_OR_PRECHARGE;
-                    sdramRegisterA[9:1] = isRamdacRequest ? ramdacRequestWordAddress[8:0] : busWordAddress[8:0];
-                    sdramRegisterA[10] = 0;			// don't use auto-precharge
-                    sdramRegisterA[0] = 0;
-                    ddrRegisterDataStrobeEnable = 0;			// Set DQS for input
-                    inflightReadQueueStage0Type = isRamdacRequest ? INFLIGHT_READ_QUEUE_TYPE_RAMDAC : INFLIGHT_READ_QUEUE_TYPE_BUS;
-                }
+            case SD_RD_WAIT_FOR_RAS:
+                sd_state = SD_RD_SEND_CAS;
+
+            case SD_RD_SEND_CAS:
+                // CAS
+                sdramRegisterCS = 0;
+                sdramRegisterRAS = 1;
+                sdramRegisterCAS = 0;
+                sdramRegisterWE = 1;
+                sd_state = SD_RD_SEND_ANOTHER_CAS_OR_PRECHARGE;
+                sdramRegisterA[9:1] = isRamdacRequest ? ramdacRequestWordAddress[8:0] : busWordAddress[8:0];
+                sdramRegisterA[10] = 0;			// don't use auto-precharge
+                sdramRegisterA[0] = 0;
+                ddrRegisterDataStrobeEnable = 0;			// Set DQS for input
+                inflightReadQueueStage0Type = isRamdacRequest ? INFLIGHT_READ_QUEUE_TYPE_RAMDAC : INFLIGHT_READ_QUEUE_TYPE_BUS;
 
             case SD_RD_SEND_ANOTHER_CAS_OR_PRECHARGE:
                 // PRECHARGE
