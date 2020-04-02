@@ -1,0 +1,41 @@
+module name.martingeisse.esdk.riscv.rtl.ram.RamAgentCommandEngine;
+
+interface {
+
+    in clock clk;
+    in bit reset;
+
+    // as long as this flag is true, regular requests to the RAM controller must be blocked
+    out bit lockRamInterface;
+
+    // CPU interface
+    in vector[4] cpuCommandCode;
+    in vector[24] cpuWordAddress;
+    in bit cpuEnable, cpuWrite;
+    in vector[32] cpuWriteData;
+    in vector[4] cpuWriteMask;
+    out vector[32] cpuReadData;
+    out bit cpuAcknowledge;
+
+    // RAM controller interface
+    out vector[24] ramRequestWordAddress;
+    out bit ramRequestEnable, ramRequestWrite;
+    out vector[32] ramRequestWriteData;
+    out vector[4] ramRequestWriteMask;
+    in bit ramRequestAcknowledge;
+    in vector[32] ramResponseReadData;
+    in bit ramResponseEnable;
+
+}
+
+// no-op implementation
+do (*) {
+    lockRamInterface = 0;
+    cpuReadData = 0;
+    cpuAcknowledge = 1;
+    ramRequestWordAddress = 0;
+    ramRequestEnable = 0;
+    ramRequestWrite = 0;
+    ramRequestWriteData = 0;
+    ramRequestWriteMask = 0;
+}
