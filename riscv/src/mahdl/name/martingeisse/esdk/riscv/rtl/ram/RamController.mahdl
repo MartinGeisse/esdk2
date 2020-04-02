@@ -106,7 +106,7 @@ do (*) {
     busAcknowledge = busRegisterWriteAcknowledge | (inflightReadQueueStage4Type == INFLIGHT_READ_QUEUE_TYPE_BUS);
     busReadData = ddrRegisterDataIn;
 
-    ramdacRequestAcknowledge = (sd_state == SD_RD_SEND_CAS) & ramdacRequestEnable & followupRequestHasSameAddress;
+    ramdacRequestAcknowledge = (sd_state == SD_RD_SEND_CAS) & isRamdacRequest & ramdacRequestEnable & isRequestingCurrentRow;
     ramdacResponseEnable = (inflightReadQueueStage4Type == INFLIGHT_READ_QUEUE_TYPE_RAMDAC);
     ramdacResponseWordAddress = currentRowAddressRegister _ inflightReadQueueStage4Address;
     ramdacResponseData = ddrRegisterDataIn;
@@ -186,8 +186,8 @@ do (clk0) {
 // arbitrary clients and prioritize the RAMDAC per request (not per "combo" with the same row), since it simplifies
 // the logic. The only downside (if it's a downside at all) is that the RAMDAC will break combos made by the bus.
 register vector[15] currentRowAddressRegister;
-signal vector[15] followupRequestRowAddress = (isRamdacRequest ? ramdacRequestWordAddress[23:9] : busWordAddress[23:9]);
-signal bit followupRequestHasSameAddress = (followupRequestRowAddress == currentRowAddressRegister);
+signal vector[15] requestingRowAddress = (isRamdacRequest ? ramdacRequestWordAddress[23:9] : busWordAddress[23:9]);
+signal bit isRequestingCurrentRow = (requestingRowAddress == currentRowAddressRegister);
 
 // main and init state machines
 register bit refreshAcknowledge;
