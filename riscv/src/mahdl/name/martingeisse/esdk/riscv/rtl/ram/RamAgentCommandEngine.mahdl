@@ -40,6 +40,11 @@ do (*) {
     cpuAcknowledge = cpuEnable & (state == STATE_IDLE);
     cpuReadData = 0;
 }
+do (clk) {
+    if (cpuEnable & cpuWrite & cpuCommandCode == COMMAND_CODE_ACCESS_CONTROL_REGISTERS) {
+        spanLengthRegister = cpuWriteData[9:0];
+    }
+}
 
 // RAM interface: We lock the RAM as long as we're not idle, and generate all RAM-related signals through secondary
 // registers in the state machine
@@ -52,36 +57,56 @@ do (*) {
     ramRequestWriteMask = ramRequestWriteMaskRegister;
 }
 
-// control registers
-// register vector[10] spanLengthRegister;
+// control registers (writable by the CPU)
+register vector[10] spanLengthRegister; // 10d0 means 2^10, not 0
 
 // main state register
 constant vector[4] STATE_IDLE = 4d0;
+constant vector[4] STATE_WRITE_SPAN = 4d1;
 register vector[4] state;
 
-// secondary processing registers
+// secondary processing registers: RAM control
 register bit ramRequestEnableRegister;
 register vector[24] ramRequestWordAddressRegister;
 register bit ramRequestWriteRegister;
 register vector[32] ramRequestWriteDataRegister;
 register vector[4] ramRequestWriteMaskRegister;
 
+// secondary processing registers: other
+register vector[10] remainingSpanLengthRegister;
+
 // main state machine
 do (clk) {
     if (reset) {
         ramRequestEnableRegister = 0;
-
-        // TODO remove from reset, currently just works around a limitation in the compiler
-        ramRequestWordAddressRegister = 0;
-        ramRequestWriteRegister = 0;
-        ramRequestWriteDataRegister = 0;
-        ramRequestWriteMaskRegister = 0;
-
     }
     switch (state) {
 
         case STATE_IDLE:
+            ramRequestWordAddressRegister = cpuWordAddress;
+            ramRequestWriteRegister = cpuWrite;
+            ramRequestWriteDataRegister = cpuWriteData;
+            ramRequestWriteMaskRegister = cpuWriteMask;
+            if (cpuEnable) {
+                if (cpuWrite) {
+                    switch (cpuCommandCode) {
+                        case COMMAND_CODE_WRITE_SPAN:
+                            state = STATE_WRITE_SPAN;
+                            remainingSpanLengthRegister = spanLengthRegister;
+                            ramRequestEnableRegister = 1;
+                    }
+                }
+            }
             state = STATE_IDLE;
+
+        case STATE_WRITE_SPAN:
+            if (ramRequestAcknowledge) {
+                ramRequestWordAddressRegister = ramRequestWordAddressRegister + 24d1;
+                if (remainingSpanLengthRegister == 10d1) {
+                    ramRequestEnableRegister = 0;
+                    state = STATE_IDLE;
+                }
+            }
 
         default:
             state = STATE_IDLE;
