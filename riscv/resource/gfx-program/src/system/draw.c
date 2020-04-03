@@ -120,7 +120,7 @@ static void drawHorizontalLine(int x1, int x2, int y) {
     }
 
     // convert x-values to pointers
-    unsigned char *screenRow = drawPlane + y * 1024;
+    unsigned char *screenRow = drawPlane + (y << 10);
     unsigned char *p1 = screenRow + x1;
     unsigned char *p2 = screenRow + x2;
 
@@ -130,7 +130,7 @@ static void drawHorizontalLine(int x1, int x2, int y) {
         // draw initial word fraction
         while ((int)p1 & 3) {
             *p1 = drawColor;
-            *p1++;
+            p1++;
         }
 
         // draw full words
@@ -156,7 +156,7 @@ static void drawHorizontalLine(int x1, int x2, int y) {
     // draw final word fraction (or whole line if less than 8 pixels)
     while (p1 < p2) {
         *p1 = drawColor;
-        *p1++;
+        p1++;
     }
 
 }
@@ -176,9 +176,10 @@ void drawAxisAlignedRectangle(int x, int y, int w, int h) {
     if (y + h > 480) {
         h = 480 - y;
     }
+    int x2 = x + w;
     int y2 = y + h;
     while (y < y2) {
-        drawHorizontalLine(x, x + w, y);
+        drawHorizontalLine(x, x2, y);
         y++;
     }
 }
