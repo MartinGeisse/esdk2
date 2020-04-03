@@ -97,7 +97,6 @@ do (clk) {
                         }
                     }
                 }
-                state = STATE_IDLE;
 
             case STATE_WRITE_SPAN:
                 if (ramRequestAcknowledge) {
