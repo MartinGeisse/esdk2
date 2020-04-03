@@ -103,31 +103,6 @@ void setDrawColor(int color) {
     drawColorWord = (drawColorWord << 16) | drawColorWord;
 }
 
-void drawAxisAlignedRectangle(int x, int y, int w, int h) {
-    if (x < 0) {
-        w += x;
-        x = 0;
-    }
-    if (y < 0) {
-        h += y;
-        y = 0;
-    }
-    if (x + w > 640) {
-        w = 640 - x;
-    }
-    if (y + h > 480) {
-        h = 480 - y;
-    }
-    unsigned char *startPointer = drawPlane + y * 1024 + x;
-    while (h > 0) {
-        for (int i = 0; i < w; i++) {
-            startPointer[i] = drawColor;
-        }
-        h--;
-        startPointer += 1024;
-    }
-}
-
 // note: expects x1 <= x2
 static void drawHorizontalLine(int x1, int x2, int y) {
 
@@ -184,6 +159,28 @@ static void drawHorizontalLine(int x1, int x2, int y) {
         *p1++;
     }
 
+}
+
+void drawAxisAlignedRectangle(int x, int y, int w, int h) {
+    if (x < 0) {
+        w += x;
+        x = 0;
+    }
+    if (y < 0) {
+        h += y;
+        y = 0;
+    }
+    if (x + w > 640) {
+        w = 640 - x;
+    }
+    if (y + h > 480) {
+        h = 480 - y;
+    }
+    int y2 = y + h;
+    while (y < y2) {
+        drawHorizontalLine(x, x + w, y);
+        y++;
+    }
 }
 
 static void drawHalfTriangle(int x1a, int x1b, int y1, int x2, int y2, int dy) {
