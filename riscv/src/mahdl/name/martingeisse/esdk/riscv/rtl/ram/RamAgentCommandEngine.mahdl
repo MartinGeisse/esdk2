@@ -79,37 +79,39 @@ register vector[10] remainingSpanLengthRegister;
 do (clk) {
     if (reset) {
         ramRequestEnableRegister = 0;
-    }
-    switch (state) {
+    } else {
+        switch (state) {
 
-        case STATE_IDLE:
-            ramRequestWordAddressRegister = cpuWordAddress;
-            ramRequestWriteRegister = cpuWrite;
-            ramRequestWriteDataRegister = cpuWriteData;
-            ramRequestWriteMaskRegister = cpuWriteMask;
-            if (cpuEnable) {
-                if (cpuWrite) {
-                    switch (cpuCommandCode) {
-                        case COMMAND_CODE_WRITE_SPAN:
-                            state = STATE_WRITE_SPAN;
-                            remainingSpanLengthRegister = spanLengthRegister;
-                            ramRequestEnableRegister = 1;
+            case STATE_IDLE:
+                ramRequestWordAddressRegister = cpuWordAddress;
+                ramRequestWriteRegister = cpuWrite;
+                ramRequestWriteDataRegister = cpuWriteData;
+                ramRequestWriteMaskRegister = cpuWriteMask;
+                if (cpuEnable) {
+                    if (cpuWrite) {
+                        switch (cpuCommandCode) {
+                            case COMMAND_CODE_WRITE_SPAN:
+                                state = STATE_WRITE_SPAN;
+                                remainingSpanLengthRegister = spanLengthRegister;
+                                ramRequestEnableRegister = 1;
+                        }
                     }
                 }
-            }
-            state = STATE_IDLE;
+                state = STATE_IDLE;
 
-        case STATE_WRITE_SPAN:
-            if (ramRequestAcknowledge) {
-                ramRequestWordAddressRegister = ramRequestWordAddressRegister + 24d1;
-                if (remainingSpanLengthRegister == 10d1) {
-                    ramRequestEnableRegister = 0;
-                    state = STATE_IDLE;
+            case STATE_WRITE_SPAN:
+                if (ramRequestAcknowledge) {
+                    ramRequestWordAddressRegister = ramRequestWordAddressRegister + 24d1;
+                    // TODO decrement remainingSpanLengthRegister
+                    if (remainingSpanLengthRegister == 10d1) {
+                        ramRequestEnableRegister = 0;
+                        state = STATE_IDLE;
+                    }
                 }
-            }
 
-        default:
-            state = STATE_IDLE;
+            default:
+                state = STATE_IDLE;
 
+        }
     }
 }
