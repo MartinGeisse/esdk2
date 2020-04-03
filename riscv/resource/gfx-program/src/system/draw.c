@@ -136,19 +136,15 @@ static void drawHorizontalLine(int x1, int x2, int y) {
         // draw full words
         unsigned int word = drawColorWord;
         int fourPixels = word | (word << 8) | (word << 16) | (word << 24);
+
         if (simdevIsSimulation()) {
             int wordCount = ((int)(p2 - p1)) >> 2;
             simdevFillWordsShowInt(p1, word, wordCount);
             p1 += wordCount << 2;
         } else {
-            while (1) {
-                unsigned char *nextP1 = p1 + 4;
-                if (nextP1 > p2) {
-                    break;
-                }
-                *(unsigned int *)p1 = fourPixels;
-                p1 = nextP1;
-            }
+            *(int *)RAM_AGENT_COMMAND_ENGINE_SPAN_LENGTH_REGISTER_ADDRESS = (p2 - p1) >> 2;
+            *(int*)(((int)p1) | RAM_AGENT_COMMAND_ENGINE_ADDRESS_BIT | RAM_AGENT_COMMAND_ENGINE_COMMAND_CODE_WRITE_SPAN) = fourPixels;
+            p1 = (unsigned char *)(((int)p2) & ~3);
         }
 
     }
