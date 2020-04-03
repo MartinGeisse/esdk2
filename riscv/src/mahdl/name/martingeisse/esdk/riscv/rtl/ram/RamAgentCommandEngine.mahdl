@@ -18,8 +18,9 @@ interface {
     out bit cpuAcknowledge;
 
     // RAM controller interface
+    out bit ramRequestEnable;
     out vector[24] ramRequestWordAddress;
-    out bit ramRequestEnable, ramRequestWrite;
+    out bit ramRequestWrite;
     out vector[32] ramRequestWriteData;
     out vector[4] ramRequestWriteMask;
     in bit ramRequestAcknowledge;
@@ -28,14 +29,62 @@ interface {
 
 }
 
-// no-op implementation
+// these command codes can be sent by the CPU
+constant vector[4] COMMAND_CODE_ACCESS_CONTROL_REGISTERS = 4d0;
+constant vector[4] COMMAND_CODE_WRITE_SPAN = 4d1;
+
+// Bus interface: in STATE_IDLE, immediate read or write control registers. In other states, wait for STATE_IDLE.
+// This module does not support complex bus operations; they must be broken down to simple operations. We block off
+// operations while not idle because they would read or write inconsistent data.
 do (*) {
-    lockRamInterface = 0;
+    cpuAcknowledge = cpuEnable & (state == STATE_IDLE);
     cpuReadData = 0;
-    cpuAcknowledge = 1;
-    ramRequestWordAddress = 0;
-    ramRequestEnable = 0;
-    ramRequestWrite = 0;
-    ramRequestWriteData = 0;
-    ramRequestWriteMask = 0;
+}
+
+// RAM interface: We lock the RAM as long as we're not idle, and generate all RAM-related signals through secondary
+// registers in the state machine
+do (*) {
+    lockRamInterface = (state != STATE_IDLE);
+    ramRequestEnable = ramRequestEnableRegister;
+    ramRequestWordAddress = ramRequestWordAddressRegister;
+    ramRequestWrite = ramRequestWriteRegister;
+    ramRequestWriteData = ramRequestWriteDataRegister;
+    ramRequestWriteMask = ramRequestWriteMaskRegister;
+}
+
+// control registers
+// register vector[10] spanLengthRegister;
+
+// main state register
+constant vector[4] STATE_IDLE = 4d0;
+register vector[4] state;
+
+// secondary processing registers
+register bit ramRequestEnableRegister;
+register vector[24] ramRequestWordAddressRegister;
+register bit ramRequestWriteRegister;
+register vector[32] ramRequestWriteDataRegister;
+register vector[4] ramRequestWriteMaskRegister;
+
+// main state machine
+do (clk) {
+    if (reset) {
+        ramRequestEnableRegister = 0;
+
+        // TODO remove from reset, currently just works around a limitation in the compiler
+        ramRequestWordAddressRegister = 0;
+        ramRequestWriteRegister = 0;
+        ramRequestWriteDataRegister = 0;
+        ramRequestWriteMaskRegister = 0;
+
+    }
+    switch (state) {
+
+        case STATE_IDLE:
+            state = STATE_IDLE;
+
+        default:
+            state = STATE_IDLE;
+
+    }
 }
