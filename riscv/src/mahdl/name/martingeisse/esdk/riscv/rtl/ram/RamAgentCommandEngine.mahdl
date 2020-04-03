@@ -101,11 +101,11 @@ do (clk) {
             case STATE_WRITE_SPAN:
                 if (ramRequestAcknowledge) {
                     ramRequestWordAddressRegister = ramRequestWordAddressRegister + 24d1;
-                    // TODO decrement remainingSpanLengthRegister
                     if (remainingSpanLengthRegister == 10d1) {
                         ramRequestEnableRegister = 0;
                         state = STATE_IDLE;
                     }
+                    remainingSpanLengthRegister = remainingSpanLengthRegister - 10d1;
                 }
 
             default:
