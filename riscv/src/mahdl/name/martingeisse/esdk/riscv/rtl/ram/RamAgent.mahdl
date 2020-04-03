@@ -54,7 +54,7 @@ do (clk) {
         // To simplify the logic, this branch may be taken for command processing, but the flag should stay at 0 for
         // commands anyway, so overwriting with 0 here should not matter.
         requestAcknowledgedRegister = 0;
-    } else if (~cpuSelectCommandEngine & ramRequestAcknowledge) {
+    } else if (~cpuSelectCommandEngine & ~commandEngine.lockRamInterface & ramRequestAcknowledge) {
         requestAcknowledgedRegister = 1;
     }
 }
