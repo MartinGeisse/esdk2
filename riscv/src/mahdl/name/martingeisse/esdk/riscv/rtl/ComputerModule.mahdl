@@ -23,8 +23,8 @@ name.martingeisse.esdk.riscv.rtl.spi.SpiInterface spiInterface;
 
 // bus decoder: big devices
 signal bit ramAgentSelected = cpu.memoryWordAddress[29];
-signal bit simulationDeviceSelected = cpu.memoryWordAddress[28];
-signal bit smallDeviceRegionSelected = ~ramAgentSelected & ~simulationDeviceSelected;
+signal bit simulationDeviceSelected = ~cpu.memoryWordAddress[29] & cpu.memoryWordAddress[28];
+signal bit smallDeviceRegionSelected = ~cpu.memoryWordAddress[29] & ~cpu.memoryWordAddress[28];
 
 // bus decoder: small devices
 signal bit terminalSelected = smallDeviceRegionSelected & cpu.memoryWordAddress[12];
