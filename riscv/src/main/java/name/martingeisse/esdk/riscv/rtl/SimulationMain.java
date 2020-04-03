@@ -7,6 +7,7 @@ import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
 import name.martingeisse.esdk.core.rtl.signal.RtlConcatenation;
 import name.martingeisse.esdk.core.rtl.signal.RtlVectorConstant;
 import name.martingeisse.esdk.core.rtl.simulation.RtlClockGenerator;
+import name.martingeisse.esdk.core.rtl.simulation.RtlClockedSimulationItem;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 import name.martingeisse.esdk.library.SignalLogger;
 import name.martingeisse.esdk.library.SignalLoggerBusInterface;
@@ -167,6 +168,19 @@ public class SimulationMain {
             SpiInterface.Implementation spiInterface = (SpiInterface.Implementation) design.getComputerModule()._spiInterface;
             SpiConnector.Connector connector = (SpiConnector.Connector) spiInterface._spiConnector;
         }
+
+        // set debugger breakpoints here to allow clock stepping
+        new RtlClockedSimulationItem(design.getClock()) {
+
+            @Override
+            public void computeNextState() {
+            }
+
+            @Override
+            public void updateState() {
+            }
+
+        };
 
         // simulate
         new RtlClockGenerator(design.getClock(), 10);
