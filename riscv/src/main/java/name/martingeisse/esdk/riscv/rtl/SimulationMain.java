@@ -33,6 +33,8 @@ import java.nio.charset.StandardCharsets;
  */
 public class SimulationMain {
 
+    public static final boolean LWJGL = false;
+
     private final ComputerDesign design;
     private final ComputerModule.Implementation computerModule;
     private final RtlRealm realm;
@@ -122,13 +124,17 @@ public class SimulationMain {
         ramAdapter = (SimulatedRamAdapterWithoutRamdacSupport) computerModule._bigRam;
         displayPanel = new SimulatedPixelDisplayPanel(ramAdapter.getRam());
 
-        JFrame frame = new JFrame("Terminal");
-        frame.add(displayPanel);
-        frame.pack();
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        frame.setResizable(false);
-        frame.setVisible(true);
-        new Timer(500, event -> displayPanel.repaint()).start();
+        if (LWJGL) {
+            // TODO
+        } else {
+            JFrame frame = new JFrame("Terminal");
+            frame.add(displayPanel);
+            frame.pack();
+            frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+            frame.setResizable(false);
+            frame.setVisible(true);
+            new Timer(500, event -> displayPanel.repaint()).start();
+        }
 
         // keyboard (disable for now)
         keyboardController = (KeyboardController.Implementation) computerModule._keyboard;
@@ -215,6 +221,7 @@ public class SimulationMain {
 //	}
 
     public static void main(String[] args) throws Exception {
+        CeeCompilerInvoker.invoke();
         new SimulationMain().design.simulate();
     }
 

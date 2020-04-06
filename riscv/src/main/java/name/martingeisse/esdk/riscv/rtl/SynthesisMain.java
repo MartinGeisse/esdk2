@@ -32,6 +32,7 @@ import java.io.File;
 public class SynthesisMain {
 
 	public static void main(String[] args) throws Exception {
+		CeeCompilerInvoker.invoke();
 		ComputerDesign design = new ComputerDesign() {
 			@Override
 			protected ComputerModule.Implementation createComputerModule() {
