@@ -11,6 +11,7 @@ import name.martingeisse.esdk.core.rtl.simulation.RtlClockedSimulationItem;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 import name.martingeisse.esdk.library.SignalLogger;
 import name.martingeisse.esdk.library.SignalLoggerBusInterface;
+import name.martingeisse.esdk.riscv.rtl.pixel.SimulatedOpenglHelper;
 import name.martingeisse.esdk.riscv.rtl.pixel.SimulatedPixelDisplayPanel;
 import name.martingeisse.esdk.riscv.rtl.ram.RamController;
 import name.martingeisse.esdk.riscv.rtl.ram.SimulatedRam;
@@ -33,7 +34,7 @@ import java.nio.charset.StandardCharsets;
  */
 public class SimulationMain {
 
-    public static final boolean LWJGL = false;
+    public static final boolean LWJGL = true;
 
     private final ComputerDesign design;
     private final ComputerModule.Implementation computerModule;
@@ -44,6 +45,7 @@ public class SimulationMain {
     private final Ps2Connector.Connector ps2Connector;
     private final SignalLoggerBusInterface.Connector loggerInterface;
     private final SignalLogger signalLogger;
+    private final SimulatedOpenglHelper openglHelper;
 
     public SimulationMain() throws Exception {
         design = new ComputerDesign() {
@@ -125,7 +127,7 @@ public class SimulationMain {
         displayPanel = new SimulatedPixelDisplayPanel(ramAdapter.getRam());
 
         if (LWJGL) {
-            // TODO
+            openglHelper = new SimulatedOpenglHelper();
         } else {
             JFrame frame = new JFrame("Terminal");
             frame.add(displayPanel);
@@ -134,6 +136,7 @@ public class SimulationMain {
             frame.setResizable(false);
             frame.setVisible(true);
             new Timer(500, event -> displayPanel.repaint()).start();
+            openglHelper = null;
         }
 
         // keyboard (disable for now)
@@ -222,10 +225,18 @@ public class SimulationMain {
 
     public static void main(String[] args) throws Exception {
         CeeCompilerInvoker.invoke();
-        new SimulationMain().design.simulate();
+        SimulationMain main = new SimulationMain();
+        main.design.simulate();
+        if (main.openglHelper != null) {
+            main.openglHelper.destroy();
+        }
     }
 
     public int readFromSimulationDevice(int wordAddress) {
+        int majorAddress = wordAddress >> 16;
+        if (majorAddress == 1) {
+            return openglHelper == null ? 0 : openglHelper.read(wordAddress);
+        }
         switch (wordAddress) {
 
             case 0:
@@ -239,6 +250,13 @@ public class SimulationMain {
     }
 
     public void writeToSimulationDevice(int wordAddress, int byteMask, int data) {
+        int majorAddress = wordAddress >> 16;
+        if (majorAddress == 1) {
+            if (openglHelper != null) {
+                openglHelper.write(wordAddress, byteMask, data);
+            }
+            return;
+        }
         switch (wordAddress) {
 
             case 0:
@@ -256,7 +274,6 @@ public class SimulationMain {
             case 3:
                 displayPanel.setDisplayPlane(data & 1);
                 break;
-
 
         }
     }

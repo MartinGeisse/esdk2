@@ -80,6 +80,7 @@ void main() {
     }
 */
 
+/*
     for (int i = 0, size = 30; i < SQUARE_COUNT; i++, size += 23) {
         xs[i] = 0;
         ys[i] = 0;
@@ -100,6 +101,14 @@ void main() {
             moveSquare(xs + i, dxs + i, 640 - sizes[i]);
             moveSquare(ys + i, dys + i, 480 - sizes[i]);
         }
+    }
+*/
+
+    int color = 0;
+    while (1) {
+        simdevGlFlipScreen();
+        simdevGlClearScreen(color);
+        color++;
     }
 
     // simdevMessage("DONE!");

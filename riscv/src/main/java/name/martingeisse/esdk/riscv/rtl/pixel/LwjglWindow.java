@@ -43,4 +43,9 @@ public class LwjglWindow {
         glfwSetErrorCallback(null).free();
     }
 
+    public void flipScreen() {
+        glfwSwapBuffers(windowHandle);
+        glfwPollEvents();
+    }
+
 }
