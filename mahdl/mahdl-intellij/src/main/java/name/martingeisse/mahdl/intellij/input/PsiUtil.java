@@ -29,6 +29,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -238,7 +239,7 @@ public final class PsiUtil {
 			VirtualFile virtualFile = psiFile.getOriginalFile().getVirtualFile();
 			if (virtualFile != null) {
 				actualDeleteCallback.run();
-				FileContentUtil.reparseFiles(virtualFile);
+				FileContentUtil.reparseFiles(node.getProject(), Collections.singletonList(virtualFile), false);
 				return;
 			}
 		}

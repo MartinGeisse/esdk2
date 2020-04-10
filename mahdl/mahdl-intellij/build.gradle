@@ -15,7 +15,7 @@ compileJava {
 }
 
 intellij {
-    version '193.6015.39'
+    version '201.6668.121'
     pluginName 'MaHDL IntelliJ Plugin'
 }
 
