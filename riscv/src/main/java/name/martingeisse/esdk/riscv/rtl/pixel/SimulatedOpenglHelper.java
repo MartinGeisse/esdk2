@@ -29,7 +29,7 @@ public final class SimulatedOpenglHelper {
                 flipScreen();
                 break;
 
-                // clear screen
+            // clear screen
             case 1:
                 GL11.glClearColor(decodeRedF(data), decodeGreenF(data), decodeBlueF(data), 1.0f);
                 GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
