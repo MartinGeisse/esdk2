@@ -6,14 +6,13 @@ import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.module.RtlModuleInstance;
 import name.martingeisse.esdk.core.rtl.pin.RtlInputPin;
 import name.martingeisse.esdk.core.rtl.pin.RtlOutputPin;
-import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
-import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
-import name.martingeisse.esdk.core.rtl.signal.RtlConcatenation;
-import name.martingeisse.esdk.core.rtl.signal.RtlVectorConstant;
+import name.martingeisse.esdk.core.rtl.signal.*;
 import name.martingeisse.esdk.core.rtl.synthesis.xilinx.ProjectGenerator;
 import name.martingeisse.esdk.core.rtl.synthesis.xilinx.XilinxPinConfiguration;
+import name.martingeisse.esdk.core.util.vector.VectorValue;
 import name.martingeisse.esdk.library.SignalLogger;
 import name.martingeisse.esdk.library.SignalLoggerBusInterface;
+import name.martingeisse.esdk.library.util.RegisterBuilder;
 import name.martingeisse.esdk.riscv.rtl.ram.RamController;
 import name.martingeisse.esdk.riscv.rtl.ram.SdramConnector;
 import name.martingeisse.esdk.riscv.rtl.ram.SdramConnectorImpl;
@@ -116,13 +115,32 @@ public class SynthesisMain {
 		ps2Connector.setClkSocket(ps2Pin(realm, "G14"));
 		ps2Connector.setDataSocket(ps2Pin(realm, "G13"));
 
+		// serial port test
+		RtlBitSignal serialPortSignal;
+		{
+			// NET "FX2_IO<5>"  LOC = "A6"  | IOSTANDARD = LVCMOS33  | SLEW = FAST  | DRIVE = 8 ;
+			XilinxPinConfiguration configuration = new XilinxPinConfiguration();
+			configuration.setIostandard("LVCMOS33");
+			configuration.setSlew(XilinxPinConfiguration.Slew.FAST);
+			configuration.setDrive(8);
+			RtlInputPin serialPortPin = new RtlInputPin(realm);
+			serialPortPin.setId("A6");
+			serialPortPin.setConfiguration(configuration);
+			serialPortSignal = serialPortPin;
+		}
+		RtlBitSignal serialPortActive = RegisterBuilder.build(false,
+				design.getClock(), new RtlBitConstant(realm, true), serialPortSignal);
+		RtlVectorSignal serialPortDivider = RegisterBuilder.build(20, VectorValue.of(20, 0),
+				design.getClock(), r -> r.add(1));
+
+
         //
 		// signal logger
 		//
 		SignalLoggerBusInterface.Connector loggerInterface = (SignalLoggerBusInterface.Connector)computerModule._signalLogger;
 		SignalLogger signalLogger = new SignalLogger.Implementation(realm, design.getClock(), design.getClock());
-		signalLogger.setLogEnable(new RtlBitConstant(realm, false));
-		signalLogger.setLogData(RtlVectorConstant.of(realm, 32, 0));
+		signalLogger.setLogEnable(serialPortActive.and(serialPortDivider.compareEqual(0)));
+		signalLogger.setLogData(RtlVectorConstant.of(realm, 31, 0).concat(serialPortSignal));
 		signalLogger.setBusEnable(loggerInterface.getBusEnableSocket());
 		signalLogger.setBusWrite(loggerInterface.getBusWriteSocket());
 		signalLogger.setBusWriteData(loggerInterface.getBusWriteDataSocket());
