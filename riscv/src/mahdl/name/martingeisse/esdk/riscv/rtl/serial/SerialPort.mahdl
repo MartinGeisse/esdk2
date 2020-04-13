@@ -8,7 +8,18 @@ interface {
     out vector[32] busReadData;
 }
 
+register vector[8] receiveBuffer, finishedByte;
+register bit hasFinishedByte = 0;
+
 do (*) {
     busAcknowledge = 1;
-    busReadData = 0;
+    busReadData = hasFinishedByte ? (24d0 _ finishedByte) : 32hffffffff;
+}
+
+do (clk) {
+    // TODO serial interface
+
+    if (busEnable) {
+        hasFinishedByte = 0;
+    }
 }
