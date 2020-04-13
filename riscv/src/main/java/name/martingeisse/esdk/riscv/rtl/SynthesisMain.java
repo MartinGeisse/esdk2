@@ -16,6 +16,7 @@ import name.martingeisse.esdk.library.util.RegisterBuilder;
 import name.martingeisse.esdk.riscv.rtl.ram.RamController;
 import name.martingeisse.esdk.riscv.rtl.ram.SdramConnector;
 import name.martingeisse.esdk.riscv.rtl.ram.SdramConnectorImpl;
+import name.martingeisse.esdk.riscv.rtl.serial.SerialPort;
 import name.martingeisse.esdk.riscv.rtl.spi.SpiConnector;
 import name.martingeisse.esdk.riscv.rtl.spi.SpiInterface;
 import name.martingeisse.esdk.riscv.rtl.terminal.KeyboardController;
@@ -144,7 +145,7 @@ public class SynthesisMain {
 		computerModule.setSerialPortSignal(serialPortSignal);
 		RtlBitSignal serialPortActive = RegisterBuilder.build(false,
 				design.getClock(), new RtlBitConstant(realm, true), serialPortSignal.not());
-		RtlVectorSignal serialPortDivider = RegisterBuilder.build(3, VectorValue.of(3, 0),
+		RtlVectorSignal serialPortDivider = RegisterBuilder.build(5, VectorValue.of(5, 0),
 				design.getClock(), r -> r.add(1));
 
 
@@ -154,7 +155,10 @@ public class SynthesisMain {
 		SignalLoggerBusInterface.Connector loggerInterface = (SignalLoggerBusInterface.Connector)computerModule._signalLogger;
 		SignalLogger signalLogger = new SignalLogger.Implementation(realm, design.getClock(), design.getClock());
 		signalLogger.setLogEnable(serialPortActive.and(serialPortDivider.compareEqual(0)));
-		signalLogger.setLogData(RtlVectorConstant.of(realm, 31, 0).concat(serialPortSignal));
+		signalLogger.setLogData(RtlVectorConstant.of(realm, 27, 0)
+			.concat(serialPortSignal)
+			.concat(((SerialPort.Implementation)computerModule._serialPort)._state)
+		);
 		signalLogger.setBusEnable(loggerInterface.getBusEnableSocket());
 		signalLogger.setBusWrite(loggerInterface.getBusWriteSocket());
 		signalLogger.setBusWriteData(loggerInterface.getBusWriteDataSocket());
