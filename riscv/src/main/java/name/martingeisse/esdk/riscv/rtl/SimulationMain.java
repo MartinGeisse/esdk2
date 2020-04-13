@@ -34,7 +34,7 @@ import java.nio.charset.StandardCharsets;
  */
 public class SimulationMain {
 
-    public static final boolean LWJGL = true;
+    public static final boolean LWJGL = false;
 
     private final ComputerDesign design;
     private final ComputerModule.Implementation computerModule;
