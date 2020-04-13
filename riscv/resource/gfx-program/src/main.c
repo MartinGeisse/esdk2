@@ -104,12 +104,35 @@ void main() {
     }
 */
 
+    volatile int *signalLogger = (int*)0x00008000;
+    *signalLogger = 3;
+    *signalLogger = 8;
+    int drawPlane = 0;
+    while (1) {
+        drawPlane = 1 - drawPlane;
+        selectDrawPlane(drawPlane);
+        selectDisplayPlane(1 - drawPlane);
+        clearScreen(0);
+
+        *signalLogger = 10;
+        *signalLogger = 8;
+        for (int i = 0; i < 512; i++) {
+            int loggedValue = *signalLogger;
+            drawPixel(i, 0, loggedValue ? 2 : 1);
+            drawPixel(i, 10, loggedValue ? 1 : 2);
+        }
+    }
+
+
+
+/*
     int color = 0;
     while (1) {
         simdevGlFlipScreen();
         simdevGlClearScreen(color);
         color++;
     }
+*/
 
     // simdevMessage("DONE!");
 
