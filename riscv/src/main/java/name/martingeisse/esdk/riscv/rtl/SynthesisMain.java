@@ -116,6 +116,12 @@ public class SynthesisMain {
 		ps2Connector.setDataSocket(ps2Pin(realm, "G13"));
 
 		// serial port test
+		// Notes:
+		// - idle state is HIGH
+		// - start bit is LOW
+		// - data gets transmitted active-HIGH
+		// - lowest bit is sent first
+		// - stop bit is HIGH (equivalent to "no stop bit, but at least 1 bit idle between bytes")
 		RtlBitSignal serialPortSignal;
 		{
 			// NET "FX2_IO<5>"  LOC = "A6"  | IOSTANDARD = LVCMOS33  | SLEW = FAST  | DRIVE = 8 ;
@@ -129,8 +135,8 @@ public class SynthesisMain {
 			serialPortSignal = serialPortPin;
 		}
 		RtlBitSignal serialPortActive = RegisterBuilder.build(false,
-				design.getClock(), new RtlBitConstant(realm, true), serialPortSignal);
-		RtlVectorSignal serialPortDivider = RegisterBuilder.build(20, VectorValue.of(20, 0),
+				design.getClock(), new RtlBitConstant(realm, true), serialPortSignal.not());
+		RtlVectorSignal serialPortDivider = RegisterBuilder.build(14, VectorValue.of(14, 0),
 				design.getClock(), r -> r.add(1));
 
 
