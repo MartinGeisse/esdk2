@@ -27,7 +27,7 @@ do (logClock) {
 do (logClock) {
     if (resetLogPointer) {
         logPointer = 0;
-    } else if (loggingActive & logEnable) {
+    } else if (loggingActive & logEnable & logPointer != 9b111111111) {
         logPointer = logPointer + 9d1;
     }
 }
@@ -64,5 +64,5 @@ do (busClock) {
 register bit secondBusReadCycle = 0;
 do (*) busAcknowledge = busWrite | secondBusReadCycle;
 do (busClock) {
-    secondBusReadCycle = busWrite ? bit(0) : ~secondBusReadCycle;
+    secondBusReadCycle = (~busEnable | busWrite) ? bit(0) : ~secondBusReadCycle;
 }
