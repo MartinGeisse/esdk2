@@ -52,7 +52,7 @@ public class ValueGenerator {
 			if (vector.getSize() > 64) {
 				throw new UnsupportedOperationException("constant vector size >64 not yet supported");
 			}
-			return "VectorValue.of(" + vector.getSize() + ", " + vector.convertToInteger().longValue() + ")";
+			return "VectorValue.of(" + vector.getSize() + ", " + vector.convertToInteger().longValue() + "L)";
 		} else if (value instanceof ConstantValue.Matrix) {
 			ConstantValue.Matrix matrix = (ConstantValue.Matrix)value;
 			String name = "___matrix" + model.newSyntheticConstruct();
