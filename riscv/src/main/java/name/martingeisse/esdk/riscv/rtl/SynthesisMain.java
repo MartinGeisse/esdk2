@@ -118,10 +118,17 @@ public class SynthesisMain {
 		// serial port test
 		// Notes:
 		// - idle state is HIGH
-		// - start bit is LOW
+		// - start bit is LOW (seems to be somewhat longer than data bits! data is ~70% as long as start/stop)
 		// - data gets transmitted active-HIGH
 		// - lowest bit is sent first
 		// - stop bit is HIGH (equivalent to "no stop bit, but at least 1 bit idle between bytes")
+		// Nominally 115200 bauds means 868 clock cycles (at 100Mhz) per bit.
+		// Measuring on screen looks like that is the length of a data bit.
+		// Measuring again at smaller scale; 8 clock cycles per pixel:
+		// total logging length: 12.9cm, 512 pixels --> 4096 clocks
+		// start bit: 3.6cm --> 142.8837 pixels --> 1143.0696 clocks
+		// data bits: 3 x 2.8cm --> 3 x 111.1318 pixels --> 3 x 889.0544 clocks
+		// fraction of a data bit: 0.9cm --> 35.7209 pixels --> 285.7672 clocks
 		RtlBitSignal serialPortSignal;
 		{
 			// NET "FX2_IO<5>"  LOC = "A6"  | IOSTANDARD = LVCMOS33  | SLEW = FAST  | DRIVE = 8 ;
@@ -136,7 +143,7 @@ public class SynthesisMain {
 		}
 		RtlBitSignal serialPortActive = RegisterBuilder.build(false,
 				design.getClock(), new RtlBitConstant(realm, true), serialPortSignal.not());
-		RtlVectorSignal serialPortDivider = RegisterBuilder.build(14, VectorValue.of(14, 0),
+		RtlVectorSignal serialPortDivider = RegisterBuilder.build(3, VectorValue.of(3, 0),
 				design.getClock(), r -> r.add(1));
 
 
