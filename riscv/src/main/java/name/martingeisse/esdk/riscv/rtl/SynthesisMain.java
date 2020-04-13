@@ -141,6 +141,7 @@ public class SynthesisMain {
 			serialPortPin.setConfiguration(configuration);
 			serialPortSignal = serialPortPin;
 		}
+		computerModule.setSerialPortSignal(serialPortSignal);
 		RtlBitSignal serialPortActive = RegisterBuilder.build(false,
 				design.getClock(), new RtlBitConstant(realm, true), serialPortSignal.not());
 		RtlVectorSignal serialPortDivider = RegisterBuilder.build(3, VectorValue.of(3, 0),

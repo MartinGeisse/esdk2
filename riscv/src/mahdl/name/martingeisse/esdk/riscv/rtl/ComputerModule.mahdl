@@ -7,6 +7,7 @@ interface {
     in clock ddrClock0, ddrClock90, ddrClock180, ddrClock270;
 
     in vector[8] buttonsAndSwitches;
+    in bit serialPortSignal;
 }
 
 // CPU
@@ -20,6 +21,7 @@ name.martingeisse.esdk.riscv.rtl.terminal.PixelDisplayController display;
 name.martingeisse.esdk.riscv.rtl.terminal.KeyboardController keyboard;
 name.martingeisse.esdk.library.SignalLoggerBusInterface signalLogger;
 name.martingeisse.esdk.riscv.rtl.spi.SpiInterface spiInterface;
+name.martingeisse.esdk.riscv.rtl.serial.SerialPort serialPort;
 
 // bus decoder: big devices
 signal bit ramAgentSelected = cpu.memoryWordAddress[29];
@@ -32,8 +34,9 @@ signal bit signalLoggerSelected = smallDeviceRegionSelected & cpu.memoryWordAddr
 signal bit gpioSelected = smallDeviceRegionSelected & cpu.memoryWordAddress[14];
 signal bit spiSelected = smallDeviceRegionSelected & cpu.memoryWordAddress[15];
 signal bit displayControllerSelected = smallDeviceRegionSelected & cpu.memoryWordAddress[16];
-signal bit internalMemorySelected = smallDeviceRegionSelected &
-        ~terminalSelected & ~signalLoggerSelected & ~gpioSelected & ~spiSelected & ~displayControllerSelected;
+signal bit serialPortSelected = smallDeviceRegionSelected & cpu.memoryWordAddress[17];
+signal bit internalMemorySelected = smallDeviceRegionSelected & ~terminalSelected & ~signalLoggerSelected
+    & ~gpioSelected & ~spiSelected & ~displayControllerSelected & ~serialPortSelected;
 
 // Memory: the number indicates the significance inside a word, NOT the position of a byte in a byte buffer (these
 // are different since RISC-V is little-endian).
@@ -56,7 +59,8 @@ do (*) {
                     gpioSelected ? (24d0 _ buttonsAndSwitches) :
                         spiSelected ? 32d0 :
                             displayControllerSelected ? 32d0 :
-                                memoryReadData;
+                                serialPortSelected ? serialPort.busReadData :
+                                    memoryReadData;
     cpu.memoryAcknowledge = ramAgentSelected ? ramAgent.cpuAcknowledge :
         simulationDeviceSelected ? simulationDevice.busAcknowledge :
             terminalSelected ? bit(1) :
@@ -64,7 +68,8 @@ do (*) {
                     gpioSelected ? bit(1) :
                         spiSelected ? spiInterface.busAcknowledge :
                             displayControllerSelected ? bit(1) :
-                                (cpu.memoryWrite | internalMemorySecondReadCycle);
+                                serialPortSelected ? serialPort.busAcknowledge :
+                                    (cpu.memoryWrite | internalMemorySecondReadCycle);
 
     display.clk = clk;
     display.registerWriteEnable = cpu.memoryEnable & cpu.memoryWrite & displayControllerSelected;
@@ -120,6 +125,10 @@ do (*) {
     simulationDevice.busWordAddress = cpu.memoryWordAddress[23:0];
     simulationDevice.busWriteData = cpu.memoryWriteData;
     simulationDevice.busWriteMask = cpu.memoryWriteMask;
+
+    serialPort.clk = clk;
+    serialPort.busEnable = cpu.memoryEnable & serialPortSelected;
+    serialPort.serialSignal = serialPortSignal;
 
 }
 

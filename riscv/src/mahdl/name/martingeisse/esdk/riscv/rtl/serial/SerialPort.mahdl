@@ -1,0 +1,14 @@
+module name.martingeisse.esdk.riscv.rtl.serial.SerialPort;
+
+interface {
+    in clock clk;
+    in bit serialSignal;
+    in bit busEnable;
+    out bit busAcknowledge;
+    out vector[32] busReadData;
+}
+
+do (*) {
+    busAcknowledge = 1;
+    busReadData = 0;
+}
