@@ -6,6 +6,7 @@ sdata:
 .text
 
 // startup / interrupt entry switch
+entryPoint:
     j start
     j interruptEntry
 
@@ -22,6 +23,10 @@ start:
     // initialize the SP register
     lui sp, 0x00004
 
+    // wait until SDRAM is ready
+    li a0, 500
+    call delay
+
     // the bootloader is located at the end of the memory (see below)
     j bootloader
 
@@ -31,30 +36,62 @@ hang:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+delay:
+    beq a0, x0, return
+    addi t0, x0, 1000
+innerLoop:
+    addi x0, x0, 0 // NOP = 4 cycles
+    addi x0, x0, 0 // 8 cycles
+    addi x0, x0, 0 // 12
+    addi x0, x0, 0 // 16
+    addi x0, x0, 0 // 20
+    addi x0, x0, 0 // 24
+    addi x0, x0, 0 // 28
+    addi t0, t0, -1 // 44
+    bne t0, x0, innerLoop // 48 cycles ~~ 1 µs
+    addi a0, a0, -1
+    j delay
+
+return:
+    ret
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
 // some empty space so the bootloader won't overwrite itself
 .skip 5000
 
-bootloader:
-    li t0, 0x00080000 // serial port
-    li t1, 0x80000000 // memory
-    li t2, 0 // end-of-stream detection timer
-    li t5, 5 // TODO TEST
-bootloaderLoop:
-    lw t3, 0(t0) // read byte
-    bltz t3, notAvailable // check if available
-    sb t5, 0(t1) // write byte
-    addi t1, t1, 1 // advance write pointer
-    li t2, 0 // reset end-of-stream detection timer
-    j bootloaderLoop
-notAvailable:
-    addi t2, t2, 1 // advance timer
-    li t3, 10000000 // check if expired
-    bne t2, t3, bootloaderLoop // otherwise loop
-    // TODO expired
-    li t1, 0x80000000
-    li t5, 7
-    sb t5, 0(t1) // write byte
-    sb t5, 1(t1) // write byte
-hang2:
-    j hang2
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
+drawLine:
+    li t0, 0x80000000 // screen memory
+    li t1, 64
+drawLineLoop:
+    sb a0, 0(t0)
+    addi t0, t0, 1
+    addi t1, t1, -1
+    bnez t1, drawLineLoop
+    ret
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+bootloader:
+    li s0, 0x00080000 // serial port
+    // TODO: li s1, 0x80200000 // start of non-screen memory
+    li s1, 0 // small memory (to write to)
+    li s2, 0 // end-of-stream detection timer
+firstByteLoop:
+    lw s3, 0(s0) // read byte
+    bgez s3, available // check if available
+    j firstByteLoop
+moreBytesLoop:
+    lw s3, 0(s0) // read byte
+    bgez s3, available // check if available
+    addi s2, s2, 1 // advance timer
+    li s3, 5000000 // check if expired
+    bne s2, s3, moreBytesLoop // otherwise loop
+    j entryPoint // run loaded program
+available:
+    sb s3, 0(s1) // write byte
+    addi s1, s1, 1 // advance write pointer
+    li s2, 0 // reset end-of-stream detection timer
+    j moreBytesLoop
