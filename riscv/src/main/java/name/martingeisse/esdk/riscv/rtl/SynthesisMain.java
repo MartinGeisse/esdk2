@@ -117,19 +117,15 @@ public class SynthesisMain {
 		ps2Connector.setDataSocket(ps2Pin(realm, "G13"));
 
 		// serial port test
-		// Notes:
-		// - idle state is HIGH
-		// - start bit is LOW (seems to be somewhat longer than data bits! data is ~70% as long as start/stop)
-		// - data gets transmitted active-HIGH
-		// - lowest bit is sent first
-		// - stop bit is HIGH (equivalent to "no stop bit, but at least 1 bit idle between bytes")
-		// Nominally 115200 bauds means 868 clock cycles (at 100Mhz) per bit.
-		// Measuring on screen looks like that is the length of a data bit.
-		// Measuring again at smaller scale; 8 clock cycles per pixel:
+		// I built my own software serial implementation because the built-in library for Arduino is buggy as hell.
+		// Parameters: idle = HIGH, 1 start bit (LOW), 1 stop bit (HIGH, equivalent to at least one idle bit),
+		// data is sent active-HIGH. Lowest bit is sent first. All bits including start/stop have the same length.
+		// The catch is that this length is not well-defined and has to be measured:
+		// - each pixel is two clock cycles
 		// total logging length: 12.9cm, 512 pixels --> 4096 clocks
-		// start bit: 3.6cm --> 142.8837 pixels --> 1143.0696 clocks
-		// data bits: 3 x 2.8cm --> 3 x 111.1318 pixels --> 3 x 889.0544 clocks
-		// fraction of a data bit: 0.9cm --> 35.7209 pixels --> 285.7672 clocks
+		// start bit length: 5.7cm (226 pixels, 452 clocks)
+		// data bit length: 6.1 cm (242 pixels, 484 clocks)
+		// residue after that: 1.2cm
 		RtlBitSignal serialPortSignal;
 		{
 			// NET "FX2_IO<5>"  LOC = "A6"  | IOSTANDARD = LVCMOS33  | SLEW = FAST  | DRIVE = 8 ;
@@ -145,7 +141,7 @@ public class SynthesisMain {
 		computerModule.setSerialPortSignal(serialPortSignal);
 		RtlBitSignal serialPortActive = RegisterBuilder.build(false,
 				design.getClock(), new RtlBitConstant(realm, true), serialPortSignal.not());
-		RtlVectorSignal serialPortDivider = RegisterBuilder.build(5, VectorValue.of(5, 0),
+		RtlVectorSignal serialPortDivider = RegisterBuilder.build(4, VectorValue.of(4, 0),
 				design.getClock(), r -> r.add(1));
 
 

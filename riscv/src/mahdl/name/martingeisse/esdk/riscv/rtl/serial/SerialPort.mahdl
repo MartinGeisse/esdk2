@@ -8,11 +8,10 @@ interface {
     out vector[32] busReadData;
 }
 
-// Arduino SoftSerial at 115200 bauds (has a slightly longer start/stop bit). Idle is HIGH; start bit is
-// LOW; stop bit is HIGH (equivalent to minimum idle time between bits, so we don't have to process it
-// explicitly). Data is transmitted active-HIGH, lowest bit first.
-constant integer INITIAL_DELAY_CLOCKS = 699;
-constant integer BIT_DURATION_CLOCKS = 889;
+// Using my own software-serial. Idle is HIGH; start bit is LOW; stop bit is HIGH (equivalent to minimum idle time
+// between bits, so we don't have to process it explicitly). Data is transmitted active-HIGH, lowest bit first.
+constant integer INITIAL_DELAY_CLOCKS = 210;
+constant integer BIT_DURATION_CLOCKS = 477;
 
 // state is (number of sampled bits + 2); 0 = idle, 1 = first part of start bit;
 // 2 = second part of start bit and first half of bit 0 (equivalent to "0 bits sampled").
