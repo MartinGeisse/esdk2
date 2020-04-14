@@ -5,6 +5,8 @@
 sdata:
 .text
 
+.set payloadEntryPoint, 0x80200000
+
 // startup / interrupt entry switch
 entryPoint:
     j start
@@ -80,8 +82,7 @@ drawLineLoop:
 
 bootloader:
     li s0, 0x00080000 // serial port
-    // TODO: li s1, 0x80200000 // start of non-screen memory
-    li s1, 0 // small memory (to write to)
+    li s1, 0x80200000 // start of non-screen memory
     li s2, 0 // end-of-stream detection timer
 firstByteLoop:
     lw s3, 0(s0) // read byte
@@ -95,7 +96,7 @@ moreBytesLoop:
     bne s2, s3, moreBytesLoop // otherwise loop
     li a0, 5 // indicate status
     call drawLine // ...
-    j entryPoint // run loaded program TODO change to non-screen SDRAM
+    tail payloadEntryPoint // run loaded program
 available:
     li a0, 2 // indicate status
     call drawLine // ...

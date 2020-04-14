@@ -6,6 +6,7 @@ sdata:
 .text
 
 // startup / interrupt entry switch
+entryPoint:
     j start
     j interruptEntry
 

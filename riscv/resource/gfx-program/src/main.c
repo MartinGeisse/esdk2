@@ -5,7 +5,7 @@
 #include "system/cpu.h"
 
 #define SQUARE_COUNT 7
-#define SPEED 1
+#define SPEED 10
 static int xs[SQUARE_COUNT];
 static int ys[SQUARE_COUNT];
 static int dxs[SQUARE_COUNT];

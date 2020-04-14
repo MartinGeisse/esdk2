@@ -14,7 +14,7 @@ function buildFile($inputPath, $outputPath) {
 function linkFiles() {
     global $objectFiles;
     $objectFilesList = implode(' ', $objectFiles);
-    system(TOOL . 'ld -Map=build/program.map -A rv32im -N -Ttext 0 -o build/program.elf -e 0 ' . $objectFilesList);
+    system(TOOL . 'ld -Map=build/program.map -A rv32im -N -Ttext=0x80200000 -o build/program.elf -e entryPoint ' . $objectFilesList);
 }
 
 function convertExecutable() {
