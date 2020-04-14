@@ -1,12 +1,15 @@
 
 void setup() {
+  Serial.begin(115200);
+  Serial.println("Hello world!");
   pinMode(4, INPUT_PULLUP);
   pinMode(8, OUTPUT);
   digitalWrite(8, 1);
-  noInterrupts();
+  delay(1000);
 }
 
 void sendByte(uint8_t value) {
+  noInterrupts();
   digitalWrite(8, 0); // start
   digitalWrite(8, value & 1); // bit 0
   value = value >> 1;
@@ -23,128 +26,28 @@ void sendByte(uint8_t value) {
   digitalWrite(8, value & 1); // bit 6
   value = value >> 1;
   digitalWrite(8, value & 1); // bit 7
-  digitalWrite(8, 1); // stop
+  digitalWrite(8, 1); // stop -- might be able to take some time off this
   digitalWrite(8, 1);
   digitalWrite(8, 1);
   digitalWrite(8, 1);
   digitalWrite(8, 1);
   digitalWrite(8, 1);
   digitalWrite(8, 1);
-//   delay(1);
+  interrupts();
 }
 
 void loop() {
-  while (digitalRead(4)) {
-  }
-  delay(100);
-  if (digitalRead(4)) {
+  int dataByte = Serial.read();
+  if (dataByte < 0) {
     return;
   }
-
-  sendByte((uint8_t)0x6f);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x80);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x6f);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x02);
-  sendByte((uint8_t)0x37);
-  sendByte((uint8_t)0x04);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x80);
-  sendByte((uint8_t)0x93);
-  sendByte((uint8_t)0x04);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x00);
-
-  sendByte((uint8_t)0x23);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x94);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x93);
-  sendByte((uint8_t)0x84);
-  sendByte((uint8_t)0x14);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x13);
-  sendByte((uint8_t)0x05);
-  sendByte((uint8_t)0xc0);
-  sendByte((uint8_t)0x12);
-  sendByte((uint8_t)0xef);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0xc0);
-  sendByte((uint8_t)0x00);
-
-  sendByte((uint8_t)0x6f);
-  sendByte((uint8_t)0xf0);
-  sendByte((uint8_t)0x1f);
-  sendByte((uint8_t)0xff);
-  sendByte((uint8_t)0x6f);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x63);
-  sendByte((uint8_t)0x0a);
-  sendByte((uint8_t)0x05);
-  sendByte((uint8_t)0x02);
-  sendByte((uint8_t)0x93);
-  sendByte((uint8_t)0x02);
-  sendByte((uint8_t)0x80);
-  sendByte((uint8_t)0x3e);
-
-  sendByte((uint8_t)0x13);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x13);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x13);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x13);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x00);
-
-  sendByte((uint8_t)0x13);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x13);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x13);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x93);
-  sendByte((uint8_t)0x82);
-  sendByte((uint8_t)0xf2);
-  sendByte((uint8_t)0xff);
-
-  sendByte((uint8_t)0xe3);
-  sendByte((uint8_t)0x90);
-  sendByte((uint8_t)0x02);
-  sendByte((uint8_t)0xfe);
-  sendByte((uint8_t)0x13);
-  sendByte((uint8_t)0x05);
-  sendByte((uint8_t)0xf5);
-  sendByte((uint8_t)0xff);
-  sendByte((uint8_t)0x6f);
-  sendByte((uint8_t)0xf0);
-  sendByte((uint8_t)0x1f);
-  sendByte((uint8_t)0xfd);
-  sendByte((uint8_t)0x67);
-  sendByte((uint8_t)0x80);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x00);
-
-  while (!digitalRead(4)) {
-  }
-  delay(100);
+  /*
+  Serial.print("you sent: ");
+  Serial.print(dataByte);
+  Serial.print(" / ");
+  Serial.print((char)dataByte);
+  Serial.print("\n");
+  */
+  sendByte((uint8_t)dataByte);
 }
 
