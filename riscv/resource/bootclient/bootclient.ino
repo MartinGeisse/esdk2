@@ -2,7 +2,6 @@
 void setup() {
   Serial.begin(115200);
   Serial.println("Hello world!");
-  pinMode(4, INPUT_PULLUP);
   pinMode(8, OUTPUT);
   digitalWrite(8, 1);
   delay(1000);
@@ -26,7 +25,7 @@ void sendByte(uint8_t value) {
   digitalWrite(8, value & 1); // bit 6
   value = value >> 1;
   digitalWrite(8, value & 1); // bit 7
-  digitalWrite(8, 1); // stop -- might be able to take some time off this
+  digitalWrite(8, 1); // stop
   digitalWrite(8, 1);
   digitalWrite(8, 1);
   digitalWrite(8, 1);
@@ -41,13 +40,6 @@ void loop() {
   if (dataByte < 0) {
     return;
   }
-  /*
-  Serial.print("you sent: ");
-  Serial.print(dataByte);
-  Serial.print(" / ");
-  Serial.print((char)dataByte);
-  Serial.print("\n");
-  */
   sendByte((uint8_t)dataByte);
 }
 
