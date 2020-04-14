@@ -16,7 +16,7 @@ static unsigned char drawColor = 7;
 static unsigned int drawColorWord = 0x07070707;
 
 void selectDrawPlane(int plane) {
-    int offset = (plane & 1) << 20;
+    int offset = (plane & 1) << 20; // TODO 640x480 -> 1024x512 should be enough, why 1M?
     drawPlane = (unsigned char *)(PLANE0_BASE_ADDRESS + offset);
 }
 
