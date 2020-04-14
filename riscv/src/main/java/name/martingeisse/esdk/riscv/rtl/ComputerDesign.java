@@ -28,7 +28,7 @@ public class ComputerDesign extends Design {
     private final RtlClockNetwork ddrClock270;
     private final ComputerModule.Implementation computerModule;
 
-    public ComputerDesign() throws IOException {
+    public ComputerDesign(String programPath) throws IOException {
         this.realm = new RtlRealm(this);
         this.clockSignalConnector = new RtlBitSignalConnector(realm);
         this.clock = realm.createClockNetwork(clockSignalConnector);
@@ -41,8 +41,7 @@ public class ComputerDesign extends Design {
         this.ddrClock270SignalConnector = new RtlBitSignalConnector(realm);
         this.ddrClock270 = realm.createClockNetwork(ddrClock270SignalConnector);
         this.computerModule = createComputerModule();
-        try (FileInputStream in = new FileInputStream("riscv/resource/gfx-program/build/program.bin")) {
-//        try (FileInputStream in = new FileInputStream("riscv/resource/gfx-program/build/program.bin")) {
+        try (FileInputStream in = new FileInputStream(programPath)) {
             int index = 0;
             while (true) {
                 int first = in.read();

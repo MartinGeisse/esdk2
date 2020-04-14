@@ -48,7 +48,7 @@ public class SimulationMain {
     private final SimulatedOpenglHelper openglHelper;
 
     public SimulationMain() throws Exception {
-        design = new ComputerDesign() {
+        design = new ComputerDesign("riscv/resource/gfx-program/build/program.bin") {
             @Override
             protected ComputerModule.Implementation createComputerModule() {
                 return new ComputerModule.Implementation(getRealm(), getClock(), getDdrClock0(), getDdrClock180(), getDdrClock270(), getDdrClock90()) {

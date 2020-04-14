@@ -7,7 +7,12 @@ import java.io.File;
 public class CeeCompilerInvoker {
 
     public static void invoke() throws Exception {
-        File directory = new File("riscv/resource/gfx-program");
+        invoke("riscv/resource/bootloader");
+        invoke("riscv/resource/gfx-program");
+    }
+
+    public static void invoke(String path) throws Exception {
+        File directory = new File(path);
         File buildScript = new File(directory, "build.php");
         Process process = Runtime.getRuntime().exec(buildScript.getAbsolutePath(), null, directory);
         int status = process.waitFor();
@@ -16,6 +21,8 @@ public class CeeCompilerInvoker {
             System.err.println("***************************************");
             System.err.println("*** ERROR WHILE COMPILING C PROGRAM ***");
             System.err.println("***************************************");
+            System.err.println();
+            System.err.println("path: " + path);
             System.err.println();
             IOUtils.copy(process.getInputStream(), System.err);
             IOUtils.copy(process.getErrorStream(), System.err);

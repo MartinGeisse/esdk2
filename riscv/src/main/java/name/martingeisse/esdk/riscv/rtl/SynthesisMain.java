@@ -33,7 +33,7 @@ public class SynthesisMain {
 
 	public static void main(String[] args) throws Exception {
 		CeeCompilerInvoker.invoke();
-		ComputerDesign design = new ComputerDesign() {
+		ComputerDesign design = new ComputerDesign("riscv/resource/bootloader/build/program.bin") {
 			@Override
 			protected ComputerModule.Implementation createComputerModule() {
 				return new ComputerModule.Implementation(getRealm(), getClock(), getDdrClock0(), getDdrClock180(), getDdrClock270(), getDdrClock90()) {
