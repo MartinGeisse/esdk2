@@ -28,7 +28,7 @@ public class CeeCompilerInvoker {
             IOUtils.copy(process.getErrorStream(), System.err);
             System.err.println("C build script status code " + status);
             System.err.flush();
-            System.exit(0);
+            System.exit(1);
         }
     }
 
