@@ -118,10 +118,10 @@ void main() {
         *signalLogger = 8;
         for (int i = 0; i < 512; i++) {
             int loggedValue = *signalLogger;
-            for (int mask = 1, y = 0; mask <= 16; mask = mask + mask, y = y + 50) {
+            for (int mask = 1, y = 0; mask <= 4096; mask = mask + mask, y = y + 20) {
                 int high = (loggedValue & mask) != 0;
                 drawPixel(i, y, high ? 2 : 1);
-                drawPixel(i, y + 10, high ? 1 : 2);
+                drawPixel(i, y + 5, high ? 1 : 2);
             }
         }
     }

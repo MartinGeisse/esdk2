@@ -141,7 +141,7 @@ public class SynthesisMain {
 		computerModule.setSerialPortSignal(serialPortSignal);
 		RtlBitSignal serialPortActive = RegisterBuilder.build(false,
 				design.getClock(), new RtlBitConstant(realm, true), serialPortSignal.not());
-		RtlVectorSignal serialPortDivider = RegisterBuilder.build(4, VectorValue.of(4, 0),
+		RtlVectorSignal serialPortDivider = RegisterBuilder.build(8, VectorValue.of(8, 0),
 				design.getClock(), r -> r.add(1));
 
 
@@ -151,7 +151,8 @@ public class SynthesisMain {
 		SignalLoggerBusInterface.Connector loggerInterface = (SignalLoggerBusInterface.Connector)computerModule._signalLogger;
 		SignalLogger signalLogger = new SignalLogger.Implementation(realm, design.getClock(), design.getClock());
 		signalLogger.setLogEnable(serialPortActive.and(serialPortDivider.compareEqual(0)));
-		signalLogger.setLogData(RtlVectorConstant.of(realm, 27, 0)
+		signalLogger.setLogData(RtlVectorConstant.of(realm, 19, 0)
+			.concat(((SerialPort.Implementation)computerModule._serialPort)._receiveBuffer)
 			.concat(serialPortSignal)
 			.concat(((SerialPort.Implementation)computerModule._serialPort)._state)
 		);
