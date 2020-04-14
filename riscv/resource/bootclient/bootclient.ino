@@ -41,40 +41,6 @@ void loop() {
     return;
   }
 
-  sendByte((uint8_t)0x01);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x01);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x01);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x01);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x01);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x01);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x01);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x01);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x00);
-  sendByte((uint8_t)0x00);
-
-/*
   sendByte((uint8_t)0x6f);
   sendByte((uint8_t)0x00);
   sendByte((uint8_t)0x80);
@@ -176,7 +142,6 @@ void loop() {
   sendByte((uint8_t)0x80);
   sendByte((uint8_t)0x00);
   sendByte((uint8_t)0x00);
-*/
 
   while (!digitalRead(4)) {
   }
