@@ -28,8 +28,8 @@ start:
     call delay
 
     // indicate status
-    // li a0, 1
-    // call drawLine
+    li a0, 1
+    call drawLine
 
     // the bootloader is located at the end of the memory (see below)
     j bootloader
@@ -81,8 +81,7 @@ drawLineLoop:
 bootloader:
     li s0, 0x00080000 // serial port
     // TODO: li s1, 0x80200000 // start of non-screen memory
-    // TODO li s1, 0 // small memory (to write to)
-    li s1, 0x80000000 // TODO test
+    li s1, 0 // small memory (to write to)
     li s2, 0 // end-of-stream detection timer
 firstByteLoop:
     lw s3, 0(s0) // read byte
@@ -94,13 +93,12 @@ moreBytesLoop:
     addi s2, s2, 1 // advance timer
     li s3, 5000000 // check if expired
     bne s2, s3, moreBytesLoop // otherwise loop
-    // TODO li a0, 5 // indicate status
-    // TODO call drawLine // ...
-    // TODO j entryPoint // run loaded program
-    j entryPoint
+    li a0, 5 // indicate status
+    call drawLine // ...
+    j entryPoint // run loaded program TODO change to non-screen SDRAM
 available:
-    // TODO li a0, 2 // indicate status
-    // TODO call drawLine // ...
+    li a0, 2 // indicate status
+    call drawLine // ...
     sb s3, 0(s1) // write byte
     addi s1, s1, 1 // advance write pointer
     li s2, 0 // reset end-of-stream detection timer
