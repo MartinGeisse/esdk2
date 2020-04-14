@@ -50,6 +50,6 @@ do (clk) {
         delayCounter = delayCounter - 10d1;
     }
     if (busEnable) {
-        hasFinishedByte = 0;
+        hasFinishedByte = (delayCounter == 10d0 & state == 4d10);
     }
 }
