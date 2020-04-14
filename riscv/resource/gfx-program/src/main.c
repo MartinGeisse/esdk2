@@ -80,7 +80,6 @@ void main() {
     }
 */
 
-/*
     for (int i = 0, size = 30; i < SQUARE_COUNT; i++, size += 23) {
         xs[i] = 0;
         ys[i] = 0;
@@ -102,8 +101,8 @@ void main() {
             moveSquare(ys + i, dys + i, 480 - sizes[i]);
         }
     }
-*/
 
+/*
     volatile int *signalLogger = (int*)0x00008000;
     *signalLogger = 3;
     *signalLogger = 8;
@@ -125,7 +124,7 @@ void main() {
             }
         }
     }
-
+*/
 
 
 /*
