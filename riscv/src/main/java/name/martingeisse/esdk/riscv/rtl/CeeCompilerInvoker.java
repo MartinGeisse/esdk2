@@ -8,6 +8,7 @@ public class CeeCompilerInvoker {
 
     public static void invoke() throws Exception {
         invoke("riscv/resource/bootloader");
+        invoke("riscv/resource/bootloaded");
         invoke("riscv/resource/gfx-program");
     }
 
