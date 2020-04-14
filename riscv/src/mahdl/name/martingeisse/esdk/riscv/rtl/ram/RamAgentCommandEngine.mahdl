@@ -79,6 +79,7 @@ register vector[10] remainingSpanLengthRegister;
 do (clk) {
     if (reset) {
         ramRequestEnableRegister = 0;
+        state = STATE_IDLE;
     } else {
         switch (state) {
 

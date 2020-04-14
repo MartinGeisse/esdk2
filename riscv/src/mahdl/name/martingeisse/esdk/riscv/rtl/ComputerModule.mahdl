@@ -109,6 +109,7 @@ do (*) {
     // RAMDAC connections
     bigRam.ramdacRequestEnable = display.ramdacRequestEnable;
     bigRam.ramdacRequestWordAddress = display.ramdacRequestWordAddress;
+    display.reset = reset;
     display.ramdacRequestAcknowledge = bigRam.ramdacRequestAcknowledge;
     display.ramdacResponseEnable = bigRam.ramdacResponseEnable;
     display.ramdacResponseWordAddress = bigRam.ramdacResponseWordAddress;
@@ -127,6 +128,7 @@ do (*) {
     simulationDevice.busWriteMask = cpu.memoryWriteMask;
 
     serialPort.clk = clk;
+    serialPort.reset = reset;
     serialPort.busEnable = cpu.memoryEnable & serialPortSelected;
     serialPort.serialSignal = serialPortSignal;
 

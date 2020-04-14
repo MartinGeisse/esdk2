@@ -2,6 +2,7 @@ module name.martingeisse.esdk.riscv.rtl.terminal.PixelDisplayController;
 
 interface {
     in clock clk;
+    in bit reset;
 
     in bit registerWriteEnable;
     in bit registerWriteData;
@@ -20,7 +21,9 @@ interface {
 //
 register bit planeSelector = 0;
 do (clk) {
-    if (registerWriteEnable) {
+    if (reset) {
+        planeSelector = 0;
+    } else if (registerWriteEnable) {
         planeSelector = registerWriteData;
     }
 }

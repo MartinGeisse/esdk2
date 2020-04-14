@@ -2,6 +2,7 @@ module name.martingeisse.esdk.riscv.rtl.serial.SerialPort;
 
 interface {
     in clock clk;
+    in bit reset;
     in bit serialSignal;
     in bit busEnable;
     out bit busAcknowledge;
@@ -28,28 +29,33 @@ do (*) {
 }
 
 do (clk) {
-    if (delayCounter == 10d0) {
-        switch (state) {
-            case 4d0:
-                if (serialSignal == bit(0)) {
-                    delayCounter = INITIAL_DELAY_CLOCKS;
-                    state = 1;
-                }
-
-            case 4d10:
-                state = 0;
-                finishedByte = receiveBuffer;
-                hasFinishedByte = 1;
-
-            default:
-                state = state + 4d1;
-                delayCounter = BIT_DURATION_CLOCKS;
-                receiveBuffer = serialSignal _ receiveBuffer[7:1];
-        }
+    if (reset) {
+        state = 0;
+        hasFinishedByte = 0;
     } else {
-        delayCounter = delayCounter - 10d1;
-    }
-    if (busEnable) {
-        hasFinishedByte = (delayCounter == 10d0 & state == 4d10);
+        if (delayCounter == 10d0) {
+            switch (state) {
+                case 4d0:
+                    if (serialSignal == bit(0)) {
+                        delayCounter = INITIAL_DELAY_CLOCKS;
+                        state = 1;
+                    }
+
+                case 4d10:
+                    state = 0;
+                    finishedByte = receiveBuffer;
+                    hasFinishedByte = 1;
+
+                default:
+                    state = state + 4d1;
+                    delayCounter = BIT_DURATION_CLOCKS;
+                    receiveBuffer = serialSignal _ receiveBuffer[7:1];
+            }
+        } else {
+            delayCounter = delayCounter - 10d1;
+        }
+        if (busEnable) {
+            hasFinishedByte = (delayCounter == 10d0 & state == 4d10);
+        }
     }
 }
