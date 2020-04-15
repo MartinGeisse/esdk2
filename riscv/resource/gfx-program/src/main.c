@@ -80,6 +80,7 @@ void main() {
     }
 */
 
+/*
     for (int i = 0, size = 30; i < SQUARE_COUNT; i++, size += 23) {
         xs[i] = 0;
         ys[i] = 0;
@@ -101,6 +102,33 @@ void main() {
             moveSquare(ys + i, dys + i, 480 - sizes[i]);
         }
     }
+*/
+
+    clearScreen(0);
+    setDrawColor(1);
+    drawLine(200, 200, 300, 200);
+    drawLine(200, 200, 300, 150);
+    drawLine(200, 200, 300, 100);
+    setDrawColor(2);
+    drawLine(200, 200, 250, 100);
+    drawLine(200, 200, 200, 100);
+    setDrawColor(3);
+    drawLine(200, 200, 150, 100);
+    drawLine(200, 200, 100, 100);
+    drawLine(200, 200, 100, 150);
+    setDrawColor(4);
+    drawLine(200, 200, 100, 200);
+    drawLine(200, 200, 100, 250);
+    setDrawColor(5);
+    drawLine(200, 200, 100, 300);
+    drawLine(200, 200, 150, 300);
+    setDrawColor(6);
+    drawLine(200, 200, 200, 300);
+    drawLine(200, 200, 250, 300);
+    setDrawColor(7);
+    drawLine(200, 200, 300, 300);
+    drawLine(200, 200, 300, 250);
+    while (1);
 
 /*
     volatile int *signalLogger = (int*)0x00008000;
