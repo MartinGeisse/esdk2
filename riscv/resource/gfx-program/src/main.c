@@ -105,6 +105,13 @@ void main() {
 */
 
     clearScreen(0);
+    setDrawColor(5);
+    drawLine(0, 0, 639, 0);
+    drawLine(639, 0, 639, 479);
+    drawLine(639, 479, 0, 479);
+    drawLine(0, 479, 0, 0);
+
+
     setDrawColor(1);
     drawLine(200, 200, 300, 200);
     drawLine(200, 200, 300, 150);
@@ -128,6 +135,7 @@ void main() {
     setDrawColor(7);
     drawLine(200, 200, 300, 300);
     drawLine(200, 200, 300, 250);
+    drawTriangle(400, 200, 500, 150, 550, 300);
     while (1);
 
 /*
