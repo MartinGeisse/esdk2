@@ -22,6 +22,78 @@ static void moveSquare(int *pp, int *dp, int max) {
     }
 }
 
+// movement keys
+static int keyW = 0, keyX = 0, keyA = 0, keyD = 0, keyE = 0, keyC = 0;
+
+// rotation keys
+static int keyQ = 0, keyR = 0, keyUp = 0, keyDown = 0, keyLeft = 0, keyRight = 0;
+
+static int keyReleasePrefix = 0;
+
+void checkKeyboard() {
+    int incomingCode = *(int*)0x00004000;
+    if (incomingCode == 0 || incomingCode == 0xe0 || incomingCode == 0xe1) {
+        return;
+    }
+    if (incomingCode == 0xf0) {
+        keyReleasePrefix = 1;
+        return;
+    }
+    int newState = !keyReleasePrefix;
+    keyReleasePrefix = 0;
+    switch (incomingCode) {
+
+        case 0x1d:
+            keyW = newState;
+            break;
+
+        case 0x22:
+            keyX = newState;
+            break;
+
+        case 0x1c:
+            keyA = newState;
+            break;
+
+        case 0x23:
+            keyD = newState;
+            break;
+
+        case 0x24:
+            keyE = newState;
+            break;
+
+        case 0x21:
+            keyC = newState;
+            break;
+
+        case 0x15:
+            keyQ = newState;
+            break;
+
+        case 0x2d:
+            keyR = newState;
+            break;
+
+        case 0x75:
+            keyUp = newState;
+            break;
+
+        case 0x72:
+            keyDown = newState;
+            break;
+
+        case 0x6b:
+            keyLeft = newState;
+            break;
+
+        case 0x74:
+            keyRight = newState;
+            break;
+
+    }
+}
+
 void main() {
 
 //    simdevShowInt("a", mul(3, 0));
@@ -104,39 +176,100 @@ void main() {
     }
 */
 
-    clearScreen(0);
-    setDrawColor(5);
-    drawLine(0, 0, 639, 0);
-    drawLine(639, 0, 639, 479);
-    drawLine(639, 479, 0, 479);
-    drawLine(0, 479, 0, 0);
+    int drawPlane = 0, x = 200, y = 200;
+    while (1) {
 
+        // ...
+        checkKeyboard();
 
-    setDrawColor(1);
-    drawLine(200, 200, 300, 200);
-    drawLine(200, 200, 300, 150);
-    drawLine(200, 200, 300, 100);
-    setDrawColor(2);
-    drawLine(200, 200, 250, 100);
-    drawLine(200, 200, 200, 100);
-    setDrawColor(3);
-    drawLine(200, 200, 150, 100);
-    drawLine(200, 200, 100, 100);
-    drawLine(200, 200, 100, 150);
-    setDrawColor(4);
-    drawLine(200, 200, 100, 200);
-    drawLine(200, 200, 100, 250);
-    setDrawColor(5);
-    drawLine(200, 200, 100, 300);
-    drawLine(200, 200, 150, 300);
-    setDrawColor(6);
-    drawLine(200, 200, 200, 300);
-    drawLine(200, 200, 250, 300);
-    setDrawColor(7);
-    drawLine(200, 200, 300, 300);
-    drawLine(200, 200, 300, 250);
-    drawTriangle(400, 200, 500, 150, 550, 300);
-    while (1);
+        // flip and clear screen
+        drawPlane = 1 - drawPlane;
+        selectDrawPlane(drawPlane);
+        selectDisplayPlane(1 - drawPlane);
+        clearScreen(0);
+
+        // ...
+        checkKeyboard();
+
+        // draw border
+        setDrawColor(5);
+        checkKeyboard();
+        drawLine(0, 0, 639, 0);
+        checkKeyboard();
+        drawLine(639, 0, 639, 479);
+        checkKeyboard();
+        drawLine(639, 479, 0, 479);
+        checkKeyboard();
+        drawLine(0, 479, 0, 0);
+        checkKeyboard();
+
+        // draw test lines
+        setDrawColor(1);
+        checkKeyboard();
+        drawLine(x, y, x + 100, y);
+        checkKeyboard();
+        drawLine(x, y, x + 100, y - 50);
+        checkKeyboard();
+        drawLine(x, y, x + 100, y - 100);
+        checkKeyboard();
+        setDrawColor(2);
+        checkKeyboard();
+        drawLine(x, y, x + 50, y - 100);
+        checkKeyboard();
+        drawLine(x, y, x, y - 100);
+        checkKeyboard();
+        setDrawColor(3);
+        checkKeyboard();
+        drawLine(x, y, x - 50, y - 100);
+        checkKeyboard();
+        drawLine(x, y, x - 100, y - 100);
+        checkKeyboard();
+        drawLine(x, y, x - 100, y - 50);
+        checkKeyboard();
+        setDrawColor(4);
+        checkKeyboard();
+        drawLine(x, y, x - 100, y);
+        checkKeyboard();
+        drawLine(x, y, x - 100, y + 50);
+        checkKeyboard();
+        setDrawColor(5);
+        checkKeyboard();
+        drawLine(x, y, x - 100, y + 100);
+        checkKeyboard();
+        drawLine(x, y, x - 50, y + 100);
+        checkKeyboard();
+        setDrawColor(6);
+        checkKeyboard();
+        drawLine(x, y, x, y + 100);
+        checkKeyboard();
+        drawLine(x, y, x + 50, y + 100);
+        checkKeyboard();
+        setDrawColor(7);
+        checkKeyboard();
+        drawLine(x, y, x + 100, y + 100);
+        checkKeyboard();
+        drawLine(x, y, x + 100, y + 50);
+        checkKeyboard();
+
+        // draw test triangle
+        drawTriangle(x + 200, y, x + 300, y - 50, x + 350, y + 100);
+        checkKeyboard();
+
+        // movement
+        if (keyLeft) {
+            x -= 5;
+        }
+        if (keyRight) {
+            x += 5;
+        }
+        if (keyUp) {
+            y -= 5;
+        }
+        if (keyDown) {
+            y += 5;
+        }
+
+    }
 
 /*
     volatile int *signalLogger = (int*)0x00008000;

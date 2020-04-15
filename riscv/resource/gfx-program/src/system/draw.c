@@ -28,6 +28,8 @@ void selectDisplayPlane(int plane) {
     }
 }
 
+extern void checkKeyboard();
+
 void clearScreen(unsigned char color) {
     int isSimulation = simdevIsSimulation();
     int fourPixels = color | (color << 8) | (color << 16) | (color << 24);
@@ -43,6 +45,7 @@ void clearScreen(unsigned char color) {
             *(int*)(((int)rowPointer) | RAM_AGENT_COMMAND_ENGINE_ADDRESS_BIT | RAM_AGENT_COMMAND_ENGINE_COMMAND_CODE_WRITE_SPAN) = fourPixels;
         }
         rowPointer += 256;
+        checkKeyboard();
     }
 }
 
@@ -265,6 +268,9 @@ static void drawHalfTriangle(int x1a, int x1b, int y1, int x2, int y2, int dy) {
     }
     int partialXa = 0, partialXb = 0;
     while (y1 != y2) {
+
+        // ...
+        checkKeyboard();
 
         // draw row
         drawHorizontalLine(x1a, x1b, y1);
