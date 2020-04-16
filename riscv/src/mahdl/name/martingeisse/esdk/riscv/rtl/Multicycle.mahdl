@@ -63,7 +63,7 @@ register vector[32] miscRegisterWriteValue;
 
 // exception / interrupt handling
 register vector[32] exceptionHandlerReturnAddress;
-register bit registerSetSelector = 0;
+/*register*/ signal bit registerSetSelector = 0;
 
 // special registers including CSRs
 constant vector[5] EXCEPTION_NONE = 0;

@@ -29,6 +29,8 @@ do (*) {
     outputEnable = cpu.memoryEnable & cpu.memoryWrite & (cpu.memoryWordAddress == 30h3ffffff8);
     stopSimulation = cpu.memoryEnable & cpu.memoryWrite & (cpu.memoryWordAddress == 30h3ffffff7);
 
+    // interrupts
+    cpu.interrupt = 0;
 }
 
 do (clk) {
