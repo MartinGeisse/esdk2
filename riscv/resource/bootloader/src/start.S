@@ -36,9 +36,12 @@ start:
     // the bootloader is located at the end of the memory (see below)
     j bootloader
 
-interruptEntry:
 hang:
     j hang
+
+interruptEntry:
+    // return from interrupt (0000 1000 0000 0000 1000 0000 0000 1011)
+    .word 0x0800800b
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
