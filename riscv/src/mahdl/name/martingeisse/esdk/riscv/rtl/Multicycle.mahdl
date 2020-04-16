@@ -325,7 +325,7 @@ do (clk) {
 
 			case STATE_EXCEPTION:
 				pc = 4;
-				registerSetSelector = 1;
+				// no register sets for now: registerSetSelector = 1;
 				exceptionHandlerReturnAddress = oldPc;
                 state = STATE_START;
 
@@ -379,7 +379,7 @@ do (clk) {
 					case 4d2:
 						state = STATE_START;
 						pc = exceptionHandlerReturnAddress;
-						registerSetSelector = 0;
+						// no register sets for now: registerSetSelector = 0;
 
 					default:
 						state = STATE_EXCEPTION;
