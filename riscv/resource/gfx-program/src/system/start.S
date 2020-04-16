@@ -31,14 +31,6 @@ hang:
 
 // interrupt logic
 interruptEntry:
-
-    // since we're using the alternative general purpose register set, copy the GP from the regular set
-    .word 0x00018191 // ADDI gp, other_gp, 0
-
-    // TODO establish interrupt handler stack pointer
-
     // load instruction location (== return address) into a0
-    .word 00000000000000000000010100001011
-
-    call exception
+    // .word 00000000000000000000010100001011
     j hang
