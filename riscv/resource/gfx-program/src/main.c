@@ -308,8 +308,3 @@ void main() {
     // simdevMessage("DONE!");
 
 }
-
-void exception() {
-    simdevMessage("EXCEPTION!");
-    simdevShowInt("Exception code", cpuGetExceptionCode());
-}
