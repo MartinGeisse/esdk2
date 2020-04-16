@@ -8,6 +8,8 @@ sdata:
 // startup / interrupt entry switch
 entryPoint:
     j start
+    // TODO the payload program can't have a hardware interrupt entry point since it sits at the wrong
+    // location in memory (0x80200000, not 0)
     j interruptEntry
 
 // startup logic
@@ -22,6 +24,10 @@ start:
 
     // initialize the SP register
     lui sp, 0x00004
+
+    // enable interrupts (0000 0100 0010 0010 1000 0101 0000 1011)
+    li t0, 1
+    .word 0x0422850b
 
     // main program
     call main
