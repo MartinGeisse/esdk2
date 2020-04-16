@@ -71,6 +71,11 @@ do (*) {
                                 serialPortSelected ? serialPort.busAcknowledge :
                                     (cpu.memoryWrite | internalMemorySecondReadCycle);
 
+    // interrupts
+    cpu.interrupt = 0;
+
+    // devices
+
     display.clk = clk;
     display.registerWriteEnable = cpu.memoryEnable & cpu.memoryWrite & displayControllerSelected;
     display.registerWriteData = cpu.memoryWriteData[0];

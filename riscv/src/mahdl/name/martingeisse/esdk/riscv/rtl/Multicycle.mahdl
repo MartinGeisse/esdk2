@@ -15,6 +15,9 @@ interface {
 	out vector[4] memoryWriteMask;
 	in bit memoryAcknowledge;
 
+	// interrupts
+	in bit interrupt;
+
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -64,8 +67,10 @@ register bit registerSetSelector = 0;
 
 // special registers including CSRs
 constant vector[5] EXCEPTION_NONE = 0;
-constant vector[5] EXCEPTION_INVALID_INSTRUCTION = 1;
+constant vector[5] EXCEPTION_INTERRUPT = 1;
+constant vector[5] EXCEPTION_INVALID_INSTRUCTION = 2;
 register vector[5] exceptionCode = 0;
+register bit enableInterrupts = 0;
 
 // --------------------------------------------------------------------------------------------------------------------
 // derived signals
@@ -195,13 +200,19 @@ do (clk) {
 	if (reset) {
 		state = STATE_START;
 		pc = 0;
+		enableInterrupts = 0;
 	} else {
 		switch (state) {
 
 			case STATE_START:
                 oldPc = pc;
 				memoryAddressRegister = pc;
-				state = STATE_FETCH;
+				if (enableInterrupts & interrupt) {
+					exceptionCode = EXCEPTION_INTERRUPT;
+					state = STATE_EXCEPTION;
+				} else {
+					state = STATE_FETCH;
+				}
 
 			case STATE_FETCH:
 				if (memoryAcknowledge) {
@@ -324,6 +335,7 @@ do (clk) {
 				state = STATE_START;
 
 			case STATE_EXCEPTION:
+				enableInterrupts = 0;
 				pc = 4;
 				// no register sets for now: registerSetSelector = 1;
 				exceptionHandlerReturnAddress = oldPc;
@@ -359,6 +371,12 @@ do (clk) {
 							case 5d0:
 								miscRegisterWriteValue = exceptionHandlerReturnAddress;
 
+							case 5d1:
+								miscRegisterWriteValue = 27d0 _ exceptionCode;
+
+							case 5d2:
+								miscRegisterWriteValue = 31d0 _ enableInterrupts;
+
 							default:
 								state = STATE_EXCEPTION;
 								exceptionCode = EXCEPTION_INVALID_INSTRUCTION;
@@ -373,11 +391,22 @@ do (clk) {
 							case 5d0:
 								exceptionHandlerReturnAddress = firstRegisterValue;
 
+							case 5d1:
+								exceptionCode = firstRegisterValue[4:0];
+
+							case 5d2:
+								enableInterrupts = firstRegisterValue[0];
+
+							default:
+								state = STATE_EXCEPTION;
+								exceptionCode = EXCEPTION_INVALID_INSTRUCTION;
+
 						}
 
 					// leave exception handler
 					case 4d2:
 						state = STATE_START;
+						enableInterrupts = 1;
 						pc = exceptionHandlerReturnAddress;
 						// no register sets for now: registerSetSelector = 0;
 
