@@ -102,3 +102,9 @@ available:
     addi s1, s1, 1 // advance write pointer
     li s2, 0 // reset end-of-stream detection timer
     j moreBytesLoop
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// TODO:
+// We want to fill up to a specific adress here, but neither .org nor .fill nor anything else will do
+// because "ld"'s LTO will shift things to the wrong position again...
