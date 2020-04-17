@@ -10,31 +10,36 @@ extern "C" {
 #include "engine.h"
 
 // constants
-const Fixed NEAR_Z = buildFixed(0, 6554); // 0.1
+Fixed SCREEN_WIDTH_FIXED;
+Fixed HALF_SCREEN_WIDTH_FIXED;
+Fixed SCREEN_HEIGHT_FIXED;
+Fixed HALF_SCREEN_HEIGHT_FIXED;
+Fixed FOV_UNIT_FIXED;
+Fixed NEAR_Z;
 
 // vertices
-int vertexCount = 0;
+int vertexCount;
 Vector3 vertices[maxVertices];
 
 // vertex indices (primitives use this table to share vertices since they are expensive to transform)
-int vertexIndexCount = 0;
+int vertexIndexCount;
 int vertexIndices[maxVertexIndices];
 
 // polygons
-int polygonCount = 0;
+int polygonCount;
 Polygon polygons[maxPolygons];
 
 // collision detection
-int collisionPlaneCount = 0;
+int collisionPlaneCount;
 CollisionPlane collisionPlanes[maxCollisionPlanes];
 
 // sectors
-int sectorCount = 0;
+int sectorCount;
 Sector sectors[maxSectors];
 
 // player
 Transform3 playerTransform;
-int playerSectorIndex = 0;
+int playerSectorIndex;
 
 // internal data
 static Transform3 inversePlayerTransform;
@@ -55,6 +60,24 @@ static int currentPolygonVertexCount2;
 static Vector2 currentPolygonVertices2[64];
 static Vector2 currentPolygonBackupVertices2[64];
 static Fixed currentPolygonEvaluations[64];
+
+void initializeEngine() {
+    SCREEN_WIDTH_FIXED = intToFixed(SCREEN_WIDTH);
+    HALF_SCREEN_WIDTH_FIXED = intToFixed(HALF_SCREEN_WIDTH);
+    SCREEN_HEIGHT_FIXED = intToFixed(SCREEN_HEIGHT);
+    HALF_SCREEN_HEIGHT_FIXED = intToFixed(HALF_SCREEN_HEIGHT);
+    FOV_UNIT_FIXED = intToFixed(FOV_UNIT);
+    NEAR_Z = buildFixed(0, 6554); // 0.1
+    vertexCount = 0;
+    vertexIndexCount = 0;
+    polygonCount = 0;
+    collisionPlaneCount = 0;
+    sectorCount = 0;
+    playerTransform = Transform3();
+    playerSectorIndex = 0;
+}
+
+// ----------------------------------------------------------------------------------------------------------------
 
 // called once for all non-near vertices, and on demand for near vertices after clipping
 static Vector2 project(Vector3 v) {

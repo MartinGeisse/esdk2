@@ -20,13 +20,6 @@ const int HALF_SCREEN_HEIGHT = 300;
 // inverse half-screen FOV; half the above screen size means a total FOV of 90 degrees (on that axis)
 const int FOV_UNIT = 400;
 
-// Fixed-typed variants of the above constants
-const Fixed SCREEN_WIDTH_FIXED = intToFixed(SCREEN_WIDTH);
-const Fixed HALF_SCREEN_WIDTH_FIXED = intToFixed(HALF_SCREEN_WIDTH);
-const Fixed SCREEN_HEIGHT_FIXED = intToFixed(SCREEN_HEIGHT);
-const Fixed HALF_SCREEN_HEIGHT_FIXED = intToFixed(HALF_SCREEN_HEIGHT);
-const Fixed FOV_UNIT_FIXED = intToFixed(FOV_UNIT);
-
 struct Polygon {
 
     // number of vertices
@@ -100,6 +93,7 @@ extern Transform3 playerTransform;
 extern int playerSectorIndex;
 
 // functions
+void initializeEngine();
 void render();
 
 #endif

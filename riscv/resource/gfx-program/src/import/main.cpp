@@ -37,6 +37,7 @@ static void moveRelative(Fixed dx, Fixed dy, Fixed dz) {
 }
 
 int main() {
+    initializeEngine();
     buildLevel();
 	al_init();
 	ALLEGRO_DISPLAY *display = al_create_display(SCREEN_WIDTH, SCREEN_HEIGHT);
