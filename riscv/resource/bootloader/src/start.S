@@ -35,8 +35,8 @@ start:
     addi gp, gp, 2
     addi gp, gp, 0x7ff
 
-    // initialize the SP register
-    lui sp, 0x00004
+    // initialize the SP register to start below the key state table
+    la sp, keyStateTable
 
     // clear keyboard states
     li t0, 0
