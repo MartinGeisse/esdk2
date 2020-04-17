@@ -2,39 +2,6 @@
 #ifndef FIXED_H
 #define FIXED_H
 
-#define FIXED_IS_FLOAT 0
-#if FIXED_IS_FLOAT
-
-#include <math.h>
-
-typedef float Fixed;
-const Fixed fixedZero = 0.0f;
-const Fixed fixedOne = 1.0f;
-const Fixed fixedMinusOne = -1.0f;
-const Fixed fixedEpsilon = 0.01f;
-const Fixed fixedMinusEpsilon = -0.01f;
-
-inline Fixed buildFixed(signed short integral, unsigned short fractional) {
-    return integral * 1.0f + fractional / 65536.0f;
-}
-
-inline Fixed intToFixed(signed short integral) {
-    return (float)integral;
-}
-
-inline int fixedToInt(Fixed f) {
-    return (int)f;
-}
-
-inline int fixedToFractionalPart(Fixed f) {
-    return (int)(fmodf(f, 1.0f) * 65536.0f);
-}
-
-#else
-
-#include <stdio.h>
-#include <stdlib.h>
-
 struct Fixed {
 
     int value;
@@ -99,19 +66,15 @@ inline Fixed operator*(Fixed a, Fixed b) {
     );
 }
 
-inline Fixed operator*=(Fixed &a, Fixed b) {
+inline void operator*=(Fixed &a, Fixed b) {
     a = a * b;
 }
 
 inline Fixed operator/(Fixed a, Fixed b) {
 
-    // Check for division by zero.
-    // We want to check this specifically because Linux is so braindead that it describes a division by zero as
-    // a "floating point exception" even though no floating point operation is involved. We do have actual
-    // floating point code to emulate fixed-point operations and we want to distinguish the errors.
+    // Check for division by zero and emulate RISC-V behavior.
     if (b.value == 0) {
-        printf("division by zero\n");
-        exit(1);
+        return buildFixed(-1, -1);
     }
 
     // Handle sign, so the actual division is unsigned / unsigned.
@@ -160,7 +123,7 @@ inline Fixed operator/(Fixed a, Fixed b) {
 
 }
 
-inline Fixed operator/=(Fixed &a, Fixed b) {
+inline void operator/=(Fixed &a, Fixed b) {
     a = a / b;
 }
 
@@ -186,13 +149,6 @@ const Fixed fixedMinusOne = buildFixed(-1, 0);
 const Fixed fixedEpsilon = buildFixed(0, 66); // 1/1000
 const Fixed fixedMinusEpsilon = buildFixed(-1, 65536 - 66); // 1/1000
 
-#endif
-
-void printFixed(Fixed x);
-Fixed fixedSin(Fixed x);
-Fixed fixedCos(Fixed x);
 Fixed fixedSqrt(Fixed x);
-Fixed floatToFixed(float x);
-float fixedToFloat(Fixed x);
 
 #endif

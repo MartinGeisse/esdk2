@@ -2,7 +2,6 @@
 #ifndef __MATRIX3_H__
 #define __MATRIX3_H__
 
-#include <stdio.h>
 #include "Fixed.h"
 #include "Vector3.h"
 
@@ -54,28 +53,6 @@ struct Matrix3 {
             a * (m11 * m22 - m12 * m21)
 
         );
-    }
-
-    inline void print() {
-        printf("(");
-        printFixed(m11);
-        printf(", ");
-        printFixed(m12);
-        printf(", ");
-        printFixed(m13);
-        printf(", ");
-        printFixed(m21);
-        printf(", ");
-        printFixed(m22);
-        printf(", ");
-        printFixed(m23);
-        printf(", ");
-        printFixed(m31);
-        printf(", ");
-        printFixed(m32);
-        printf(", ");
-        printFixed(m33);
-        printf(")");
     }
 
 };

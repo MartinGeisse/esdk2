@@ -2,7 +2,6 @@
 #ifndef __PLANE2_H__
 #define __PLANE2_H__
 
-#include <stdio.h>
 #include "Fixed.h"
 #include "Vector2.h"
 
@@ -37,16 +36,6 @@ struct Plane2 {
 
     inline Fixed evaluate(const Vector2 &v) {
         return a * v.x + b * v.y + c;
-    }
-
-    inline void print() {
-        printf("Plane2(");
-        printFixed(a);
-        printf(", ");
-        printFixed(b);
-        printf(", ");
-        printFixed(c);
-        printf(")");
     }
 
 };

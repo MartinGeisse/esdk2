@@ -36,6 +36,9 @@ $paths = array(
     'src/system/simdev.c' => 'build/simdev.o',
     'src/system/cpu.S' => 'build/cpu.o',
 
+    'src/engine/Fixed.cpp' => 'build/Fixed.o',
+    'src/engine/engine.cpp' => 'build/engine.o',
+
     'src/main.c' => 'build/main.o',
 
 );

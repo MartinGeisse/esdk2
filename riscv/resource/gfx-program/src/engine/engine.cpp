@@ -1,6 +1,8 @@
 
-#include <allegro5/allegro.h>
-#include <allegro5/allegro_primitives.h>
+extern "C" {
+    #include "../system/util.h"
+    #include "../system/draw.h"
+}
 
 #include "Vector2.h"
 #include "Vector3.h"
@@ -38,8 +40,6 @@ int playerSectorIndex = 0;
 static Transform3 inversePlayerTransform;
 static Vector3 transformedVertices[maxVertices];
 static Vector2 projectedVertices[maxVertices]; // only valid if (z >= NEAR_Z), otherwise we must clip BEFORE projection
-static ALLEGRO_COLOR wireframeColor;
-static ALLEGRO_COLOR splitLineColor;
 
 // internal data: 2d clipping
 static const int maxClipperStackSize = 64;
@@ -76,44 +76,31 @@ static void renderLine(Vector2 a, Vector2 b) {
         Plane2 *clipper = clipperStack + i;
         Fixed va = clipper->evaluate(a);
         Fixed vb = clipper->evaluate(b);
-        #if DEBUG_RENDERING
-            printf("clipper evaluation: ");
-            printFixed(va);
-            printf(", ");
-            printFixed(vb);
-            printf("\n");
-        #endif
         if (va < fixedEpsilon) {
             if (vb < fixedEpsilon) {
                 // invisible
-                #if DEBUG_RENDERING
-                    printf("invisible\n");
-                #endif
                 return;
             } else {
                 // point a clipped away
-                #if DEBUG_RENDERING
-                    printf("adjusting first point\n");
-                #endif
                 a -= (b - a) * va / (vb - va);
             }
         } else if (vb < fixedEpsilon) {
             // point b clipped away
-            #if DEBUG_RENDERING
-                printf("adjusting second point\n");
-            #endif
             b -= (a - b) * vb / (va - vb);
         } // else: fully visible WRT this clipper
     }
 
-    // draw clipped line
+    // draw clipped line TODO
+    setDrawColor(2);
+    /*
     al_draw_line(
-        fixedToFloat(screenTransformX(a.x)),
-        fixedToFloat(screenTransformY(a.y)),
-        fixedToFloat(screenTransformX(b.x)),
-        fixedToFloat(screenTransformY(b.y)),
+        FTF(screenTransformX(a.x)),
+        FTF(screenTransformY(a.y)),
+        FTF(screenTransformX(b.x)),
+        FTF(screenTransformY(b.y)),
         wireframeColor, 1.0f
     );
+    */
 
 }
 
@@ -123,13 +110,6 @@ static void renderLine(int vertexIndex1, int vertexIndex2) {
     // non-projected version of the other vertex too, to perform clipping itself.
     Fixed vaz = transformedVertices[vertexIndex1].z - NEAR_Z;
     Fixed vbz = transformedVertices[vertexIndex2].z - NEAR_Z;
-    #if DEBUG_RENDERING
-        printf("render line, vaz = ");
-        printFixed(vaz);
-        printf(", vbz = ");
-        printFixed(vbz);
-        printf("\n");
-    #endif
 
     if (vaz < fixedZero) {
         if (vbz < fixedZero) {
@@ -311,16 +291,6 @@ static void projectAndClipPolygon(int *polygonVertexIndices, int vertexCount) {
 
 static void renderSector(int sectorIndex) {
 
-    #if DEBUG_RENDERING
-        printf("rendering sector %d\n", sectorIndex);
-        printf("clippers: \n");
-        for (int i = clipperStackStart; i < clipperStackEnd; i++) {
-            printf("\t");
-            clipperStack[i].print();
-            printf("\n");
-        }
-    #endif
-
     Sector *sector = sectors + sectorIndex;
     int *sectorVertexIndices = vertexIndices + sector->vertexIndexStart;
     Polygon *polygon = polygons + sector->polygonStart;
@@ -331,9 +301,6 @@ static void renderSector(int sectorIndex) {
         // clip the portal
         projectAndClipPolygon(sectorVertexIndices, polygon->vertexCount);
         if (currentPolygonVertexCount2 >= 3) {
-            #if DEBUG_RENDERING
-                printf("portal visible\n");
-            #endif
 
             // Check winding (backface culling). We don't really need this, but without it we'll draw a whole sector
             // against an "impossible" set of clippers, slowing things down.
@@ -373,10 +340,6 @@ static void renderSector(int sectorIndex) {
                 clipperStackStart = oldClipperStackStart;
 
             }
-        } else {
-            #if DEBUG_RENDERING
-                printf("portal not visible\n");
-            #endif
         }
 
         // advance to the next polygon and its vertices
@@ -389,15 +352,19 @@ static void renderSector(int sectorIndex) {
     for (int i = 0; i < sector->solidPolygonCount; i++) {
         projectAndClipPolygon(sectorVertexIndices, polygon->vertexCount);
         for (int j = 2; j < currentPolygonVertexCount2; j++) {
+            setDrawColor(4);
+            // TODO
+            /*
             al_draw_filled_triangle(
-                fixedToFloat(screenTransformX(currentPolygonVertices2[0].x)),
-                fixedToFloat(screenTransformY(currentPolygonVertices2[0].y)),
-                fixedToFloat(screenTransformX(currentPolygonVertices2[j - 1].x)),
-                fixedToFloat(screenTransformY(currentPolygonVertices2[j - 1].y)),
-                fixedToFloat(screenTransformX(currentPolygonVertices2[j].x)),
-                fixedToFloat(screenTransformY(currentPolygonVertices2[j].y)),
+                FTF(screenTransformX(currentPolygonVertices2[0].x)),
+                FTF(screenTransformY(currentPolygonVertices2[0].y)),
+                FTF(screenTransformX(currentPolygonVertices2[j - 1].x)),
+                FTF(screenTransformY(currentPolygonVertices2[j - 1].y)),
+                FTF(screenTransformX(currentPolygonVertices2[j].x)),
+                FTF(screenTransformY(currentPolygonVertices2[j].y)),
                 splitLineColor
             );
+            */
         }
         sectorVertexIndices += polygon->vertexCount;
         polygon++;
@@ -412,24 +379,6 @@ static void renderSector(int sectorIndex) {
 }
 
 void render() {
-
-    #if DEBUG_RENDERING
-        printf("\n");
-        printf("---------------------------------------------\n");
-        printf("--- rendering\n");
-        printf("---------------------------------------------\n");
-        printf("\n");
-    #endif
-
-    // initialize (might go into a one-time initialization)
-    wireframeColor.r = 0.0f;
-    wireframeColor.g = 1.0f;
-    wireframeColor.b = 0.0f;
-    wireframeColor.a = 1.0f;
-    splitLineColor.r = 1.0f;
-    splitLineColor.g = 0.0f;
-    splitLineColor.b = 0.0f;
-    splitLineColor.a = 1.0f;
 
     // transform all vertices
     inversePlayerTransform = playerTransform.getInverse();

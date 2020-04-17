@@ -1,5 +1,7 @@
 .option norvc
 
+.globl	entryPoint
+
 // helper for GP initialization, see below
 .section .sdata
 sdataSection:

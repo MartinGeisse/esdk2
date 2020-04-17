@@ -2,7 +2,6 @@
 #ifndef __VECTOR2_H__
 #define __VECTOR2_H__
 
-#include <stdio.h>
 #include "Fixed.h"
 
 struct Vector2;
@@ -45,14 +44,6 @@ struct Vector2 {
 
     inline void normalize() {
         *this /= norm();
-    }
-
-    inline void print() {
-        printf("(");
-        printFixed(x);
-        printf(", ");
-        printFixed(y);
-        printf(")");
     }
 
     inline void rotateLeft90() {

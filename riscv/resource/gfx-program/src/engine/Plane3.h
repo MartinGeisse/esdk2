@@ -2,7 +2,6 @@
 #ifndef __PLANE3_H__
 #define __PLANE3_H__
 
-#include <stdio.h>
 #include "Fixed.h"
 #include "Vector3.h"
 
@@ -38,18 +37,6 @@ struct Plane3 {
 
     inline Fixed evaluate(const Vector3 &v) {
         return a * v.x + b * v.y + c * v.z + d;
-    }
-
-    inline void print() {
-        printf("Plane3(");
-        printFixed(a);
-        printf(", ");
-        printFixed(b);
-        printf(", ");
-        printFixed(c);
-        printf(", ");
-        printFixed(d);
-        printf(")");
     }
 
     // note: only works if normalized!

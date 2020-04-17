@@ -2,7 +2,6 @@
 #ifndef __TRANSFORM3_H__
 #define __TRANSFORM3_H__
 
-#include <stdio.h>
 #include "Fixed.h"
 #include "Matrix3.h"
 #include "Vector3.h"
@@ -41,14 +40,6 @@ struct Transform3 {
     inline Transform3 getInverse() {
         Matrix3 i = m.getInverse();
         return Transform3(i, i * -v);
-    }
-
-    inline void print() {
-        printf("Transform(");
-        m.print();
-        printf(", ");
-        v.print();
-        printf(")");
     }
 
 };

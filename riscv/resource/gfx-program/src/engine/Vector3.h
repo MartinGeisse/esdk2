@@ -2,7 +2,6 @@
 #ifndef __VECTOR3_H__
 #define __VECTOR3_H__
 
-#include <stdio.h>
 #include "Fixed.h"
 
 struct Vector3;
@@ -18,7 +17,7 @@ inline Vector3 operator/(const Vector3 &a, Fixed s);
 inline void operator/=(Vector3 &a, Fixed s);
 inline Fixed operator*(const Vector3 &a, const Vector3 &b);
 inline Vector3 operator%(const Vector3 &a, const Vector3 &b);
-inline Vector3 operator%=(Vector3 &a, const Vector3 &b);
+inline void operator%=(Vector3 &a, const Vector3 &b);
 
 struct Vector3 {
 
@@ -47,16 +46,6 @@ struct Vector3 {
 
     inline void normalize() {
         *this /= norm();
-    }
-
-    inline void print() {
-        printf("(");
-        printFixed(x);
-        printf(", ");
-        printFixed(y);
-        printf(", ");
-        printFixed(z);
-        printf(")");
     }
 
 };
@@ -117,7 +106,7 @@ inline Vector3 operator%(const Vector3 &a, const Vector3 &b) {
     return Vector3(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x);
 }
 
-inline Vector3 operator%=(Vector3 &a, const Vector3 &b) {
+inline void operator%=(Vector3 &a, const Vector3 &b) {
     a = a % b;
 }
 
