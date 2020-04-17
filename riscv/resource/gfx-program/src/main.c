@@ -4,6 +4,9 @@
 #include "system/simdev.h"
 #include "system/cpu.h"
 
+static volatile unsigned char *keyStateTable = (volatile unsigned char *)(0x00004000 - 32);
+#define KEY_STATE(scancode) ((keyStateTable[(scancode) >> 3] & (1 << ((scancode) & 7))) != 0)
+
 #define SQUARE_COUNT 7
 #define SPEED 10
 static int xs[SQUARE_COUNT];
@@ -23,14 +26,15 @@ static void moveSquare(int *pp, int *dp, int max) {
 }
 
 // movement keys
-static int keyW = 0, keyX = 0, keyA = 0, keyD = 0, keyE = 0, keyC = 0;
+// static int keyW = 0, keyX = 0, keyA = 0, keyD = 0, keyE = 0, keyC = 0;
 
 // rotation keys
-static int keyQ = 0, keyR = 0, keyUp = 0, keyDown = 0, keyLeft = 0, keyRight = 0;
+// static int keyQ = 0, keyR = 0, keyUp = 0, keyDown = 0, keyLeft = 0, keyRight = 0;
 
-static int keyReleasePrefix = 0;
+// static int keyReleasePrefix = 0;
 
 void checkKeyboard() {
+/*
     int incomingCode = *(int*)0x00004000;
     if (incomingCode == 0 || incomingCode == 0xe0 || incomingCode == 0xe1) {
         return;
@@ -92,6 +96,7 @@ void checkKeyboard() {
             break;
 
     }
+*/
 }
 
 void main() {
@@ -256,16 +261,16 @@ void main() {
         checkKeyboard();
 
         // movement
-        if (keyLeft) {
+        if (KEY_STATE(0x6b)) {
             x -= 5;
         }
-        if (keyRight) {
+        if (KEY_STATE(0x74)) {
             x += 5;
         }
-        if (keyUp) {
+        if (KEY_STATE(0x75)) {
             y -= 5;
         }
-        if (keyDown) {
+        if (KEY_STATE(0x72)) {
             y += 5;
         }
 

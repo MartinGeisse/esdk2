@@ -2,12 +2,17 @@ module name.martingeisse.esdk.riscv.rtl.terminal.KeyboardController;
 
 interface {
     in clock clk;
+    out bit ready;
     out vector[8] inputData;
     in bit inputAcknowledge;
 }
 
+register bit readyRegister;
 register vector[8] dataRegister;
-do (*) inputData = dataRegister;
+do (*) {
+    ready = readyRegister;
+    inputData = dataRegister;
+}
 
 name.martingeisse.esdk.riscv.rtl.terminal.Ps2Connector ps2;
 
@@ -56,6 +61,7 @@ register vector[8] shiftRegister;
 register bit parity;
 do (clk) {
     if (inputAcknowledge) {
+        readyRegister = 0;
         dataRegister = 0;
     }
     if (ps2ClockWatchdogCounterExpired & state != STATE_IDLE) {
@@ -90,6 +96,7 @@ do (clk) {
             case STATE_PARITY:
                 if (ps2Data ^ parity) {
                     state = STATE_STOP;
+                    readyRegister = 1;
                     dataRegister = shiftRegister;
                 } else {
                     state = STATE_ERROR;

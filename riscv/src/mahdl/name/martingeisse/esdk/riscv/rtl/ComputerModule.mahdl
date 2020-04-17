@@ -72,7 +72,7 @@ do (*) {
                                     (cpu.memoryWrite | internalMemorySecondReadCycle);
 
     // interrupts
-    cpu.interrupt = buttonsAndSwitches[3];
+    cpu.interrupt = keyboard.ready;
 
     // devices
 
