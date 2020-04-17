@@ -143,11 +143,25 @@ inline bool operator>=(Fixed a, Fixed b) {
     return a.value >= b.value;
 }
 
-const Fixed fixedZero = buildFixed(0, 0);
-const Fixed fixedOne = buildFixed(1, 0);
-const Fixed fixedMinusOne = buildFixed(-1, 0);
-const Fixed fixedEpsilon = buildFixed(0, 66); // 1/1000
-const Fixed fixedMinusEpsilon = buildFixed(-1, 65536 - 66); // 1/1000
+inline Fixed getFixedZero() {
+    return buildFixed(0, 0);
+};
+
+inline Fixed getFixedOne() {
+    return buildFixed(1, 0);
+}
+
+inline Fixed getFixedMinusOne() {
+    return buildFixed(-1, 0);
+}
+
+inline Fixed getFixedEpsilon() {
+    return buildFixed(0, 66); // 1/1000
+}
+
+inline Fixed getFixedMinusEpsilon() {
+    return buildFixed(-1, 65536 - 66); // 1/1000
+}
 
 Fixed fixedSqrt(Fixed x);
 

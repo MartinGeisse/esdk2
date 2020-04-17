@@ -23,7 +23,7 @@ struct Vector3 {
 
     Fixed x, y, z;
 
-    inline Vector3(): x(fixedZero), y(fixedZero), z(fixedZero) {
+    inline Vector3(): x(getFixedZero()), y(getFixedZero()), z(getFixedZero()) {
     }
 
     inline Vector3(Fixed x, Fixed y, Fixed z): x(x), y(y), z(z) {

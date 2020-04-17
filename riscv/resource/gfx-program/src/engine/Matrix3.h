@@ -16,9 +16,9 @@ struct Matrix3 {
     Fixed m11, m12, m13, m21, m22, m23, m31, m32, m33;
 
     inline Matrix3() :
-        m11(fixedOne), m12(fixedZero), m13(fixedZero),
-        m21(fixedZero), m22(fixedOne), m23(fixedZero),
-        m31(fixedZero), m32(fixedZero), m33(fixedOne) {
+        m11(getFixedOne()), m12(getFixedZero()), m13(getFixedZero()),
+        m21(getFixedZero()), m22(getFixedOne()), m23(getFixedZero()),
+        m31(getFixedZero()), m32(getFixedZero()), m33(getFixedOne()) {
     }
 
     inline Matrix3(Fixed m11, Fixed m12, Fixed m13, Fixed m21, Fixed m22, Fixed m23, Fixed m31, Fixed m32, Fixed m33):

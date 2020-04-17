@@ -23,7 +23,7 @@ static void moveRelative(Fixed dx, Fixed dy, Fixed dz) {
     for (int i = 0; i < sector->collisionPlaneCount; i++) {
         CollisionPlane *collisionPlane = collisionPlanes + sector->collisionPlaneStart + i;
         Fixed v = collisionPlane->plane.evaluate(newPosition);
-        if (v < fixedZero) {
+        if (v < getFixedZero()) {
             if (collisionPlane->targetSector < 0) {
                 newPosition = collisionPlane->plane.projectPointOntoPlane(newPosition);
             } else {
@@ -55,63 +55,63 @@ int main() {
             break;
         }
         if (al_key_down(&keyboardState, ALLEGRO_KEY_D)) {
-            moveRelative(SPEED, fixedZero, fixedZero);
+            moveRelative(SPEED, getFixedZero(), getFixedZero());
         }
         if (al_key_down(&keyboardState, ALLEGRO_KEY_A)) {
-            moveRelative(-SPEED, fixedZero, fixedZero);
+            moveRelative(-SPEED, getFixedZero(), getFixedZero());
         }
         if (al_key_down(&keyboardState, ALLEGRO_KEY_E)) {
-            moveRelative(fixedZero, SPEED, fixedZero);
+            moveRelative(getFixedZero(), SPEED, getFixedZero());
         }
         if (al_key_down(&keyboardState, ALLEGRO_KEY_C)) {
-            moveRelative(fixedZero, -SPEED, fixedZero);
+            moveRelative(getFixedZero(), -SPEED, getFixedZero());
         }
         if (al_key_down(&keyboardState, ALLEGRO_KEY_W)) {
-            moveRelative(fixedZero, fixedZero, SPEED);
+            moveRelative(getFixedZero(), getFixedZero(), SPEED);
         }
         if (al_key_down(&keyboardState, ALLEGRO_KEY_X)) {
-            moveRelative(fixedZero, fixedZero, -SPEED);
+            moveRelative(getFixedZero(), getFixedZero(), -SPEED);
         }
         if (al_key_down(&keyboardState, ALLEGRO_KEY_RIGHT)) {
             playerTransform.m *= Matrix3(
-                ROT_COS, fixedZero, ROT_SIN,
-                fixedZero, fixedOne, fixedZero,
-                -ROT_SIN, fixedZero, ROT_COS
+                ROT_COS, getFixedZero(), ROT_SIN,
+                getFixedZero(), getFixedOne(), getFixedZero(),
+                -ROT_SIN, getFixedZero(), ROT_COS
             );
         }
         if (al_key_down(&keyboardState, ALLEGRO_KEY_LEFT)) {
             playerTransform.m *= Matrix3(
-                ROT_COS, fixedZero, -ROT_SIN,
-                fixedZero, fixedOne, fixedZero,
-                ROT_SIN, fixedZero, ROT_COS
+                ROT_COS, getFixedZero(), -ROT_SIN,
+                getFixedZero(), getFixedOne(), getFixedZero(),
+                ROT_SIN, getFixedZero(), ROT_COS
             );
         }
         if (al_key_down(&keyboardState, ALLEGRO_KEY_UP)) {
             playerTransform.m *= Matrix3(
-                fixedOne, fixedZero, fixedZero,
-                fixedZero, ROT_COS, -ROT_SIN,
-                fixedZero, ROT_SIN, ROT_COS
+                getFixedOne(), getFixedZero(), getFixedZero(),
+                getFixedZero(), ROT_COS, -ROT_SIN,
+                getFixedZero(), ROT_SIN, ROT_COS
             );
         }
         if (al_key_down(&keyboardState, ALLEGRO_KEY_DOWN)) {
             playerTransform.m *= Matrix3(
-                fixedOne, fixedZero, fixedZero,
-                fixedZero, ROT_COS, ROT_SIN,
-                fixedZero, -ROT_SIN, ROT_COS
+                getFixedOne(), getFixedZero(), getFixedZero(),
+                getFixedZero(), ROT_COS, ROT_SIN,
+                getFixedZero(), -ROT_SIN, ROT_COS
             );
         }
         if (al_key_down(&keyboardState, ALLEGRO_KEY_Q)) {
             playerTransform.m *= Matrix3(
-                ROT_COS, -ROT_SIN, fixedZero,
-                ROT_SIN, ROT_COS, fixedZero,
-                fixedZero, fixedZero, fixedOne
+                ROT_COS, -ROT_SIN, getFixedZero(),
+                ROT_SIN, ROT_COS, getFixedZero(),
+                getFixedZero(), getFixedZero(), getFixedOne()
             );
         }
         if (al_key_down(&keyboardState, ALLEGRO_KEY_R)) {
             playerTransform.m *= Matrix3(
-                ROT_COS, ROT_SIN, fixedZero,
-                -ROT_SIN, ROT_COS, fixedZero,
-                fixedZero, fixedZero, fixedOne
+                ROT_COS, ROT_SIN, getFixedZero(),
+                -ROT_SIN, ROT_COS, getFixedZero(),
+                getFixedZero(), getFixedZero(), getFixedOne()
             );
         }
 

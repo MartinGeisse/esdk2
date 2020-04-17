@@ -21,7 +21,7 @@ struct Vector2 {
 
     Fixed x, y;
 
-    inline Vector2(): x(fixedZero), y(fixedZero) {
+    inline Vector2(): x(getFixedZero()), y(getFixedZero()) {
     }
 
     inline Vector2(Fixed x, Fixed y): x(x), y(y) {

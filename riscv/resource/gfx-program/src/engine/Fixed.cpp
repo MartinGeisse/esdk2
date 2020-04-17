@@ -4,7 +4,7 @@
 Fixed fixedSqrt(Fixed xf) {
     int x = xf.value;
     if (x <= 0) {
-        return fixedZero;
+        return getFixedZero();
     }
     int r  = x;
     while (true) {

@@ -99,15 +99,15 @@ static void renderLine(Vector2 a, Vector2 b) {
         Plane2 *clipper = clipperStack + i;
         Fixed va = clipper->evaluate(a);
         Fixed vb = clipper->evaluate(b);
-        if (va < fixedEpsilon) {
-            if (vb < fixedEpsilon) {
+        if (va < getFixedEpsilon()) {
+            if (vb < getFixedEpsilon()) {
                 // invisible
                 return;
             } else {
                 // point a clipped away
                 a -= (b - a) * va / (vb - va);
             }
-        } else if (vb < fixedEpsilon) {
+        } else if (vb < getFixedEpsilon()) {
             // point b clipped away
             b -= (a - b) * vb / (va - vb);
         } // else: fully visible WRT this clipper
@@ -134,8 +134,8 @@ static void renderLine(int vertexIndex1, int vertexIndex2) {
     Fixed vaz = transformedVertices[vertexIndex1].z - NEAR_Z;
     Fixed vbz = transformedVertices[vertexIndex2].z - NEAR_Z;
 
-    if (vaz < fixedZero) {
-        if (vbz < fixedZero) {
+    if (vaz < getFixedZero()) {
+        if (vbz < getFixedZero()) {
             // invisible
             return;
         } else {
@@ -145,7 +145,7 @@ static void renderLine(int vertexIndex1, int vertexIndex2) {
             a -= (b - a) * vaz / (vbz - vaz);
             renderLine(project(a), projectedVertices[vertexIndex2]);
         }
-    } else if (vbz < fixedZero) {
+    } else if (vbz < getFixedZero()) {
         // second point clipped away
         Vector3 a = transformedVertices[vertexIndex1];
         Vector3 b = transformedVertices[vertexIndex2];
@@ -198,7 +198,7 @@ static void projectAndClipPolygon(int *polygonVertexIndices, int vertexCount) {
         for (int j = 0; j < currentPolygonVertexCount3; j++) {
             Vector3 currentVertex = currentPolygonBackupVertices3[j];
             Fixed currentEvaluation = currentPolygonEvaluations[j];
-            if (currentEvaluation > fixedZero) {
+            if (currentEvaluation > getFixedZero()) {
                 currentPolygonVertices3[outputVertexCount] = currentVertex;
                 outputVertexCount++;
                 continue;
@@ -214,19 +214,19 @@ static void projectAndClipPolygon(int *polygonVertexIndices, int vertexCount) {
             // Even worse, for portals we have to handle it as a special case either here or when building the new
             // clippers as a line between two identical points cannot define a valid clipper.
             // Not handling it here causes followup problems when clipping against the next clipper, too.
-            if (previousEvaluation > fixedZero && nextEvaluation > fixedZero && currentEvaluation > fixedMinusEpsilon) {
+            if (previousEvaluation > getFixedZero() && nextEvaluation > getFixedZero() && currentEvaluation > getFixedMinusEpsilon()) {
                 currentPolygonVertices3[outputVertexCount] = currentVertex;
                 outputVertexCount++;
                 continue;
             }
 
-            if (previousEvaluation > fixedZero) {
+            if (previousEvaluation > getFixedZero()) {
                 currentPolygonVertices3[outputVertexCount] =
                     currentVertex - (currentPolygonBackupVertices3[previousIndex] - currentVertex) *
                         currentEvaluation / (previousEvaluation - currentEvaluation);
                 outputVertexCount++;
             }
-            if (nextEvaluation > fixedZero) {
+            if (nextEvaluation > getFixedZero()) {
                 currentPolygonVertices3[outputVertexCount] =
                     currentVertex - (currentPolygonBackupVertices3[nextIndex] - currentVertex) *
                         currentEvaluation / (nextEvaluation - currentEvaluation);
@@ -261,7 +261,7 @@ static void projectAndClipPolygon(int *polygonVertexIndices, int vertexCount) {
         int anyVertexVisible = 0;
         for (int j = 0; j < currentPolygonVertexCount2; j++) {
             Fixed evaluation = clipper->evaluate(currentPolygonVertices2[j]);
-            if (evaluation > fixedZero) {
+            if (evaluation > getFixedZero()) {
                 anyVertexVisible = 1;
             }
             currentPolygonEvaluations[j] = evaluation;
@@ -277,7 +277,7 @@ static void projectAndClipPolygon(int *polygonVertexIndices, int vertexCount) {
         for (int j = 0; j < currentPolygonVertexCount2; j++) {
             Vector2 currentVertex = currentPolygonBackupVertices2[j];
             Fixed currentEvaluation = currentPolygonEvaluations[j];
-            if (currentEvaluation > fixedZero) {
+            if (currentEvaluation > getFixedZero()) {
                 currentPolygonVertices2[outputVertexCount] = currentVertex;
                 outputVertexCount++;
                 continue;
@@ -288,19 +288,19 @@ static void projectAndClipPolygon(int *polygonVertexIndices, int vertexCount) {
             Fixed nextEvaluation = currentPolygonEvaluations[nextIndex];
 
             // again, prevent generating two identical split vertices from a single vertex on the clipper
-            if (previousEvaluation > fixedZero && nextEvaluation > fixedZero && currentEvaluation > fixedMinusEpsilon) {
+            if (previousEvaluation > getFixedZero() && nextEvaluation > getFixedZero() && currentEvaluation > getFixedMinusEpsilon()) {
                 currentPolygonVertices2[outputVertexCount] = currentVertex;
                 outputVertexCount++;
                 continue;
             }
 
-            if (previousEvaluation > fixedZero) {
+            if (previousEvaluation > getFixedZero()) {
                 currentPolygonVertices2[outputVertexCount] =
                     currentVertex - (currentPolygonBackupVertices2[previousIndex] - currentVertex) *
                         currentEvaluation / (previousEvaluation - currentEvaluation);
                 outputVertexCount++;
             }
-            if (nextEvaluation > fixedZero) {
+            if (nextEvaluation > getFixedZero()) {
                 currentPolygonVertices2[outputVertexCount] =
                     currentVertex - (currentPolygonBackupVertices2[nextIndex] - currentVertex) *
                         currentEvaluation / (nextEvaluation - currentEvaluation);
@@ -330,7 +330,7 @@ static void renderSector(int sectorIndex) {
             int correctWinding = 1;
             Plane2 firstSide = buildPlane2FromPoints(currentPolygonVertices2[0], currentPolygonVertices2[1]);
             for (int j = 2; j < currentPolygonVertexCount2; j++) {
-                if (firstSide.evaluate(currentPolygonVertices2[j]) < fixedMinusEpsilon) {
+                if (firstSide.evaluate(currentPolygonVertices2[j]) < getFixedMinusEpsilon()) {
                     correctWinding = 0;
                     break;
                 }
@@ -416,10 +416,10 @@ void render() {
     // reset clipping
     clipperStackStart = 0;
     clipperStackEnd = 4;
-    clipperStack[0] = buildPlane2FromPoints(Vector2(fixedMinusOne, fixedMinusOne), Vector2(fixedOne, fixedMinusOne));
-    clipperStack[1] = buildPlane2FromPoints(Vector2(fixedOne, fixedMinusOne), Vector2(fixedOne, fixedOne));
-    clipperStack[2] = buildPlane2FromPoints(Vector2(fixedOne, fixedOne), Vector2(fixedMinusOne, fixedOne));
-    clipperStack[3] = buildPlane2FromPoints(Vector2(fixedMinusOne, fixedOne), Vector2(fixedMinusOne, fixedMinusOne));
+    clipperStack[0] = buildPlane2FromPoints(Vector2(getFixedMinusOne(), getFixedMinusOne()), Vector2(getFixedOne(), getFixedMinusOne()));
+    clipperStack[1] = buildPlane2FromPoints(Vector2(getFixedOne(), getFixedMinusOne()), Vector2(getFixedOne(), getFixedOne()));
+    clipperStack[2] = buildPlane2FromPoints(Vector2(getFixedOne(), getFixedOne()), Vector2(getFixedMinusOne(), getFixedOne()));
+    clipperStack[3] = buildPlane2FromPoints(Vector2(getFixedMinusOne(), getFixedOne()), Vector2(getFixedMinusOne(), getFixedMinusOne()));
 
     // render
     renderSector(playerSectorIndex);
@@ -431,7 +431,7 @@ CollisionPlane *findCollisionPlane(Vector3 position) {
     for (int i = 0; i < sector->collisionPlaneCount; i++) {
         CollisionPlane *collisionPlane = collisionPlanes + sector->collisionPlaneStart + i;
         Fixed v = collisionPlane->plane.evaluate(position);
-        if (v < fixedZero) {
+        if (v < getFixedZero()) {
             return collisionPlane;
         }
     }
