@@ -1,4 +1,0 @@
-
-Seems like GCC inlines a method when it appears inside the class definition. If the method appears inside a class
-definition and cannot be inlined (e.g. it is recursive), then a unique name is generated per compilation unit that
-defines the class (that is, includes the class definition header).

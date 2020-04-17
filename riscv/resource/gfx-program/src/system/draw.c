@@ -1,6 +1,10 @@
 
 #include "simdev.h"
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// low-level helpers
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #define DISPLAY_CONTROL_BASE_ADDRESS 0x00040000
 #define PLANE0_BASE_ADDRESS 0x80000000
 
@@ -9,46 +13,6 @@
 #define RAM_AGENT_COMMAND_ENGINE_SPAN_LENGTH_REGISTER_ADDRESS RAM_AGENT_COMMAND_ENGINE_BASE_ADDRESS
 #define RAM_AGENT_COMMAND_ENGINE_COMMAND_CODE_WRITE_SPAN 0x04000000
 #define RAM_AGENT_COMMAND_ENGINE_WRITE_SPAN_BASE_ADDRESS RAM_AGENT_COMMAND_ENGINE_BASE_ADDRESS
-
-static unsigned char *drawPlane = (unsigned char *)PLANE0_BASE_ADDRESS;
-
-static unsigned char drawColor = 7;
-static unsigned int drawColorWord = 0x07070707;
-
-void selectDrawPlane(int plane) {
-    int offset = (plane & 1) << 20; // TODO 640x480 -> 1024x512 should be enough, why 1M?
-    drawPlane = (unsigned char *)(PLANE0_BASE_ADDRESS + offset);
-}
-
-void selectDisplayPlane(int plane) {
-    if (simdevIsSimulation()) {
-        simdevSelectDisplayPlane(plane);
-    } else {
-        *(int*)DISPLAY_CONTROL_BASE_ADDRESS = plane;
-    }
-}
-
-void clearScreen(unsigned char color) {
-    int isSimulation = simdevIsSimulation();
-    int fourPixels = color | (color << 8) | (color << 16) | (color << 24);
-    int *rowPointer = (int*)drawPlane;
-    int *screenEnd = rowPointer + 256 * 480;
-    if (!isSimulation) {
-        *(int *)RAM_AGENT_COMMAND_ENGINE_SPAN_LENGTH_REGISTER_ADDRESS = 160;
-    }
-    while (rowPointer < screenEnd) {
-        if (isSimulation) {
-            simdevFillWordsShowInt(rowPointer, fourPixels, 160);
-        } else {
-            *(int*)(((int)rowPointer) | RAM_AGENT_COMMAND_ENGINE_ADDRESS_BIT | RAM_AGENT_COMMAND_ENGINE_COMMAND_CODE_WRITE_SPAN) = fourPixels;
-        }
-        rowPointer += 256;
-    }
-}
-
-void drawPixel(int x, int y, unsigned char color) {
-    drawPlane[(y << 10) + x] = color;
-}
 
 static int mul(int x, int y) {
     int result = 0;
@@ -97,10 +61,64 @@ static int div(int x, int y) {
     return negative ? -result : result;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// basics
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+static unsigned char *drawPlane = (unsigned char *)PLANE0_BASE_ADDRESS;
+
+static unsigned char drawColor = 7;
+static unsigned int drawColorWord = 0x07070707;
+
+void selectDrawPlane(int plane) {
+    int offset = (plane & 1) << 20; // TODO 640x480 -> 1024x512 should be enough, why 1M?
+    drawPlane = (unsigned char *)(PLANE0_BASE_ADDRESS + offset);
+}
+
+void selectDisplayPlane(int plane) {
+    if (simdevIsSimulation()) {
+        simdevSelectDisplayPlane(plane);
+    } else {
+        *(int*)DISPLAY_CONTROL_BASE_ADDRESS = plane;
+    }
+}
+
+void clearScreen(unsigned char color) {
+    int isSimulation = simdevIsSimulation();
+    int fourPixels = color | (color << 8) | (color << 16) | (color << 24);
+    int *rowPointer = (int*)drawPlane;
+    int *screenEnd = rowPointer + 256 * 480;
+    if (!isSimulation) {
+        *(int *)RAM_AGENT_COMMAND_ENGINE_SPAN_LENGTH_REGISTER_ADDRESS = 160;
+    }
+    while (rowPointer < screenEnd) {
+        if (isSimulation) {
+            simdevFillWordsShowInt(rowPointer, fourPixels, 160);
+        } else {
+            *(int*)(((int)rowPointer) | RAM_AGENT_COMMAND_ENGINE_ADDRESS_BIT | RAM_AGENT_COMMAND_ENGINE_COMMAND_CODE_WRITE_SPAN) = fourPixels;
+        }
+        rowPointer += 256;
+    }
+}
+
+void setPixel(int x, int y, unsigned char color) {
+    if (x >= 0 && x < 640 && y >= 0 && y < 480) {
+        drawPlane[(y << 10) + x] = color;
+    }
+}
+
 void setDrawColor(int color) {
     drawColor = color;
     drawColorWord = (color << 8) | color;
     drawColorWord = (drawColorWord << 16) | drawColorWord;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// drawing primitives
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void drawPixel(int x, int y) {
+    setPixel(x, y, drawColor);
 }
 
 // note: expects x1 <= x2
@@ -180,12 +198,6 @@ void drawAxisAlignedRectangle(int x, int y, int w, int h) {
     }
 }
 
-static void drawLinePixel(int x, int y) {
-    if (x >= 0 && x < 640 && y >= 0 && y < 480) {
-        drawPlane[(y << 10) + x] = drawColor;
-    }
-}
-
 void drawLine(int x1, int y1, int x2, int y2) {
 
     // make sure that x1 <= x2, swap points if not
@@ -211,7 +223,7 @@ void drawLine(int x1, int y1, int x2, int y2) {
     }
 
     // since we have to draw both endpoints, drawing the first endpoint out of the loop makes the loop condition simpler
-    drawLinePixel(x1, y1);
+    drawPixel(x1, y1);
 
     // We use different algorithmms for horizontal and vertical cases to make them simpler.
     int x = x1, y = y1;
@@ -226,7 +238,7 @@ void drawLine(int x1, int y1, int x2, int y2) {
                 fraction -= absdy;
                 x++;
             }
-            drawLinePixel(x, y);
+            drawPixel(x, y);
         }
 
     } else {
@@ -240,7 +252,7 @@ void drawLine(int x1, int y1, int x2, int y2) {
                 fraction -= dx;
                 y += signy;
             }
-            drawLinePixel(x, y);
+            drawPixel(x, y);
         }
 
     }
