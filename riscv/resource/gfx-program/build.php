@@ -29,14 +29,15 @@ system('rm -rf build');
 system('mkdir build');
 
 $paths = array(
+
     'src/system/start.S' => 'build/start.o',
     'src/system/draw.c' => 'build/draw.o',
-    'src/system/system.S' => 'build/system.o',
+    'src/system/util.S' => 'build/system.o',
     'src/system/simdev.c' => 'build/simdev.o',
     'src/system/cpu.S' => 'build/cpu.o',
-    'src/engine/engine.cpp' => 'build/engine.o',
+
     'src/main.c' => 'build/main.o',
-    'src/vec3test.cpp' => 'build/vec3test.o',
+
 );
 foreach ($paths as $inputPath => $outputPath) {
     buildFile($inputPath, $outputPath);
