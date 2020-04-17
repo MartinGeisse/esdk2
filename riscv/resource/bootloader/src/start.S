@@ -2,8 +2,9 @@
 
 // helper for GP initialization, see below
 .section .sdata
-sdata:
+sdataSection:
 .text
+textSection:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // external locations
@@ -11,7 +12,7 @@ sdata:
 
 .set payloadEntryPoint, 0x80200000
 .set keyStateTable, (0x00004000 - 32)
-.set keyboardController 0x00004000
+.set keyboardController, 0x00004000
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // entry points
@@ -30,12 +31,24 @@ start:
     // section relaxation) so it doesn't try to use GP to initialize GP. To do that, we load an address that has a
     // distance greater than 0x800 from the assumed / intended value of GP; 0x800 is the largest possible immediate
     // offset for loads/stores and immediate constants for ADDI. Then, we correct the error at run-time.
-    la gp, sdata - 1
+    la gp, sdataSection  - 1
     addi gp, gp, 2
     addi gp, gp, 0x7ff
 
     // initialize the SP register
     lui sp, 0x00004
+
+    // clear keyboard states
+    li t0, 0
+    la t1, keyStateTable
+    sw t0, 0(t1)
+    sw t0, 4(t1)
+    sw t0, 8(t1)
+    sw t0, 12(t1)
+    sw t0, 16(t1)
+    sw t0, 20(t1)
+    sw t0, 24(t1)
+    sw t0, 28(t1)
 
     // wait until SDRAM is ready
     li a0, 500
