@@ -8,7 +8,7 @@ $objectFiles = array();
 function buildFile($inputPath, $outputPath) {
     global $objectFiles;
     $objectFiles[] = $outputPath;
-    system(TOOL . 'gcc -msmall-data-limit=100000 -march=rv32im -mabi=ilp32 -c -o ' . $outputPath . ' ' . $inputPath);
+    system(TOOL . 'gcc -msmall-data-limit=100000 -march=rv32im -mabi=ilp32 -fno-exceptions -fno-rtti -c -o ' . $outputPath . ' ' . $inputPath);
 }
 
 function linkFiles() {
@@ -32,7 +32,7 @@ $paths = array(
 
     'src/system/start.S' => 'build/start.o',
     'src/system/draw.c' => 'build/draw.o',
-    'src/system/util.S' => 'build/system.o',
+    'src/system/util.S' => 'build/util.o',
     'src/system/simdev.c' => 'build/simdev.o',
     'src/system/cpu.S' => 'build/cpu.o',
 
@@ -40,6 +40,8 @@ $paths = array(
     'src/engine/engine.cpp' => 'build/engine.o',
 
     'src/main.c' => 'build/main.o',
+    'src/demo.cpp' => 'build/demo.o',
+    'src/level.cpp' => 'build/level.o',
 
 );
 foreach ($paths as $inputPath => $outputPath) {

@@ -1,12 +1,7 @@
 
-#include <stdlib.h>
-#include "engine.h"
+#include "engine/engine.h"
 
 void addVertex(Vector3 v) {
-    if (vertexCount == maxVertices) {
-        printf("too many vertices\n");
-        exit(1);
-    }
     vertices[vertexCount] = v;
     vertexCount++;
 }

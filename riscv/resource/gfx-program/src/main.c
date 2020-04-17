@@ -3,8 +3,8 @@
 #include "system/draw.h"
 #include "system/simdev.h"
 
-static volatile unsigned char *keyStateTable = (volatile unsigned char *)(0x00004000 - 32);
-#define KEY_STATE(scancode) ((keyStateTable[(scancode) >> 3] & (1 << ((scancode) & 7))) != 0)
+int demo();
+
 
 void main() {
 
@@ -12,7 +12,9 @@ void main() {
     if (!simdevIsSimulation()) {
         delay(500);
     }
+    demo();
 
+    /*
     int drawPlane = 0, x = 200, y = 200;
     while (1) {
 
@@ -72,5 +74,6 @@ void main() {
         }
 
     }
+    */
 
 }
