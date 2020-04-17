@@ -65,10 +65,79 @@ start:
 // interrupts
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+interruptRegisterSaveArea:
+    .word 0
+    .word 0
+    .word 0
+    .word 0
+    .word 0
+
+keyReleasePrefixReceived:
+    .word 0
+
 // currently only used for the keyboard
 interruptEntry:
 
-    TODO
+    // save registers
+    sw t0, %lo(interruptRegisterSaveArea)(x0)
+    sw t1, %lo(interruptRegisterSaveArea + 4)(x0)
+    sw t2, %lo(interruptRegisterSaveArea + 8)(x0)
+    sw t3, %lo(interruptRegisterSaveArea + 12)(x0)
+    sw t4, %lo(interruptRegisterSaveArea + 16)(x0)
+
+    // load scan code
+    la t0, keyboardController
+    lw t0, 0(t0)
+
+    // ignore fake keypress indication markers
+    li t1, 0xe0
+    beq t0, t1, interruptExit
+    li t1, 0xe1
+    beq t0, t1, interruptExit
+
+    // recognize key release prefix
+    li t1, 0xf0
+    bne t0, t1, currentScancodeIsNotKeyReleasePrefix
+    li t1, 1
+    sw t1, %lo(keyReleasePrefixReceived)(x0)
+    j interruptExit
+currentScancodeIsNotKeyReleasePrefix:
+
+    // 8 bits per byte -> lowest 3 scancode bits indicate the bit inside the byte; high 5 scancode bits indicate the
+    // byte in the key state table. First, build the bit mask in t1.
+    li t1, 1
+    andi t2, t0, 7
+    sll t1, t1, t2
+
+    // then build the byte offset in t0
+    srl t0, t0, 3
+
+    // load and clear keyReleasePrefixReceived (goes into t2)
+    lw t2, %lo(keyReleasePrefixReceived)(x0)
+    sw x0, %lo(keyReleasePrefixReceived)(x0)
+
+    // finally, set or clear the relevant bit
+    la t3, keyStateTable
+    add t3, t3, t0
+    lb t4, 0(t3)
+    bnez t2, onKeyUp
+onKeyDown:
+    or t4, t4, t1
+    j storeKeyState
+onKeyUp:
+    not t1, t1
+    and t4, t4, t1
+storeKeyState:
+    sb t4, 0(t3)
+
+interruptExit:
+
+    // restore registers
+    lw t4, %lo(interruptRegisterSaveArea + 16)(x0)
+    lw t3, %lo(interruptRegisterSaveArea + 12)(x0)
+    lw t2, %lo(interruptRegisterSaveArea + 8)(x0)
+    lw t1, %lo(interruptRegisterSaveArea + 4)(x0)
+    lw t0, %lo(interruptRegisterSaveArea)(x0)
 
     // return from interrupt (0000 1000 0000 0000 1000 0000 0000 1011)
     .word 0x0800800b
