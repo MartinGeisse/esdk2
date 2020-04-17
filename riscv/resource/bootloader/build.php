@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 
-define('TOOL', '~/riscv-toolchain/bin/riscv32-unknown-elf-');
+define('TOOL', '~/riscv-toolchain/bin/riscv32-unknown-linux-gnu-');
 
 $objectFiles = array();
 
