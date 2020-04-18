@@ -1,6 +1,7 @@
 
 #include "cpu.h"
 #include "draw.h"
+#include "terminal.h"
 
 static int x, y;
 
@@ -34,6 +35,12 @@ void termPrintInt(int i) {
 }
 
 void termPrintUnsignedInt(unsigned int i) {
+
+    // special case: since we suppress leading zeroes, actual zero would be invisible without this
+    if (i == 0) {
+        termPrintChar('0');
+        return;
+    }
 
     // start with the first digit (could be optimized)
     int significance = 1000000000;

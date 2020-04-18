@@ -93,7 +93,7 @@ extern Transform3 playerTransform;
 extern int playerSectorIndex;
 
 // functions
-void initializeEngine();
-void render();
+void initializeEngine(void);
+void render(void);
 
 #endif

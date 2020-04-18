@@ -16,17 +16,6 @@
 #define RAM_AGENT_COMMAND_ENGINE_COMMAND_CODE_WRITE_SPAN 0x04000000
 #define RAM_AGENT_COMMAND_ENGINE_WRITE_SPAN_BASE_ADDRESS RAM_AGENT_COMMAND_ENGINE_BASE_ADDRESS
 
-static int mul(int x, int y) {
-    int result = 0;
-    for (int bit = 1; bit != 0; bit <<= 1) {
-        if (y & bit) {
-            result += x;
-        }
-        x <<= 1;
-    }
-    return result;
-}
-
 static int div(int x, int y) {
     int negative = 0;
     if (x < 0) {
