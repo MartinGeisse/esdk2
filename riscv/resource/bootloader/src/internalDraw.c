@@ -1,4 +1,9 @@
 
+void drawLineInternal(int x1, int y1, int x2, int y2, int planeIndex, int color) {
+    // TODO do nothing
+}
+
+/*
 static void setPixel(unsigned char *drawPlane, int x, int y, unsigned char color) {
     if (x >= 0 && x < 640 && y >= 0 && y < 480) {
         drawPlane[(y << 10) + x] = color;
@@ -8,7 +13,7 @@ static void setPixel(unsigned char *drawPlane, int x, int y, unsigned char color
 void drawLineInternal(int x1, int y1, int x2, int y2, int planeIndex, int color) {
 
     // build a pointer to the draw plane based on the index
-    unsigned char *drawPlane = 0; // TODO plane size not yet clear
+    unsigned char *drawPlane = (unsigned char *)(0x80000000 + (planeIndex << 19));
 
     // make sure that x1 <= x2, swap points if not
     if (x1 > x2) {
@@ -68,3 +73,4 @@ void drawLineInternal(int x1, int y1, int x2, int y2, int planeIndex, int color)
     }
 
 }
+*/
