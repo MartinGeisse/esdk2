@@ -373,18 +373,14 @@ static void renderSector(int sectorIndex) {
         projectAndClipPolygon(sectorVertexIndices, polygon->vertexCount);
         for (int j = 2; j < currentPolygonVertexCount2; j++) {
             setDrawColor(4);
-            // TODO
-            /*
-            al_draw_filled_triangle(
-                FTF(screenTransformX(currentPolygonVertices2[0].x)),
-                FTF(screenTransformY(currentPolygonVertices2[0].y)),
-                FTF(screenTransformX(currentPolygonVertices2[j - 1].x)),
-                FTF(screenTransformY(currentPolygonVertices2[j - 1].y)),
-                FTF(screenTransformX(currentPolygonVertices2[j].x)),
-                FTF(screenTransformY(currentPolygonVertices2[j].y)),
-                splitLineColor
+            drawTriangle(
+                fixedToInt(screenTransformX(currentPolygonVertices2[0].x)),
+                fixedToInt(screenTransformY(currentPolygonVertices2[0].y)),
+                fixedToInt(screenTransformX(currentPolygonVertices2[j - 1].x)),
+                fixedToInt(screenTransformY(currentPolygonVertices2[j - 1].y)),
+                fixedToInt(screenTransformX(currentPolygonVertices2[j].x)),
+                fixedToInt(screenTransformY(currentPolygonVertices2[j].y))
             );
-            */
         }
         sectorVertexIndices += polygon->vertexCount;
         polygon++;
