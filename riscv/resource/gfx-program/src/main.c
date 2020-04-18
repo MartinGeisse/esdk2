@@ -8,10 +8,6 @@ int demo();
 
 void main() {
 
-    // wait for SDRAM startup, but only on real hardware
-    if (!simdevIsSimulation()) {
-        delay(500);
-    }
     demo();
 
     /*
