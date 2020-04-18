@@ -1,5 +1,7 @@
 
 #include "simdev.h"
+#include "cpu.h"
+#include "chargen.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // low-level helpers
@@ -329,4 +331,27 @@ void drawTriangle(int x1, int y1, int x2, int y2, int x3, int y3) {
     drawHalfTriangle(x2, splitX, y2, x1, y1, -1);
     drawHalfTriangle(x2, splitX, y2, x3, y3, 1);
 
+}
+
+void drawCharacter(int x, int y, char c) {
+    unsigned char *thisCharacterData = CHARACTER_DATA[(unsigned char)c];
+    for (int dy = 0; dy < 16; dy++) {
+        unsigned char row = thisCharacterData[dy];
+        for (int dx = 0; dx < 8; dx++) {
+            int mask = (1 << dx);
+            setPixel(x + dx, y + dy, (row & mask) == 0 ? 0 : drawColor);
+        }
+    }
+}
+
+void drawText(int x, int y, const char *text) {
+    while (1) {
+        char c = *text;
+        if (c == 0) {
+            return;
+        }
+        drawCharacter(x, y, c);
+        x += 8;
+        text++;
+    }
 }
