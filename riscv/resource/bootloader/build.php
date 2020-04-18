@@ -30,6 +30,7 @@ system('mkdir build');
 
 $paths = array(
     'src/start.S' => 'build/start.o',
+    'src/internalDraw.c' => 'build/internalDraw.o',
 );
 foreach ($paths as $inputPath => $outputPath) {
     buildFile($inputPath, $outputPath);
