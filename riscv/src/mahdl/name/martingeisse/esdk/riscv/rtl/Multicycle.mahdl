@@ -47,6 +47,7 @@ constant vector[5] STATE_SYSTEM_INSTRUCTION = 18;
 constant vector[5] STATE_CSR_INSTRUCTION = 19;
 constant vector[5] STATE_WRITE_MISC_VALUE_TO_REGISTER = 20;
 constant vector[5] STATE_CUSTOM_INSTRUCTION = 21;
+constant vector[5] STATE_FINISH_EARLY_FETCH = 22;
 
 // CPU state
 register vector[5] state = STATE_START;
@@ -76,6 +77,10 @@ register bit enableInterrupts = 0;
 // derived signals
 // --------------------------------------------------------------------------------------------------------------------
 
+// early fetching
+register bit earlyFetchStarted, earlyFetchFinished;
+register vector[32] earlyFetchResult;
+
 // decoding
 signal vector[5] opcode = instructionRegister[6:2];
 signal vector[6] sourceRegisterIndex1 = (registerSetSelector == instructionRegister[1]) _ instructionRegister[19:15];
@@ -91,7 +96,7 @@ signal bit isLTU = (sourceValue1 < sourceValue2);
 
 // memory interface
 do (*) {
-	memoryEnable = (state == STATE_MEM_ACCESS) | (state == STATE_FETCH);
+	memoryEnable = (state == STATE_MEM_ACCESS) | (state == STATE_FETCH) | (earlyFetchStarted & ~earlyFetchFinished);
 	memoryWrite = (state == STATE_MEM_ACCESS) & opcode[3];
 	memoryWordAddress = memoryAddressRegister[31:2];
 	if (instructionRegister[13]) {
@@ -202,6 +207,10 @@ do (clk) {
 		pc = 0;
 		enableInterrupts = 0;
 	} else {
+		if (memoryAcknowledge) {
+			earlyFetchFinished = 1; // will be ignored for non-early-fetch ACKs
+			earlyFetchResult = memoryReadData;
+		}
 		switch (state) {
 
 			case STATE_START:
@@ -221,6 +230,23 @@ do (clk) {
 					pc = pc + 32d4;
 				}
 
+			case STATE_FINISH_EARLY_FETCH:
+				// note: we could save another cycle by noticing memoryAcknowledge here directly, but we'd have to
+				// add more muxes for the other values.
+				if (earlyFetchFinished) {
+					earlyFetchStarted = 0;
+					earlyFetchFinished = 0;
+					oldPc = pc;
+					pc = pc + 32d4;
+					instructionRegister = earlyFetchResult;
+					if (enableInterrupts & interrupt) {
+						exceptionCode = EXCEPTION_INTERRUPT;
+						state = STATE_EXCEPTION;
+					} else {
+						state = STATE_DECODE_AND_READ1;
+					}
+				}
+
 			case STATE_DECODE_AND_READ1:
 				aluImmediate = repeat(20, instructionRegister[31]) _ instructionRegister[31:20];
 				state = STATE_DECODE_AND_READ2;
@@ -228,6 +254,8 @@ do (clk) {
 			case STATE_DECODE_AND_READ2:
 				firstRegisterValue = registerReadValue;
 				rightShiftInBit = (instructionRegister[30] ? registerReadValue[31] : bit(0));
+				memoryAddressRegister = pc; // for early fetching
+				earlyFetchFinished = 0;
 				switch (opcode) {
 
 					case 5d0: // LOAD
@@ -240,6 +268,7 @@ do (clk) {
 						state = STATE_START;
 
 					case 5d4: // OP-IMM
+						earlyFetchStarted = 1;
 						state = (instructionRegister[14:12] == 3d1) ? STATE_EXEC_OP_0 : STATE_EXEC_OP_1;
 
 					case 5d5: // AUIPC
@@ -249,6 +278,7 @@ do (clk) {
 						state = STATE_MEM_COMPUTE_ADDRESS;
 
 					case 5d12: // OP
+						earlyFetchStarted = 1;
 						if (operationIsMulDev) {
 							state = (instructionRegister[14:12] == 3d0) ? STATE_EXEC_OP_0 : STATE_EXEC_OP_1;
 						} else {
@@ -291,7 +321,7 @@ do (clk) {
 				state = STATE_EXEC_OP_3;
 
 			case STATE_EXEC_OP_3:
-				state = STATE_START;
+				state = STATE_FINISH_EARLY_FETCH;
 
 			case STATE_PREPARE_BRANCH:
 				// this state loads partialBranchCondition
