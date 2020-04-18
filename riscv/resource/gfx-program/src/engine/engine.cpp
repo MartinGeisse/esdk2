@@ -115,15 +115,12 @@ static void renderLine(Vector2 a, Vector2 b) {
 
     // draw clipped line TODO
     setDrawColor(2);
-    /*
-    al_draw_line(
-        FTF(screenTransformX(a.x)),
-        FTF(screenTransformY(a.y)),
-        FTF(screenTransformX(b.x)),
-        FTF(screenTransformY(b.y)),
-        wireframeColor, 1.0f
+    drawLine(
+        fixedToInt(screenTransformX(a.x)),
+        fixedToInt(screenTransformY(a.y)),
+        fixedToInt(screenTransformX(b.x)),
+        fixedToInt(screenTransformY(b.y))
     );
-    */
 
 }
 

@@ -5,11 +5,15 @@
 #include "engine/Plane3.h"
 #include "engine/Transform3.h"
 #include "engine/engine.h"
+#include "engine/Fixed.h"
+
 #include "level.h"
 
 extern "C" {
+    #include "system/cpu.h"
     #include "system/util.h"
     #include "system/draw.h"
+    #include "system/terminal.h"
 }
 
 static volatile unsigned char *keyStateTable = (volatile unsigned char *)(0x00004000 - 32);
@@ -49,7 +53,6 @@ static void moveRelative(Fixed dx, Fixed dy, Fixed dz) {
 int internalDemo() {
     initializeEngine();
     buildLevel();
-
     int drawPlane = 0;
 	while (true) {
 
@@ -142,7 +145,7 @@ int internalDemo() {
             );
         }
 */
-        delay(100);
+        delay(50); // TODO since the code is loaded from SDRAM, this function won't work correctly anymore
 	}
     return 0;
 }
