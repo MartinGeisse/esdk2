@@ -9,6 +9,14 @@ void termInitialize() {
     x = y = 0;
 }
 
+static void advance() {
+    x += 8;
+    if (x == 512) { // my display cuts off the right part of the screen, so 512 instead of 640
+        x = 0;
+        y += 16;
+    }
+}
+
 void termPrintString(const char *s) {
     while (1) {
         char c = *s;
@@ -16,14 +24,14 @@ void termPrintString(const char *s) {
             return;
         }
         drawCharacter(x, y, c);
-        x += 8;
+        advance();
         s++;
     }
 }
 
 void termPrintChar(char c) {
     drawCharacter(x, y, c);
-    x += 8;
+    advance();
 }
 
 void termPrintInt(int i) {
