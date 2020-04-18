@@ -8,7 +8,15 @@ $objectFiles = array();
 function buildFile($inputPath, $outputPath) {
     global $objectFiles;
     $objectFiles[] = $outputPath;
-    system(TOOL . 'gcc -msmall-data-limit=100000 -march=rv32im -mabi=ilp32 -fno-exceptions -fno-rtti -Wall -c -o ' . $outputPath . ' ' . $inputPath);
+
+    if (strpos($inputPath, '.cpp') === FALSE) {
+        $cppFlags = '';
+    } else {
+        $cppFlags = ' -fno-rtti ';
+    }
+
+    system(TOOL . 'gcc -msmall-data-limit=100000 -march=rv32im -mabi=ilp32 -fno-exceptions ' . $cppFlags .
+        ' -Wall -c -o ' . $outputPath . ' ' . $inputPath);
 }
 
 function linkFiles() {
