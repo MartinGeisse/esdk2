@@ -218,10 +218,10 @@ do (clk) {
 				if (memoryAcknowledge) {
 					state = STATE_DECODE_AND_READ1;
 					instructionRegister = memoryReadData;
+					pc = pc + 32d4;
 				}
 
 			case STATE_DECODE_AND_READ1:
-				pc = pc + 32d4;
 				aluImmediate = repeat(20, instructionRegister[31]) _ instructionRegister[31:20];
 				state = STATE_DECODE_AND_READ2;
 
