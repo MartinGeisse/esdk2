@@ -94,7 +94,7 @@ register vector[8] refillPointer;
 register bit refillInProgress, refillFinished;
 do (*) {
     ramdacRequestEnable = refillInProgress;
-    ramdacRequestWordAddress = 5d0 _ planeSelector _ stage1y _ refillPointer;
+    ramdacRequestWordAddress = 6d0 _ planeSelector _ stage1y[8:0] _ refillPointer;
 }
 do (clk) {
     if (ramdacResponseEnable) {
