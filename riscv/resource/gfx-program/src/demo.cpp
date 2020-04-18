@@ -145,7 +145,7 @@ int internalDemo() {
             );
         }
 */
-        delay(50); // TODO since the code is loaded from SDRAM, this function won't work correctly anymore
+        // delay(50); // TODO since the code is loaded from SDRAM, this function won't work correctly anymore
 	}
     return 0;
 }
