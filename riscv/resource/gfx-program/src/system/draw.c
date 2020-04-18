@@ -2,6 +2,7 @@
 #include "simdev.h"
 #include "cpu.h"
 #include "chargen.h"
+#include "builtin.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // low-level helpers
@@ -34,14 +35,16 @@ static int div(int x, int y) {
 // basics
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+static int drawPlaneIndex = 0;
 static unsigned char *drawPlane = (unsigned char *)PLANE0_BASE_ADDRESS;
 
 static unsigned char drawColor = 7;
 static unsigned int drawColorWord = 0x07070707;
 
 void selectDrawPlane(int plane) {
-    int offset = (plane & 1) << 19;
-    drawPlane = (unsigned char *)(PLANE0_BASE_ADDRESS + offset);
+    plane = plane & 1;
+    drawPlaneIndex = plane;
+    drawPlane = (unsigned char *)(PLANE0_BASE_ADDRESS + (plane << 19));
 }
 
 void selectDisplayPlane(int plane) {
@@ -168,7 +171,9 @@ void drawAxisAlignedRectangle(int x, int y, int w, int h) {
 }
 
 void drawLine(int x1, int y1, int x2, int y2) {
+    drawLineInternal(x1, y1, x2, y2, drawPlaneIndex, drawColor);
 
+/*
     // make sure that x1 <= x2, swap points if not
     if (x1 > x2) {
         x1 ^= x2;
@@ -226,6 +231,7 @@ void drawLine(int x1, int y1, int x2, int y2) {
 
     }
 
+*/
 }
 
 static void drawHalfTriangle(int x1a, int x1b, int y1, int x2, int y2, int dy) {
