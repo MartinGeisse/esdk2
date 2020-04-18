@@ -272,6 +272,7 @@ do (clk) {
 						state = (instructionRegister[14:12] == 3d1) ? STATE_EXEC_OP_0 : STATE_EXEC_OP_1;
 
 					case 5d5: // AUIPC
+						earlyFetchStarted = 1;
 						state = STATE_EXEC_AUIPC;
 
 					case 5d8: // STORE
@@ -286,6 +287,7 @@ do (clk) {
 						}
 
 					case 5d13: // LUI
+						earlyFetchStarted = 1;
 						state = STATE_EXEC_LUI;
 
 					case 5d24: // BRANCH
@@ -334,10 +336,10 @@ do (clk) {
 				state = STATE_START;
 
 			case STATE_EXEC_LUI:
-				state = STATE_START;
+				state = STATE_FINISH_EARLY_FETCH;
 
 			case STATE_EXEC_AUIPC:
-				state = STATE_START;
+				state = STATE_FINISH_EARLY_FETCH;
 
 			case STATE_EXEC_JAL:
 				pc = oldPc + (repeat(12, instructionRegister[31]) _ instructionRegister[19:12] _ instructionRegister[20] _ instructionRegister[30:21] _ 1b0);
