@@ -66,85 +66,67 @@ int internalDemo() {
 		render();
 
         // movement
-        if (KEY_STATE(0x6b)) {
-            moveRelative(-getSpeed(), getFixedZero(), getFixedZero());
-        }
-        if (KEY_STATE(0x74)) {
+        if (KEY_STATE(0x23)) {
             moveRelative(getSpeed(), getFixedZero(), getFixedZero());
         }
-        if (KEY_STATE(0x75)) {
-            moveRelative(getFixedZero(), getSpeed(), getFixedZero());
-        }
-        if (KEY_STATE(0x72)) {
-            moveRelative(getFixedZero(), -getSpeed(), getFixedZero());
-        }
-/*
-        ALLEGRO_KEYBOARD_STATE keyboardState;
-        al_get_keyboard_state(&keyboardState);
-        if (al_key_down(&keyboardState, ALLEGRO_KEY_ESCAPE)) {
-            break;
-        }
-        if (al_key_down(&keyboardState, ALLEGRO_KEY_D)) {
-            moveRelative(getSpeed(), getFixedZero(), getFixedZero());
-        }
-        if (al_key_down(&keyboardState, ALLEGRO_KEY_A)) {
+        if (KEY_STATE(0x1c)) {
             moveRelative(-getSpeed(), getFixedZero(), getFixedZero());
         }
-        if (al_key_down(&keyboardState, ALLEGRO_KEY_E)) {
+        if (KEY_STATE(0x24)) {
             moveRelative(getFixedZero(), getSpeed(), getFixedZero());
         }
-        if (al_key_down(&keyboardState, ALLEGRO_KEY_C)) {
+        if (KEY_STATE(0x21)) {
             moveRelative(getFixedZero(), -getSpeed(), getFixedZero());
         }
-        if (al_key_down(&keyboardState, ALLEGRO_KEY_W)) {
+        if (KEY_STATE(0x1d)) {
             moveRelative(getFixedZero(), getFixedZero(), getSpeed());
         }
-        if (al_key_down(&keyboardState, ALLEGRO_KEY_X)) {
+        if (KEY_STATE(0x22)) {
             moveRelative(getFixedZero(), getFixedZero(), -getSpeed());
         }
-        if (al_key_down(&keyboardState, ALLEGRO_KEY_RIGHT)) {
+        if (KEY_STATE(0x74)) {
             playerTransform.m *= Matrix3(
                 getRotationCos(), getFixedZero(), getRotationSin(),
                 getFixedZero(), getFixedOne(), getFixedZero(),
                 -getRotationSin(), getFixedZero(), getRotationCos()
             );
         }
-        if (al_key_down(&keyboardState, ALLEGRO_KEY_LEFT)) {
+        if (KEY_STATE(0x6b)) {
             playerTransform.m *= Matrix3(
                 getRotationCos(), getFixedZero(), -getRotationSin(),
                 getFixedZero(), getFixedOne(), getFixedZero(),
                 getRotationSin(), getFixedZero(), getRotationCos()
             );
         }
-        if (al_key_down(&keyboardState, ALLEGRO_KEY_UP)) {
+        if (KEY_STATE(0x75)) {
             playerTransform.m *= Matrix3(
                 getFixedOne(), getFixedZero(), getFixedZero(),
                 getFixedZero(), getRotationCos(), -getRotationSin(),
                 getFixedZero(), getRotationSin(), getRotationCos()
             );
         }
-        if (al_key_down(&keyboardState, ALLEGRO_KEY_DOWN)) {
+        if (KEY_STATE(0x72)) {
             playerTransform.m *= Matrix3(
                 getFixedOne(), getFixedZero(), getFixedZero(),
                 getFixedZero(), getRotationCos(), getRotationSin(),
                 getFixedZero(), -getRotationSin(), getRotationCos()
             );
         }
-        if (al_key_down(&keyboardState, ALLEGRO_KEY_Q)) {
+        if (KEY_STATE(0x15)) {
             playerTransform.m *= Matrix3(
                 getRotationCos(), -getRotationSin(), getFixedZero(),
                 getRotationSin(), getRotationCos(), getFixedZero(),
                 getFixedZero(), getFixedZero(), getFixedOne()
             );
         }
-        if (al_key_down(&keyboardState, ALLEGRO_KEY_R)) {
+        if (KEY_STATE(0x2d)) {
             playerTransform.m *= Matrix3(
                 getRotationCos(), getRotationSin(), getFixedZero(),
                 -getRotationSin(), getRotationCos(), getFixedZero(),
                 getFixedZero(), getFixedZero(), getFixedOne()
             );
         }
-*/
+
         // delay(50); // TODO since the code is loaded from SDRAM, this function won't work correctly anymore
 	}
     return 0;
