@@ -12,7 +12,7 @@ Fixed fixedSqrt(Fixed xf) {
     }
     int r  = x;
     while (true) {
-        int next = udiv(r + x, r) >> 1;
+        int next = (r + udiv(x, r)) >> 1;
         if (next >= r - 1 && next <= r + 1) {
             return buildFixed(next << 8);
         }
