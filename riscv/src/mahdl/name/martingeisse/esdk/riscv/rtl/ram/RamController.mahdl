@@ -102,7 +102,7 @@ do (*) {
 
 // Wishbone output registers for the main and init state machine
 do (*) {
-    busRequestAcknowledge = (sd_state == SD_RD_SEND_CAS_OR_PRECHARGE | sd_state == SD_WR_SEND_CAS)
+    busRequestAcknowledge = (sd_state == SD_RD_SEND_CAS_OR_PRECHARGE | sd_state == SD_WR_CAS_WAIT)
             & ~isRamdacRequest & busRequestEnable & isRequestingCurrentRow;
     busResponseEnable = (inflightReadQueueStage4Type == INFLIGHT_READ_QUEUE_TYPE_BUS);
     busResponseReadData = ddrRegisterDataIn;
@@ -417,8 +417,6 @@ do (clk0) {
                 sdramRegisterWE = 1;
                 sdramRegisterBA[1:0] = currentRowAddressRegister[14:13];
                 sdramRegisterA[12:0] = currentRowAddressRegister[12:0];
-                ddrRegisterDataOut = busRequestWriteData;
-                ddrRegisterDataOutMask = ~busRequestWriteMask;
                 sd_state = SD_WR_WAIT_FOR_RAS;
 
             case SD_WR_WAIT_FOR_RAS:
@@ -457,6 +455,8 @@ do (clk0) {
                 // send data
                 ddrRegisterDataStrobe = 1;
                 ddrRegisterDataOutEnable = 1;
+                ddrRegisterDataOut = busRequestWriteData;
+                ddrRegisterDataOutMask = ~busRequestWriteMask;
                 //
                 sd_state = SD_WR_LATCH;
 
