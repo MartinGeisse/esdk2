@@ -65,8 +65,8 @@ constant vector[6] SD_RD_WAIT_FOR_PRECHARGE = 13;
 constant vector[6] SD_RD_DONE = 14;
 constant vector[6] SD_WR_START = 15;
 constant vector[6] SD_WR_WAIT_FOR_RAS = 16;
-constant vector[6] SD_WR_SEND_CAS = 17;
-constant vector[6] SD_WR_SEND_DATA = 18;
+constant vector[6] SD_WR_SEND_FIRST_CAS = 17;
+constant vector[6] SD_WR_TRY_SEND_ANOTHER_CAS = 18;
 constant vector[6] SD_WR_WAIT_WRITE_RECOVERY_1 = 19;
 constant vector[6] SD_WR_WAIT_WRITE_RECOVERY_2 = 20;
 constant vector[6] SD_WR_SEND_PRECHARGE = 21;
@@ -105,13 +105,14 @@ do (*) {
 
 // Wishbone output registers for the main and init state machine
 do (*) {
-    busRequestAcknowledge = (sd_state == SD_RD_SEND_CAS_OR_PRECHARGE | sd_state == SD_WR_SEND_CAS)
-            & ~isRamdacRequest & busRequestEnable & isRequestingCurrentRow;
+    busRequestAcknowledge =
+        (sd_state == SD_RD_SEND_CAS_OR_PRECHARGE | sd_state == SD_WR_SEND_FIRST_CAS | sd_state == SD_WR_TRY_SEND_ANOTHER_CAS)
+        & ~isRamdacRequest & busRequestEnable & isRequestingCurrentRow;
     busResponseEnable = (inflightReadQueueStage4Type == INFLIGHT_READ_QUEUE_TYPE_BUS);
     busResponseReadData = ddrRegisterDataIn;
 
     ramdacRequestAcknowledge = (sd_state == SD_RD_SEND_CAS_OR_PRECHARGE)
-            & isRamdacRequest & ramdacRequestEnable & isRequestingCurrentRow;
+        & isRamdacRequest & ramdacRequestEnable & isRequestingCurrentRow;
     ramdacResponseEnable = (inflightReadQueueStage4Type == INFLIGHT_READ_QUEUE_TYPE_RAMDAC);
     ramdacResponseWordAddress = currentRowAddressRegister _ inflightReadQueueStage4Address;
     ramdacResponseData = ddrRegisterDataIn;
@@ -445,13 +446,14 @@ do (clk0) {
                 sdramRegisterRAS = 1;
                 sdramRegisterCAS = 1;
                 sdramRegisterWE = 1;
-                sd_state = SD_WR_SEND_CAS;
+                sd_state = SD_WR_SEND_FIRST_CAS;
 
             // Note to understand the timing: Our internal clock edge occurs when we assert the output signals. From
             // the POV of the SDRAM, "the clock edge" occurs when the output signals are stable, which is half a cycle
             // later (see generation of the output clock through a DDR module in SdramConnectorImpl). Therefore
             // generation of DQS at clk180 is aligned with the output clock.
-            case SD_WR_SEND_CAS:
+
+            case SD_WR_SEND_FIRST_CAS:
                 // CAS
                 sdramRegisterCS = 0;
                 sdramRegisterRAS = 1;
@@ -463,22 +465,27 @@ do (clk0) {
                 // set DQS to LOW (will start when the data starts)
                 ddrRegisterDataStrobeEnable = 1;
                 ddrRegisterDataStrobe = 0;
-                //
-                sd_state = SD_WR_SEND_DATA;
+                sd_state = SD_WR_TRY_SEND_ANOTHER_CAS;
 
-            case SD_WR_SEND_DATA:
-                // NOP
-                sdramRegisterCS = 1;
-                sdramRegisterRAS = 1;
-                sdramRegisterCAS = 1;
-                sdramRegisterWE = 1;
-                // send data
+            case SD_WR_TRY_SEND_ANOTHER_CAS:
+                // send the data word we just acknowledged
                 ddrRegisterDataStrobe = 1;
                 ddrRegisterDataOutEnable = 1;
                 ddrRegisterDataOut = delayedWriteData;
                 ddrRegisterDataOutMask = ~delayedWriteMask;
-                //
-                sd_state = SD_WR_WAIT_WRITE_RECOVERY_1;
+                // check if we can accept another request immediately
+                if (ramdacRequestAcknowledge | busRequestAcknowledge) {
+                    // keep CAS and just change the address
+                    sdramRegisterA[9:1] = isRamdacRequest ? ramdacRequestWordAddress[8:0] : busRequestWordAddress[8:0];
+                } else {
+                    // NOP
+                    sdramRegisterCS = 1;
+                    sdramRegisterRAS = 1;
+                    sdramRegisterCAS = 1;
+                    sdramRegisterWE = 1;
+                    //
+                    sd_state = SD_WR_WAIT_WRITE_RECOVERY_1;
+                }
 
             case SD_WR_WAIT_WRITE_RECOVERY_1:
                 ddrRegisterDataStrobe = 0;
