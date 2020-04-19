@@ -105,7 +105,7 @@ do (*) {
 
 // Wishbone output registers for the main and init state machine
 do (*) {
-    busRequestAcknowledge = (sd_state == SD_RD_SEND_CAS_OR_PRECHARGE | sd_state == SD_WR_SEND_DATA)
+    busRequestAcknowledge = (sd_state == SD_RD_SEND_CAS_OR_PRECHARGE | sd_state == SD_WR_SEND_CAS)
             & ~isRamdacRequest & busRequestEnable & isRequestingCurrentRow;
     busResponseEnable = (inflightReadQueueStage4Type == INFLIGHT_READ_QUEUE_TYPE_BUS);
     busResponseReadData = ddrRegisterDataIn;
@@ -177,6 +177,23 @@ do (clk0) {
     inflightReadQueueStage3Address = inflightReadQueueStage2Address;
     inflightReadQueueStage4Type = inflightReadQueueStage3Type;
     inflightReadQueueStage4Address = inflightReadQueueStage3Address;
+}
+
+/* The write delay registers are used to acknowledge a write cycle when its CAS is sent to the SDRAM -- the actual
+ * data and the byte mask have to be sent one cycle later according to the timing specifications. This poses a problem
+ * without delay registers because then we cannot acknowledge at the same time as the CAS (because the data would be
+ * gone when needed), but we cannot acknowledge when sending the data either because at that time we already want to
+ * know if another request is pending so we can send the CAS for that, and we don't know that if we have not ack'ed
+ * the first request. So without delay registers, we would have to introduce a wait state instead and slow consecutive
+ * write cycles down to half the speed.
+ */
+register vector[32] delayedWriteData;
+register vector[4] delayedWriteMask;
+do (clk0) {
+    // only the bus can write, so we can take these assignments out of the state machine and therefore simplify the
+    // enable logic.
+    delayedWriteData = busRequestWriteData;
+    delayedWriteMask = busRequestWriteMask;
 }
 
 // This row address is sent to the SDRAM and also sent back in the response. It is copied from the request so it
@@ -458,8 +475,8 @@ do (clk0) {
                 // send data
                 ddrRegisterDataStrobe = 1;
                 ddrRegisterDataOutEnable = 1;
-                ddrRegisterDataOut = busRequestWriteData;
-                ddrRegisterDataOutMask = ~busRequestWriteMask;
+                ddrRegisterDataOut = delayedWriteData;
+                ddrRegisterDataOutMask = ~delayedWriteMask;
                 //
                 sd_state = SD_WR_WAIT_WRITE_RECOVERY_1;
 
