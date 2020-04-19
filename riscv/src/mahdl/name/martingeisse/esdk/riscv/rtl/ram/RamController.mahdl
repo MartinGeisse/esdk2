@@ -70,9 +70,6 @@ constant vector[6] SD_WR_TRY_SEND_ANOTHER_CAS = 18;
 constant vector[6] SD_WR_WAIT_WRITE_RECOVERY_1 = 19;
 constant vector[6] SD_WR_WAIT_WRITE_RECOVERY_2 = 20;
 constant vector[6] SD_WR_SEND_PRECHARGE = 21;
-constant vector[6] SD_WR_LATCH = 22;
-constant vector[6] SD_WR_LATCH1 = 23;
-constant vector[6] SD_WR_DONE = 24;
 
 // initialization state machine
 constant vector[4] SI_START = 0;
@@ -501,22 +498,7 @@ do (clk0) {
                 sdramRegisterRAS = 0;
                 sdramRegisterCAS = 1;
                 sdramRegisterWE = 0;
-                //
-                sd_state = SD_WR_LATCH;
-
-            case SD_WR_LATCH:
-                // NOP
-                sdramRegisterCS = 1;
-                sdramRegisterRAS = 1;
-                sdramRegisterCAS = 1;
-                sdramRegisterWE = 1;
-                //
-                sd_state = SD_WR_LATCH1;
-
-            case SD_WR_LATCH1:
-                sd_state = SD_WR_DONE;
-
-            case SD_WR_DONE:
+                // the IDLE state will send the NOP necessary between PRECHARGE and RAS (ACTIVE) to obey timing (tPR)
                 sd_state = SD_IDLE;
 
             // --------------------------------------------------------------------------------------------------------
