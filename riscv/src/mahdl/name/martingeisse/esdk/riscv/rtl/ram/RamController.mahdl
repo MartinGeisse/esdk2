@@ -430,25 +430,35 @@ do (clk0) {
                 sdramRegisterWE = 1;
                 sd_state = SD_WR_SEND_CAS;
 
+            // Note to understand the timing: Our internal clock edge occurs when we assert the output signals. From
+            // the POV of the SDRAM, "the clock edge" occurs when the output signals are stable, which is half a cycle
+            // later (see generation of the output clock through a DDR module in SdramConnectorImpl). Therefore
+            // generation of DQS at clk180 is aligned with the output clock.
             case SD_WR_SEND_CAS:
-                sdramRegisterCS = 0;			// Access column
+                // CAS
+                sdramRegisterCS = 0;
                 sdramRegisterRAS = 1;
                 sdramRegisterCAS = 0;
                 sdramRegisterWE = 0;
-                ddrRegisterDataStrobeEnable = 1;
-                sd_state = SD_WR_CAS_WAIT;
-                sdramRegisterA[10] = 1;		// Use auto-precharge
+                sdramRegisterA[10] = 1; // use auto-precharge
                 sdramRegisterA[9:1] = isRamdacRequest ? ramdacRequestWordAddress[8:0] : busRequestWordAddress[8:0];
                 sdramRegisterA[0] = 0;
+                //
+                ddrRegisterDataStrobeEnable = 1;
+                //
+                sd_state = SD_WR_CAS_WAIT;
 
             case SD_WR_CAS_WAIT:
-                sd_state = SD_WR_LATCH;
-                ddrRegisterDataStrobe = 1;			// Start with DQS low
-                ddrRegisterDataOutEnable = 1;				// Drive the data bus
+                // NOP
                 sdramRegisterCS = 1;
                 sdramRegisterRAS = 1;
                 sdramRegisterCAS = 1;
                 sdramRegisterWE = 1;
+                // send data
+                ddrRegisterDataStrobe = 1;
+                ddrRegisterDataOutEnable = 1;
+                //
+                sd_state = SD_WR_LATCH;
 
             case SD_WR_LATCH:
                 sd_state = SD_WR_LATCH1;
