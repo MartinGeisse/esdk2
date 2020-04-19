@@ -208,7 +208,11 @@ do (clk0) {
         wait_count = wait_count + 6d1;
         switch (sd_state) {
 
-            // Initialize, wait until INIT_WAIT
+            // --------------------------------------------------------------------------------------------------------
+            // initialization
+            // --------------------------------------------------------------------------------------------------------
+
+            // choose next initialization step
             case SD_INIT:
                 switch (init_state) {
                     case SI_START:
@@ -268,7 +272,7 @@ do (clk0) {
                 }
 
 
-            // ** Waiting for SDRAM waking up *****************************
+            // waiting for SDRAM waking up
             case SD_INIT_WAIT:
                 init_wait_count = init_wait_count + 15d1;
                 if (init_wait_count == INIT_WAIT) {
@@ -278,7 +282,7 @@ do (clk0) {
                     sdramRegisterCKE = 1;
                 }
 
-            // ** Precharge command ***************************************
+            // precharge command
             case SD_PRECHG_ALL:
                 sd_state = SD_PRECHG_ALL1;
                 sdramRegisterRAS = 0;
@@ -294,7 +298,7 @@ do (clk0) {
                 sdramRegisterWE = 1;
                 sd_state = SD_IDLE;			// Precharge takes 15nS before next command
 
-            // ** Load mode register **************************************
+            // load mode register
             case SD_LD_MODE:
                 sd_state = SD_LD_MODE1;
                 sdramRegisterRAS = 0;
@@ -310,7 +314,10 @@ do (clk0) {
                 sdramRegisterWE = 1;					// Load Mode takes 12nS
                 sd_state = SD_IDLE;			// Add wait if needed
 
-            // ** Auto refresh command ************************************
+            // --------------------------------------------------------------------------------------------------------
+            // refresh
+            // --------------------------------------------------------------------------------------------------------
+
             case SD_AUTO_REF:
                 sd_state = SD_AUTO_REF1;
                 sdramRegisterRAS = 0;
@@ -335,7 +342,9 @@ do (clk0) {
                 sd_state = SD_IDLE;
                 refreshAcknowledge = 0;
 
-            // ** Read cycle **********************************************
+            // --------------------------------------------------------------------------------------------------------
+            // reading
+            // --------------------------------------------------------------------------------------------------------
 
             case SD_RD_START:
                 // RAS
@@ -396,7 +405,10 @@ do (clk0) {
                 ddrRegisterDataStrobeEnable = 1;	// Set DQS back to output
                 sd_state = SD_IDLE;
 
-            // ** Write cycle *********************************************
+            // --------------------------------------------------------------------------------------------------------
+            // writing
+            // --------------------------------------------------------------------------------------------------------
+
             case SD_WR_START:
                 // RAS
                 sdramRegisterCS = 0;
@@ -450,7 +462,10 @@ do (clk0) {
                 ddrRegisterDataOutEnable = 0;
                 sd_state = SD_IDLE;
 
-            // Wishbone transfer is done during idle time
+            // --------------------------------------------------------------------------------------------------------
+            // idle
+            // --------------------------------------------------------------------------------------------------------
+
             case SD_IDLE: 						// Idle/sleep process
                 sdramRegisterRAS = 1;				// Set for NOP by default
                 sdramRegisterCAS = 1;
