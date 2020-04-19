@@ -461,15 +461,14 @@ do (clk0) {
                 sd_state = SD_WR_LATCH;
 
             case SD_WR_LATCH:
-                sd_state = SD_WR_LATCH1;
                 ddrRegisterDataStrobe = 0;
+                ddrRegisterDataOutEnable = 0;
+                sd_state = SD_WR_LATCH1;
 
             case SD_WR_LATCH1:
                 sd_state = SD_WR_DONE;
-                ddrRegisterDataStrobe = 0;
 
             case SD_WR_DONE:
-                ddrRegisterDataOutEnable = 0;
                 sd_state = SD_IDLE;
 
             // --------------------------------------------------------------------------------------------------------
