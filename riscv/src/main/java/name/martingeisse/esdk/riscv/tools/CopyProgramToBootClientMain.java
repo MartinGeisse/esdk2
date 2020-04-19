@@ -5,6 +5,7 @@ import name.martingeisse.esdk.riscv.rtl.CeeCompilerInvoker;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.util.Arrays;
 
 public class CopyProgramToBootClientMain {
 
@@ -12,7 +13,7 @@ public class CopyProgramToBootClientMain {
         CeeCompilerInvoker.invoke();
         System.out.println("starting to send...");
         File file = new File("/home/martin/git-repos/esdk2/riscv/resource/gfx-program/build/program.bin");
-        File device = new File("/dev/ttyACM0");
+        File device = findDeviceFile();
         try (FileInputStream in = new FileInputStream(file)) {
             try (FileOutputStream out = new FileOutputStream(device)) {
                 while (true) {
@@ -31,4 +32,14 @@ public class CopyProgramToBootClientMain {
         }
         System.out.println("finished to send");
     }
+
+    private static File findDeviceFile() {
+        File folder = new File("/dev");
+        File[] files = folder.listFiles((dir, name) -> name.startsWith("ttyACM"));
+        if (files.length != 1) {
+            throw new RuntimeException("could not detect device file: " + Arrays.asList(files));
+        }
+        return files[0];
+    }
+
 }

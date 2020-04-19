@@ -66,10 +66,13 @@ constant vector[6] SD_RD_DONE = 14;
 constant vector[6] SD_WR_START = 15;
 constant vector[6] SD_WR_WAIT_FOR_RAS = 16;
 constant vector[6] SD_WR_SEND_CAS = 17;
-constant vector[6] SD_WR_CAS_WAIT = 18;
-constant vector[6] SD_WR_LATCH = 19;
-constant vector[6] SD_WR_LATCH1 = 20;
-constant vector[6] SD_WR_DONE = 21;
+constant vector[6] SD_WR_SEND_DATA = 18;
+constant vector[6] SD_WR_WAIT_WRITE_RECOVERY_1 = 19;
+constant vector[6] SD_WR_WAIT_WRITE_RECOVERY_2 = 20;
+constant vector[6] SD_WR_SEND_PRECHARGE = 21;
+constant vector[6] SD_WR_LATCH = 22;
+constant vector[6] SD_WR_LATCH1 = 23;
+constant vector[6] SD_WR_DONE = 24;
 
 // initialization state machine
 constant vector[4] SI_START = 0;
@@ -102,7 +105,7 @@ do (*) {
 
 // Wishbone output registers for the main and init state machine
 do (*) {
-    busRequestAcknowledge = (sd_state == SD_RD_SEND_CAS_OR_PRECHARGE | sd_state == SD_WR_CAS_WAIT)
+    busRequestAcknowledge = (sd_state == SD_RD_SEND_CAS_OR_PRECHARGE | sd_state == SD_WR_SEND_DATA)
             & ~isRamdacRequest & busRequestEnable & isRequestingCurrentRow;
     busResponseEnable = (inflightReadQueueStage4Type == INFLIGHT_READ_QUEUE_TYPE_BUS);
     busResponseReadData = ddrRegisterDataIn;
@@ -437,16 +440,16 @@ do (clk0) {
                 sdramRegisterRAS = 1;
                 sdramRegisterCAS = 0;
                 sdramRegisterWE = 0;
-                sdramRegisterA[10] = 1; // use auto-precharge
+                sdramRegisterA[10] = 0; // don't use auto-precharge
                 sdramRegisterA[9:1] = isRamdacRequest ? ramdacRequestWordAddress[8:0] : busRequestWordAddress[8:0];
                 sdramRegisterA[0] = 0;
                 // set DQS to LOW (will start when the data starts)
                 ddrRegisterDataStrobeEnable = 1;
                 ddrRegisterDataStrobe = 0;
                 //
-                sd_state = SD_WR_CAS_WAIT;
+                sd_state = SD_WR_SEND_DATA;
 
-            case SD_WR_CAS_WAIT:
+            case SD_WR_SEND_DATA:
                 // NOP
                 sdramRegisterCS = 1;
                 sdramRegisterRAS = 1;
@@ -458,11 +461,32 @@ do (clk0) {
                 ddrRegisterDataOut = busRequestWriteData;
                 ddrRegisterDataOutMask = ~busRequestWriteMask;
                 //
+                sd_state = SD_WR_WAIT_WRITE_RECOVERY_1;
+
+            case SD_WR_WAIT_WRITE_RECOVERY_1:
+                ddrRegisterDataStrobe = 0;
+                ddrRegisterDataOutEnable = 0;
+                sd_state = SD_WR_WAIT_WRITE_RECOVERY_2;
+
+            case SD_WR_WAIT_WRITE_RECOVERY_2:
+                sd_state = SD_WR_SEND_PRECHARGE;
+
+            case SD_WR_SEND_PRECHARGE:
+                // PRECHARGE
+                sdramRegisterCS = 0;
+                sdramRegisterRAS = 0;
+                sdramRegisterCAS = 1;
+                sdramRegisterWE = 0;
+                //
                 sd_state = SD_WR_LATCH;
 
             case SD_WR_LATCH:
-                ddrRegisterDataStrobe = 0;
-                ddrRegisterDataOutEnable = 0;
+                // NOP
+                sdramRegisterCS = 1;
+                sdramRegisterRAS = 1;
+                sdramRegisterCAS = 1;
+                sdramRegisterWE = 1;
+                //
                 sd_state = SD_WR_LATCH1;
 
             case SD_WR_LATCH1:
