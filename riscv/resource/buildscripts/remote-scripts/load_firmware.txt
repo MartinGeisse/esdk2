@@ -1,0 +1,7 @@
+cd
+cd Xilinx92i
+. settings.sh
+cd
+cd usb-driver
+./setup_pcusb
+/etc/init.d/udev restart

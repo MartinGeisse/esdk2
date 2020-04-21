@@ -1,0 +1,5 @@
+source Xilinx92i/settings.sh
+cd ~/auto-ise
+
+export LD_PRELOAD=/home/martin/usb-driver/libusb-driver.so
+impact -batch impact.txt
