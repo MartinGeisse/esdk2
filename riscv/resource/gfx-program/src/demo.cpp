@@ -14,6 +14,7 @@ extern "C" {
     #include "system/util.h"
     #include "system/draw.h"
     #include "system/terminal.h"
+    #include "system/profiling.h"
 }
 
 static volatile unsigned char *keyStateTable = (volatile unsigned char *)(0x00004000 - 32);
@@ -56,14 +57,20 @@ int internalDemo() {
     int drawPlane = 0;
 	while (true) {
 
+	    profReset();
+
         // flip and clear screen
         drawPlane = 1 - drawPlane;
         selectDrawPlane(drawPlane);
         selectDisplayPlane(1 - drawPlane);
         clearScreen(0);
 
+        profLog("after clear screen");
+
         // main 3d rendering
 		render();
+
+        profLog("after rendering");
 
         // movement
         if (KEY_STATE(0x23)) {
@@ -126,6 +133,10 @@ int internalDemo() {
                 getFixedZero(), getFixedZero(), getFixedOne()
             );
         }
+
+        profLog("after keyboard handling");
+
+        profDisplay();
 
         // delay(50); // TODO since the code is loaded from SDRAM, this function won't work correctly anymore
 	}
