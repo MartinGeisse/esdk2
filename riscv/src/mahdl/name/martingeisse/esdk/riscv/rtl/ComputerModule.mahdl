@@ -35,8 +35,9 @@ signal bit gpioSelected = smallDeviceRegionSelected & cpu.memoryWordAddress[14];
 signal bit spiSelected = smallDeviceRegionSelected & cpu.memoryWordAddress[15];
 signal bit displayControllerSelected = smallDeviceRegionSelected & cpu.memoryWordAddress[16];
 signal bit serialPortSelected = smallDeviceRegionSelected & cpu.memoryWordAddress[17];
+signal bit hardwareClockSelected = smallDeviceRegionSelected & cpu.memoryWordAddress[18];
 signal bit internalMemorySelected = smallDeviceRegionSelected & ~terminalSelected & ~signalLoggerSelected
-    & ~gpioSelected & ~spiSelected & ~displayControllerSelected & ~serialPortSelected;
+    & ~gpioSelected & ~spiSelected & ~displayControllerSelected & ~serialPortSelected & ~hardwareClockSelected;
 
 // Memory: the number indicates the significance inside a word, NOT the position of a byte in a byte buffer (these
 // are different since RISC-V is little-endian).
@@ -60,7 +61,8 @@ do (*) {
                         spiSelected ? 32d0 :
                             displayControllerSelected ? 32d0 :
                                 serialPortSelected ? serialPort.busReadData :
-                                    memoryReadData;
+                                    hardwareClockSelected ? hardwareClock :
+                                        memoryReadData;
     cpu.memoryAcknowledge = ramAgentSelected ? ramAgent.cpuAcknowledge :
         simulationDeviceSelected ? simulationDevice.busAcknowledge :
             terminalSelected ? bit(1) :
@@ -69,7 +71,8 @@ do (*) {
                         spiSelected ? spiInterface.busAcknowledge :
                             displayControllerSelected ? bit(1) :
                                 serialPortSelected ? serialPort.busAcknowledge :
-                                    (cpu.memoryWrite | internalMemorySecondReadCycle);
+                                    hardwareClockSelected ? bit(1) :
+                                        (cpu.memoryWrite | internalMemorySecondReadCycle);
 
     // interrupts
     cpu.interrupt = keyboard.ready;
@@ -139,6 +142,17 @@ do (*) {
 
 }
 
+// hardware clock
+register vector[32] hardwareClock = 0;
+register vector[4] hardwareClockPrescaler = 0;
+do (clk) {
+    hardwareClockPrescaler = hardwareClockPrescaler + 4d1;
+    if (hardwareClockPrescaler == 4d0) {
+        hardwareClock = hardwareClock + 32d1;
+    }
+}
+
+// small memory
 signal vector[12] memoryDataWordAddress = cpu.memoryWordAddress[11:0];
 register vector[8] memoryReadData0, memoryReadData1, memoryReadData2, memoryReadData3;
 do (*) memoryReadData = memoryReadData3 _ memoryReadData2 _ memoryReadData1 _ memoryReadData0;
