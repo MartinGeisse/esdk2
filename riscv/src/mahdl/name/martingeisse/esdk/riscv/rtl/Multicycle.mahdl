@@ -224,9 +224,9 @@ do (clk) {
 				}
 
 			case STATE_FETCH:
+				instructionRegister = memoryReadData;
 				if (memoryAcknowledge) {
 					state = STATE_DECODE_AND_READ1;
-					instructionRegister = memoryReadData;
 					pc = pc + 32d4;
 				}
 
