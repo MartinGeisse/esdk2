@@ -2,6 +2,7 @@
 extern "C" {
     #include "../system/util.h"
     #include "../system/draw.h"
+    #include "../system/profiling.h"
 }
 
 #include "Vector2.h"
@@ -311,6 +312,8 @@ static void projectAndClipPolygon(int *polygonVertexIndices, int vertexCount) {
 
 static void renderSector(int sectorIndex) {
 
+    profLog("start renderSector");
+
     Sector *sector = sectors + sectorIndex;
     int *sectorVertexIndices = vertexIndices + sector->vertexIndexStart;
     Polygon *polygon = polygons + sector->polygonStart;
@@ -368,6 +371,8 @@ static void renderSector(int sectorIndex) {
 
     }
 
+    profLog("- portals finished");
+
     // draw solid polygons
     for (int i = 0; i < sector->solidPolygonCount; i++) {
         projectAndClipPolygon(sectorVertexIndices, polygon->vertexCount);
@@ -386,11 +391,15 @@ static void renderSector(int sectorIndex) {
         polygon++;
     }
 
+    profLog("- polygons finished");
+
     // draw lines
     for (int i = 0; i < sector->lineCount; i++) {
         renderLine(sectorVertexIndices[0], sectorVertexIndices[1]);
         sectorVertexIndices += 2;
     }
+
+    profLog("finish renderSector");
 
 }
 
@@ -406,6 +415,8 @@ void render() {
         }
     }
 
+    profLog("transformation finished");
+
     // reset clipping
     clipperStackStart = 0;
     clipperStackEnd = 4;
@@ -413,6 +424,8 @@ void render() {
     clipperStack[1] = buildPlane2FromPoints(Vector2(getFixedOne(), getFixedMinusOne()), Vector2(getFixedOne(), getFixedOne()));
     clipperStack[2] = buildPlane2FromPoints(Vector2(getFixedOne(), getFixedOne()), Vector2(getFixedMinusOne(), getFixedOne()));
     clipperStack[3] = buildPlane2FromPoints(Vector2(getFixedMinusOne(), getFixedOne()), Vector2(getFixedMinusOne(), getFixedMinusOne()));
+
+    profLog("clipping init finished");
 
     // render
     renderSector(playerSectorIndex);
