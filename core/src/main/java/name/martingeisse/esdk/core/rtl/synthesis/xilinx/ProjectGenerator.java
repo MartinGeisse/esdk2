@@ -89,8 +89,10 @@ public class ProjectGenerator {
 
 		generateFile("build.sh", out -> {
 			out.println("ssh martin@ise ./auto-ise/clean.sh");
-			out.println("scp -r . martin@ise:./auto-ise/src");
+			out.println("scp -r ../" + outputFolder.getName() + " martin@ise:./auto-ise/src");
 			out.println("ssh martin@ise ./auto-ise/build.sh environment.sh");
+			out.println("scp martin@ise:./auto-ise/build/trce.twr .");
+			out.println("scp martin@ise:./auto-ise/build/netgen/routed.v .");
 		});
 
 		generateFile("upload.sh", out -> {

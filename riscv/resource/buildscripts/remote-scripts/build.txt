@@ -22,10 +22,12 @@ par -ol high build/mapped.ncd build/routed.ncd build/mapped.pcf
 trce -v 20 build/routed.ncd build/mapped.pcf -o build/trce.twr
 
 # generate post-PAR verilog
+cd build
 mkdir netgen
 cd netgen
 cp ../routed.ncd .
 netgen -ofmt verilog routed.ncd
+cd ..
 cd ..
 
 # generate programming files
