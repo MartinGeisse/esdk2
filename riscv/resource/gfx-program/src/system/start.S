@@ -27,7 +27,7 @@ entryPoint:
     .option pop
 
     // initialize the SP register to start below the key state table
-    la sp, keyStateTable
+    li sp, keyStateTable
 
     // enable interrupts (0000 0100 0010 0010 1000 0101 0000 1011)
     li t0, 1
