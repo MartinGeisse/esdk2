@@ -48,11 +48,11 @@ start:
     addi gp, gp, 0x7ff
 
     // initialize the SP register to start below the key state table
-    la sp, keyStateTable
+    li sp, keyStateTable
 
     // clear keyboard states
     li t0, 0
-    la t1, keyStateTable
+    li t1, keyStateTable
     sw t0, 0(t1)
     sw t0, 4(t1)
     sw t0, 8(t1)
@@ -98,7 +98,7 @@ interruptEntry:
     sw t4, %lo(interruptRegisterSaveArea + 16)(x0)
 
     // load scan code
-    la t0, keyboardController
+    li t0, keyboardController
     lw t0, 0(t0)
 
     // ignore fake keypress indication markers
@@ -129,7 +129,7 @@ currentScancodeIsNotKeyReleasePrefix:
     sw x0, %lo(keyReleasePrefixReceived)(x0)
 
     // finally, set or clear the relevant bit
-    la t3, keyStateTable
+    li t3, keyStateTable
     add t3, t3, t0
     lb t4, 0(t3)
     bnez t2, onKeyUp
