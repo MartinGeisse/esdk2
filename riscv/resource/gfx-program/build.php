@@ -29,7 +29,7 @@ function buildFile($inputPath, $outputPath) {
         // TODO 'src/engine/engine.cpp',
         // 'src/main.c',
         // TODO 'src/demo.cpp',
-        // 'src/level.cpp',
+        'src/level.cpp',
     );
     $optFlag = (in_array($inputPath, $optimizedInputs) ? ' -O3 ' : ' ');
     // $optFlag = ($inputPath != 'src/engine/engine.cpp' ? ' -O3 ' : ' ');
