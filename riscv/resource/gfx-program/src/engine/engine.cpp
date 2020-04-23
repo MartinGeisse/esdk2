@@ -115,6 +115,7 @@ static void renderLine(Vector2 a, Vector2 b) {
     }
 
     // draw clipped line TODO
+    profLog("draw line");
     setDrawColor(2);
     drawLine(
         fixedToInt(screenTransformX(a.x)),
@@ -312,7 +313,7 @@ static void projectAndClipPolygon(int *polygonVertexIndices, int vertexCount) {
 
 static void renderSector(int sectorIndex) {
 
-    profLog("start renderSector");
+    // profLog("start renderSector");
 
     Sector *sector = sectors + sectorIndex;
     int *sectorVertexIndices = vertexIndices + sector->vertexIndexStart;
@@ -371,7 +372,7 @@ static void renderSector(int sectorIndex) {
 
     }
 
-    profLog("- portals finished");
+    // profLog("- portals finished");
 
     // draw solid polygons
     for (int i = 0; i < sector->solidPolygonCount; i++) {
@@ -391,15 +392,17 @@ static void renderSector(int sectorIndex) {
         polygon++;
     }
 
-    profLog("- polygons finished");
+    // profLog("- polygons finished");
 
     // draw lines
     for (int i = 0; i < sector->lineCount; i++) {
+        profLog("start line");
         renderLine(sectorVertexIndices[0], sectorVertexIndices[1]);
         sectorVertexIndices += 2;
     }
+    profLog("finish lines");
 
-    profLog("finish renderSector");
+    // profLog("finish renderSector");
 
 }
 
@@ -415,7 +418,7 @@ void render() {
         }
     }
 
-    profLog("transformation finished");
+    // profLog("transformation finished");
 
     // reset clipping
     clipperStackStart = 0;
@@ -425,7 +428,7 @@ void render() {
     clipperStack[2] = buildPlane2FromPoints(Vector2(getFixedOne(), getFixedOne()), Vector2(getFixedMinusOne(), getFixedOne()));
     clipperStack[3] = buildPlane2FromPoints(Vector2(getFixedMinusOne(), getFixedOne()), Vector2(getFixedMinusOne(), getFixedMinusOne()));
 
-    profLog("clipping init finished");
+    // profLog("clipping init finished");
 
     // render
     renderSector(playerSectorIndex);

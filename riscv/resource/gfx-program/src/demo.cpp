@@ -65,12 +65,12 @@ int internalDemo() {
         selectDisplayPlane(1 - drawPlane);
         clearScreen(0);
 
-        profLog("after clear screen");
+        // profLog("after clear screen");
 
         // main 3d rendering
 		render();
 
-        profLog("after rendering");
+        // profLog("after rendering");
 
         // movement
         if (KEY_STATE(0x23)) {
@@ -134,7 +134,7 @@ int internalDemo() {
             );
         }
 
-        profLog("after keyboard handling");
+        // profLog("after keyboard handling");
 
         profDisplay();
 
