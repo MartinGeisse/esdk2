@@ -15,25 +15,7 @@ function buildFile($inputPath, $outputPath) {
         $cppFlags = ' -fno-rtti ';
     }
 
-    $optimizedInputs = array(
-        'src/system/builtin.S',
-        'src/system/draw.c',
-        'src/system/util.S',
-        'src/system/simdev.c',
-        'src/system/cpu.S',
-        'src/system/cpu.c',
-        'src/system/chargen.c',
-        'src/system/terminal.c',
-        'src/system/profiling.c',
-        'src/engine/Fixed.cpp',
-        // TODO 'src/engine/engine.cpp',
-        // 'src/main.c',
-        // TODO 'src/demo.cpp',
-        'src/level.cpp',
-    );
-    $optFlag = (in_array($inputPath, $optimizedInputs) ? ' -O3 ' : ' ');
-    // $optFlag = ($inputPath != 'src/engine/engine.cpp' ? ' -O3 ' : ' ');
-
+    $optFlag = ' -O1 ';
     system(TOOL . 'gcc -msmall-data-limit=100000 -march=rv32im -mabi=ilp32 -fno-exceptions ' . $cppFlags .
         ' -Wall -S ' . $optFlag . ' -fno-tree-loop-distribute-patterns -o ' . $outputPath . '.S ' . $inputPath);
     system(TOOL . 'gcc -msmall-data-limit=100000 -march=rv32im -mabi=ilp32 -fno-exceptions ' . $cppFlags .
