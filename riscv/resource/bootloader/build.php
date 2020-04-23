@@ -8,7 +8,8 @@ $objectFiles = array();
 function buildFile($inputPath, $outputPath) {
     global $objectFiles;
     $objectFiles[] = $outputPath;
-    system(TOOL . 'gcc -msmall-data-limit=100000 -march=rv32im -mabi=ilp32 -c -o ' . $outputPath . ' ' . $inputPath);
+    system(TOOL . 'gcc -msmall-data-limit=100000 -march=rv32im -mabi=ilp32 -O3 -S -o ' . $outputPath . '.S ' . $inputPath);
+    system(TOOL . 'gcc -msmall-data-limit=100000 -march=rv32im -mabi=ilp32 -O3 -c -o ' . $outputPath . ' ' . $inputPath);
 }
 
 function linkFiles() {

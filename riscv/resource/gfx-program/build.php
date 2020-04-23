@@ -15,8 +15,13 @@ function buildFile($inputPath, $outputPath) {
         $cppFlags = ' -fno-rtti ';
     }
 
+    $optimizedInputs = array();
+    $optFlag = (in_array($inputPath, $optimizedInputs) ? ' -O3 ' : ' ');
+
     system(TOOL . 'gcc -msmall-data-limit=100000 -march=rv32im -mabi=ilp32 -fno-exceptions ' . $cppFlags .
-        ' -Wall -c -o ' . $outputPath . ' ' . $inputPath);
+        ' -Wall -S ' . $optFlag . ' -fno-tree-loop-distribute-patterns -o ' . $outputPath . '.S ' . $inputPath);
+    system(TOOL . 'gcc -msmall-data-limit=100000 -march=rv32im -mabi=ilp32 -fno-exceptions ' . $cppFlags .
+        ' -Wall -c ' . $optFlag . ' -fno-tree-loop-distribute-patterns -o ' . $outputPath . ' ' . $inputPath);
 }
 
 function linkFiles() {
