@@ -15,7 +15,10 @@ function buildFile($inputPath, $outputPath) {
         $cppFlags = ' -fno-rtti ';
     }
 
-    $optimizedInputs = array();
+    $optimizedInputs = array(
+        'src/system/terminal.c',
+        'src/system/draw.c',
+    );
     $optFlag = (in_array($inputPath, $optimizedInputs) ? ' -O3 ' : ' ');
 
     system(TOOL . 'gcc -msmall-data-limit=100000 -march=rv32im -mabi=ilp32 -fno-exceptions ' . $cppFlags .
