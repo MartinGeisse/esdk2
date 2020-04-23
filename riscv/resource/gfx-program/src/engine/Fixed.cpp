@@ -1,6 +1,6 @@
 
 extern "C" {
-    #include "../system/cpu.h"
+    #include "../system/builtin.h"
 }
 
 #include "Fixed.h"

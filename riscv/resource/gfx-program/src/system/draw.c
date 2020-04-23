@@ -1,6 +1,6 @@
 
 #include "simdev.h"
-#include "cpu.h"
+#include "builtin.h"
 #include "chargen.h"
 #include "builtin.h"
 
@@ -16,20 +16,6 @@
 #define RAM_AGENT_COMMAND_ENGINE_SPAN_LENGTH_REGISTER_ADDRESS RAM_AGENT_COMMAND_ENGINE_BASE_ADDRESS
 #define RAM_AGENT_COMMAND_ENGINE_COMMAND_CODE_WRITE_SPAN 0x04000000
 #define RAM_AGENT_COMMAND_ENGINE_WRITE_SPAN_BASE_ADDRESS RAM_AGENT_COMMAND_ENGINE_BASE_ADDRESS
-
-static int div(int x, int y) {
-    int negative = 0;
-    if (x < 0) {
-        x = -x;
-        negative = !negative;
-    }
-    if (y < 0) {
-        y = -y;
-        negative = !negative;
-    }
-    int result = udiv(x, y);
-    return negative ? -result : result;
-}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // basics

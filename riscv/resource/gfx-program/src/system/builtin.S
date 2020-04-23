@@ -1,4 +1,16 @@
 .option norvc
 
+.globl	udivrem
+.set udivrem, 8
+
+.globl	udiv
+.set udiv, 12
+
+.globl	urem
+.set urem, 16
+
+.globl	div
+.set div, 20
+
 .globl	drawLineInternal
-.set drawLineInternal, 8
+.set drawLineInternal, 24

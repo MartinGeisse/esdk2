@@ -10,7 +10,7 @@
 #include "level.h"
 
 extern "C" {
-    #include "system/cpu.h"
+    #include "system/builtin.h"
     #include "system/util.h"
     #include "system/draw.h"
     #include "system/terminal.h"

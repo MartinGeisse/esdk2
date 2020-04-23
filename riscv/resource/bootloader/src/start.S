@@ -28,6 +28,10 @@ entryPoint:
 
 // the following are built-in library functions so they can be executed from small (fast) RAM
 functionTable:
+    .word udivrem
+    .word udiv
+    .word urem
+    .word div
     .word drawLineInternal
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
