@@ -20,13 +20,12 @@ function buildFile($inputPath, $outputPath) {
     }
 
     $cppFlags = ($extension == '.cpp' ? ' -fno-rtti ' : '');
-    $optFlag = ' -O1 ';
     if ($extension != 'S') {
         system(TOOL . 'gcc -msmall-data-limit=100000 -march=rv32im -mabi=ilp32 -fno-exceptions ' . $cppFlags .
-            ' -Wall -S ' . $optFlag . ' -fno-tree-loop-distribute-patterns -o ' . $outputPath . '.S ' . $inputPath);
+            ' -Wall -S -O3 -fno-tree-loop-distribute-patterns -o ' . $outputPath . '.S ' . $inputPath);
     }
     system(TOOL . 'gcc -msmall-data-limit=100000 -march=rv32im -mabi=ilp32 -fno-exceptions ' . $cppFlags .
-        ' -Wall -c ' . $optFlag . ' -fno-tree-loop-distribute-patterns -o ' . $outputPath . ' ' . $inputPath);
+        ' -Wall -c -O3 -fno-tree-loop-distribute-patterns -o ' . $outputPath . ' ' . $inputPath);
 }
 
 function linkFiles() {
