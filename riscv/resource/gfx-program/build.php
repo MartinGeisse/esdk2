@@ -35,6 +35,41 @@ function linkFiles() {
     system(TOOL . 'ld -Map=build/program.map -A rv32im -N -Ttext=0x80200000 -o build/program.elf -e entryPoint ' . $objectFilesList);
 }
 
+function checkNoUnknownSections() {
+    $knownSections = array(
+        '.text',
+        '.data',
+        '.bss',
+    );
+    $text = shell_exec(TOOL . 'objdump -x build/program.elf');
+    $started = FALSE;
+    foreach (explode("\n", $text) as $line) {
+        if (!$started) {
+            if ($line == 'Sections:') {
+                $started = TRUE;
+            }
+            continue;
+        }
+        if ($line == 'SYMBOL TABLE:') {
+            break;
+        }
+        if (strpos($line, 'Idx Name') === 0) {
+            continue;
+        }
+        $line = trim($line);
+        $segments = explode(' ', $line);
+        if ($segments[0] !== (string)(int)$segments[0]) {
+            continue;
+        }
+        $line = trim(substr($line, strpos($line, ' ')));
+        $sectionName = substr($line, 0, strpos($line, ' '));
+        if (!in_array($sectionName, $knownSections)) {
+            die('executable contains unknown section: ' . $sectionName);
+        }
+    }
+
+}
+
 function convertExecutable() {
     system(TOOL . 'objcopy -j .text -j .rodata -j .sdata -I elf32-littleriscv -O binary build/program.elf build/program.bin');
 }
@@ -71,4 +106,5 @@ foreach ($paths as $inputPath => $outputPath) {
     buildFile($inputPath, $outputPath);
 }
 linkFiles();
+checkNoUnknownSections();
 convertExecutable();
