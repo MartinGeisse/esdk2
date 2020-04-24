@@ -38,8 +38,13 @@ function linkFiles() {
 function checkNoUnknownSections() {
     $knownSections = array(
         '.text',
-        '.data',
+        // '.data', is not yet copied to the executable
+        '.rodata',
+        '.init_array',
+        '.sdata',
         '.bss',
+        '.sbss',
+        '.comment',
     );
     $text = shell_exec(TOOL . 'objdump -x build/program.elf');
     $started = FALSE;
@@ -71,7 +76,7 @@ function checkNoUnknownSections() {
 }
 
 function convertExecutable() {
-    system(TOOL . 'objcopy -j .text -j .rodata -j .sdata -I elf32-littleriscv -O binary build/program.elf build/program.bin');
+    system(TOOL . 'objcopy -j .text -j .rodata -j .init_array -j .sdata -I elf32-littleriscv -O binary build/program.elf build/program.bin');
 }
 
 //
