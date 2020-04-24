@@ -9,15 +9,22 @@ function buildFile($inputPath, $outputPath) {
     global $objectFiles;
     $objectFiles[] = $outputPath;
 
-    if (strpos($inputPath, '.cpp') === FALSE) {
-        $cppFlags = '';
-    } else {
-        $cppFlags = ' -fno-rtti ';
+    $dotPosition = strrpos($inputPath, '.');
+    if ($dotPosition === FALSE) {
+        die('no dot in input filename');
+    }
+    $extension = substr($inputPath, $dotPosition + 1);
+    $allowedExtensions = array('c', 'cpp', 'S');
+    if (!in_array($extension, $allowedExtensions)) {
+        die('unknown input file extension: ' . $extension);
     }
 
+    $cppFlags = ($extension == '.cpp' ? ' -fno-rtti ' : '');
     $optFlag = ' -O1 ';
-    system(TOOL . 'gcc -msmall-data-limit=100000 -march=rv32im -mabi=ilp32 -fno-exceptions ' . $cppFlags .
-        ' -Wall -S ' . $optFlag . ' -fno-tree-loop-distribute-patterns -o ' . $outputPath . '.S ' . $inputPath);
+    if ($extension != 'S') {
+        system(TOOL . 'gcc -msmall-data-limit=100000 -march=rv32im -mabi=ilp32 -fno-exceptions ' . $cppFlags .
+            ' -Wall -S ' . $optFlag . ' -fno-tree-loop-distribute-patterns -o ' . $outputPath . '.S ' . $inputPath);
+    }
     system(TOOL . 'gcc -msmall-data-limit=100000 -march=rv32im -mabi=ilp32 -fno-exceptions ' . $cppFlags .
         ' -Wall -c ' . $optFlag . ' -fno-tree-loop-distribute-patterns -o ' . $outputPath . ' ' . $inputPath);
 }
