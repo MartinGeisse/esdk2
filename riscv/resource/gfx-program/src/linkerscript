@@ -5,10 +5,10 @@ SECTIONS {
   . = 0x80200000;
   .image : {
 
-    // we need the real .text first because it contains the implicit entry point
+    /* we need the real .text first because it contains the implicit entry point */
     *(.text .stub .text.* .gnu.linkonce.t.*)
 
-    // other text
+    /* other text */
     *(.text.unlikely .text.*_unlikely .text.unlikely.*)
     *(.text.exit .text.exit.*)
     *(.text.startup .text.startup.*)
@@ -16,14 +16,14 @@ SECTIONS {
     *(SORT(.text.sorted.*))
     *(.gnu.warning)
 
-    // data
+    /* data */
     __global_pointer$ = . + 0x800;
     *(.rodata .rodata.* .gnu.linkonce.r.*)
     *(.data .data.* .gnu.linkonce.d.*)
     *(.srodata.cst16) *(.srodata.cst8) *(.srodata.cst4) *(.srodata.cst2) *(.srodata .srodata.*)
     *(.sdata .sdata.* .gnu.linkonce.s.*)
 
-    // ???
+    /* ??? */
     PROVIDE_HIDDEN (__init_array_start = .);
     KEEP (*(SORT_BY_INIT_PRIORITY(.init_array.*) SORT_BY_INIT_PRIORITY(.ctors.*)))
     KEEP (*(.init_array EXCLUDE_FILE (*crtbegin.o *crtbegin?.o *crtend.o *crtend?.o ) .ctors))
