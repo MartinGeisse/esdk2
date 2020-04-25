@@ -158,66 +158,6 @@ void drawAxisAlignedRectangle(int x, int y, int w, int h) {
 
 void drawLine(int x1, int y1, int x2, int y2) {
     drawLineInternal(x1, y1, x2, y2, drawPlaneIndex, drawColor);
-
-/*
-    // make sure that x1 <= x2, swap points if not
-    if (x1 > x2) {
-        x1 ^= x2;
-        x2 ^= x1;
-        x1 ^= x2;
-        y1 ^= y2;
-        y2 ^= y1;
-        y1 ^= y2;
-    }
-
-    // compute deltas (dx >= 0), signy (-1 for negative, +1 for zero or positive) and absdy
-    int dx = x2 - x1;
-    int dy = y2 - y1;
-    int signy, absdy;
-    if (dy < 0) {
-        signy = -1;
-        absdy = -dy;
-    } else {
-        signy = +1;
-        absdy = dy;
-    }
-
-    // since we have to draw both endpoints, drawing the first endpoint out of the loop makes the loop condition simpler
-    drawPixel(x1, y1);
-
-    // We use different algorithmms for horizontal and vertical cases to make them simpler.
-    int x = x1, y = y1;
-    if (dy < -dx || dy > dx) {
-
-        // vertical case
-        int fraction = 0;
-        while (y != y2) {
-            y += signy;
-            fraction += dx;
-            if (fraction >= (absdy >> 1)) {
-                fraction -= absdy;
-                x++;
-            }
-            drawPixel(x, y);
-        }
-
-    } else {
-
-        // horizontal case
-        int fraction = 0;
-        while (x != x2) {
-            x++;
-            fraction += absdy;
-            if (fraction >= (dx >> 1)) {
-                fraction -= dx;
-                y += signy;
-            }
-            drawPixel(x, y);
-        }
-
-    }
-
-*/
 }
 
 static void drawHalfTriangle(int x1a, int x1b, int y1, int x2, int y2, int dy) {
