@@ -8,8 +8,24 @@ $objectFiles = array();
 function buildFile($inputPath, $outputPath) {
     global $objectFiles;
     $objectFiles[] = $outputPath;
-    system(TOOL . 'gcc -msmall-data-limit=100000 -march=rv32im -mabi=ilp32 -O3 -S -o ' . $outputPath . '.S ' . $inputPath);
-    system(TOOL . 'gcc -msmall-data-limit=100000 -march=rv32im -mabi=ilp32 -O3 -c -o ' . $outputPath . ' ' . $inputPath);
+
+    $dotPosition = strrpos($inputPath, '.');
+    if ($dotPosition === FALSE) {
+        die('no dot in input filename');
+    }
+    $extension = substr($inputPath, $dotPosition + 1);
+    $allowedExtensions = array('c', 'cpp', 'S');
+    if (!in_array($extension, $allowedExtensions)) {
+        die('unknown input file extension: ' . $extension);
+    }
+
+    $cppFlags = ($extension == '.cpp' ? ' -fno-rtti ' : '');
+    if ($extension != 'S') {
+        system(TOOL . 'gcc -msmall-data-limit=100000 -march=rv32im -mabi=ilp32 -fno-exceptions ' . $cppFlags .
+            ' -Wall -S -O3 -fno-tree-loop-distribute-patterns -o ' . $outputPath . '.S ' . $inputPath);
+    }
+    system(TOOL . 'gcc -msmall-data-limit=100000 -march=rv32im -mabi=ilp32 -fno-exceptions ' . $cppFlags .
+        ' -Wall -c -O3 -fno-tree-loop-distribute-patterns -o ' . $outputPath . ' ' . $inputPath);
 }
 
 function linkFiles() {
