@@ -17,3 +17,6 @@
 
 .globl	drawHorizontalLineInternal
 .set drawHorizontalLineInternal, 28
+
+.globl	drawHalfTriangleInternal
+.set drawHalfTriangleInternal, 32

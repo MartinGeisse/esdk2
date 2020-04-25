@@ -34,6 +34,7 @@ functionTable:
     .word div
     .word drawLineInternal
     .word drawHorizontalLineInternal
+    .word drawHalfTriangleInternal
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // startup

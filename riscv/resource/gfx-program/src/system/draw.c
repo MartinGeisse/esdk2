@@ -112,54 +112,7 @@ void drawLine(int x1, int y1, int x2, int y2) {
 }
 
 static void drawHalfTriangle(int x1a, int x1b, int y1, int x2, int y2, int dy) {
-
-    // sort vertically aligned points by X
-    if (x1a > x1b) {
-        int temp = x1a;
-        x1a = x1b;
-        x1b = temp;
-    }
-
-    // draw loop
-    int deltaXa = x2 - x1a;
-    int deltaXb = x2 - x1b;
-    int deltaY = y2 - y1;
-    if (deltaY < 0) {
-        deltaY = -deltaY;
-    }
-    int partialXa = 0, partialXb = 0;
-    while (y1 != y2) {
-
-        // draw row
-        drawHorizontalLine(x1a, x1b, y1);
-
-        // adjust left endpoint
-        partialXa += deltaXa;
-        while (partialXa >= deltaY) {
-            partialXa -= deltaY;
-            x1a++;
-        }
-        while (partialXa <= -deltaY) {
-            partialXa += deltaY;
-            x1a--;
-        }
-
-        // adjust right endpoint
-        partialXb += deltaXb;
-        while (partialXb >= deltaY) {
-            partialXb -= deltaY;
-            x1b++;
-        }
-        while (partialXb <= -deltaY) {
-            partialXb += deltaY;
-            x1b--;
-        }
-
-        // move to next row
-        y1 += dy;
-
-    }
-
+    drawHalfTriangleInternal(x1a, x1b, y1, x2, y2, dy, drawPlaneIndex, drawColor);
 }
 
 void drawTriangle(int x1, int y1, int x2, int y2, int x3, int y3) {
