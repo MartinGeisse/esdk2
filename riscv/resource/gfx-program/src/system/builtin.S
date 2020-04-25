@@ -14,3 +14,6 @@
 
 .globl	drawLineInternal
 .set drawLineInternal, 24
+
+.globl	drawHorizontalLineInternal
+.set drawHorizontalLineInternal, 28

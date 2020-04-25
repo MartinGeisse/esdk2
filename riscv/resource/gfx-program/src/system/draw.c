@@ -81,56 +81,7 @@ void drawPixel(int x, int y) {
 
 // note: expects x1 <= x2
 static void drawHorizontalLine(int x1, int x2, int y) {
-
-    // clip vertically
-    if (y < 0 || y >= 480) {
-        return;
-    }
-
-    // clip horizontally
-    if (x1 < 0) {
-        x1 = 0;
-    }
-    if (x2 > 640) {
-        x2 = 640;
-    }
-
-    // convert x-values to pointers
-    unsigned char *screenRow = drawPlane + (y << 10);
-    unsigned char *p1 = screenRow + x1;
-    unsigned char *p2 = screenRow + x2;
-
-    // avoid complications with word alignment in short rows
-    if (p2 - p1 >= 8) {
-
-        // draw initial word fraction
-        while ((int)p1 & 3) {
-            *p1 = drawColor;
-            p1++;
-        }
-
-        // draw full words
-        unsigned int word = drawColorWord;
-        int fourPixels = word | (word << 8) | (word << 16) | (word << 24);
-
-        if (simdevIsSimulation()) {
-            int wordCount = ((int)(p2 - p1)) >> 2;
-            simdevFillWordsShowInt(p1, word, wordCount);
-            p1 += wordCount << 2;
-        } else {
-            *(int *)RAM_AGENT_COMMAND_ENGINE_SPAN_LENGTH_REGISTER_ADDRESS = (p2 - p1) >> 2;
-            *(int*)(((int)p1) | RAM_AGENT_COMMAND_ENGINE_ADDRESS_BIT | RAM_AGENT_COMMAND_ENGINE_COMMAND_CODE_WRITE_SPAN) = fourPixels;
-            p1 = (unsigned char *)(((int)p2) & ~3);
-        }
-
-    }
-
-    // draw final word fraction (or whole line if less than 8 pixels)
-    while (p1 < p2) {
-        *p1 = drawColor;
-        p1++;
-    }
-
+    drawHorizontalLineInternal(x1, x2, y, drawPlaneIndex, drawColor);
 }
 
 void drawAxisAlignedRectangle(int x, int y, int w, int h) {
