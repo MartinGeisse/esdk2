@@ -1,6 +1,5 @@
 
 #include "profiling.h"
-#include "draw.h"
 #include "terminal.h"
 
 typedef struct {
@@ -26,8 +25,6 @@ void profLog(const char *label) {
 }
 
 void profDisplay() {
-    setDrawColor(5);
-    termInitialize();
     for (int i = 0; i < entryCount; i++) {
         termPrintUnsignedHexInt(entries[i].time);
         termPrintChar(' ');

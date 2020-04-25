@@ -51,11 +51,33 @@ static void moveRelative(Fixed dx, Fixed dy, Fixed dz) {
     playerTransform.v = newPosition;
 }
 
+static int lastFrameTimestamp;
+
 int internalDemo() {
     initializeEngine();
     buildLevel();
     int drawPlane = 0;
 	while (true) {
+
+        //
+        termInitialize();
+
+	    // FPS counter
+	    {
+	        int now = *(unsigned int *)0x00100000;
+	        int frameDuration = now - lastFrameTimestamp;
+	        lastFrameTimestamp = now;
+	        int tenths = udiv(62500000, frameDuration);
+	        int fps = udiv(tenths, 10);
+	        tenths -= fps * 10;
+
+            setDrawColor(5);
+            termPrintString("FPS: ");
+            termPrintInt(fps);
+            termPrintChar('.');
+            termPrintInt(tenths);
+            termPrintln();
+	    }
 
 	    profReset();
 
@@ -136,6 +158,7 @@ int internalDemo() {
 
         // profLog("after keyboard handling");
 
+        setDrawColor(5);
         profDisplay();
 
         // delay(50); // TODO since the code is loaded from SDRAM, this function won't work correctly anymore
