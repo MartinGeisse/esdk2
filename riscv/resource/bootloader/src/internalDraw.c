@@ -111,8 +111,19 @@ void drawHorizontalLineInternal(int x1, int x2, int y, int planeIndex, int color
     unsigned char *p1 = screenRow + x1;
     unsigned char *p2 = screenRow + x2;
 
-    // avoid complications with word alignment in short rows
-    if (p2 - p1 >= 8) {
+    // Avoid complications with word alignment in short rows. Also, we compute the necessary parameters for handing
+    // the actual filling over to the RAM agent, but we only start it after drawing the finishing pixels. This allows
+    // the RAM agent to run in parallel while this method returns, possibly to other code in small RAM (especially
+    // triangle drawing).
+    if (p2 - p1 < 8) {
+
+        // just draw pixel-wise
+        while (p1 < p2) {
+            *p1 = color;
+            p1++;
+        }
+
+    } else {
 
         // draw initial word fraction
         while ((int)p1 & 3) {
@@ -120,18 +131,22 @@ void drawHorizontalLineInternal(int x1, int x2, int y, int planeIndex, int color
             p1++;
         }
 
-        // draw full words
-        int fourPixels = color | (color << 8) | (color << 16) | (color << 24);
-        *(int *)RAM_AGENT_COMMAND_ENGINE_SPAN_LENGTH_REGISTER_ADDRESS = (p2 - p1) >> 2;
-        *(int*)(((int)p1) | RAM_AGENT_COMMAND_ENGINE_ADDRESS_BIT | RAM_AGENT_COMMAND_ENGINE_COMMAND_CODE_WRITE_SPAN) = fourPixels;
+        // prepare drawing full words
+        int start = (int)p1;
+        int words = (p2 - p1) >> 2;
         p1 = (unsigned char *)(((int)p2) & ~3);
 
-    }
+        // draw final word fraction (or whole line if less than 8 pixels)
+        while (p1 < p2) {
+            *p1 = color;
+            p1++;
+        }
 
-    // draw final word fraction (or whole line if less than 8 pixels)
-    while (p1 < p2) {
-        *p1 = color;
-        p1++;
+        // draw full words
+        int fourPixels = color | (color << 8) | (color << 16) | (color << 24);
+        *(int *)RAM_AGENT_COMMAND_ENGINE_SPAN_LENGTH_REGISTER_ADDRESS = words;
+        *(int*)(start | RAM_AGENT_COMMAND_ENGINE_ADDRESS_BIT | RAM_AGENT_COMMAND_ENGINE_COMMAND_CODE_WRITE_SPAN) = fourPixels;
+
     }
 
 }

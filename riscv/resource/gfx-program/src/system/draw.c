@@ -3,6 +3,7 @@
 #include "builtin.h"
 #include "chargen.h"
 #include "builtin.h"
+#include "profiling.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // low-level helpers
@@ -117,6 +118,8 @@ static void drawHalfTriangle(int x1a, int x1b, int y1, int x2, int y2, int dy) {
 
 void drawTriangle(int x1, int y1, int x2, int y2, int x3, int y3) {
 
+    profLog("DT start");
+
     // sort by Y
     int temp;
     if (y1 > y2) {
@@ -152,9 +155,13 @@ void drawTriangle(int x1, int y1, int x2, int y2, int x3, int y3) {
     // find the split point of the point 1 / point 3 line
     int splitX = x1 + div((x3 - x1) * (y2 - y1), y3 - y1);
 
+    profLog("DT prep done");
+
     // draw the two halves
     drawHalfTriangle(x2, splitX, y2, x1, y1, -1);
     drawHalfTriangle(x2, splitX, y2, x3, y3, 1);
+
+    profLog("DT finished");
 
 }
 
