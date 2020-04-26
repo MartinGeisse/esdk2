@@ -31,11 +31,11 @@ function buildFile($inputPath, $outputPath) {
 function linkFiles() {
     global $objectFiles;
     $objectFilesList = implode(' ', $objectFiles);
-    system(TOOL . 'ld -Map=build/program.map -A rv32im -N -Ttext 0 -o build/program.elf -e 0 ' . $objectFilesList);
+    system(TOOL . 'ld -T src/linkerscript -Map=build/program.map -A rv32im -o build/program.elf ' . $objectFilesList);
 }
 
 function convertExecutable() {
-    system(TOOL . 'objcopy -j .text -j .rodata -j .sdata -I elf32-littleriscv -O binary build/program.elf build/program.bin');
+    system(TOOL . 'objcopy -j .image -I elf32-littleriscv -O binary build/program.elf build/program.bin');
 }
 
 //
