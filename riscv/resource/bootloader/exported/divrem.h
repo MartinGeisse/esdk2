@@ -1,6 +1,6 @@
 
-#ifndef __BOOTLOADER_DIVREM_H__
-#define __BOOTLOADER_DIVREM_H__
+#ifndef __BOOTLOADER_EXPORTED_DIVREM_H__
+#define __BOOTLOADER_EXPORTED_DIVREM_H__
 
 extern unsigned int (*udivrem)(unsigned int x, unsigned int y, int rem);
 extern unsigned int (*udiv)(unsigned int x, unsigned int y);
