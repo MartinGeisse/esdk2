@@ -20,12 +20,12 @@ function buildFile($inputPath, $outputPath) {
     }
 
     $cppFlags = ($extension == '.cpp' ? ' -fno-rtti ' : '');
+    $baseCommand = TOOL . 'gcc -msmall-data-limit=100000 -march=rv32im -mabi=ilp32 -fno-exceptions ' . $cppFlags .
+        ' -Wall -O3 -fno-tree-loop-distribute-patterns -I../bootloader/exported';
     if ($extension != 'S') {
-        system(TOOL . 'gcc -msmall-data-limit=100000 -march=rv32im -mabi=ilp32 -fno-exceptions ' . $cppFlags .
-            ' -Wall -S -O3 -fno-tree-loop-distribute-patterns -o ' . $outputPath . '.S ' . $inputPath);
+        system($baseCommand . ' -S  -o ' . $outputPath . '.S ' . $inputPath);
     }
-    system(TOOL . 'gcc -msmall-data-limit=100000 -march=rv32im -mabi=ilp32 -fno-exceptions ' . $cppFlags .
-        ' -Wall -c -O3 -fno-tree-loop-distribute-patterns -o ' . $outputPath . ' ' . $inputPath);
+    system($baseCommand . ' -c  -o ' . $outputPath . ' ' . $inputPath);
 }
 
 function linkFiles() {
@@ -48,7 +48,8 @@ system('mkdir build');
 $paths = array(
 
     'src/system/start.S' => 'build/start.o',
-    'src/system/builtin.S' => 'build/builtin.o',
+    '../bootloader/exported/builtin.S' => 'build/builtin.o',
+
     'src/system/draw.c' => 'build/draw.o',
     'src/system/util.S' => 'build/util.o',
     'src/system/simdev.c' => 'build/simdev.o',

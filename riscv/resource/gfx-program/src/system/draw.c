@@ -1,8 +1,8 @@
 
+#include <divrem.h>
+#include <internalDraw.h>
 #include "simdev.h"
-#include "builtin.h"
 #include "chargen.h"
-#include "builtin.h"
 #include "profiling.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

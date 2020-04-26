@@ -1,6 +1,6 @@
 
 extern "C" {
-    #include "../system/builtin.h"
+    #include <divrem.h>
 }
 
 #include "Fixed.h"
