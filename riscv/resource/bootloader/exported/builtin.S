@@ -55,3 +55,62 @@
 
 .globl setFont
 .set setFont, 68
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// terminal
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+.globl termInitialize
+.set termInitialize, 72
+
+.globl termPrintString
+.set termPrintString, 76
+
+.globl termPrintChar
+.set termPrintChar, 80
+
+.globl termPrintInt
+.set termPrintInt, 84
+
+.globl termPrintUnsignedInt
+.set termPrintUnsignedInt, 88
+
+.globl termPrintHexInt
+.set termPrintHexInt, 92
+
+.globl termPrintUnsignedHexInt
+.set termPrintUnsignedHexInt, 96
+
+.globl termPrintln
+.set termPrintln, 100
+
+.globl termPrintlnString
+.set termPrintlnString, 104
+
+.globl termPrintlnChar
+.set termPrintlnChar, 108
+
+.globl termPrintlnInt
+.set termPrintlnInt, 112
+
+.globl termPrintlnUnsignedInt
+.set termPrintlnUnsignedInt, 116
+
+.globl termPrintlnHexInt
+.set termPrintlnHexInt, 120
+
+.globl termPrintlnUnsignedHexInt
+.set termPrintlnUnsignedHexInt, 124
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// profiling
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+.globl profReset
+.set profReset, 128
+
+.globl profLog
+.set profLog, 132
+
+.globl profDisplay
+.set profDisplay, 136

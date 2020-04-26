@@ -44,6 +44,23 @@ functionTable:
     .word drawCharacter
     .word drawText
     .word setFont
+    .word termInitialize
+    .word termPrintString
+    .word termPrintChar
+    .word termPrintInt
+    .word termPrintUnsignedInt
+    .word termPrintHexInt
+    .word termPrintUnsignedHexInt
+    .word termPrintln
+    .word termPrintlnString
+    .word termPrintlnChar
+    .word termPrintlnInt
+    .word termPrintlnUnsignedInt
+    .word termPrintlnHexInt
+    .word termPrintlnUnsignedHexInt
+    .word profReset
+    .word profLog
+    .word profDisplay
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // startup

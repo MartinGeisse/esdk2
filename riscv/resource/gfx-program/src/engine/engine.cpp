@@ -1,8 +1,8 @@
 
 extern "C" {
     #include <draw.h>
+    #include <profiling.h>
     #include "../system/util.h"
-    #include "../system/profiling.h"
 }
 
 #include "Vector2.h"

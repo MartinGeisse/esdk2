@@ -12,10 +12,10 @@
 extern "C" {
     #include <divrem.h>
     #include <draw.h>
+    #include <terminal.h>
+    #include <profiling.h>
     #include "system/chargen.h"
     #include "system/util.h"
-    #include "system/terminal.h"
-    #include "system/profiling.h"
 }
 
 static volatile unsigned char *keyStateTable = (volatile unsigned char *)(0x00004000 - 32);
