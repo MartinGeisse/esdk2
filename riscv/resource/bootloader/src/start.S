@@ -32,9 +32,18 @@ functionTable:
     .word udiv
     .word urem
     .word div
-    .word drawLineInternal
-    .word drawHorizontalLineInternal
-    .word drawHalfTriangleInternal
+    .word selectDrawPlane
+    .word selectDisplayPlane
+    .word clearScreen
+    .word setPixel
+    .word setDrawColor
+    .word drawPixel
+    .word drawAxisAlignedRectangle
+    .word drawLine
+    .word drawTriangle
+    .word drawCharacter
+    .word drawText
+    .word setFont
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // startup

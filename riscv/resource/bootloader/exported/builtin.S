@@ -20,11 +20,38 @@
 // draw
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-.globl drawLineInternal
-.set drawLineInternal, 24
+.globl selectDrawPlane
+.set selectDrawPlane, 24
 
-.globl drawHorizontalLineInternal
-.set drawHorizontalLineInternal, 28
+.globl selectDisplayPlane
+.set selectDisplayPlane, 28
 
-.globl drawHalfTriangleInternal
-.set drawHalfTriangleInternal, 32
+.globl clearScreen
+.set clearScreen, 32
+
+.globl setPixel
+.set setPixel, 36
+
+.globl setDrawColor
+.set setDrawColor, 40
+
+.globl drawPixel
+.set drawPixel, 44
+
+.globl drawAxisAlignedRectangle
+.set drawAxisAlignedRectangle, 48
+
+.globl drawLine
+.set drawLine, 52
+
+.globl drawTriangle
+.set drawTriangle, 56
+
+.globl drawCharacter
+.set drawCharacter, 60
+
+.globl drawText
+.set drawText, 64
+
+.globl setFont
+.set setFont, 68

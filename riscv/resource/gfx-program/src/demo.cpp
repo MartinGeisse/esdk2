@@ -11,8 +11,9 @@
 
 extern "C" {
     #include <divrem.h>
+    #include <draw.h>
+    #include "system/chargen.h"
     #include "system/util.h"
-    #include "system/draw.h"
     #include "system/terminal.h"
     #include "system/profiling.h"
 }
@@ -54,6 +55,7 @@ static void moveRelative(Fixed dx, Fixed dy, Fixed dz) {
 static int lastFrameTimestamp;
 
 int internalDemo() {
+    setFont(CHARACTER_DATA);
     initializeEngine();
     buildLevel();
     int drawPlane = 0;

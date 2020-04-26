@@ -1,12 +1,13 @@
 
-#ifndef __DRAW_H__
-#define __DRAW_H__
+#ifndef __BOOTLOADER_INTERNAL_DRAW_H__
+#define __BOOTLOADER_INTERNAL_DRAW_H__
 
 void selectDrawPlane(int plane);
 void selectDisplayPlane(int plane);
 
 void clearScreen(unsigned char color);
 void setPixel(int x, int y, unsigned char color);
+void setFont(unsigned char (*font)[16]);
 
 void setDrawColor(int color);
 void drawPixel(int x, int y);

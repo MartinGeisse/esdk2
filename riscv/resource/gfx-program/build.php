@@ -50,7 +50,6 @@ $paths = array(
     'src/system/start.S' => 'build/start.o',
     '../bootloader/exported/builtin.S' => 'build/builtin.o',
 
-    'src/system/draw.c' => 'build/draw.o',
     'src/system/util.S' => 'build/util.o',
     'src/system/simdev.c' => 'build/simdev.o',
     'src/system/cpu.S' => 'build/cpu_s.o',

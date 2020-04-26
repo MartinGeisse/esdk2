@@ -1,6 +1,6 @@
 
 #include <divrem.h>
-#include "draw.h"
+#include <draw.h>
 #include "terminal.h"
 
 static int x, y;
