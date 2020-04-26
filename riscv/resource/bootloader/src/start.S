@@ -68,7 +68,7 @@ start:
 
     // indicate status
     li a0, 1
-    call drawLine
+    call drawStatusLine
 
     // the bootloader is located at the end of the memory (see below)
     j bootloader
@@ -181,14 +181,14 @@ return:
 // colored status line
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-drawLine:
+drawStatusLine:
     li t0, 0x80000000 // screen memory
     li t1, 64
-drawLineLoop:
+drawStatusLineLoop:
     sb a0, 0(t0)
     addi t0, t0, 1
     addi t1, t1, -1
-    bnez t1, drawLineLoop
+    bnez t1, drawStatusLineLoop
     ret
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -210,11 +210,11 @@ moreBytesLoop:
     li s3, 5000000 // check if expired
     bne s2, s3, moreBytesLoop // otherwise loop
     li a0, 5 // indicate status
-    call drawLine // ...
+    call drawStatusLine // ...
     tail payloadEntryPoint // run loaded program
 available:
     li a0, 2 // indicate status
-    call drawLine // ...
+    call drawStatusLine // ...
     sb s3, 0(s1) // write byte
     addi s1, s1, 1 // advance write pointer
     li s2, 0 // reset end-of-stream detection timer
