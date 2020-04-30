@@ -32,8 +32,8 @@ module clk_reset_highspeed(clkIn, resetIn,
     .CLKIN(clkInBuffered),
     .CLKFB(clk50),
     .CLK0(clk50Unbuffered),
-    .CLK2X(highspeedClk0Unbuffered),
-    .CLK2X180(highspeedClk180Unbuffered),
+    .CLKFX(highspeedClk0Unbuffered),
+    .CLKFX180(highspeedClk180Unbuffered),
     .LOCKED(dcmLocked),
     .PSCLK(1'b0),
     .PSEN(1'b0),
@@ -42,13 +42,13 @@ module clk_reset_highspeed(clkIn, resetIn,
 
   defparam dcm50.CLKDV_DIVIDE = 2.0;
   defparam dcm50.CLKFX_DIVIDE = 1;
-  defparam dcm50.CLKFX_MULTIPLY = 4;
+  defparam dcm50.CLKFX_MULTIPLY = 2;
   defparam dcm50.CLKIN_DIVIDE_BY_2 = "FALSE";
   defparam dcm50.CLKIN_PERIOD = 20.0;
   defparam dcm50.CLKOUT_PHASE_SHIFT = "NONE";
   defparam dcm50.CLK_FEEDBACK = "1X";
   defparam dcm50.DESKEW_ADJUST = "SYSTEM_SYNCHRONOUS";
-  defparam dcm50.DLL_FREQUENCY_MODE = "LOW";
+  defparam dcm50.DLL_FREQUENCY_MODE = "HIGH";
   defparam dcm50.DUTY_CYCLE_CORRECTION = "TRUE";
   defparam dcm50.PHASE_SHIFT = 0;
   defparam dcm50.STARTUP_WAIT = "FALSE";
