@@ -47,11 +47,9 @@ signal bit blanked;
 do (*) {
     blanked = stage1hblank | stage1vblank;
 }
-register vector[2] stage2p;
 register vector[2] stage2r, stage2g, stage2b;
 register bit stage2hsync, stage2vsync;
 do (clk) {
-    stage2p = stage1p;
     stage2r = blanked ? 2d0 : stage1x[5:4];
     stage2g = blanked ? 2d0 : stage1y[5:4];
     stage2b = 2d0;
@@ -60,13 +58,16 @@ do (clk) {
 }
 
 // dithering stage (has to be last before otuput, because this runs at higher speed)
+// dither patterns: 0000, 0101, 1011, 1111
 register bit ditherR, ditherG, ditherB, ditherHsync, ditherVsync;
+register vector[2] ditherCounter = 0;
 do (ditherClk) {
-    ditherR = stage2r[1];// | (stage2r[0] & stage2p[1]);
-    ditherG = stage2g[1];// | (stage2g[0] & stage2p[1]);
-    ditherB = stage2b[1];// | (stage2b[0] & stage2p[1]);
+    ditherR = stage2r[1] ? (stage2r[0] | ditherCounter != 2d1) : (stage2r[0] & ditherCounter[0]);
+    ditherG = stage2g[1] ? (stage2g[0] | ditherCounter != 2d1) : (stage2g[0] & ditherCounter[0]);
+    ditherB = stage2b[1] ? (stage2b[0] | ditherCounter != 2d1) : (stage2b[0] & ditherCounter[0]);
     ditherHsync = stage2hsync;
     ditherVsync = stage2vsync;
+    ditherCounter = ditherCounter + 2d1;
 }
 
 // output stage
