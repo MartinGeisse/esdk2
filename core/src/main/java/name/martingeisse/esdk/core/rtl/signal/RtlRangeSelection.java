@@ -6,6 +6,10 @@ package name.martingeisse.esdk.core.rtl.signal;
 
 import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.SignalUsageConsumer;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.SynthesisPreparationContext;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogSignalDeclarationKeyword;
+import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.EmptyVerilogContribution;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.contribution.VerilogContribution;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.expression.VerilogExpressionNesting;
@@ -64,7 +68,30 @@ public class RtlRangeSelection extends RtlItem implements RtlVectorSignal {
 
 	@Override
 	public VerilogContribution getVerilogContribution() {
-		return new EmptyVerilogContribution();
+		// The container of a selection is special in that it even cannot be a constant, only a signal. So we treat
+		// constants specially. Anything that is not explicitly a constant (e.g. complex signals that only have
+		// constant inputs and could be constant-folded) will not be recognized by the instanceof, but they will be
+		// moved out because they don't match SIGNALS_AND_CONSTANTS.
+		if (containerSignal instanceof RtlVectorConstant) {
+			return new VerilogContribution() {
+
+				@Override
+				public void prepareSynthesis(SynthesisPreparationContext context) {
+					context.declareSignal(containerSignal, VerilogSignalDeclarationKeyword.WIRE, true);
+				}
+
+				@Override
+				public void analyzeSignalUsage(SignalUsageConsumer consumer) {
+				}
+
+				@Override
+				public void printImplementation(VerilogWriter out) {
+				}
+
+			};
+		} else {
+			return new EmptyVerilogContribution();
+		}
 	}
 
 	@Override
