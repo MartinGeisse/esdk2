@@ -3,44 +3,37 @@
 //
 
 
-module clk_reset_highspeed(clk_in, reset_in,
-                 highspeed_clk_0, highspeed_clk_180,
+module clk_reset_highspeed(clkIn, resetIn,
+                 highspeedClk0, highspeedClk180,
                  dcmLocked, reset);
-    input clk_in;
-    input reset_in;
-    output highspeed_clk_0;
-    output highspeed_clk_180;
+    input clkIn;
+    input resetIn;
+    output highspeedClk0;
+    output highspeedClk180;
     output dcmLocked;
     output reset;
-
-  wire clk;
-  wire clk_in_buffered;
-  wire clk50_out;
-  wire clk100_out;
-  wire clk100_in;
-  wire clk100_0;
-  wire clk100_90;
-  wire clk100_180;
-  wire clk100_270;
 
   reg reset_p;
   reg reset_s;
   reg [23:0] reset_counter;
   wire reset_counting;
 
-  //------------------------------------------------------------
-
-  IBUFG clk_in_buffer(
-    .I(clk_in),
-    .O(clk_in_buffered)
+  wire clkInBuffered;
+  IBUFG ClkInBuffer(
+    .I(clkIn),
+    .O(clkInBuffered)
   );
 
+  wire clk50Unbuffered, clk50;
+  wire highspeedClk0Unbuffered;
+  wire highspeedClk180Unbuffered;
   DCM_SP dcm50(
     .RST(1'b0),
-    .CLKIN(clk_in_buffered),
-    .CLKFB(clk),
-    .CLK0(clk50_out),
-    .CLK2X(clk100_out),
+    .CLKIN(clkInBuffered),
+    .CLKFB(clk50),
+    .CLK0(clk50Unbuffered),
+    .CLK2X(highspeedClk0Unbuffered),
+    .CLK2X180(highspeedClk180Unbuffered),
     .LOCKED(dcmLocked),
     .PSCLK(1'b0),
     .PSEN(1'b0),
@@ -60,60 +53,27 @@ module clk_reset_highspeed(clk_in, reset_in,
   defparam dcm50.PHASE_SHIFT = 0;
   defparam dcm50.STARTUP_WAIT = "FALSE";
 
-  BUFG clk50_buffer(
-    .I(clk50_out),
-    .O(clk)
+  BUFG clk50Buffer(
+    .I(clk50Unbuffered),
+    .O(clk50)
   );
 
-  BUFG clk100_buffer(
-    .I(clk100_out),
-    .O(clk100_in)
+  BUFG highspeedClkBuffer0(
+    .I(highspeedClk0Unbuffered),
+    .O(highspeedClk0)
   );
 
-  //------------------------------------------------------------
-
-  DCM_SP dcm100(
-    .RST(~dcmLocked),
-    .CLKIN(clk100_in),
-    .CLKFB(highspeed_clk_0),
-    .CLK0(clk100_0),
-    .CLK90(clk100_90),
-    .CLK180(clk100_180),
-    .CLK270(clk100_270),
-    .PSCLK(1'b0),
-    .PSEN(1'b0),
-    .PSINCDEC(1'b0)
-  );
-
-  defparam dcm100.CLKDV_DIVIDE = 2.0;
-  defparam dcm100.CLKFX_DIVIDE = 1;
-  defparam dcm100.CLKFX_MULTIPLY = 4;
-  defparam dcm100.CLKIN_DIVIDE_BY_2 = "FALSE";
-  defparam dcm100.CLKIN_PERIOD = 10.0;
-  defparam dcm100.CLKOUT_PHASE_SHIFT = "NONE";
-  defparam dcm100.CLK_FEEDBACK = "1X";
-  defparam dcm100.DESKEW_ADJUST = "SYSTEM_SYNCHRONOUS";
-  defparam dcm100.DLL_FREQUENCY_MODE = "LOW";
-  defparam dcm100.DUTY_CYCLE_CORRECTION = "TRUE";
-  defparam dcm100.PHASE_SHIFT = 0;
-  defparam dcm100.STARTUP_WAIT = "FALSE";
-
-  BUFG clk100_0_buffer(
-    .I(clk100_0),
-    .O(highspeed_clk_0)
-  );
-
-  BUFG clk100_180_buffer(
-    .I(clk100_180),
-    .O(highspeed_clk_180)
+  BUFG highspeedClkBuffer180(
+    .I(highspeedClk180Unbuffered),
+    .O(highspeedClk180)
   );
 
   //------------------------------------------------------------
 
   assign reset_counting = (reset_counter == 24'hFFFFFF) ? 0 : 1;
 
-  always @(posedge clk) begin
-    reset_p <= reset_in;
+  always @(posedge highspeedClk180) begin
+    reset_p <= resetIn;
     reset_s <= reset_p;
     if (reset_s | ~dcmLocked) begin
       reset_counter <= 24'h000000;
