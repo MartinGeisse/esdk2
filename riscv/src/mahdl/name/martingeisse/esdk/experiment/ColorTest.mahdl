@@ -47,27 +47,38 @@ signal bit blanked;
 do (*) {
     blanked = stage1hblank | stage1vblank;
 }
-register vector[2] stage2r, stage2g, stage2b;
+register vector[3] stage2r, stage2g, stage2b;
 register bit stage2hsync, stage2vsync;
 do (clk) {
-    stage2r = blanked ? 2d0 : stage1x[5:4];
-    stage2g = blanked ? 2d0 : stage1y[5:4];
-    stage2b = 2d0;
+    stage2r = blanked ? 3d0 : stage1x[6:4];
+    stage2g = blanked ? 3d0 : stage1y[6:4];
+    stage2b = 3d0;
     stage2hsync = stage1hsync;
     stage2vsync = stage1vsync;
 }
 
 // dithering stage (has to be last before otuput, because this runs at higher speed)
 // dither patterns: 0000, 0101, 1011, 1111
+
+name.martingeisse.esdk.experiment.DitherTable ditherTableR, ditherTableG, ditherTableB;
+do (*) {
+    ditherTableR.value = stage2r;
+    ditherTableR.index = ditherCounter;
+    ditherTableG.value = stage2g;
+    ditherTableG.index = ditherCounter;
+    ditherTableB.value = stage2b;
+    ditherTableB.index = ditherCounter;
+}
+
 register bit ditherR, ditherG, ditherB, ditherHsync, ditherVsync;
-register vector[2] ditherCounter = 0;
+register vector[4] ditherCounter = 0;
 do (ditherClk) {
-    ditherR = stage2r[1] ? (stage2r[0] | ditherCounter != 2d1) : (stage2r[0] & ditherCounter[0]);
-    ditherG = stage2g[1] ? (stage2g[0] | ditherCounter != 2d1) : (stage2g[0] & ditherCounter[0]);
-    ditherB = stage2b[1] ? (stage2b[0] | ditherCounter != 2d1) : (stage2b[0] & ditherCounter[0]);
+    ditherR = ditherTableR.dithered;
+    ditherG = ditherTableG.dithered;
+    ditherB = ditherTableB.dithered;
     ditherHsync = stage2hsync;
     ditherVsync = stage2vsync;
-    ditherCounter = ditherCounter + 2d1;
+    ditherCounter = ditherCounter == 4d11 ? 4d0 : (ditherCounter + 4d1);
 }
 
 // output stage

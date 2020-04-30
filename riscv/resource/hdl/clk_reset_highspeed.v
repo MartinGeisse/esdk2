@@ -150,7 +150,7 @@ module clk_reset_highspeed(clk_in, reset_in,
 
   defparam dcmHigh.CLKDV_DIVIDE = 2.0;
   defparam dcmHigh.CLKFX_DIVIDE = 1;
-  defparam dcmHigh.CLKFX_MULTIPLY = 2;
+  defparam dcmHigh.CLKFX_MULTIPLY = 3;
   defparam dcmHigh.CLKIN_DIVIDE_BY_2 = "FALSE";
   defparam dcmHigh.CLKIN_PERIOD = 10.0;
   defparam dcmHigh.CLKOUT_PHASE_SHIFT = "NONE";
