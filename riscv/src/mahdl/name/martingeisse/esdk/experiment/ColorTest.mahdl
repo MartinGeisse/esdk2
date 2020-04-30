@@ -2,6 +2,7 @@ module name.martingeisse.esdk.experiment.ColorTest;
 
 interface {
     in clock clk;
+    in clock ditherClk;
     out bit r, g, b, hsync, vsync;
 }
 
@@ -58,11 +59,21 @@ do (clk) {
     stage2vsync = stage1vsync;
 }
 
+// dithering stage (has to be last before otuput, because this runs at higher speed)
+register bit ditherR, ditherG, ditherB, ditherHsync, ditherVsync;
+do (ditherClk) {
+    ditherR = stage2r[1];
+    ditherG = stage2g[1];
+    ditherB = stage2b[1];
+    ditherHsync = stage2hsync;
+    ditherVsync = stage2vsync;
+}
+
 // output stage
 do (*) {
-    r = stage2r[1];
-    g = stage2g[1];
-    b = stage2b[1];
-    hsync = stage2hsync;
-    vsync = stage2vsync;
+    r = ditherR;
+    g = ditherG;
+    b = ditherB;
+    hsync = ditherHsync;
+    vsync = ditherVsync;
 }

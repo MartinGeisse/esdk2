@@ -28,10 +28,11 @@ public class ColorTestMain {
 		clkReset.createBitInputPort("reset_in", buttonPin(realm, "V16"));
 		RtlBitSignal reset = clkReset.createBitOutputPort("reset");
 		RtlClockNetwork clk0 = realm.createClockNetwork(withName(clkReset.createBitOutputPort("ddr_clk_0"), "ddr_clk_0"));
-		RtlClockNetwork clk180 = realm.createClockNetwork(withName(clkReset.createBitOutputPort("ddr_clk_180"), "ddr_clk_180"));
+		RtlClockNetwork highspeedClk0 = realm.createClockNetwork(withName(clkReset.createBitOutputPort("highspeed_clk_0"), "highspeed_clk_0"));
+		RtlClockNetwork highspeedClk180 = realm.createClockNetwork(withName(clkReset.createBitOutputPort("highspeed_clk_180"), "highspeed_clk_180"));
 
 		// main module
-		ColorTest colorTest = new ColorTest.Implementation(realm, clk0);
+		ColorTest colorTest = new ColorTest.Implementation(realm, clk0, highspeedClk0);
 
 		// VGA pins
 		vgaPin(realm, "H14", colorTest.getR());
