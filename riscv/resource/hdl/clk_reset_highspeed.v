@@ -5,25 +5,23 @@
 
 module clk_reset_highspeed(clk_in, reset_in,
                  highspeed_clk_0, highspeed_clk_180,
-                 highspeed_clk_ok, reset);
+                 dcmLocked, reset);
     input clk_in;
     input reset_in;
     output highspeed_clk_0;
     output highspeed_clk_180;
-    output highspeed_clk_ok;
+    output dcmLocked;
     output reset;
 
   wire clk;
-  wire clk50_in;
+  wire clk_in_buffered;
   wire clk50_out;
-  wire clk50_ok;
   wire clk100_out;
   wire clk100_in;
   wire clk100_0;
   wire clk100_90;
   wire clk100_180;
   wire clk100_270;
-  wire clk100_ok;
 
   reg reset_p;
   reg reset_s;
@@ -34,16 +32,16 @@ module clk_reset_highspeed(clk_in, reset_in,
 
   IBUFG clk_in_buffer(
     .I(clk_in),
-    .O(clk50_in)
+    .O(clk_in_buffered)
   );
 
   DCM_SP dcm50(
     .RST(1'b0),
-    .CLKIN(clk50_in),
+    .CLKIN(clk_in_buffered),
     .CLKFB(clk),
     .CLK0(clk50_out),
     .CLK2X(clk100_out),
-    .LOCKED(clk50_ok),
+    .LOCKED(dcmLocked),
     .PSCLK(1'b0),
     .PSEN(1'b0),
     .PSINCDEC(1'b0)
@@ -75,14 +73,13 @@ module clk_reset_highspeed(clk_in, reset_in,
   //------------------------------------------------------------
 
   DCM_SP dcm100(
-    .RST(~clk50_ok),
+    .RST(~dcmLocked),
     .CLKIN(clk100_in),
     .CLKFB(highspeed_clk_0),
     .CLK0(clk100_0),
     .CLK90(clk100_90),
     .CLK180(clk100_180),
     .CLK270(clk100_270),
-    .LOCKED(clk100_ok),
     .PSCLK(1'b0),
     .PSEN(1'b0),
     .PSINCDEC(1'b0)
@@ -111,8 +108,6 @@ module clk_reset_highspeed(clk_in, reset_in,
     .O(highspeed_clk_180)
   );
 
-  assign highspeed_clk_ok = clk100_ok;
-
   //------------------------------------------------------------
 
   assign reset_counting = (reset_counter == 24'hFFFFFF) ? 0 : 1;
@@ -120,7 +115,7 @@ module clk_reset_highspeed(clk_in, reset_in,
   always @(posedge clk) begin
     reset_p <= reset_in;
     reset_s <= reset_p;
-    if (reset_s | ~clk50_ok | ~clk100_ok) begin
+    if (reset_s | ~dcmLocked) begin
       reset_counter <= 24'h000000;
     end else begin
       if (reset_counting == 1) begin
