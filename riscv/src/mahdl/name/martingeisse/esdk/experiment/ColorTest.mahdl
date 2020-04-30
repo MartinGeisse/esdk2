@@ -52,9 +52,9 @@ register vector[2] stage2r, stage2g, stage2b;
 register bit stage2hsync, stage2vsync;
 do (clk) {
     stage2p = stage1p;
-    stage2r = blanked ? 2d0 : stage1x[1:0];
-    stage2g = blanked ? 2d0 : stage1y[1:0];
-    stage2b = blanked ? 2d0 : (stage1x + stage1y)[6:5];
+    stage2r = blanked ? 2d0 : stage1x[5:4];
+    stage2g = blanked ? 2d0 : stage1y[5:4];
+    stage2b = 2d0;
     stage2hsync = stage1hsync;
     stage2vsync = stage1vsync;
 }
@@ -62,9 +62,9 @@ do (clk) {
 // dithering stage (has to be last before otuput, because this runs at higher speed)
 register bit ditherR, ditherG, ditherB, ditherHsync, ditherVsync;
 do (ditherClk) {
-    ditherR = stage2r[1];
-    ditherG = stage2g[1];
-    ditherB = stage2b[1];
+    ditherR = stage2r[1];// | (stage2r[0] & stage2p[1]);
+    ditherG = stage2g[1];// | (stage2g[0] & stage2p[1]);
+    ditherB = stage2b[1];// | (stage2b[0] & stage2p[1]);
     ditherHsync = stage2hsync;
     ditherVsync = stage2vsync;
 }
