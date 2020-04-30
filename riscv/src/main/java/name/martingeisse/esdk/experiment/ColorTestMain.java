@@ -27,10 +27,8 @@ public class ColorTestMain {
 		clkReset.createBitInputPort("clk_in", clockPin(realm));
 		clkReset.createBitInputPort("reset_in", buttonPin(realm, "V16"));
 		RtlBitSignal reset = clkReset.createBitOutputPort("reset");
-		RtlClockNetwork clk0 = realm.createClockNetwork(withName(clkReset.createBitOutputPort("ddr_clk_0"), "ddr_clk_0"));
-		RtlClockNetwork clk90 = realm.createClockNetwork(withName(clkReset.createBitOutputPort("ddr_clk_90"), "ddr_clk_90"));
-		RtlClockNetwork clk180 = realm.createClockNetwork(withName(clkReset.createBitOutputPort("ddr_clk_180"), "ddr_clk_180"));
-		RtlClockNetwork clk270 = realm.createClockNetwork(withName(clkReset.createBitOutputPort("ddr_clk_270"), "ddr_clk_270"));
+		RtlClockNetwork clk0 = realm.createClockNetwork(withName(clkReset.createBitOutputPort("highspeed_clk_0"), "highspeed_clk_0"));
+		RtlClockNetwork clk180 = realm.createClockNetwork(withName(clkReset.createBitOutputPort("highspeed_clk_180"), "highspeed_clk_180"));
 
 		// main module
 		ColorTest colorTest = new ColorTest.Implementation(realm, clk0);

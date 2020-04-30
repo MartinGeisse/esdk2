@@ -4,15 +4,13 @@
 
 
 module clk_reset_highspeed(clk_in, reset_in,
-                 ddr_clk_0, ddr_clk_90, ddr_clk_180,
-                 ddr_clk_270, ddr_clk_ok, reset);
+                 highspeed_clk_0, highspeed_clk_180,
+                 highspeed_clk_ok, reset);
     input clk_in;
     input reset_in;
-    output ddr_clk_0;
-    output ddr_clk_90;
-    output ddr_clk_180;
-    output ddr_clk_270;
-    output ddr_clk_ok;
+    output highspeed_clk_0;
+    output highspeed_clk_180;
+    output highspeed_clk_ok;
     output reset;
 
   wire clk;
@@ -79,7 +77,7 @@ module clk_reset_highspeed(clk_in, reset_in,
   DCM_SP dcm100(
     .RST(~clk50_ok),
     .CLKIN(clk100_in),
-    .CLKFB(ddr_clk_0),
+    .CLKFB(highspeed_clk_0),
     .CLK0(clk100_0),
     .CLK90(clk100_90),
     .CLK180(clk100_180),
@@ -105,25 +103,15 @@ module clk_reset_highspeed(clk_in, reset_in,
 
   BUFG clk100_0_buffer(
     .I(clk100_0),
-    .O(ddr_clk_0)
-  );
-
-  BUFG clk100_90_buffer(
-    .I(clk100_90),
-    .O(ddr_clk_90)
+    .O(highspeed_clk_0)
   );
 
   BUFG clk100_180_buffer(
     .I(clk100_180),
-    .O(ddr_clk_180)
+    .O(highspeed_clk_180)
   );
 
-  BUFG clk100_270_buffer(
-    .I(clk100_270),
-    .O(ddr_clk_270)
-  );
-
-  assign ddr_clk_ok = clk100_ok;
+  assign highspeed_clk_ok = clk100_ok;
 
   //------------------------------------------------------------
 
