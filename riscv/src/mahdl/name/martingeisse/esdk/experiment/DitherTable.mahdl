@@ -2,7 +2,7 @@ module name.martingeisse.esdk.experiment.DitherTable;
 
 interface {
     in vector[3] value;
-    in vector[4] index;
+    in vector[3] index;
     out bit dithered;
 }
 
@@ -13,22 +13,22 @@ do (*) {
             dithered = 0;
 
         case 3d1:
-            dithered = 16b0001000010000000[index];
+            dithered = 8b00100000[index];
 
         case 3d2:
-            dithered = 16b0100010001000100[index];
+            dithered = 8b01000100[index];
 
         case 3d3:
-            dithered = 16b0100100100100100[index];
+            dithered = 8b01001001[index];
 
         case 3d4:
-            dithered = 16b0101010101010101[index];
+            dithered = 8b01010101[index];
 
         case 3d5:
-            dithered = 16b1011011011011011[index];
+            dithered = 8b10110110[index];
 
         case 3d6:
-            dithered = 16b1101110111011101[index];
+            dithered = 8b10111011[index];
 
         case 3d7:
             dithered = 1;

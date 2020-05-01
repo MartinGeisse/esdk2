@@ -71,14 +71,14 @@ do (*) {
 }
 
 register bit ditherR, ditherG, ditherB, ditherHsync, ditherVsync;
-register vector[4] ditherCounter = 0;
+register vector[3] ditherCounter = 0;
 do (ditherClk) {
     ditherR = ditherTableR.dithered;
     ditherG = ditherTableG.dithered;
     ditherB = ditherTableB.dithered;
     ditherHsync = stage2hsync;
     ditherVsync = stage2vsync;
-    ditherCounter = ditherCounter == 4d11 ? 4d0 : (ditherCounter + 4d1);
+    ditherCounter = ditherCounter + 3d1;
 }
 
 // output stage
