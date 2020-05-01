@@ -2,39 +2,26 @@ module name.martingeisse.esdk.experiment.DitherTable;
 
 interface {
     in vector[3] value;
-    in vector[3] index;
-    out bit dithered;
+    in vector[2] index;
+    out vector[2] dithered;
 }
 
+signal vector[8] pattern = switch (value) {
+    case 3d0: 8b00000000
+    case 3d1: 8b00100000
+    case 3d2: 8b01000100
+    case 3d3: 8b01001001
+    case 3d4: 8b01010101
+    case 3d5: 8b10110110
+    case 3d6: 8b10111011
+    case 3d7: 8b11111111
+};
+
 do (*) {
-    switch (value) {
-
-        case 3d0:
-            dithered = 0;
-
-        case 3d1:
-            dithered = 8b00100000[index];
-
-        case 3d2:
-            dithered = 8b01000100[index];
-
-        case 3d3:
-            dithered = 8b01001001[index];
-
-        case 3d4:
-            dithered = 8b01010101[index];
-
-        case 3d5:
-            dithered = 8b10110110[index];
-
-        case 3d6:
-            dithered = 8b10111011[index];
-
-        case 3d7:
-            dithered = 1;
-
-        default:
-            dithered = 0;
-
-    }
+    dithered = switch (index) {
+        case 2d0: pattern[1:0]
+        case 2d1: pattern[3:2]
+        case 2d2: pattern[5:4]
+        case 2d3: pattern[7:6]
+    };
 }
