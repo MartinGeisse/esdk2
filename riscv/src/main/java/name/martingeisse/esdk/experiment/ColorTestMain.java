@@ -88,7 +88,7 @@ public class ColorTestMain {
                                     RtlBitSignal firstOutputSignal,
                                     RtlClockNetwork secondClock,
                                     RtlBitSignal secondOutputSignal) {
-/*
+
         RtlModuleInstance oddr = new RtlModuleInstance(realm, "ODDR2");
         oddr.getParameters().put("DDR_ALIGNMENT", "NONE");
         oddr.getParameters().put("INIT", VectorValue.of(1, 0));
@@ -109,12 +109,9 @@ public class ColorTestMain {
         iobuf.getParameters().put("IOSTANDARD", "LVTTL");
         iobuf.getParameters().put("SLEW", "SLOW");
         iobuf.createBitInputPort("I", outputDdrBit);
-        iobuf.createBitInputPort("T", new RtlBitConstant(realm, true));
+        iobuf.createBitInputPort("T", new RtlBitConstant(realm, false));
 
         vgaPin(realm, id, iobuf.createBitOutputPort("IO"), true);
-*/
-
-        vgaPin(realm, id, firstOutputSignal, true);
     }
 
     private static void vgaPin(RtlRealm realm, String id, RtlBitSignal outputSignal, boolean lowDrive) {
