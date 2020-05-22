@@ -1,6 +1,6 @@
 package name.martingeisse.esdk.riscv.tools;
 
-import name.martingeisse.esdk.riscv.rtl.CeeCompilerInvoker;
+import name.martingeisse.esdk.riscv.rtl.HeosCompilerInvoker;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -10,9 +10,14 @@ import java.util.Arrays;
 public class CopyProgramToBootClientMain {
 
     public static void main(String[] args) throws Exception {
-        CeeCompilerInvoker.invoke();
+
+        // CeeCompilerInvoker.invoke();
+        // File file = new File("/home/martin/git-repos/esdk2/riscv/resource/gfx-program/build/program.bin");
+
+        HeosCompilerInvoker.invoke();
+        File file = new File("/home/martin/git-repos/heos/out-fpga/program.bin");
+
         System.out.println("starting to send...");
-        File file = new File("/home/martin/git-repos/esdk2/riscv/resource/gfx-program/build/program.bin");
         File device = findDeviceFile();
         try (FileInputStream in = new FileInputStream(file)) {
             try (FileOutputStream out = new FileOutputStream(device)) {
