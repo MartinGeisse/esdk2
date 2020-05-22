@@ -12,6 +12,7 @@ textSection:
 
 .set payloadEntryPoint, 0x80200000
 .set keyStateTable, (0x00004000 - 32)
+.set scanCodeBuffer, (0x00004000 - 64)
 .set keyboardController, 0x00004000
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -73,20 +74,25 @@ start:
     la gp, __global_pointer$
     .option pop
 
-    // initialize the SP register to start below the key state table
-    li sp, keyStateTable
+    // initialize the SP register to start below the scan code buffer
+    li sp, scanCodeBuffer
 
-    // clear keyboard states
-    li t0, 0
+    // clear keyboard states, receive logic, scan code buffer
     li t1, keyStateTable
-    sw t0, 0(t1)
-    sw t0, 4(t1)
-    sw t0, 8(t1)
-    sw t0, 12(t1)
-    sw t0, 16(t1)
-    sw t0, 20(t1)
-    sw t0, 24(t1)
-    sw t0, 28(t1)
+    sw x0, 0(t1)
+    sw x0, 4(t1)
+    sw x0, 8(t1)
+    sw x0, 12(t1)
+    sw x0, 16(t1)
+    sw x0, 20(t1)
+    sw x0, 24(t1)
+    sw x0, 28(t1)
+    la t1, keyReleasePrefixReceived
+    sw x0, 0(t1)
+    la t1, scanCodeBufferWriteIndex
+    sw x0, 0(t1)
+    la t1, scanCodeBuffer
+    sb x0, 0(t1)
 
     // wait until SDRAM is ready
     li a0, 500
@@ -113,6 +119,9 @@ interruptRegisterSaveArea:
 keyReleasePrefixReceived:
     .word 0
 
+scanCodeBufferWriteIndex:
+    .word 0
+
 // currently only used for the keyboard
 interruptEntry:
 
@@ -126,6 +135,20 @@ interruptEntry:
     // load scan code
     li t0, keyboardController
     lw t0, 0(t0)
+
+    // store scan code in buffer
+    // ... get current and next index to store the scancode and the terminator
+    la t3, scanCodeBufferWriteIndex
+    lw t1, 0(t3)
+    addi t2, t1, 1
+    andi t2, t2, 31
+    sw t2, 0(t3)
+    // ... store scan code and terminator
+    la t3, scanCodeBuffer
+    add t4, t3, t2
+    sb x0, 0(t4)
+    add t4, t3, t1
+    sb t0, 0(t4)
 
     // ignore fake keypress indication markers
     li t1, 0xe0

@@ -13,6 +13,8 @@ textSection:
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 .set keyStateTable, (0x00004000 - 32)
+.set scanCodeBuffer, (0x00004000 - 64)
+.set keyboardController, 0x00004000
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // entry point
@@ -27,7 +29,7 @@ entryPoint:
     .option pop
 
     // initialize the SP register to start below the key state table
-    li sp, keyStateTable
+    li sp, scanCodeBuffer
 
     // enable interrupts (0000 0100 0010 0010 1000 0101 0000 1011)
     li t0, 1
