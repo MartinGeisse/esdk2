@@ -23,28 +23,18 @@ name.martingeisse.esdk.library.SignalLoggerBusInterface signalLogger;
 name.martingeisse.esdk.riscv.rtl.spi.SpiInterface spiInterface;
 name.martingeisse.esdk.riscv.rtl.serial.SerialPort serialPort;
 
-// bus decoder: big devices
+// bus decoder
 signal bit ramAgentSelected = cpu.memoryWordAddress[29];
-signal bit simulationDeviceSelected = ~cpu.memoryWordAddress[29] & cpu.memoryWordAddress[28];
-signal bit smallDeviceRegionSelected = ~cpu.memoryWordAddress[29] & ~cpu.memoryWordAddress[28];
-
-// bus decoder: small devices
-signal bit terminalSelected = smallDeviceRegionSelected & cpu.memoryWordAddress[12];
-signal bit signalLoggerSelected = smallDeviceRegionSelected & cpu.memoryWordAddress[13];
-signal bit gpioSelected = smallDeviceRegionSelected & cpu.memoryWordAddress[14];
-signal bit spiSelected = smallDeviceRegionSelected & cpu.memoryWordAddress[15];
-signal bit displayControllerSelected = smallDeviceRegionSelected & cpu.memoryWordAddress[16];
-signal bit serialPortSelected = smallDeviceRegionSelected & cpu.memoryWordAddress[17];
-signal bit hardwareClockSelected = smallDeviceRegionSelected & cpu.memoryWordAddress[18];
-signal bit internalMemorySelected = smallDeviceRegionSelected & ~terminalSelected & ~signalLoggerSelected
-    & ~gpioSelected & ~spiSelected & ~displayControllerSelected & ~serialPortSelected & ~hardwareClockSelected;
-
-// Memory: the number indicates the significance inside a word, NOT the position of a byte in a byte buffer (these
-// are different since RISC-V is little-endian).
-register matrix[4096][8] memory0, memory1, memory2, memory3;
-signal vector[32] memoryReadData;
-register bit internalMemorySecondReadCycle = 0;
-
+signal bit internalMemorySelected = cpu.memoryWordAddress[29:22] == 8d0;
+signal bit terminalSelected = cpu.memoryWordAddress[29:22] == 8d1;
+signal bit signalLoggerSelected = cpu.memoryWordAddress[29:22] == 8d2;
+signal bit gpioSelected = cpu.memoryWordAddress[29:22] == 8d3;
+signal bit spiSelected = cpu.memoryWordAddress[29:22] == 8d4;
+signal bit displayControllerSelected = cpu.memoryWordAddress[29:22] == 8d5;
+signal bit serialPortSelected = cpu.memoryWordAddress[29:22] == 8d6;
+signal bit hardwareClockSelected = cpu.memoryWordAddress[29:22] == 8d7;
+// ...
+signal bit simulationDeviceSelected = cpu.memoryWordAddress[29:22] == 8d127;
 
 do (*) {
 
@@ -53,26 +43,35 @@ do (*) {
     cpu.reset = reset;
 
     // data interface
-    cpu.memoryReadData = ramAgentSelected ? ramAgent.cpuReadData :
-        simulationDeviceSelected ? simulationDevice.busReadData :
-            terminalSelected ? (24d0 _ keyboard.inputData) :
-                signalLoggerSelected ? signalLogger.busReadData :
-                    gpioSelected ? (24d0 _ buttonsAndSwitches) :
-                        spiSelected ? 32d0 :
-                            displayControllerSelected ? 32d0 :
-                                serialPortSelected ? serialPort.busReadData :
-                                    hardwareClockSelected ? hardwareClock :
-                                        memoryReadData;
-    cpu.memoryAcknowledge = ramAgentSelected ? ramAgent.cpuAcknowledge :
-        simulationDeviceSelected ? simulationDevice.busAcknowledge :
-            terminalSelected ? bit(1) :
-                signalLoggerSelected ? signalLogger.busAcknowledge :
-                    gpioSelected ? bit(1) :
-                        spiSelected ? spiInterface.busAcknowledge :
-                            displayControllerSelected ? bit(1) :
-                                serialPortSelected ? serialPort.busAcknowledge :
-                                    hardwareClockSelected ? bit(1) :
-                                        (cpu.memoryWrite | internalMemorySecondReadCycle);
+    if (ramAgentSelected) {
+        cpu.memoryReadData = ramAgent.cpuReadData;
+        cpu.memoryAcknowledge = ramAgent.cpuAcknowledge;
+    } else {
+        cpu.memoryReadData = switch (cpu.memoryWordAddress[28:22]) {
+            case 7d0: memoryReadData
+            case 7d1: 24d0 _ keyboard.inputData
+            case 7d2: signalLogger.busReadData
+            case 7d3: 24d0 _ buttonsAndSwitches
+            case 7d4: 32d0
+            case 7d5: 32d0
+            case 7d6: serialPort.busReadData
+            case 7d7: hardwareClock
+            case 7d127: simulationDevice.busReadData
+            default: 32d0
+        };
+        cpu.memoryAcknowledge = switch (cpu.memoryWordAddress[28:22]) {
+            case 7d0: cpu.memoryWrite | internalMemorySecondReadCycle
+            case 7d1: bit(1)
+            case 7d2: signalLogger.busAcknowledge
+            case 7d3: bit(1)
+            case 7d4: spiInterface.busAcknowledge
+            case 7d5: bit(1)
+            case 7d6: serialPort.busAcknowledge
+            case 7d7: bit(1)
+            case 7d127: simulationDevice.busAcknowledge
+            default: bit(1)
+        };
+    }
 
     // interrupts
     cpu.interrupt = keyboard.ready;
@@ -152,7 +151,12 @@ do (clk) {
     }
 }
 
-// small memory
+// small memory: the number indicates the significance inside a word, NOT the position of a byte in a byte buffer (these
+// are different since RISC-V is little-endian).
+register matrix[4096][8] memory0, memory1, memory2, memory3;
+signal vector[32] memoryReadData;
+register bit internalMemorySecondReadCycle = 0;
+
 signal vector[12] memoryDataWordAddress = cpu.memoryWordAddress[11:0];
 register vector[8] memoryReadData0, memoryReadData1, memoryReadData2, memoryReadData3;
 do (*) memoryReadData = memoryReadData3 _ memoryReadData2 _ memoryReadData1 _ memoryReadData0;

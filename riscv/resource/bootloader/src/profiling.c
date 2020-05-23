@@ -12,13 +12,13 @@ static int entryCount;
 static ProfilingEntry entries[32];
 
 void profReset() {
-    startTime = *(unsigned int *)0x00100000;
+    startTime = *(unsigned int *)0x07000000;
     entryCount = 0;
 }
 
 void profLog(const char *label) {
     if (entryCount < 32) {
-        entries[entryCount].time = (*(unsigned int *)0x00100000) - startTime;
+        entries[entryCount].time = (*(unsigned int *)0x07000000) - startTime;
         entries[entryCount].label = label;
         entryCount++;
     }

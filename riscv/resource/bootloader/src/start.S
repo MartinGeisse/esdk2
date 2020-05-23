@@ -13,7 +13,7 @@ textSection:
 .set payloadEntryPoint, 0x80200000
 .set keyStateTable, (0x00004000 - 32)
 .set scanCodeBuffer, (0x00004000 - 64)
-.set keyboardController, 0x00004000
+.set keyboardController, 0x01000000
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // entry points
@@ -246,7 +246,7 @@ drawStatusLineLoop:
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 bootloader:
-    li s0, 0x00080000 // serial port
+    li s0, 0x06000000 // serial port
     li s1, 0x80200000 // start of non-screen memory
     li s2, 0 // end-of-stream detection timer
 firstByteLoop:

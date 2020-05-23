@@ -1,10 +1,8 @@
 
 #include "simdev.h"
 
-#define OPENGL_BASE_ADDRESS = 0x10000;
-
-static volatile int *simulationDevice = (volatile int *)0x40000000;
-static volatile int *openglDevice = (volatile int *)0x40040000;
+static volatile int *simulationDevice = (volatile int *)0x7f000000;
+static volatile int *openglDevice = (volatile int *)0x7f040000;
 
 int simdevIsSimulation() {
     return *simulationDevice;

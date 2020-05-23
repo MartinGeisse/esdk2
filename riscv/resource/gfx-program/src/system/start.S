@@ -14,7 +14,7 @@ textSection:
 
 .set keyStateTable, (0x00004000 - 32)
 .set scanCodeBuffer, (0x00004000 - 64)
-.set keyboardController, 0x00004000
+.set keyboardController, 0x01000000
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // entry point

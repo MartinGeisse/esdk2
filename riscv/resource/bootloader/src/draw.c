@@ -5,7 +5,7 @@
 // low-level helpers
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#define DISPLAY_CONTROL_BASE_ADDRESS 0x00040000
+#define DISPLAY_CONTROL_BASE_ADDRESS 0x05000000
 #define PLANE0_BASE_ADDRESS 0x80000000
 
 #define RAM_AGENT_COMMAND_ENGINE_ADDRESS_BIT 0x40000000

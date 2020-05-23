@@ -66,7 +66,7 @@ int internalDemo() {
 
 	    // FPS counter
 	    {
-	        int now = *(unsigned int *)0x00100000;
+	        int now = *(unsigned int *)0x07000000;
 	        int frameDuration = now - lastFrameTimestamp;
 	        lastFrameTimestamp = now;
 	        int tenths = udiv(62500000, frameDuration);
