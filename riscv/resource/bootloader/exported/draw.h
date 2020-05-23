@@ -16,5 +16,6 @@ extern void (*drawLine)(int x1, int y1, int x2, int y2);
 extern void (*drawTriangle)(int x1, int y1, int x2, int y2, int x3, int y3);
 extern void (*drawCharacter)(int x, int y, char c);
 extern void (*drawText)(int x, int y, const char *text);
+extern void (*scroll)(int amount, int fillColor);
 
 #endif
