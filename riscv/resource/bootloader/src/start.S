@@ -45,6 +45,7 @@ functionTable:
     .word drawCharacter
     .word drawText
     .word setFont
+    .word scroll
     .word termInitialize
     .word termPrintString
     .word termPrintChar

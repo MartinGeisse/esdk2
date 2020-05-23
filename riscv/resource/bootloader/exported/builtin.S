@@ -56,61 +56,65 @@
 .globl setFont
 .set setFont, 68
 
+.globl scroll
+.set scroll, 72
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // terminal
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 .globl termInitialize
-.set termInitialize, 72
+.set termInitialize, 76
 
 .globl termPrintString
-.set termPrintString, 76
+.set termPrintString, 80
 
 .globl termPrintChar
-.set termPrintChar, 80
+.set termPrintChar, 84
 
 .globl termPrintInt
-.set termPrintInt, 84
+.set termPrintInt, 88
 
 .globl termPrintUnsignedInt
-.set termPrintUnsignedInt, 88
+.set termPrintUnsignedInt, 92
 
 .globl termPrintHexInt
-.set termPrintHexInt, 92
+.set termPrintHexInt, 96
 
 .globl termPrintUnsignedHexInt
-.set termPrintUnsignedHexInt, 96
+.set termPrintUnsignedHexInt, 100
 
 .globl termPrintln
-.set termPrintln, 100
+.set termPrintln, 104
 
 .globl termPrintlnString
-.set termPrintlnString, 104
+.set termPrintlnString, 108
 
 .globl termPrintlnChar
-.set termPrintlnChar, 108
+.set termPrintlnChar, 112
 
 .globl termPrintlnInt
-.set termPrintlnInt, 112
+.set termPrintlnInt, 116
 
 .globl termPrintlnUnsignedInt
-.set termPrintlnUnsignedInt, 116
+.set termPrintlnUnsignedInt, 120
 
 .globl termPrintlnHexInt
-.set termPrintlnHexInt, 120
+.set termPrintlnHexInt, 124
 
 .globl termPrintlnUnsignedHexInt
-.set termPrintlnUnsignedHexInt, 124
+.set termPrintlnUnsignedHexInt, 128
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // profiling
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 .globl profReset
-.set profReset, 128
+.set profReset, 132
 
 .globl profLog
-.set profLog, 132
+.set profLog, 136
 
 .globl profDisplay
-.set profDisplay, 136
+.set profDisplay, 140
+

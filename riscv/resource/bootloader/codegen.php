@@ -23,6 +23,7 @@ $sections = array(
         'drawCharacter',
         'drawText',
         'setFont',
+        'scroll',
     ),
 
     'terminal' => array(

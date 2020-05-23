@@ -331,3 +331,27 @@ void drawText(int x, int y, const char *text) {
         text++;
     }
 }
+
+void scroll(int amount, int fillColor) {
+
+    // move the scrolled part
+    int y0 = 480 - amount;
+    for (int y = 0; y < y0; y++) {
+        int *writeRow = (int*)(drawPlane + (y << 10));
+        int *readRow = (int*)(drawPlane + ((y + amount) << 10));
+        for (int i = 0; i < 160; i++) {
+            writeRow[i] = readRow[i];
+        }
+    }
+
+    // fill the new part (using a word that contains the fill color four times)
+    int fillColorWord = (fillColor << 8) | fillColor;
+    fillColorWord = (fillColorWord << 16) | fillColorWord;
+    for (int y = y0; y < 480; y++) {
+        int *writeRow = (int*)(drawPlane + (y << 10));
+        for (int i = 0; i < 160; i++) {
+            writeRow[i] = fillColorWord;
+        }
+    }
+
+}
