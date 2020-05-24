@@ -15,7 +15,7 @@ interface {
 
 }
 
-register bit mdcRegister = 1, mdioOutWeakRegister = 1;
+register bit mdcRegister = 0, mdioOutWeakRegister = 1;
 
 do (*) {
     busAcknowledge = 1;
@@ -26,6 +26,7 @@ do (*) {
 
 do (clk) {
     if (reset) {
+        mdcRegister = 0;
         mdioOutWeakRegister = 1;
     } else if (busEnable & busWrite) {
         mdioOutWeakRegister = busWriteData[0];
