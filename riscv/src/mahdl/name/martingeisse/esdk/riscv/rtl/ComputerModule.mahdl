@@ -8,6 +8,8 @@ interface {
 
     in vector[8] buttonsAndSwitches;
     in bit serialPortSignal;
+    out bit lanMdc, lanMdioOutWeak;
+    in bit lanMdioIn;
 }
 
 // CPU
@@ -22,6 +24,7 @@ name.martingeisse.esdk.riscv.rtl.terminal.KeyboardController keyboard;
 name.martingeisse.esdk.library.SignalLoggerBusInterface signalLogger;
 name.martingeisse.esdk.riscv.rtl.spi.SpiInterface spiInterface;
 name.martingeisse.esdk.riscv.rtl.serial.SerialPort serialPort;
+name.martingeisse.esdk.riscv.rtl.lan.LanController lanController;
 
 // bus decoder
 signal bit ramAgentSelected = cpu.memoryWordAddress[29];
@@ -33,6 +36,7 @@ signal bit spiSelected = cpu.memoryWordAddress[29:22] == 8d4;
 signal bit displayControllerSelected = cpu.memoryWordAddress[29:22] == 8d5;
 signal bit serialPortSelected = cpu.memoryWordAddress[29:22] == 8d6;
 signal bit hardwareClockSelected = cpu.memoryWordAddress[29:22] == 8d7;
+signal bit lanControllerSelected = cpu.memoryWordAddress[29:22] == 8d8;
 // ...
 signal bit simulationDeviceSelected = cpu.memoryWordAddress[29:22] == 8d127;
 
@@ -56,6 +60,7 @@ do (*) {
             case 7d5: 32d0
             case 7d6: serialPort.busReadData
             case 7d7: hardwareClock
+            case 7d8: lanController.busReadData
             case 7d127: simulationDevice.busReadData
             default: 32d0
         };
@@ -68,6 +73,7 @@ do (*) {
             case 7d5: bit(1)
             case 7d6: serialPort.busAcknowledge
             case 7d7: bit(1)
+            case 7d8: lanController.busAcknowledge
             case 7d127: simulationDevice.busAcknowledge
             default: bit(1)
         };
@@ -138,6 +144,15 @@ do (*) {
     serialPort.reset = reset;
     serialPort.busEnable = cpu.memoryEnable & serialPortSelected;
     serialPort.serialSignal = serialPortSignal;
+
+    lanController.clk = clk;
+    lanController.reset = reset;
+    lanController.busEnable = cpu.memoryEnable & lanControllerSelected;
+    lanController.busWrite = cpu.memoryWrite;
+    lanController.busWriteData = cpu.memoryWriteData;
+    lanController.mdioIn = lanMdioIn;
+    lanMdc = lanController.mdc;
+    lanMdioOutWeak = lanController.mdioOutWeak;
 
 }
 

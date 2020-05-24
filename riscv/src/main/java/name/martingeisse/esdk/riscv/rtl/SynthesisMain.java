@@ -4,6 +4,7 @@ import name.martingeisse.esdk.core.model.Item;
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.module.RtlModuleInstance;
+import name.martingeisse.esdk.core.rtl.pin.RtlBidirectionalPin;
 import name.martingeisse.esdk.core.rtl.pin.RtlInputPin;
 import name.martingeisse.esdk.core.rtl.pin.RtlOutputPin;
 import name.martingeisse.esdk.core.rtl.signal.*;
@@ -144,6 +145,32 @@ public class SynthesisMain {
 		RtlVectorSignal serialPortDivider = RegisterBuilder.build(8, VectorValue.of(8, 0),
 				design.getClock(), r -> r.add(1));
 
+		//
+		// LAN PHY interface
+		//
+		{
+			XilinxPinConfiguration configuration = new XilinxPinConfiguration();
+			configuration.setIostandard("LVCMOS33");
+			configuration.setSlew(XilinxPinConfiguration.Slew.SLOW);
+			configuration.setDrive(8);
+			RtlOutputPin mdcPin = new RtlOutputPin(realm);
+			mdcPin.setId("P9");
+			mdcPin.setConfiguration(configuration);
+			mdcPin.setOutputSignal(computerModule.getLanMdc());
+		}
+		{
+			XilinxPinConfiguration configuration = new XilinxPinConfiguration();
+			configuration.setIostandard("LVCMOS33");
+			configuration.setSlew(XilinxPinConfiguration.Slew.SLOW);
+			configuration.setDrive(8);
+			configuration.setAdditionalInfo("PULLUP");
+			RtlBidirectionalPin mdioPin = new RtlBidirectionalPin(realm);
+			mdioPin.setId("U5");
+			mdioPin.setConfiguration(configuration);
+			mdioPin.setOutputSignal(new RtlBitConstant(realm, false));
+			mdioPin.setOutputEnableSignal(computerModule.getLanMdioOutWeak().not());
+			computerModule.setLanMdioIn(mdioPin);
+		}
 
         //
 		// signal logger
