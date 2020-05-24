@@ -1,6 +1,6 @@
 
-#ifndef __BOOTLOADER_INTERNAL_TERMINAL_H__
-#define __BOOTLOADER_INTERNAL_TERMINAL_H__
+#ifndef __BOOTLOADER_INTERNAL_TERM_H__
+#define __BOOTLOADER_INTERNAL_TERM_H__
 
 void termInitialize(void);
 void termPrintString(const char *s);

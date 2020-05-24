@@ -1,7 +1,7 @@
 
 #include "divrem.h"
 #include "draw.h"
-#include "terminal.h"
+#include "term.h"
 
 static int x, y;
 

@@ -1,6 +1,6 @@
 
-#ifndef __BOOTLOADER_EXPORTED_TERMINAL_H__
-#define __BOOTLOADER_EXPORTED_TERMINAL_H__
+#ifndef __BOOTLOADER_EXPORTED_TERM_H__
+#define __BOOTLOADER_EXPORTED_TERM_H__
 
 extern void (*termInitialize)(void);
 extern void (*termPrintString)(const char *s);
