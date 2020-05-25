@@ -6,30 +6,92 @@ interface {
     in bit reset;
 
     in bit busEnable, busWrite;
+    in vector[22] busWordAddress;
+    in vector[32] busWriteData;
     out bit busAcknowledge;
     out vector[32] busReadData;
-    in vector[32] busWriteData;
 
     out bit mdc, mdioOutWeak;
     in bit mdioIn;
 
+    in bit rxDv, rxClk;
+    in vector[4] rxd;
+
 }
 
-register bit mdcRegister = 0, mdioOutWeakRegister = 1;
+name.martingeisse.esdk.riscv.rtl.lan.ReceiveBuffer receiveBuffer;
+do (*) {
+    receiveBuffer.clk = clk;
+}
+
+register bit mdcRegister = 0, mdioOutWeakRegister = 1, dataReadyFlag = 0;
+register bit busReadSecondCycle;
+register vector[12] receiveBufferPointer;
 
 do (*) {
-    busAcknowledge = 1;
+
+    // bus interface
+    receiveBuffer.readAddress = busWordAddress[8:0];
+    if (busWordAddress[14]) {
+        busAcknowledge = busReadSecondCycle;
+        busReadData = receiveBuffer.readData;
+    } else {
+        busAcknowledge = 1;
+        busReadData = 29d0 _ dataReadyFlag _ 1d0 _ mdioIn;
+    }
+
+    // management interface
     mdc = mdcRegister;
     mdioOutWeak = mdioOutWeakRegister;
-    busReadData = 31d0 _ mdioIn;
+
 }
 
 do (clk) {
+
+    // set data ready flag when finishing a packet, overridden by reset or bus write
+    if (previousRxDv & ~rxDv) {
+        dataReadyFlag = 1;
+    }
+
+    // bus write handling
     if (reset) {
         mdcRegister = 0;
         mdioOutWeakRegister = 1;
+        dataReadyFlag = 0;
     } else if (busEnable & busWrite) {
-        mdioOutWeakRegister = busWriteData[0];
-        mdcRegister = busWriteData[1];
+        if (~busWordAddress[14]) { // writing to the receive buffer is not implemented
+            mdioOutWeakRegister = busWriteData[0];
+            mdcRegister = busWriteData[1];
+            dataReadyFlag = busWriteData[2];
+        }
+    }
+
+    // reading from the receive buffer
+    if (busEnable & busWordAddress[14]) {
+        busReadSecondCycle = ~busReadSecondCycle;
+    } else {
+        busReadSecondCycle = 0;
+    }
+
+}
+
+// receive logic
+register bit previousRxClk, previousRxDv;
+signal bit rxClkRisingEdge;
+do (*) {
+    rxClkRisingEdge = rxClk & ~previousRxClk;
+    receiveBuffer.writeEnable = rxClkRisingEdge & rxDv;
+    receiveBuffer.writeAddress = receiveBufferPointer;
+    receiveBuffer.writeData = rxd;
+}
+do (clk) {
+    previousRxClk = rxClk;
+    previousRxDv = rxDv;
+    if (rxClkRisingEdge) {
+        if (rxDv) {
+            receiveBufferPointer = receiveBufferPointer + 12d1;
+        } else {
+            receiveBufferPointer = 12d0;
+        }
     }
 }

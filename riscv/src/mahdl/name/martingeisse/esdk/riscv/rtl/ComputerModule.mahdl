@@ -8,8 +8,12 @@ interface {
 
     in vector[8] buttonsAndSwitches;
     in bit serialPortSignal;
+
     out bit lanMdc, lanMdioOutWeak;
     in bit lanMdioIn;
+    in bit lanRxDv, lanRxClk;
+    in vector[4] lanRxd;
+
 }
 
 // CPU
@@ -149,10 +153,14 @@ do (*) {
     lanController.reset = reset;
     lanController.busEnable = cpu.memoryEnable & lanControllerSelected;
     lanController.busWrite = cpu.memoryWrite;
+    lanController.busWordAddress = cpu.memoryWordAddress[21:0];
     lanController.busWriteData = cpu.memoryWriteData;
     lanController.mdioIn = lanMdioIn;
     lanMdc = lanController.mdc;
     lanMdioOutWeak = lanController.mdioOutWeak;
+    lanController.rxDv = lanRxDv;
+    lanController.rxClk = lanRxClk;
+    lanController.rxd = lanRxd;
 
 }
 
