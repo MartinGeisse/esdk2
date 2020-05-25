@@ -14,7 +14,7 @@ interface {
     out bit mdc, mdioOutWeak;
     in bit mdioIn;
 
-    in bit rxDv, rxClk;
+    in bit rxDv, rxClk, rxEr;
     in vector[4] rxd;
 
 }
@@ -26,7 +26,7 @@ do (*) {
 
 register bit mdcRegister = 0, mdioOutWeakRegister = 1, dataReadyFlag = 0;
 register bit busReadSecondCycle;
-register vector[12] receiveBufferPointer;
+register vector[11] receivedPacketLengthRegister;
 
 do (*) {
 
@@ -75,23 +75,75 @@ do (clk) {
 
 }
 
-// receive logic
-register bit previousRxClk, previousRxDv;
+// rx_clk edge detector
+register bit previousRxClk;
 signal bit rxClkRisingEdge;
 do (*) {
     rxClkRisingEdge = rxClk & ~previousRxClk;
-    receiveBuffer.writeEnable = rxClkRisingEdge & rxDv;
-    receiveBuffer.writeAddress = receiveBufferPointer;
-    receiveBuffer.writeData = rxd;
 }
 do (clk) {
     previousRxClk = rxClk;
-    previousRxDv = rxDv;
-    if (rxClkRisingEdge) {
-        if (rxDv) {
-            receiveBufferPointer = receiveBufferPointer + 12d1;
-        } else {
+}
+
+// receiver state machine
+register vector[3] receiveState;
+constant vector[3] RECEIVE_STATE_SKIP_PACKET = 3d0;
+constant vector[3] RECEIVE_STATE_IDLE = 3d1;
+constant vector[3] RECEIVE_STATE_RECEIVING = 3d2;
+constant vector[3] RECEIVE_STATE_APPEND_PADDING = 3d3;
+constant vector[3] RECEIVE_STATE_CONSUME_PACKET = 3d4;
+constant vector[3] RECEIVE_STATE_CONSUME_PACKET = 3d4;
+do (clk) {
+    if (reset) {
+        receiveState = RECEIVE_STATE_SKIP_PACKET;
+    } else switch (receiveState) {
+
+        case RECEIVE_STATE_SKIP_PACKET:
             receiveBufferPointer = 12d0;
-        }
+            if (~rxDv) {
+                receiveState = RECEIVE_STATE_IDLE;
+            }
+
+        case RECEIVE_STATE_IDLE:
+            if (rxClkRisingEdge & rxDv) {
+                receiveBufferPointer = receiveBufferPointer + 12d1;
+                if (rxEr) {
+                    receiveState = RECEIVE_STATE_SKIP_PACKET;
+                } else {
+                    receiveState = RECEIVE_STATE_RECEIVING;
+                }
+            }
+
+        case RECEIVE_STATE_RECEIVING:
+            if (rxClkRisingEdge) {
+                receiveBufferPointer = receiveBufferPointer + 12d1;
+                if (~rxDv) {
+                    receivedPacketLengthRegister = receiveBufferPointer;
+                    receiveState = RECEIVE_STATE_APPEND_PADDING;
+                } else if (rxEr) {
+                    receiveState = RECEIVE_STATE_SKIP_PACKET;
+                } else {
+                    receiveState = RECEIVE_STATE_RECEIVING;
+                }
+            }
+
+        case RECEIVE_STATE_APPEND_PADDING:
+            receiveBufferPointer = receiveBufferPointer + 12d1;
+            if (receiveBufferPointer[2:0] == 3d0) {
+                receiveState = RECEIVE_STATE_CONSUME_PACKET;
+            }
+
+        case RECEIVE_STATE_CONSUME_PACKET:
+            TODO;
+
     }
+}
+
+// receive buffer writing
+register vector[12] receiveBufferPointer;
+do (*) {
+    receiveBuffer.writeEnable = rxClkRisingEdge & rxDv & (receiveState == RECEIVE_STATE_IDLE |
+            receiveState == RECEIVE_STATE_RECEIVING | receiveState == RECEIVE_STATE_APPEND_PADDING);
+    receiveBuffer.writeAddress = receiveBufferPointer;
+    receiveBuffer.writeData = rxDv ? rxd : 4d0;
 }
