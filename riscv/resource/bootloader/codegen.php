@@ -26,7 +26,7 @@ $sections = array(
         'scroll',
     ),
 
-    'terminal' => array(
+    'term' => array(
         'termInitialize',
         'termPrintString',
         'termPrintChar',

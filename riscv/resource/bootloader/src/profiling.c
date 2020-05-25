@@ -1,6 +1,6 @@
 
 #include "profiling.h"
-#include "terminal.h"
+#include "term.h"
 
 typedef struct {
     unsigned int time;

@@ -2,6 +2,7 @@ package name.martingeisse.esdk.riscv.rtl;
 
 import name.martingeisse.esdk.core.model.Item;
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
+import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.module.RtlModuleInstance;
 import name.martingeisse.esdk.core.rtl.pin.RtlBidirectionalPin;
@@ -14,6 +15,8 @@ import name.martingeisse.esdk.core.util.vector.VectorValue;
 import name.martingeisse.esdk.library.SignalLogger;
 import name.martingeisse.esdk.library.SignalLoggerBusInterface;
 import name.martingeisse.esdk.library.util.RegisterBuilder;
+import name.martingeisse.esdk.riscv.rtl.lan.LanController;
+import name.martingeisse.esdk.riscv.rtl.lan.ReceiveBuffer;
 import name.martingeisse.esdk.riscv.rtl.ram.RamController;
 import name.martingeisse.esdk.riscv.rtl.ram.SdramConnector;
 import name.martingeisse.esdk.riscv.rtl.ram.SdramConnectorImpl;
@@ -84,6 +87,36 @@ public class SynthesisMain {
 						};
 					}
 
+					@Override
+					protected LanController createLanController(RtlRealm realm, RtlClockNetwork clk) {
+						return new LanController.Implementation(realm, clk) {
+							@Override
+							protected ReceiveBuffer createReceiveBuffer(RtlRealm realm, RtlClockNetwork clk) {
+								ReceiveBuffer.Connector connector = new ReceiveBuffer.Connector(realm, clk);
+								RtlModuleInstance instance = new RtlModuleInstance(realm, "RAMB16_S4_S36");
+
+								// port A (4k x 4)
+								instance.createBitInputPort("WEA", connector.getWriteEnableSocket());
+								instance.createBitInputPort("ENA", true);
+								instance.createBitInputPort("SSRA", false);
+								instance.createBitInputPort("CLKA", clk.getClockSignal());
+								instance.createVectorInputPort("ADDRA", 12, connector.getWriteAddressSocket());
+								instance.createVectorInputPort("DIA", 4, connector.getWriteDataSocket());
+
+								// port B (512 x 32, internally 512 x 36)
+								instance.createBitInputPort("WEB", false);
+								instance.createBitInputPort("ENB", true);
+								instance.createBitInputPort("SSRB", false);
+								instance.createBitInputPort("CLKB", clk.getClockSignal());
+								instance.createVectorInputPort("ADDRB", 9, connector.getReadAddressSocket());
+								instance.createVectorInputPort("DIB", 32, RtlVectorConstant.of(realm, 32, 0));
+								instance.createVectorInputPort("DIPB", 4, RtlVectorConstant.of(realm, 4, 0));
+								connector.setReadDataSocket(instance.createVectorOutputPort("DOB", 32));
+
+								return connector;
+							}
+						};
+					}
 				};
 			}
 		};

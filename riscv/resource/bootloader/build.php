@@ -49,7 +49,7 @@ $paths = array(
     'src/start.S' => 'build/start.o',
     'src/divrem.c' => 'build/divrem.o',
     'src/draw.c' => 'build/draw.o',
-    'src/terminal.c' => 'build/terminal.o',
+    'src/term.c' => 'build/term.o',
     'src/profiling.c' => 'build/profiling.o',
 );
 foreach ($paths as $inputPath => $outputPath) {

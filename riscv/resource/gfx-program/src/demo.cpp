@@ -12,7 +12,7 @@
 extern "C" {
     #include <divrem.h>
     #include <draw.h>
-    #include <terminal.h>
+    #include <term.h>
     #include <profiling.h>
     #include "system/chargen.h"
     #include "system/util.h"
