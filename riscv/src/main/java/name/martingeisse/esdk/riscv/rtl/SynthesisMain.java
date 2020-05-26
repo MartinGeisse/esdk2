@@ -2,7 +2,6 @@ package name.martingeisse.esdk.riscv.rtl;
 
 import name.martingeisse.esdk.core.model.Item;
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
-import name.martingeisse.esdk.core.rtl.RtlItem;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.module.RtlModuleInstance;
 import name.martingeisse.esdk.core.rtl.pin.RtlBidirectionalPin;
@@ -204,6 +203,14 @@ public class SynthesisMain {
 			mdioPin.setOutputEnableSignal(computerModule.getLanMdioOutWeak().not());
 			computerModule.setLanMdioIn(mdioPin);
 		}
+		computerModule.setLanRxClk(inputPin(realm, "V3", "LVCMOS33"));
+		computerModule.setLanRxDv(inputPin(realm, "V2", "LVCMOS33"));
+		computerModule.setLanRxd(inputPin(realm, "V14", "LVCMOS33")
+			.concat(inputPin(realm, "U11", "LVCMOS33"))
+			.concat(inputPin(realm, "T11", "LVCMOS33"))
+			.concat(inputPin(realm, "V8", "LVCMOS33"))
+		);
+		computerModule.setLanRxEr(inputPin(realm, "U14", "LVCMOS33"));
 
         //
 		// signal logger
@@ -344,6 +351,15 @@ public class SynthesisMain {
 
 	private static RtlOutputPin outputPin(RtlRealm realm, String id, String ioStandard, Integer drive, XilinxPinConfiguration.Slew slew, boolean constant) {
 		return outputPin(realm, id, ioStandard, drive, slew, new RtlBitConstant(realm, constant));
+	}
+
+	private static RtlInputPin inputPin(RtlRealm realm, String id, String ioStandard) {
+		XilinxPinConfiguration configuration = new XilinxPinConfiguration();
+		configuration.setIostandard(ioStandard);
+		RtlInputPin pin = new RtlInputPin(realm);
+		pin.setId(id);
+		pin.setConfiguration(configuration);
+		return pin;
 	}
 
 }
