@@ -1,5 +1,13 @@
 module name.martingeisse.esdk.riscv.rtl.lan.LanController;
 
+/*
+    Address map:
+        0x000000                PHY management I/O register
+        0x000004                received-packet consumer control
+        0x000008                received-packet length
+        0x001000 - 0x0017ff     receive buffer
+ */
+
 interface {
 
     in clock clk;
@@ -19,60 +27,46 @@ interface {
 
 }
 
-name.martingeisse.esdk.riscv.rtl.lan.ReceiveBuffer receiveBuffer;
-do (*) {
-    receiveBuffer.clk = clk;
-}
-
-register bit mdcRegister = 0, mdioOutWeakRegister = 1, dataReadyFlag = 0;
+// bus output signals
 register bit busReadSecondCycle;
-register vector[11] receivedPacketLengthRegister;
-
 do (*) {
-
-    // bus interface
-    receiveBuffer.readAddress = busWordAddress[8:0];
-    if (busWordAddress[14]) {
+    if (busWordAddress[10]) {
         busAcknowledge = busReadSecondCycle;
         busReadData = receiveBuffer.readData;
     } else {
         busAcknowledge = 1;
-        busReadData = 29d0 _ dataReadyFlag _ 1d0 _ mdioIn;
+        busReadData = switch (busWordAddress[1:0]) {
+            case 2d0: 31d0 _ mdioIn
+            case 2d1: 31d0 _ (receiveState == RECEIVE_STATE_CONSUME_PACKET)
+            case 2d2: 21d0 _ receivedPacketLengthRegister
+            case 2d3: 32d0
+        };
     }
-
-    // management interface
-    mdc = mdcRegister;
-    mdioOutWeak = mdioOutWeakRegister;
-
 }
-
 do (clk) {
-
-    // set data ready flag when finishing a packet, overridden by reset or bus write
-    if (previousRxDv & ~rxDv) {
-        dataReadyFlag = 1;
-    }
-
-    // bus write handling
-    if (reset) {
-        mdcRegister = 0;
-        mdioOutWeakRegister = 1;
-        dataReadyFlag = 0;
-    } else if (busEnable & busWrite) {
-        if (~busWordAddress[14]) { // writing to the receive buffer is not implemented
-            mdioOutWeakRegister = busWriteData[0];
-            mdcRegister = busWriteData[1];
-            dataReadyFlag = busWriteData[2];
-        }
-    }
-
-    // reading from the receive buffer
-    if (busEnable & busWordAddress[14]) {
+    if (busEnable & busWordAddress[10]) {
         busReadSecondCycle = ~busReadSecondCycle;
     } else {
         busReadSecondCycle = 0;
     }
+}
 
+// PHY management interface
+register bit mdcRegister = 0, mdioOutWeakRegister = 1;
+do (*) {
+    mdc = mdcRegister;
+    mdioOutWeak = mdioOutWeakRegister;
+}
+do (clk) {
+    if (reset) {
+        mdcRegister = 0;
+        mdioOutWeakRegister = 1;
+    } else if (busEnable & busWrite) {
+        if (~busWordAddress[10] & busWordAddress[1:0] == 2d0) {
+            mdioOutWeakRegister = busWriteData[0];
+            mdcRegister = busWriteData[1];
+        }
+    }
 }
 
 // rx_clk edge detector
@@ -91,7 +85,6 @@ constant vector[3] RECEIVE_STATE_SKIP_PACKET = 3d0;
 constant vector[3] RECEIVE_STATE_IDLE = 3d1;
 constant vector[3] RECEIVE_STATE_RECEIVING = 3d2;
 constant vector[3] RECEIVE_STATE_APPEND_PADDING = 3d3;
-constant vector[3] RECEIVE_STATE_CONSUME_PACKET = 3d4;
 constant vector[3] RECEIVE_STATE_CONSUME_PACKET = 3d4;
 do (clk) {
     if (reset) {
@@ -118,7 +111,7 @@ do (clk) {
             if (rxClkRisingEdge) {
                 receiveBufferPointer = receiveBufferPointer + 12d1;
                 if (~rxDv) {
-                    receivedPacketLengthRegister = receiveBufferPointer;
+                    receivedPacketLengthRegister = receiveBufferPointer[11:1]; // nibbles to bytes
                     receiveState = RECEIVE_STATE_APPEND_PADDING;
                 } else if (rxEr) {
                     receiveState = RECEIVE_STATE_SKIP_PACKET;
@@ -134,16 +127,22 @@ do (clk) {
             }
 
         case RECEIVE_STATE_CONSUME_PACKET:
-            TODO;
+            if (busEnable & busWrite & ~busWordAddress[10] & busWordAddress[1:0] == 2d1) {
+                receiveState = RECEIVE_STATE_SKIP_PACKET; // might happen in the middle of a second packet, so skip
+            }
 
     }
 }
 
-// receive buffer writing
+// receive buffer
+name.martingeisse.esdk.riscv.rtl.lan.ReceiveBuffer receiveBuffer;
 register vector[12] receiveBufferPointer;
+register vector[11] receivedPacketLengthRegister;
 do (*) {
+    receiveBuffer.clk = clk;
     receiveBuffer.writeEnable = rxClkRisingEdge & rxDv & (receiveState == RECEIVE_STATE_IDLE |
             receiveState == RECEIVE_STATE_RECEIVING | receiveState == RECEIVE_STATE_APPEND_PADDING);
     receiveBuffer.writeAddress = receiveBufferPointer;
     receiveBuffer.writeData = rxDv ? rxd : 4d0;
+    receiveBuffer.readAddress = busWordAddress[8:0];
 }
