@@ -146,3 +146,22 @@ do (*) {
     receiveBuffer.writeData = rxDv ? rxd : 4d0;
     receiveBuffer.readAddress = busWordAddress[8:0];
 }
+
+
+
+
+// TODO
+do (clk) {
+    sendBufferPointer = sendBufferPointer + 12d1;
+}
+
+// send buffer
+name.martingeisse.esdk.riscv.rtl.lan.SendBuffer sendBuffer;
+register vector[12] sendBufferPointer;
+do (*) {
+    sendBuffer.clk = clk;
+    sendBuffer.writeEnable = 0;
+    sendBuffer.writeData = 32d0;
+    sendBuffer.writeAddress = busWordAddress[8:0];
+    sendBuffer.readAddress = sendBufferPointer;
+}
