@@ -13,6 +13,9 @@ interface {
     in bit lanMdioIn;
     in bit lanRxDv, lanRxClk, lanRxEr;
     in vector[4] lanRxd;
+    in bit lanTxClk;
+    out bit lanTxEn, lanTxEr;
+    out vector[4] lanTxd;
 
 }
 
@@ -162,6 +165,10 @@ do (*) {
     lanController.rxClk = lanRxClk;
     lanController.rxEr = lanRxEr;
     lanController.rxd = lanRxd;
+    lanController.txClk = lanTxClk;
+    lanTxEn = lanController.txEn;
+    lanTxEr = lanController.txEr;
+    lanTxd = lanController.txd;
 
 }
 

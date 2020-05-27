@@ -4,8 +4,11 @@ module name.martingeisse.esdk.riscv.rtl.lan.LanController;
     Address map:
         0x000000                PHY management I/O register
         0x000004                received-packet consumer control
-        0x000008                received-packet length
-        0x001000 - 0x0017ff     receive buffer
+        0x000008                received-packet length (bus read)
+        0x00000c                sender ready (bus read)
+        0x00000c                to-send-packet length, start sending (bus write)
+        0x001000 - 0x0017ff     receive buffer (bus read)
+        0x001000 - 0x0017ff     send buffer (bus write)
  */
 
 interface {
@@ -25,6 +28,10 @@ interface {
     in bit rxDv, rxClk, rxEr;
     in vector[4] rxd;
 
+    in bit txClk;
+    out bit txEn, txEr;
+    out vector[4] txd;
+
 }
 
 // bus output signals
@@ -39,7 +46,7 @@ do (*) {
             case 2d0: 31d0 _ mdioIn
             case 2d1: 31d0 _ (receiveState == RECEIVE_STATE_CONSUME_PACKET)
             case 2d2: 21d0 _ receivedPacketLengthRegister
-            case 2d3: 32d0
+            case 2d3: 31d0 _ (sendState == SEND_STATE_IDLE)
         };
     }
 }
@@ -68,6 +75,10 @@ do (clk) {
         }
     }
 }
+
+// --------------------------------------------------------------------------------------------------------------------
+// receiving
+// --------------------------------------------------------------------------------------------------------------------
 
 // rx_clk edge detector
 register bit previousRxClk;
@@ -147,21 +158,81 @@ do (*) {
     receiveBuffer.readAddress = busWordAddress[8:0];
 }
 
+// --------------------------------------------------------------------------------------------------------------------
+// sending
+// --------------------------------------------------------------------------------------------------------------------
 
-
-
-// TODO
+// tx_clk edge detector
+register bit previousTxClk;
+signal bit txClkRisingEdge;
+do (*) {
+    txClkRisingEdge = txClk & ~previousTxClk;
+}
 do (clk) {
-    sendBufferPointer = sendBufferPointer + 12d1;
+    previousTxClk = txClk;
+}
+
+// Generate txd, txEn, txEr. Note that we don't output the value of the BlockRAM output register directly to the txd
+// pins since our time budget for the txd setup time would become rather small then, since the BlockRAM address gets
+// changed in reaction to the txClk edge. Draw a timing diagram to understand this, or just accept that txd gets
+// fed through an extra register before it reaches the pin.
+register bit txEnRegister = 0;
+register vector[4] txdRegister;
+do (*) {
+    txEn = txEnRegister;
+    txd = txdRegister;
+    txEr = 0; // we don't send artificial error symbols
+}
+
+// send state machine
+register vector[2] sendState;
+constant vector[2] SEND_STATE_IDLE = 2d0; // note: software must make sure we obey interpacket gap
+constant vector[2] SEND_STATE_PREPARE = 2d1;
+constant vector[2] SEND_STATE_SENDING = 2d2;
+do (clk) {
+    if (busEnable & busWrite & ~busWordAddress[10] & busWordAddress[1:0] == 2d3) {
+        sendBufferLengthRegister = busWriteData[10:0];
+    }
+    if (reset) {
+        sendState = SEND_STATE_IDLE;
+    } else switch (sendState) {
+
+        case SEND_STATE_IDLE:
+            sendBufferPointer = 12d0;
+            if (busEnable & busWrite & ~busWordAddress[10] & busWordAddress[1:0] == 2d3) {
+                sendState = SEND_STATE_PREPARE;
+            }
+
+        // we need this one extra cycle to make sure the first nibble has been read from the send buffer (it's a
+        // synchronous BlockRAM!) *before* SEND_STATE_SENDING detects a rising tx_clk edge.
+        case SEND_STATE_PREPARE:
+            sendState = SEND_STATE_SENDING;
+
+        // In SEND_STATE_SENDING, we don't actually start sending (i.e. txEn stays low) until we have seen the first
+        // tx_clk edge. This makes sure that txEn and txd obey their setup time.
+        case SEND_STATE_SENDING:
+            if (txClkRisingEdge) {
+                if (sendBufferPointer[11:1] == sendBufferLengthRegister) {
+                    txEnRegister = 0;
+                    sendState = SEND_STATE_IDLE;
+                } else {
+                    txEnRegister = 1;
+                }
+                txdRegister = sendBuffer.readData;
+                sendBufferPointer = sendBufferPointer + 12d1;
+            }
+
+    }
 }
 
 // send buffer
 name.martingeisse.esdk.riscv.rtl.lan.SendBuffer sendBuffer;
 register vector[12] sendBufferPointer;
+register vector[11] sendBufferLengthRegister;
 do (*) {
     sendBuffer.clk = clk;
-    sendBuffer.writeEnable = 0;
-    sendBuffer.writeData = 32d0;
+    sendBuffer.writeEnable = busEnable & busWrite & busWordAddress[10];
+    sendBuffer.writeData = busWriteData;
     sendBuffer.writeAddress = busWordAddress[8:0];
     sendBuffer.readAddress = sendBufferPointer;
 }
