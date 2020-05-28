@@ -240,6 +240,13 @@ public class SynthesisMain {
 			.concat(inputPin(realm, "V8", "LVCMOS33"))
 		);
 		computerModule.setLanRxEr(inputPin(realm, "U14", "LVCMOS33"));
+		computerModule.setLanTxClk(inputPin(realm, "T7", "LVCMOS33"));
+		outputPin(realm, "P15", "LVCMOS33", 8, XilinxPinConfiguration.Slew.SLOW, computerModule.getLanTxEn());
+		outputPin(realm, "R11", "LVCMOS33", 8, XilinxPinConfiguration.Slew.SLOW, computerModule.getLanTxd().select(0));
+		outputPin(realm, "T15", "LVCMOS33", 8, XilinxPinConfiguration.Slew.SLOW, computerModule.getLanTxd().select(1));
+		outputPin(realm, "R5", "LVCMOS33", 8, XilinxPinConfiguration.Slew.SLOW, computerModule.getLanTxd().select(2));
+		outputPin(realm, "T5", "LVCMOS33", 8, XilinxPinConfiguration.Slew.SLOW, computerModule.getLanTxd().select(3));
+		outputPin(realm, "R6", "LVCMOS33", 8, XilinxPinConfiguration.Slew.SLOW, computerModule.getLanTxEr());
 
         //
 		// signal logger
