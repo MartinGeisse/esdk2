@@ -1,6 +1,7 @@
 package name.martingeisse.esdk.structural.highlevel;
 
 import name.martingeisse.esdk.structural.highlevel.program.Draw;
+import name.martingeisse.esdk.structural.highlevel.program.Engine;
 
 public class Program {
 
@@ -16,32 +17,19 @@ public class Program {
 
     public void run() throws InterruptedException {
         Draw.frameBuffer = displayMatrix;
-        int i = 0;
+        Engine.buttonStates = buttonStates;
         while (true) {
-            Thread.sleep(50);
-
-            // displayMatrix[i] = 0;
-            Draw.drawTitleScreen();
-
-            if (buttonStates[Constants.BUTTON_INDEX_LEFT]) {
-                i -= 1;
-            }
-            if (buttonStates[Constants.BUTTON_INDEX_RIGHT]) {
-                i += 1;
-            }
-            if (buttonStates[Constants.BUTTON_INDEX_DOWN]) {
-                i += 16;
-            }
-            if (buttonStates[Constants.BUTTON_INDEX_ROTATE_CW]) {
-                i -= 17;
-            }
-            if (buttonStates[Constants.BUTTON_INDEX_ROTATE_CCW]) {
-                i -= 15;
-            }
-
-            i = i & 511;
-            displayMatrix[i] = 7;
+            Engine.mainLoopTick();
             displayRepaintCallback.run();
+            delay();
+        }
+    }
+
+    public static void delay() {
+        try {
+            Thread.sleep(50);
+        } catch (InterruptedException e) {
+            throw new RuntimeException();
         }
     }
 

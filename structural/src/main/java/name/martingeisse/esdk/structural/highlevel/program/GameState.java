@@ -32,7 +32,7 @@ public final class GameState {
     // drawing color of the current shape
     public static int shapeColor;
 
-    void initializeGameState() {
+    public static void initializeGameState() {
         clearGameArea();
         preview0 = randomPiece();
         preview1 = randomPiece();
@@ -42,13 +42,13 @@ public final class GameState {
         nextPiece();
     }
 
-    void clearGameArea() {
+    public static void clearGameArea() {
         for (int i = 0; i < gameArea.length; i++) {
             gameArea[i] = 0;
         }
     }
 
-    int shiftPreview(int shiftIn) {
+    public static int shiftPreview(int shiftIn) {
         int shiftOut = preview0;
         preview0 = preview1;
         preview1 = preview2;
@@ -56,17 +56,17 @@ public final class GameState {
         return shiftOut;
     }
 
-    int randomPiece() {
+    public static int randomPiece() {
         int color = Random.getRandom() % 7 + 1;
         int piece = Random.getRandom() % Shapes.numPieces;
         return piece + (color << 8);
     }
 
-    int shiftPreviewRandom() {
+    public static int shiftPreviewRandom() {
         return shiftPreview(randomPiece());
     }
 
-    int getRowScore(int level, int num) {
+    public static int getRowScore(int level, int num) {
         switch (num) {
             case 1:
                 return 40 * (level + 1);
@@ -81,21 +81,21 @@ public final class GameState {
         }
     }
 
-    boolean addRows(int num) {
+    public static boolean addRows(int num) {
         int oldLevel = rows / 10;
         score += getRowScore(oldLevel, num);
         rows += num;
         return (rows / 10) != oldLevel;
     }
 
-    void enterShape(int shapeIndex, int shapeColor) {
+    public static void enterShape(int shapeIndex, int shapeColor) {
         shapeX = 3;
         shapeY = -4;
         GameState.shapeIndex = shapeIndex;
         GameState.shapeColor = shapeColor;
     }
 
-    void nextPiece() {
+    public static void nextPiece() {
         int pieceAndColor = shiftPreviewRandom();
         int color = pieceAndColor >> 8;
         int piece = pieceAndColor & 0xff;
@@ -103,7 +103,7 @@ public final class GameState {
         enterShape(shape, color);
     }
 
-    boolean unblockedShapePosition(int x, int y, int shape) {
+    public static boolean unblockedShapePosition(int x, int y, int shape) {
         boolean[] matrix = Shapes.shapeOccupationMatrices[shape];
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
@@ -126,7 +126,7 @@ public final class GameState {
         return true;
     }
 
-    boolean moveCurrentShapeDown() {
+    public static boolean moveCurrentShapeDown() {
         if (!unblockedShapePosition(shapeX, shapeY + 1, shapeIndex)) {
             return false;
         }
@@ -134,7 +134,7 @@ public final class GameState {
         return true;
     }
 
-    boolean moveCurrentShapeLeft() {
+    public static boolean moveCurrentShapeLeft() {
         if (!unblockedShapePosition(shapeX - 1, shapeY, shapeIndex)) {
             return false;
         }
@@ -142,7 +142,7 @@ public final class GameState {
         return true;
     }
 
-    boolean moveCurrentShapeRight() {
+    public static boolean moveCurrentShapeRight() {
         if (!unblockedShapePosition(shapeX + 1, shapeY, shapeIndex)) {
             return false;
         }
@@ -150,7 +150,7 @@ public final class GameState {
         return true;
     }
 
-    boolean rotateCurrentShapeClockwise() {
+    public static boolean rotateCurrentShapeClockwise() {
         int newShape = Shapes.shapeRotatedClockwise[shapeIndex];
         if (!unblockedShapePosition(shapeX, shapeY, newShape)) {
             return false;
@@ -159,7 +159,7 @@ public final class GameState {
         return true;
     }
 
-    boolean rotateCurrentShapeCounterClockwise() {
+    public static boolean rotateCurrentShapeCounterClockwise() {
         int newShape = Shapes.shapeRotatedCounterClockwise[shapeIndex];
         if (!unblockedShapePosition(shapeX, shapeY, newShape)) {
             return false;
@@ -168,7 +168,7 @@ public final class GameState {
         return true;
     }
 
-    boolean pasteShape(int x, int y, int shapeIndex, int shapeColor) {
+    public static boolean pasteShape(int x, int y, int shapeIndex, int shapeColor) {
         boolean[] matrix = Shapes.shapeOccupationMatrices[shapeIndex];
         boolean crossedBorder = false;
         for (int i = 0; i < 4; i++) {
@@ -188,11 +188,11 @@ public final class GameState {
         return crossedBorder;
     }
 
-    boolean pasteCurrentShape() {
+    public static boolean pasteCurrentShape() {
         return pasteShape(shapeX, shapeY, shapeIndex, shapeColor);
     }
 
-    boolean isRowCompleted(int rowIndex) {
+    public static boolean isRowCompleted(int rowIndex) {
         for (int x = 0; x < 10; x++) {
             if (gameArea[10 * rowIndex + x] == 0) {
                 return false;
@@ -201,19 +201,19 @@ public final class GameState {
         return true;
     }
 
-    void clearRow(int y) {
+    public static void clearRow(int y) {
         for (int x = 0; x < 10; x++) {
             gameArea[10 * y + x] = 0;
         }
     }
 
-    void copyRow(int source, int dest) {
+    public static void copyRow(int source, int dest) {
         for (int x = 0; x < 10; x++) {
             gameArea[10 * dest + x] = gameArea[10 * source + x];
         }
     }
 
-    int findCompletedRows(int firstRowIndex, int maxRowCount, int[] rowIndices) {
+    public static int findCompletedRows(int firstRowIndex, int maxRowCount, int[] rowIndices) {
         int count = 0;
         for (int i = 0; i < maxRowCount; i++) {
             int row = firstRowIndex + i;
@@ -228,8 +228,8 @@ public final class GameState {
         return count;
     }
 
-    private boolean intArrayContains(int count, int[] array, int item) {
-        for (int i = 0; i < count; i++) {
+    private static boolean intArrayContains(int[] array, int item) {
+        for (int i = 0; i < array.length; i++) {
             if (array[i] == item) {
                 return true;
             }
@@ -237,10 +237,10 @@ public final class GameState {
         return false;
     }
 
-    void removeRows(int rowCount, int[] rowIndices) {
+    public static void removeRows(int[] rowIndices) {
         int stack = 19;
         for (int y = 19; y >= 0; y--) {
-            if (intArrayContains(rowCount, rowIndices, y)) {
+            if (intArrayContains(rowIndices, y)) {
                 continue;
             }
             copyRow(y, stack);
