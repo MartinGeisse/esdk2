@@ -10,17 +10,16 @@ public final class Draw {
 
     // offet of the game area in screen coordinates
     public static final int GAME_AREA_X_ON_SCREEN = 3;
-    public static final int GAME_AREA_Y_ON_SCREEN = 10;
+    public static final int GAME_AREA_Y_ON_SCREEN = 9;
 
     // offet of the (leftmost) preview box screen coordinates
     public static final int PREVIEW_X_ON_SCREEN = 1;
-    public static final int PREVIEW_Y_ON_SCREEN = 2;
+    public static final int PREVIEW_Y_ON_SCREEN = 1;
 
     // x offset of one preview box to the next
     public static final int PREVIEW_X_DELTA = 5;
 
     private static final byte[] titleScreenTemplate = new byte[]{
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 1, 1, 1, 1, 1, 1, 0, 0, 2, 2, 2, 2, 2, 2, 0,
             0, 1, 1, 1, 1, 1, 1, 0, 0, 2, 2, 2, 2, 2, 0, 0,
@@ -51,11 +50,9 @@ public final class Draw {
             0, 0, 0, 5, 5, 0, 0, 0, 0, 0, 6, 6, 6, 6, 6, 0,
             0, 0, 5, 5, 5, 5, 0, 0, 0, 0, 6, 6, 6, 6, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     };
 
     private static final byte[] backgroundTemplate = new byte[]{
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
             1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1,
             1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1,
@@ -86,13 +83,20 @@ public final class Draw {
             0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0,
             0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0,
             0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     };
+
+    public static void clearScreen() {
+        for (int x = 0; x < 40; x++) {
+            for (int y = 0; y < 30; y++) {
+                frameBuffer[y * 40 + x] = 0;
+            }
+        }
+    }
 
     public static void drawScreen(byte[] screenTemplate) {
         for (int x = 0; x < 16; x++) {
-            for (int y = 0; y < 32; y++) {
-                frameBuffer[y * 16 + x] = screenTemplate[y * 16 + x];
+            for (int y = 0; y < 30; y++) {
+                frameBuffer[y * 40 + x] = screenTemplate[y * 16 + x];
             }
         }
     }
@@ -118,7 +122,7 @@ public final class Draw {
                     continue;
                 }
                 if (occupationMatrix[dy * 4 + dx]) {
-                    frameBuffer[y2 * 16 + x2] = (byte) c;
+                    frameBuffer[y2 * 40 + x2] = (byte) c;
                 }
             }
         }
@@ -147,7 +151,7 @@ public final class Draw {
     public static void fillGameRow(int y, int c) {
         int i;
         for (i = 0; i < 10; i++) {
-            frameBuffer[(GAME_AREA_Y_ON_SCREEN + y) * 16 + GAME_AREA_X_ON_SCREEN + i] = (byte) c;
+            frameBuffer[(GAME_AREA_Y_ON_SCREEN + y) * 40 + GAME_AREA_X_ON_SCREEN + i] = (byte) c;
         }
     }
 
@@ -161,7 +165,7 @@ public final class Draw {
         int dx, dy;
         for (dx = 0; dx < 10; dx++) {
             for (dy = 0; dy < 20; dy++) {
-                frameBuffer[(GAME_AREA_Y_ON_SCREEN + dy) * 16 + GAME_AREA_X_ON_SCREEN + dx] = data[dy * 10 + dx];
+                frameBuffer[(GAME_AREA_Y_ON_SCREEN + dy) * 40 + GAME_AREA_X_ON_SCREEN + dx] = data[dy * 10 + dx];
             }
         }
     }

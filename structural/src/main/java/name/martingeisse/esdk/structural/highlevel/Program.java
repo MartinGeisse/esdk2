@@ -22,6 +22,7 @@ public class Program {
         try {
             Draw.frameBuffer = displayMatrix;
             Engine.buttonStates = buttonStates;
+            Draw.clearScreen();
             while (true) {
                 Engine.mainLoopTick();
                 delay();
