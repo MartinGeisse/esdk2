@@ -113,11 +113,10 @@ public final class Engine {
         }
     }
 
-    public static boolean engineDown() {
+    public static void engineDown() {
         if (GameState.moveCurrentShapeDown()) {
             Draw.drawShapeOnGameArea(GameState.shapeX, GameState.shapeY - 1, GameState.shapeIndex, 0);
             Draw.drawShapeOnGameArea(GameState.shapeX, GameState.shapeY, GameState.shapeIndex, GameState.shapeColor);
-            return false;
         } else {
             int[] completedRows = new int[4];
             int count;
@@ -125,7 +124,7 @@ public final class Engine {
             if (GameState.pasteCurrentShape()) {
                 gameOver = true;
                 gameOverFill();
-                return true;
+                return;
             }
 
             count = GameState.findCompletedRows(GameState.shapeY, 4, completedRows);
@@ -137,7 +136,6 @@ public final class Engine {
                 flashRowsEffect = 1;
             }
 
-            return true;
         }
     }
 
@@ -183,19 +181,16 @@ public final class Engine {
             return;
         }
 
-        if (buttonStates[Constants.BUTTON_INDEX_LEFT]) {
-            buttonStates[Constants.BUTTON_INDEX_LEFT] = false;
+        if (buttonStates[Constants.BUTTON_INDEX_LEFT] && (mainStepCounter & 3) == 0) {
             engineLeft();
         }
 
-        if (buttonStates[Constants.BUTTON_INDEX_RIGHT]) {
-            buttonStates[Constants.BUTTON_INDEX_RIGHT] = false;
+        if (buttonStates[Constants.BUTTON_INDEX_RIGHT] && (mainStepCounter & 3) == 0) {
             engineRight();
         }
 
         if (buttonStates[Constants.BUTTON_INDEX_DOWN]) {
-            buttonStates[Constants.BUTTON_INDEX_DOWN] = false;
-            while (!engineDown());
+            engineDown();
         } else {
             int level = GameState.rows / 10;
             if ((level > delayLevels) || (mainStepCounter % delayByLevel[level] == 0)) {
@@ -218,9 +213,6 @@ public final class Engine {
     public static void mainLoopTick() {
         if (gameRunning) {
             if (gameOver) {
-                for (int i = 0; i < buttonStates.length; i++) {
-                    buttonStates[i] = false;
-                }
                 gameRunning = false;
             } else {
                 delayFrame();
@@ -234,9 +226,6 @@ public final class Engine {
                 anyButtonPressed |= buttonStates[i];
             }
             if (anyButtonPressed) {
-                for (int i = 0; i < buttonStates.length; i++) {
-                    buttonStates[i] = false;
-                }
                 Random.autoSeedRandom();
                 gameRunning = true;
                 engineNewGame();
