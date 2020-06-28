@@ -27,9 +27,6 @@ public final class Engine {
     // this flag signals outwards to stop immediately
     public static boolean gameOver;
 
-    // fast-drop accumulation (for additional score)
-    public static int fastDrop;
-
     //
     public static int flashRowsEffect;
 
@@ -97,7 +94,6 @@ public final class Engine {
     public static void engineNewGame() {
         GameState.initializeGameState();
         gameOver = false;
-        fastDrop = 0;
         flashRowsEffect = 0;
         Draw.drawBackground();
         drawPreview();
@@ -131,9 +127,6 @@ public final class Engine {
                 gameOverFill();
                 return true;
             }
-
-            GameState.score += fastDrop;
-            fastDrop = 0;
 
             count = GameState.findCompletedRows(GameState.shapeY, 4, completedRows);
             if (count == 0) {

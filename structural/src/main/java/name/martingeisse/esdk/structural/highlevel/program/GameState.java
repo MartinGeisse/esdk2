@@ -17,9 +17,6 @@ public final class GameState {
     // completed rows (this also indicates the game level by rows/10).
     public static int rows;
 
-    // the player's score
-    public static int score;
-
     /* Position of the currently moving shape. These values may be negative and/or exceed 9 since they only
      * indicate the position of the upper left corner of the shape's 4x4 box, not of the shape itself.
      * Also, when entering the game area, the actual shape also crosses the y=0 border.
@@ -38,7 +35,6 @@ public final class GameState {
         preview1 = randomPiece();
         preview2 = randomPiece();
         rows = 0;
-        score = 0;
         nextPiece();
     }
 
@@ -66,24 +62,8 @@ public final class GameState {
         return shiftPreview(randomPiece());
     }
 
-    public static int getRowScore(int level, int num) {
-        switch (num) {
-            case 1:
-                return 40 * (level + 1);
-            case 2:
-                return 100 * (level + 1);
-            case 3:
-                return 300 * (level + 1);
-            case 4:
-                return 1200 * (level + 1);
-            default:
-                return 0;
-        }
-    }
-
     public static boolean addRows(int num) {
         int oldLevel = rows / 10;
-        score += getRowScore(oldLevel, num);
         rows += num;
         return (rows / 10) != oldLevel;
     }
