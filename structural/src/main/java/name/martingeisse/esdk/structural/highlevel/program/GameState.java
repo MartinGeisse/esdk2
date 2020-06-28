@@ -57,8 +57,8 @@ public final class GameState {
     }
 
     public static int randomPiece() {
-        int color = Random.getRandom() % 7 + 1;
-        int piece = Random.getRandom() % Shapes.numPieces;
+        int color = Random.getRandom(7) + 1;
+        int piece = Random.getRandom(Shapes.numPieces);
         return piece + (color << 8);
     }
 

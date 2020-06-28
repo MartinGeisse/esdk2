@@ -5,6 +5,8 @@ import name.martingeisse.esdk.structural.highlevel.program.Engine;
 
 public class Program {
 
+    private static Program INSTANCE = null;
+
     private final byte[] displayMatrix;
     private final Runnable displayRepaintCallback;
     private final boolean[] buttonStates;
@@ -16,18 +18,23 @@ public class Program {
     }
 
     public void run() throws InterruptedException {
-        Draw.frameBuffer = displayMatrix;
-        Engine.buttonStates = buttonStates;
-        while (true) {
-            Engine.mainLoopTick();
-            displayRepaintCallback.run();
-            delay();
+        INSTANCE = this;
+        try {
+            Draw.frameBuffer = displayMatrix;
+            Engine.buttonStates = buttonStates;
+            while (true) {
+                Engine.mainLoopTick();
+                delay();
+            }
+        } finally {
+            INSTANCE = null;
         }
     }
 
     public static void delay() {
+        INSTANCE.displayRepaintCallback.run();
         try {
-            Thread.sleep(50);
+            Thread.sleep(20);
         } catch (InterruptedException e) {
             throw new RuntimeException();
         }

@@ -17,9 +17,13 @@ public final class Random {
         currentNumber = seed;
     }
 
-    public static int getRandom() {
+    public static int getRandom(int mod) {
         currentNumber = currentNumber * 1664525 + 1013904223;
-        return currentNumber;
+        int result = currentNumber % mod;
+        if (result < 0) {
+            result += mod;
+        }
+        return result;
     }
 
     private Random() {
