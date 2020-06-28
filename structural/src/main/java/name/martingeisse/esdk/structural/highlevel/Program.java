@@ -25,7 +25,7 @@ public class Program {
             Draw.clearScreen();
             while (true) {
                 Engine.mainLoopTick();
-                delay();
+                INSTANCE.displayRepaintCallback.run();
             }
         } finally {
             INSTANCE = null;
