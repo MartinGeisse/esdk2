@@ -218,15 +218,17 @@ public final class Engine {
             }
         } else {
             Draw.drawTitleScreen();
-            boolean anyButtonPressed = false;
-            for (int i = 0; i < Devices.buttonStates.length; i++) {
-                anyButtonPressed |= Devices.buttonStates[i];
-            }
-            if (anyButtonPressed) {
-                Random.autoSeedRandom();
-                gameRunning = true;
-                engineNewGame();
-            } else {
+            while (true) {
+                boolean anyButtonPressed = false;
+                for (int i = 0; i < Devices.buttonStates.length; i++) {
+                    anyButtonPressed |= Devices.buttonStates[i];
+                }
+                if (anyButtonPressed) {
+                    Random.autoSeedRandom();
+                    gameRunning = true;
+                    engineNewGame();
+                    break;
+                }
                 Random.randomAutoSeederTick();
             }
         }

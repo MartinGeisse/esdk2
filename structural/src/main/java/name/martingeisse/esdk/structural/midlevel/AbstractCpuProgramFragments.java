@@ -229,14 +229,47 @@ public abstract class AbstractCpuProgramFragments {
         setResult(destination, performOperation(operation, x, getRightOperand(addressingMode, immediateValue)));
     }
 
+    public void lxi(int immediateValue) {
+        operation(Operation.RIGHT, AddressingMode.IMMEDIATE, Destination.X, immediateValue);
+    }
+
+    public void lyi(int immediateValue) {
+        operation(Operation.RIGHT, AddressingMode.IMMEDIATE, Destination.Y, immediateValue);
+    }
+
+    public void lxa(int immediateValue) {
+        operation(Operation.RIGHT, AddressingMode.ABSOLUTE, Destination.X, immediateValue);
+    }
+
+    public void lya(int immediateValue) {
+        operation(Operation.RIGHT, AddressingMode.ABSOLUTE, Destination.Y, immediateValue);
+    }
+
+    public void lxn() {
+        operation(Operation.RIGHT, AddressingMode.INDIRECT, Destination.X, 0);
+    }
+
+    public void lyn() {
+        operation(Operation.RIGHT, AddressingMode.INDIRECT, Destination.Y, 0);
+    }
+
+    public void txy() {
+        operation(Operation.LEFT, AddressingMode.Y, Destination.Y, 0);
+    }
+
+    public void tyx() {
+        operation(Operation.RIGHT, AddressingMode.Y, Destination.X, 0);
+    }
+
+
 //endregion
 //region store instructions
 
-    public void storeAbsolute(int immediateValue) {
+    public void sxa(int immediateValue) {
         write(immediateValue & 0xff, x);
     }
 
-    public void storeIndirect() {
+    public void sxn() {
         write(y, x);
     }
 
@@ -246,9 +279,6 @@ public abstract class AbstractCpuProgramFragments {
     public enum Condition {
         CARRY, NOT_CARRY, ZERO, NOT_ZERO, ALWAYS
     }
-
-//endregion
-//region instructions
 
     public boolean branch(Condition condition) {
         switch (condition) {
@@ -272,6 +302,17 @@ public abstract class AbstractCpuProgramFragments {
                 throw new RuntimeException();
 
         }
+    }
+
+//endregion
+//region special
+
+    // note: I might encode special instructions as special cases of jump-never instructions.
+    // also note that if the total program size stays small, jump instructions might actually cover the whole program,
+    // but that is at odds with special instructions as jump-never unless I use lots of decoded instruction bits.
+
+    public void sb(int bank) {
+        setB(bank);
     }
 
 //endregion

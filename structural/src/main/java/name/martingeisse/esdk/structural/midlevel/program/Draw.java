@@ -1,5 +1,6 @@
 package name.martingeisse.esdk.structural.midlevel.program;
 
+import name.martingeisse.esdk.structural.midlevel.CpuProgramFragments;
 import name.martingeisse.esdk.structural.midlevel.Devices;
 
 // TODO reduce to height 30 so coarse pixels can be a POW of fine pixels
@@ -18,39 +19,6 @@ public final class Draw {
 
     // x offset of one preview box to the next
     public static final int PREVIEW_X_DELTA = 5;
-
-    private static final byte[] titleScreenTemplate = new byte[]{
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 1, 1, 1, 1, 1, 1, 0, 0, 2, 2, 2, 2, 2, 2, 0,
-            0, 1, 1, 1, 1, 1, 1, 0, 0, 2, 2, 2, 2, 2, 0, 0,
-            0, 0, 0, 1, 1, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0,
-            0, 0, 0, 1, 1, 0, 0, 0, 0, 2, 2, 2, 2, 0, 0, 0,
-            0, 0, 0, 1, 1, 0, 0, 0, 0, 2, 2, 2, 2, 0, 0, 0,
-            0, 0, 0, 1, 1, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0,
-            0, 0, 0, 1, 1, 0, 0, 0, 0, 2, 2, 2, 2, 2, 0, 0,
-            0, 0, 0, 1, 1, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 3, 3, 3, 3, 3, 3, 0, 0, 4, 4, 4, 4, 0, 0, 0,
-            0, 3, 3, 3, 3, 3, 3, 0, 0, 4, 4, 4, 4, 4, 4, 0,
-            0, 0, 0, 3, 3, 0, 0, 0, 0, 4, 4, 0, 0, 4, 4, 0,
-            0, 0, 0, 3, 3, 0, 0, 0, 0, 4, 4, 4, 4, 4, 4, 0,
-            0, 0, 0, 3, 3, 0, 0, 0, 0, 4, 4, 4, 4, 0, 0, 0,
-            0, 0, 0, 3, 3, 0, 0, 0, 0, 4, 4, 0, 4, 4, 0, 0,
-            0, 0, 0, 3, 3, 0, 0, 0, 0, 4, 4, 0, 4, 4, 4, 0,
-            0, 0, 0, 3, 3, 0, 0, 0, 0, 4, 4, 0, 0, 4, 4, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 5, 5, 5, 5, 0, 0, 0, 0, 6, 6, 6, 6, 0, 0,
-            0, 0, 0, 5, 5, 0, 0, 0, 0, 6, 6, 6, 6, 6, 0, 0,
-            0, 0, 0, 5, 5, 0, 0, 0, 0, 6, 6, 0, 0, 0, 0, 0,
-            0, 0, 0, 5, 5, 0, 0, 0, 0, 6, 6, 6, 6, 6, 0, 0,
-            0, 0, 0, 5, 5, 0, 0, 0, 0, 0, 6, 6, 6, 6, 6, 0,
-            0, 0, 0, 5, 5, 0, 0, 0, 0, 0, 0, 0, 0, 6, 6, 0,
-            0, 0, 0, 5, 5, 0, 0, 0, 0, 0, 6, 6, 6, 6, 6, 0,
-            0, 0, 5, 5, 5, 5, 0, 0, 0, 0, 6, 6, 6, 6, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    };
 
     private static final byte[] backgroundTemplate = new byte[]{
             1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -106,7 +74,8 @@ public final class Draw {
     }
 
     public static void drawTitleScreen() {
-        drawScreen(titleScreenTemplate);
+        CpuProgramFragments.INSTANCE.clearScreen();
+        CpuProgramFragments.INSTANCE.drawTitleScreen();
     }
 
     public static void drawClippedShapeOnScreen(int x, int y, int shapeIndex, int c, int minx, int miny, int maxx, int maxy) {
