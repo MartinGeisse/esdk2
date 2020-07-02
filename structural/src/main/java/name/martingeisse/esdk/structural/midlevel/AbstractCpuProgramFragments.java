@@ -58,9 +58,6 @@ public abstract class AbstractCpuProgramFragments {
 
 //region state
 
-    // bank
-    private int b;
-
     // left operand
     private int x;
 
@@ -73,20 +70,11 @@ public abstract class AbstractCpuProgramFragments {
 //endregion
 //region abstraction
 
-    protected abstract int read(int address);
-    protected abstract void write(int address, int value);
+    protected abstract int read(int bank, int address);
+    protected abstract void write(int bank, int address, int value);
 
 //endregion
 //region accessors
-
-
-    public int getB() {
-        return b;
-    }
-
-    public void setB(int b) {
-        this.b = b;
-    }
 
     public int getX() {
         return x;
@@ -131,7 +119,7 @@ public abstract class AbstractCpuProgramFragments {
 
     }
 
-    private int getRightOperand(AddressingMode addressingMode, int immediateValue) {
+    private int getRightOperand(AddressingMode addressingMode, int bank, int immediateValue) {
         immediateValue = immediateValue & 0xff;
         switch (addressingMode) {
 
@@ -139,13 +127,13 @@ public abstract class AbstractCpuProgramFragments {
                 return immediateValue;
 
             case ABSOLUTE:
-                return read(immediateValue) & 0xff;
+                return read(bank, immediateValue) & 0xff;
 
             case Y:
                 return y;
 
             case INDIRECT:
-                return read(y) & 0xff;
+                return read(bank, y) & 0xff;
 
             default:
                 throw new RuntimeException();
@@ -225,8 +213,12 @@ public abstract class AbstractCpuProgramFragments {
         }
     }
 
+    public void operation(Operation operation, AddressingMode addressingMode, int bank, Destination destination, int immediateValue) {
+        setResult(destination, performOperation(operation, x, getRightOperand(addressingMode, bank, immediateValue)));
+    }
+
     public void operation(Operation operation, AddressingMode addressingMode, Destination destination, int immediateValue) {
-        setResult(destination, performOperation(operation, x, getRightOperand(addressingMode, immediateValue)));
+        operation(operation, addressingMode, 0, destination, immediateValue);
     }
 
     public void lxi(int immediateValue) {
@@ -265,12 +257,20 @@ public abstract class AbstractCpuProgramFragments {
 //endregion
 //region store instructions
 
+    public void sxa(int bank, int immediateValue) {
+        write(bank, immediateValue & 0xff, x);
+    }
+
+    public void sxn(int bank) {
+        write(bank, y, x);
+    }
+
     public void sxa(int immediateValue) {
-        write(immediateValue & 0xff, x);
+        sxa(0, immediateValue);
     }
 
     public void sxn() {
-        write(y, x);
+        sxn(0);
     }
 
 //endregion
@@ -306,14 +306,6 @@ public abstract class AbstractCpuProgramFragments {
 
 //endregion
 //region special
-
-    // note: I might encode special instructions as special cases of jump-never instructions.
-    // also note that if the total program size stays small, jump instructions might actually cover the whole program,
-    // but that is at odds with special instructions as jump-never unless I use lots of decoded instruction bits.
-
-    public void sb(int bank) {
-        setB(bank);
-    }
 
 //endregion
 
