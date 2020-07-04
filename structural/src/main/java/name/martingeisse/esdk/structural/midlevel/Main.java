@@ -23,7 +23,6 @@ public class Main {
         Devices.frameBuffer = ledMatrixPanel.getMatrix();
         Devices.displayRepaintCallback = ledMatrixPanel::repaint;
 
-        Draw.clearScreen();
         while (true) {
             Engine.mainLoopTick();
             ledMatrixPanel.repaint();

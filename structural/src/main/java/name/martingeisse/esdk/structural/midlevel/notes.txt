@@ -19,3 +19,9 @@ load I/O address bit 9 from the carry flag). So the opcode map would be:
     Note: could separate read-bank from write-bank and use a stateful flag for reading (reading from bank 1 is rarely
     used) and instruction bit for writing. I'll do that when I'm out of bits for the "reading" instructions, such as
     if three function bits are too few.
+
+
+Idea: I might use y for data and x for the address when storing to the framebuffer, simply by exchanging the wires for
+address and data on the GPU board. This might make the code much simpler since for GFX I'm mostly storing the same value
+over and over to different computed addresses. Being a separate bank, this should be easy without side effects.
+

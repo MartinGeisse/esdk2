@@ -271,5 +271,134 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
 
     }
 
+    public void drawBackground() {
+
+        lyi(0);
+        loadFa8();
+        while (true) {
+            lxi(7);
+            sxn(1);
+
+            lxy();
+            operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.Y, 0x04);
+            lxi(7);
+            sxn(1);
+            lxy();
+            operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.Y, 0x4c);
+            lxi(7);
+            sxn(1);
+
+            lxy();
+            operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.Y, 0x04);
+            lxi(7);
+            sxn(1);
+            lxy();
+            operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.Y, 0x2e);
+            lxi(7);
+            sxn(1);
+
+            lxy();
+            operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.X, 0xf0);
+            loadFa8();
+            operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.Y, 0x60);
+            lxi(7);
+            sxn(1);
+
+            lxy();
+            operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.X, 0x23);
+            if (isCarry()) {
+                break;
+            }
+            loadFa8();
+            operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.Y, 0x0c);
+        }
+
+        lyi(0x10);
+        loadFa8();
+        while (true) {
+            lxi(7);
+            sxn(1);
+
+            lxy();
+            operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.Y, 0x05);
+            lxi(7);
+            sxn(1);
+            lxy();
+            operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.Y, 0x05);
+            lxi(7);
+            sxn(1);
+            lxy();
+            operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.Y, 0x05);
+            lxi(7);
+            sxn(1);
+
+            lxy();
+            operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.Y, 0x73);
+            lxi(7);
+            sxn(1);
+            lxy();
+            operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.Y, 0x0b);
+            lxi(7);
+            sxn(1);
+
+            lxy();
+            operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.Y, 0x35);
+            loadFa8();
+            lxi(7);
+            sxn(1);
+            lxy();
+            operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.Y, 0x0b);
+            lxi(7);
+            sxn(1);
+
+            lxy();
+            operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.Y, 0x35);
+            if (isCarry()) {
+                loadFa8();
+            }
+            lxi(7);
+            sxn(1);
+            lxy();
+            operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.Y, 0x0b);
+            lxi(7);
+            sxn(1);
+
+            lxy();
+            operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.Y, 0x35);
+            lxi(7);
+            sxn(1);
+            lxy();
+            operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.Y, 0x0b);
+            lxi(7);
+            sxn(1);
+
+            lxy();
+            operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.Y, 0x35);
+            lxi(7);
+            sxn(1);
+            lxy();
+            operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.Y, 0x0b);
+            lxi(7);
+            sxn(1);
+
+            lxy();
+            operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.X, 0x33);
+            if (isCarry()) {
+                break;
+            }
+            loadFa8();
+            operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.Y, 0x50);
+
+        }
+
+        lxi(7);
+        loadFa8();
+        sxa(1, 0x63);
+        sxa(1, 0x64);
+        sxa(1, 0x73);
+        sxa(1, 0x74);
+
+    }
+
 //endregion
 }
