@@ -10,8 +10,9 @@ public final class GameState {
     private GameState() {
     }
 
-    // completed rows (this also indicates the game level by rows/10).
+    // completed rows for this level
     public static int rows;
+    public static int level;
 
     /* Position of the currently moving shape. These values may be negative and/or exceed 9 since they only
      * indicate the position of the upper left corner of the shape's 4x4 box, not of the shape itself.
@@ -34,6 +35,7 @@ public final class GameState {
         Devices.memory[MemoryMap.PREVIEW_PIECE_2] = (byte)Random.getRandom(Shapes.numPieces);
         Devices.memory[MemoryMap.PREVIEW_COLOR_2] = (byte)(Random.getRandom(7) + 1);
         rows = 0;
+        level = 0;
         nextPiece();
     }
 
@@ -42,9 +44,13 @@ public final class GameState {
     }
 
     public static boolean addRows(int num) {
-        int oldLevel = rows / 10;
         rows += num;
-        return (rows / 10) != oldLevel;
+        if (rows < 10) {
+            return false;
+        }
+        rows -= 10;
+        level++;
+        return true;
     }
 
     public static void nextPiece() {

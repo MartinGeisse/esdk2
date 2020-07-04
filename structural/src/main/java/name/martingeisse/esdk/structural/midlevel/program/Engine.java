@@ -190,7 +190,7 @@ public final class Engine {
         if (Devices.buttonStates[Constants.BUTTON_INDEX_DOWN]) {
             engineDown();
         } else {
-            int level = GameState.rows / 10;
+            int level = GameState.level;
             if ((level > delayLevels) || (mainStepCounter % delayByLevel[level] == 0)) {
                 engineDown();
             }
