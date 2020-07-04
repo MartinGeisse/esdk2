@@ -99,22 +99,22 @@ public final class Engine {
 
     public static void engineLeft() {
         if (GameState.moveCurrentShapeLeft()) {
-            Draw.drawShapeOnGameArea(GameState.shapeX + 1, GameState.shapeY, GameState.shapeIndex, 0);
-            Draw.drawShapeOnGameArea(GameState.shapeX, GameState.shapeY, GameState.shapeIndex, GameState.shapeColor);
+            Draw.drawShapeOnGameArea(GameState.shapeX + 1, GameState.shapeY, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff, 0);
+            Draw.drawShapeOnGameArea(GameState.shapeX, GameState.shapeY, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff, Devices.memory[MemoryMap.CURRENT_COLOR] & 0xff);
         }
     }
 
     public static void engineRight() {
         if (GameState.moveCurrentShapeRight()) {
-            Draw.drawShapeOnGameArea(GameState.shapeX - 1, GameState.shapeY, GameState.shapeIndex, 0);
-            Draw.drawShapeOnGameArea(GameState.shapeX, GameState.shapeY, GameState.shapeIndex, GameState.shapeColor);
+            Draw.drawShapeOnGameArea(GameState.shapeX - 1, GameState.shapeY, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff, 0);
+            Draw.drawShapeOnGameArea(GameState.shapeX, GameState.shapeY, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff, Devices.memory[MemoryMap.CURRENT_COLOR] & 0xff);
         }
     }
 
     public static void engineDown() {
         if (GameState.moveCurrentShapeDown()) {
-            Draw.drawShapeOnGameArea(GameState.shapeX, GameState.shapeY - 1, GameState.shapeIndex, 0);
-            Draw.drawShapeOnGameArea(GameState.shapeX, GameState.shapeY, GameState.shapeIndex, GameState.shapeColor);
+            Draw.drawShapeOnGameArea(GameState.shapeX, GameState.shapeY - 1, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff, 0);
+            Draw.drawShapeOnGameArea(GameState.shapeX, GameState.shapeY, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff, Devices.memory[MemoryMap.CURRENT_COLOR] & 0xff);
         } else {
             int[] completedRows = new int[4];
             int count;
@@ -139,15 +139,15 @@ public final class Engine {
 
     public static void engineRotateClockwise() {
         if (GameState.rotateCurrentShapeClockwise()) {
-            Draw.drawShapeOnGameArea(GameState.shapeX, GameState.shapeY, Shapes.shapeRotatedCounterClockwise[GameState.shapeIndex], 0);
-            Draw.drawShapeOnGameArea(GameState.shapeX, GameState.shapeY, GameState.shapeIndex, GameState.shapeColor);
+            Draw.drawShapeOnGameArea(GameState.shapeX, GameState.shapeY, Shapes.shapeRotatedCounterClockwise[Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff], 0);
+            Draw.drawShapeOnGameArea(GameState.shapeX, GameState.shapeY, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff, Devices.memory[MemoryMap.CURRENT_COLOR] & 0xff);
         }
     }
 
     public static void engineRotateCounterClockwise() {
         if (GameState.rotateCurrentShapeCounterClockwise()) {
-            Draw.drawShapeOnGameArea(GameState.shapeX, GameState.shapeY, Shapes.shapeRotatedClockwise[GameState.shapeIndex], 0);
-            Draw.drawShapeOnGameArea(GameState.shapeX, GameState.shapeY, GameState.shapeIndex, GameState.shapeColor);
+            Draw.drawShapeOnGameArea(GameState.shapeX, GameState.shapeY, Shapes.shapeRotatedClockwise[Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff], 0);
+            Draw.drawShapeOnGameArea(GameState.shapeX, GameState.shapeY, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff, Devices.memory[MemoryMap.CURRENT_COLOR] & 0xff);
         }
     }
 

@@ -20,12 +20,6 @@ public final class GameState {
      */
     public static int shapeX, shapeY;
 
-    // shape index (0-6) of the current shape
-    public static int shapeIndex;
-
-    // drawing color of the current shape
-    public static int shapeColor;
-
     public static void initializeGameState() {
         clearGameArea();
         Devices.memory[MemoryMap.PREVIEW_PIECE_0] = (byte)Random.getRandom(Shapes.numPieces);
@@ -69,8 +63,7 @@ public final class GameState {
 
         // place the new piece at the top of the game area
         int piece = Devices.memory[MemoryMap.TEMP_0] & 0xff;
-        shapeIndex = Shapes.normalShapeByPiece[piece];
-        shapeColor = Devices.memory[MemoryMap.CURRENT_COLOR] & 0xff;
+        Devices.memory[MemoryMap.CURRENT_SHAPE] = (byte)Shapes.normalShapeByPiece[piece];
         shapeX = 3;
         shapeY = -4;
 
@@ -100,7 +93,7 @@ public final class GameState {
     }
 
     public static boolean moveCurrentShapeDown() {
-        if (!unblockedShapePosition(shapeX, shapeY + 1, shapeIndex)) {
+        if (!unblockedShapePosition(shapeX, shapeY + 1, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff)) {
             return false;
         }
         shapeY++;
@@ -108,7 +101,7 @@ public final class GameState {
     }
 
     public static boolean moveCurrentShapeLeft() {
-        if (!unblockedShapePosition(shapeX - 1, shapeY, shapeIndex)) {
+        if (!unblockedShapePosition(shapeX - 1, shapeY, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff)) {
             return false;
         }
         shapeX--;
@@ -116,7 +109,7 @@ public final class GameState {
     }
 
     public static boolean moveCurrentShapeRight() {
-        if (!unblockedShapePosition(shapeX + 1, shapeY, shapeIndex)) {
+        if (!unblockedShapePosition(shapeX + 1, shapeY, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff)) {
             return false;
         }
         shapeX++;
@@ -124,20 +117,20 @@ public final class GameState {
     }
 
     public static boolean rotateCurrentShapeClockwise() {
-        int newShape = Shapes.shapeRotatedClockwise[shapeIndex];
+        int newShape = Shapes.shapeRotatedClockwise[Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff];
         if (!unblockedShapePosition(shapeX, shapeY, newShape)) {
             return false;
         }
-        shapeIndex = newShape;
+        Devices.memory[MemoryMap.CURRENT_SHAPE] = (byte)newShape;
         return true;
     }
 
     public static boolean rotateCurrentShapeCounterClockwise() {
-        int newShape = Shapes.shapeRotatedCounterClockwise[shapeIndex];
+        int newShape = Shapes.shapeRotatedCounterClockwise[Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff];
         if (!unblockedShapePosition(shapeX, shapeY, newShape)) {
             return false;
         }
-        shapeIndex = newShape;
+        Devices.memory[MemoryMap.CURRENT_SHAPE] = (byte)newShape;
         return true;
     }
 
@@ -162,7 +155,7 @@ public final class GameState {
     }
 
     public static boolean pasteCurrentShape() {
-        return pasteShape(shapeX, shapeY, shapeIndex, shapeColor);
+        return pasteShape(shapeX, shapeY, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff, Devices.memory[MemoryMap.CURRENT_COLOR] & 0xff);
     }
 
     public static boolean isRowCompleted(int rowIndex) {
