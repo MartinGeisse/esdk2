@@ -50,12 +50,12 @@ public final class Engine {
     public static void recolorTiles(int color) {
         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < 20; j++) {
-                if (GameState.gameArea[j * 10 + i] != 0) {
-                    GameState.gameArea[j * 10 + i] = (byte) color;
+                if (Devices.memory[j * 10 + i] != 0) {
+                    Devices.memory[j * 10 + i] = (byte) color;
                 }
             }
         }
-        Draw.drawGameArea(GameState.gameArea);
+        Draw.drawGameArea(Devices.memory);
     }
 
     public static void newLevel() {
@@ -165,7 +165,7 @@ public final class Engine {
                 if (GameState.addRows(count)) {
                     newLevel();
                 } else {
-                    Draw.drawGameArea(GameState.gameArea);
+                    Draw.drawGameArea(Devices.memory);
                 }
                 clearPreview();
                 GameState.nextPiece();

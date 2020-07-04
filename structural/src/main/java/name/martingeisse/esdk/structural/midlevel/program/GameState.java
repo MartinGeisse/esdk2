@@ -1,13 +1,13 @@
 package name.martingeisse.esdk.structural.midlevel.program;
 
+import name.martingeisse.esdk.structural.midlevel.CpuProgramFragments;
+import name.martingeisse.esdk.structural.midlevel.Devices;
+
 @SuppressWarnings("ExplicitArrayFilling")
 public final class GameState {
 
     private GameState() {
     }
-
-    // state of the game area (block color values, with 0 being 'free')
-    public static byte[] gameArea = new byte[10 * 20];
 
     /* Preview pieces. The piece index is stored in the lowest 8 bits (7 to 0)
      * and the color in the next higher 8 bits (15 to 8).
@@ -39,9 +39,7 @@ public final class GameState {
     }
 
     public static void clearGameArea() {
-        for (int i = 0; i < gameArea.length; i++) {
-            gameArea[i] = 0;
-        }
+        CpuProgramFragments.INSTANCE.clearGameArea();
     }
 
     public static int shiftPreview(int shiftIn) {
@@ -98,7 +96,7 @@ public final class GameState {
                 if (y2 < 0) {
                     continue;
                 }
-                if (gameArea[y2 * 10 + x2] != 0) {
+                if (Devices.memory[y2 * 10 + x2] != 0) {
                     return false;
                 }
             }
@@ -162,7 +160,7 @@ public final class GameState {
                     crossedBorder = true;
                     continue;
                 }
-                gameArea[y2 * 10 + x2] = (byte) shapeColor;
+                Devices.memory[y2 * 10 + x2] = (byte) shapeColor;
             }
         }
         return crossedBorder;
@@ -174,7 +172,7 @@ public final class GameState {
 
     public static boolean isRowCompleted(int rowIndex) {
         for (int x = 0; x < 10; x++) {
-            if (gameArea[10 * rowIndex + x] == 0) {
+            if (Devices.memory[10 * rowIndex + x] == 0) {
                 return false;
             }
         }
@@ -183,13 +181,13 @@ public final class GameState {
 
     public static void clearRow(int y) {
         for (int x = 0; x < 10; x++) {
-            gameArea[10 * y + x] = 0;
+            Devices.memory[10 * y + x] = 0;
         }
     }
 
     public static void copyRow(int source, int dest) {
         for (int x = 0; x < 10; x++) {
-            gameArea[10 * dest + x] = gameArea[10 * source + x];
+            Devices.memory[10 * dest + x] = Devices.memory[10 * source + x];
         }
     }
 

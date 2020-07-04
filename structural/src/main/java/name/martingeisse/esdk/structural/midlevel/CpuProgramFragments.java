@@ -477,5 +477,21 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
     }
 
 //endregion
+//region game state
+
+    public void clearGameArea() {
+        lyi(199);
+        while (true) {
+            lxi(0);
+            sxn();
+            lxy();
+            operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.Y, 255);
+            if (!isCarry()) {
+                break;
+            }
+        }
+    }
+
+//endregion
 
 }
