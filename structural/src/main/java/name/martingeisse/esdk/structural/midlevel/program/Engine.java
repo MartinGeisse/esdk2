@@ -2,6 +2,7 @@ package name.martingeisse.esdk.structural.midlevel.program;
 
 import name.martingeisse.esdk.structural.midlevel.Constants;
 import name.martingeisse.esdk.structural.midlevel.Devices;
+import name.martingeisse.esdk.structural.midlevel.MemoryMap;
 
 import java.util.Arrays;
 
@@ -77,15 +78,15 @@ public final class Engine {
     }
 
     private static void clearPreview() {
-        Draw.drawPieceInPreview(0, GameState.preview0 & 0xff, 0);
-        Draw.drawPieceInPreview(1, GameState.preview1 & 0xff, 0);
-        Draw.drawPieceInPreview(2, GameState.preview2 & 0xff, 0);
+        Draw.drawPieceInPreview(0, Devices.memory[MemoryMap.PREVIEW_PIECE_0] & 0xff, 0);
+        Draw.drawPieceInPreview(1, Devices.memory[MemoryMap.PREVIEW_PIECE_1] & 0xff, 0);
+        Draw.drawPieceInPreview(2, Devices.memory[MemoryMap.PREVIEW_PIECE_2] & 0xff, 0);
     }
 
     private static void drawPreview() {
-        Draw.drawPieceInPreview(0, GameState.preview0 & 0xff, GameState.preview0 >> 8);
-        Draw.drawPieceInPreview(1, GameState.preview1 & 0xff, GameState.preview1 >> 8);
-        Draw.drawPieceInPreview(2, GameState.preview2 & 0xff, GameState.preview2 >> 8);
+        Draw.drawPieceInPreview(0, Devices.memory[MemoryMap.PREVIEW_PIECE_0] & 0xff, Devices.memory[MemoryMap.PREVIEW_COLOR_0] & 0xff);
+        Draw.drawPieceInPreview(1, Devices.memory[MemoryMap.PREVIEW_PIECE_1] & 0xff, Devices.memory[MemoryMap.PREVIEW_COLOR_1] & 0xff);
+        Draw.drawPieceInPreview(2, Devices.memory[MemoryMap.PREVIEW_PIECE_2] & 0xff, Devices.memory[MemoryMap.PREVIEW_COLOR_2] & 0xff);
     }
 
     public static void engineNewGame() {

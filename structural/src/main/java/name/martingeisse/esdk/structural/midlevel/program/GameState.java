@@ -2,17 +2,13 @@ package name.martingeisse.esdk.structural.midlevel.program;
 
 import name.martingeisse.esdk.structural.midlevel.CpuProgramFragments;
 import name.martingeisse.esdk.structural.midlevel.Devices;
+import name.martingeisse.esdk.structural.midlevel.MemoryMap;
 
 @SuppressWarnings("ExplicitArrayFilling")
 public final class GameState {
 
     private GameState() {
     }
-
-    /* Preview pieces. The piece index is stored in the lowest 8 bits (7 to 0)
-     * and the color in the next higher 8 bits (15 to 8).
-     */
-    public static int preview0, preview1, preview2;
 
     // completed rows (this also indicates the game level by rows/10).
     public static int rows;
@@ -31,9 +27,12 @@ public final class GameState {
 
     public static void initializeGameState() {
         clearGameArea();
-        preview0 = randomPiece();
-        preview1 = randomPiece();
-        preview2 = randomPiece();
+        Devices.memory[MemoryMap.PREVIEW_PIECE_0] = (byte)Random.getRandom(Shapes.numPieces);
+        Devices.memory[MemoryMap.PREVIEW_COLOR_0] = (byte)(Random.getRandom(7) + 1);
+        Devices.memory[MemoryMap.PREVIEW_PIECE_1] = (byte)Random.getRandom(Shapes.numPieces);
+        Devices.memory[MemoryMap.PREVIEW_COLOR_1] = (byte)(Random.getRandom(7) + 1);
+        Devices.memory[MemoryMap.PREVIEW_PIECE_2] = (byte)Random.getRandom(Shapes.numPieces);
+        Devices.memory[MemoryMap.PREVIEW_COLOR_2] = (byte)(Random.getRandom(7) + 1);
         rows = 0;
         nextPiece();
     }
@@ -42,43 +41,33 @@ public final class GameState {
         CpuProgramFragments.INSTANCE.clearGameArea();
     }
 
-    public static int shiftPreview(int shiftIn) {
-        int shiftOut = preview0;
-        preview0 = preview1;
-        preview1 = preview2;
-        preview2 = shiftIn;
-        return shiftOut;
-    }
-
-    public static int randomPiece() {
-        int color = Random.getRandom(7) + 1;
-        int piece = Random.getRandom(Shapes.numPieces);
-        return piece + (color << 8);
-    }
-
-    public static int shiftPreviewRandom() {
-        return shiftPreview(randomPiece());
-    }
-
     public static boolean addRows(int num) {
         int oldLevel = rows / 10;
         rows += num;
         return (rows / 10) != oldLevel;
     }
 
-    public static void enterShape(int shapeIndex, int shapeColor) {
+    public static void nextPiece() {
+
+        // shift color
+        Devices.memory[MemoryMap.CURRENT_COLOR] = Devices.memory[MemoryMap.PREVIEW_COLOR_0];
+        Devices.memory[MemoryMap.PREVIEW_COLOR_0] = Devices.memory[MemoryMap.PREVIEW_COLOR_1];
+        Devices.memory[MemoryMap.PREVIEW_COLOR_1] = Devices.memory[MemoryMap.PREVIEW_COLOR_2];
+        Devices.memory[MemoryMap.PREVIEW_COLOR_2] = (byte)(Random.getRandom(7) + 1);
+
+        // shift piece
+        Devices.memory[MemoryMap.TEMP_0] = Devices.memory[MemoryMap.PREVIEW_PIECE_0];
+        Devices.memory[MemoryMap.PREVIEW_PIECE_0] = Devices.memory[MemoryMap.PREVIEW_PIECE_1];
+        Devices.memory[MemoryMap.PREVIEW_PIECE_1] = Devices.memory[MemoryMap.PREVIEW_PIECE_2];
+        Devices.memory[MemoryMap.PREVIEW_PIECE_2] = (byte) Random.getRandom(Shapes.numPieces);
+
+        // place the new piece at the top of the game area
+        int piece = Devices.memory[MemoryMap.TEMP_0] & 0xff;
+        shapeIndex = Shapes.normalShapeByPiece[piece];
+        shapeColor = Devices.memory[MemoryMap.CURRENT_COLOR] & 0xff;
         shapeX = 3;
         shapeY = -4;
-        GameState.shapeIndex = shapeIndex;
-        GameState.shapeColor = shapeColor;
-    }
 
-    public static void nextPiece() {
-        int pieceAndColor = shiftPreviewRandom();
-        int color = pieceAndColor >> 8;
-        int piece = pieceAndColor & 0xff;
-        int shape = Shapes.normalShapeByPiece[piece];
-        enterShape(shape, color);
     }
 
     public static boolean unblockedShapePosition(int x, int y, int shape) {
