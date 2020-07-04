@@ -9,5 +9,7 @@ public final class MemoryMap {
     public static final int GAME_AREA = 0;
 
     public static final int TEMP_0 = 200;
+    public static final int TEMP_1 = 201;
+    public static final int TEMP_2 = 202;
 
 }

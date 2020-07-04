@@ -46,7 +46,7 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
     }
 
 //endregion
-//region drawing
+//region full-screen drawing
 
     public void clearScreen() {
         lyi(0);
@@ -401,4 +401,81 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
     }
 
 //endregion
+//region other drawing
+
+    /**
+     * Convenience wrapper.
+     */
+    public void fillGameRow(int y, int c) {
+        Devices.memory[MemoryMap.TEMP_0] = (byte)y;
+        Devices.memory[MemoryMap.TEMP_1] = (byte)c;
+        fillGameRow();
+    }
+
+    /**
+     * TEMP_0 must contain the row index, TEMP_1 the color to fill.
+     */
+    public void fillGameRow() {
+
+        // x = 16 * TEMP_0, set fa8 to carry
+        lxa(MemoryMap.TEMP_0);
+        operation(Operation.ADD, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_0);
+        sxa(MemoryMap.TEMP_0);
+        operation(Operation.ADD, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_0);
+        sxa(MemoryMap.TEMP_0);
+        operation(Operation.ADD, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_0);
+        sxa(MemoryMap.TEMP_0);
+        operation(Operation.ADD, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_0);
+        loadFa8();
+
+        // x += 0x93, set fa8 on overflow
+        operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.X, 0x90);
+        if (isCarry()) {
+            loadFa8();
+        }
+
+        // draw line
+        operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.Y, 3);
+        lxa(MemoryMap.TEMP_1);
+        sxn(1);
+        lxy();
+        operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.Y, 1);
+        lxa(MemoryMap.TEMP_1);
+        sxn(1);
+        lxy();
+        operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.Y, 1);
+        lxa(MemoryMap.TEMP_1);
+        sxn(1);
+        lxy();
+        operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.Y, 1);
+        lxa(MemoryMap.TEMP_1);
+        sxn(1);
+        lxy();
+        operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.Y, 1);
+        lxa(MemoryMap.TEMP_1);
+        sxn(1);
+        lxy();
+        operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.Y, 1);
+        lxa(MemoryMap.TEMP_1);
+        sxn(1);
+        lxy();
+        operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.Y, 1);
+        lxa(MemoryMap.TEMP_1);
+        sxn(1);
+        lxy();
+        operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.Y, 1);
+        lxa(MemoryMap.TEMP_1);
+        sxn(1);
+        lxy();
+        operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.Y, 1);
+        lxa(MemoryMap.TEMP_1);
+        sxn(1);
+        lxy();
+        operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.Y, 1);
+        lxa(MemoryMap.TEMP_1);
+        sxn(1);
+    }
+
+//endregion
+
 }
