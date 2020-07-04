@@ -49,18 +49,27 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
 //region drawing
 
     public void clearScreen() {
-        /*
-        lyi(199);
+        lyi(0);
+        loadFa8();
         while (true) {
             lxi(0);
             sxn(1);
             lxy();
-            operation(Operation.SUB, AddressingMode.IMMEDIATE, Destination.Y, 1);
-            if (!isCarry()) {
+            operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.Y, 1);
+            if (isCarry()) {
                 break;
             }
         }
-        */
+        loadFa8();
+        while (true) {
+            lxi(0);
+            sxn(1);
+            lxy();
+            operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.Y, 1);
+            if (isCarry()) {
+                break;
+            }
+        }
     }
 
     public void drawTitleScreen() {
