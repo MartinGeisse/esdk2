@@ -89,7 +89,7 @@ public class LedMatrixPanel extends JPanel {
         for (int y = 0; y < 30; y++) {
             for (int x = 0; x < 40; x++) {
                 byte colorCode = matrix[y * 40 + x];
-                g.setColor(COLOR_TABLE[colorCode]);
+                g.setColor(COLOR_TABLE[colorCode & 7]);
                 g.fillArc(x * DOT_SIZE + DOT_PADDING, y * DOT_SIZE + DOT_PADDING,
                         DOT_SIZE - 2 * DOT_PADDING, DOT_SIZE - 2 * DOT_PADDING, 0, 360);
             }

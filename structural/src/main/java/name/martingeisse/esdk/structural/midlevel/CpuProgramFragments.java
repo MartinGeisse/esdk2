@@ -31,10 +31,8 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
                 break;
 
             case 1: {
-                // now this is a hack, using the carry as an extra address bit
-                int localAddress = (address & 0xff) | (isCarry() ? 0x100 : 0);
-                int row = (localAddress >> 4);
-                int column = (localAddress & 15);
+                int row = (address >> 4);
+                int column = (address & 15);
                 if (row < 30) {
                     Devices.frameBuffer[row * 40 + column] = (byte) value;
                 }
@@ -51,20 +49,24 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
 //region drawing
 
     public void clearScreen() {
-/*
-        lxi(0);
-        lyi(0);
-        sxa(MemoryMap.TEMP_0);
-
+        /*
+        lyi(199);
         while (true) {
-            sxn();
+            lxi(0);
+            sxn(1);
+            lxy();
+            operation(Operation.SUB, AddressingMode.IMMEDIATE, Destination.Y, 1);
+            if (!isCarry()) {
+                break;
+            }
         }
-*/
+        */
     }
 
     public void drawTitleScreen() {
 
         lxi(1);
+        loadFa8();
         sxa(1, 0x11);
         sxa(1, 0x12);
         sxa(1, 0x13);
@@ -148,6 +150,7 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
         //
         lxi(0x83);
         operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.X, 0x80);
+        loadFa8();
         //
         sxa(1, 0x03);
         sxa(1, 0x04);
@@ -157,6 +160,7 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
         sxa(1, 0x24);
 
         lxi(4);
+        loadFa8();
         sxa(1, 0xb9);
         sxa(1, 0xba);
         sxa(1, 0xbb);
@@ -184,6 +188,7 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
         //
         lxi(0x84);
         operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.X, 0x80);
+        loadFa8();
         //
         sxa(1, 0x09);
         sxa(1, 0x0a);
@@ -200,7 +205,6 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
         sxa(1, 0x2e);
 
         lxi(0x85);
-        operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.X, 0x80);
         sxa(1, 0x52);
         sxa(1, 0x53);
         sxa(1, 0x54);
@@ -223,7 +227,6 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
         sxa(1, 0xc5);
 
         lxi(0x86);
-        operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.X, 0x80);
         sxa(1, 0x5a);
         sxa(1, 0x5b);
         sxa(1, 0x5c);

@@ -67,6 +67,9 @@ public abstract class AbstractCpuProgramFragments {
     // carry
     private boolean carry;
 
+    // framebuffer address bit 8
+    private boolean fa8;
+
 //endregion
 //region abstraction
 
@@ -245,11 +248,11 @@ public abstract class AbstractCpuProgramFragments {
         operation(Operation.RIGHT, AddressingMode.INDIRECT, Destination.Y, 0);
     }
 
-    public void txy() {
+    public void lyx() {
         operation(Operation.LEFT, AddressingMode.Y, Destination.Y, 0);
     }
 
-    public void tyx() {
+    public void lxy() {
         operation(Operation.RIGHT, AddressingMode.Y, Destination.X, 0);
     }
 
@@ -258,11 +261,16 @@ public abstract class AbstractCpuProgramFragments {
 //region store instructions
 
     public void sxa(int bank, int immediateValue) {
-        write(bank, immediateValue & 0xff, x);
+        sx(bank, immediateValue);
     }
 
     public void sxn(int bank) {
-        write(bank, y, x);
+        sx(bank, y);
+    }
+
+    private void sx(int bank, int address) {
+        address = (address & 0xff) + ((fa8 && bank == 1) ? 0x100 : 0);
+        write(bank, address, x);
     }
 
     public void sxa(int immediateValue) {
@@ -306,6 +314,10 @@ public abstract class AbstractCpuProgramFragments {
 
 //endregion
 //region special
+
+    public void loadFa8() {
+        fa8 = carry;
+    }
 
 //endregion
 
