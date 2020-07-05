@@ -97,32 +97,6 @@ public final class Engine {
         drawPreview();
     }
 
-    public static void engineDown() {
-        if (GameState.moveCurrentShapeDown()) {
-            Draw.drawShapeOnGameArea(GameState.shapeX, GameState.shapeY - 1, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff, 0);
-            Draw.drawShapeOnGameArea(GameState.shapeX, GameState.shapeY, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff, Devices.memory[MemoryMap.CURRENT_COLOR] & 0xff);
-        } else {
-            int[] completedRows = new int[4];
-            int count;
-
-            if (GameState.pasteCurrentShape()) {
-                gameOver = true;
-                gameOverFill();
-                return;
-            }
-
-            count = GameState.findCompletedRows(GameState.shapeY, 4, completedRows);
-            if (count == 0) {
-                clearPreview();
-                GameState.nextPiece();
-                drawPreview();
-            } else {
-                flashRowsEffect = 1;
-            }
-
-        }
-    }
-
     public static void gameStep() {
         if (flashRowsEffect > 0) {
 
@@ -149,6 +123,8 @@ public final class Engine {
             }
 
         } else {
+
+            //region left/right movement and rotation
 
             Draw.drawShapeOnGameArea(GameState.shapeX, GameState.shapeY, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff, 0);
 
@@ -184,14 +160,46 @@ public final class Engine {
 
             Draw.drawShapeOnGameArea(GameState.shapeX, GameState.shapeY, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff, Devices.memory[MemoryMap.CURRENT_COLOR] & 0xff);
 
+            //endregion
+
+            //region down movement
+
+            boolean moveDown = false;
             if (Devices.buttonStates[Constants.BUTTON_INDEX_DOWN]) {
-                engineDown();
+                moveDown = true;
             } else {
                 int level = GameState.level;
                 if ((level > delayLevels) || (mainStepCounter % delayByLevel[level] == 0)) {
-                    engineDown();
+                    moveDown = true;
                 }
             }
+            if (moveDown) {
+                if (GameState.moveCurrentShapeDown()) {
+                    Draw.drawShapeOnGameArea(GameState.shapeX, GameState.shapeY - 1, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff, 0);
+                    Draw.drawShapeOnGameArea(GameState.shapeX, GameState.shapeY, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff, Devices.memory[MemoryMap.CURRENT_COLOR] & 0xff);
+                } else {
+                    int[] completedRows = new int[4];
+                    int count;
+
+                    if (GameState.pasteCurrentShape()) {
+                        gameOver = true;
+                        gameOverFill();
+                        return;
+                    }
+
+                    count = GameState.findCompletedRows(GameState.shapeY, 4, completedRows);
+                    if (count == 0) {
+                        clearPreview();
+                        GameState.nextPiece();
+                        drawPreview();
+                    } else {
+                        flashRowsEffect = 1;
+                    }
+
+                }
+            }
+
+            //endregion
 
         }
     }
