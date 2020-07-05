@@ -493,5 +493,34 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
     }
 
 //endregion
+//random number generator
+
+    public void randomAutoSeederTick() {
+        // TODO since loading the next bytes to add overwrites the carry flag, that flag can only be used for branches
+        // and never as a carry-in for an ADDC/ADDCI instruction, so these instructions are useless and can be removed.
+        // Check how much more complex the code becomes, and whether the logic to overwrite the carry must be changed
+        // (e.g. only set the flag for add/sub instructions). The complexity for a multi-byte increment is minor
+        // (three branch instructions), so it is relevant only for arbitrary multi-byte addition.
+        lxa(MemoryMap.RNG_SEEDER_0);
+        operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.X, 1);
+        sxa(MemoryMap.RNG_SEEDER_0);
+        if (isCarry()) {
+            lxa(MemoryMap.RNG_SEEDER_1);
+            operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.X, 1);
+            sxa(MemoryMap.RNG_SEEDER_1);
+            if (isCarry()) {
+                lxa(MemoryMap.RNG_SEEDER_2);
+                operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.X, 1);
+                sxa(MemoryMap.RNG_SEEDER_2);
+                if (isCarry()) {
+                    lxa(MemoryMap.RNG_SEEDER_3);
+                    operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.X, 1);
+                    sxa(MemoryMap.RNG_SEEDER_3);
+                }
+            }
+        }
+    }
+
+//endregion
 
 }

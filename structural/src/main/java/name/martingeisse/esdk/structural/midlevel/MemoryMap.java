@@ -24,5 +24,15 @@ public final class MemoryMap {
     public static final int CURRENT_SHAPE = 209;
     public static final int CURRENT_COLOR = 210;
 
+    // random number generator
+    public static final int RNG_SEEDER_0 = 211;
+    public static final int RNG_SEEDER_1 = 212;
+    public static final int RNG_SEEDER_2 = 213;
+    public static final int RNG_SEEDER_3 = 214;
+    public static final int RNG_CURRENT_0 = 215;
+    public static final int RNG_CURRENT_1 = 216;
+    public static final int RNG_CURRENT_2 = 217;
+    public static final int RNG_CURRENT_3 = 218;
+
 
 }

@@ -71,12 +71,6 @@ public final class Draw {
 
     public static void fillGameRow(int y, int c) {
         CpuProgramFragments.INSTANCE.fillGameRow(y, c);
-        /*
-        int i;
-        for (i = 0; i < 10; i++) {
-            Devices.frameBuffer[(GAME_AREA_Y_ON_SCREEN + y) * 40 + GAME_AREA_X_ON_SCREEN + i] = (byte) c;
-        }
-        */
     }
 
     public static void fillGameRows(int[] rows, int c) {
