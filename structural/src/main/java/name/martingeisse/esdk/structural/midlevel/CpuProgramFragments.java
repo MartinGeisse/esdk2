@@ -521,6 +521,17 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
 
     }
 
+    public void autoSeedRandom() {
+        lxa(MemoryMap.RNG_SEEDER_0);
+        sxa(MemoryMap.RNG_CURRENT_0);
+        lxa(MemoryMap.RNG_SEEDER_1);
+        sxa(MemoryMap.RNG_CURRENT_1);
+        lxa(MemoryMap.RNG_SEEDER_2);
+        sxa(MemoryMap.RNG_CURRENT_2);
+        lxa(MemoryMap.RNG_SEEDER_3);
+        sxa(MemoryMap.RNG_CURRENT_3);
+    }
+
 //endregion
 
 }

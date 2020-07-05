@@ -11,10 +11,7 @@ public final class Random {
     }
 
     public static void autoSeedRandom() {
-        Devices.memory[MemoryMap.RNG_CURRENT_0] = Devices.memory[MemoryMap.RNG_SEEDER_0];
-        Devices.memory[MemoryMap.RNG_CURRENT_1] = Devices.memory[MemoryMap.RNG_SEEDER_1];
-        Devices.memory[MemoryMap.RNG_CURRENT_2] = Devices.memory[MemoryMap.RNG_SEEDER_2];
-        Devices.memory[MemoryMap.RNG_CURRENT_3] = Devices.memory[MemoryMap.RNG_SEEDER_3];
+        CpuProgramFragments.INSTANCE.autoSeedRandom();
     }
 
     public static int getRandom(int mod) {
@@ -25,17 +22,22 @@ public final class Random {
         currentNumber |= (Devices.memory[MemoryMap.RNG_CURRENT_3] & 0xff) << 24;
 
         currentNumber = currentNumber * 1664525 + 1013904223;
-        int result = currentNumber % mod;
-        if (result < 0) {
-            result += mod;
-        }
 
         Devices.memory[MemoryMap.RNG_CURRENT_0] = (byte)currentNumber;
         Devices.memory[MemoryMap.RNG_CURRENT_1] = (byte)(currentNumber >> 8);
         Devices.memory[MemoryMap.RNG_CURRENT_2] = (byte)(currentNumber >> 16);
         Devices.memory[MemoryMap.RNG_CURRENT_3] = (byte)(currentNumber >> 24);
 
+        // TODO add 1013904223
+
+
+        // compute remainder
+        int result = currentNumber % mod;
+        if (result < 0) {
+            result += mod;
+        }
         return result;
+
     }
 
     private Random() {
