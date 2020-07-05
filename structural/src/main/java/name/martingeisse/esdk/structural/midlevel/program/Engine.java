@@ -66,7 +66,7 @@ public final class Engine {
                 delayFrames(2);
             }
         }
-        recolorTiles(3);
+        recolorTiles(1);
         delayFrames(5);
     }
 
