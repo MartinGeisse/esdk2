@@ -149,7 +149,7 @@ public final class Engine {
             }
 
             // If now unblocked, remember new position and shape. If blocked, restore old position and shape
-            if (GameState.unblockedShapePosition(GameState.shapeX, GameState.shapeY, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff)) {
+            if (GameState.unblockedShapePosition()) {
                 GameState.oldShapeX = GameState.shapeX;
                 GameState.oldShapeY = GameState.shapeY;
                 GameState.oldShape = Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff;
@@ -165,7 +165,7 @@ public final class Engine {
             }
 
             // if now blocked, restore old position and shape. Also remember that since it means the shape has landed.
-            boolean landed = !GameState.unblockedShapePosition(GameState.shapeX, GameState.shapeY, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff);
+            boolean landed = !GameState.unblockedShapePosition();
             if (landed) {
                 // TODO only y can change, so restoring x and shape is not necessary
                 GameState.shapeX = GameState.oldShapeX;

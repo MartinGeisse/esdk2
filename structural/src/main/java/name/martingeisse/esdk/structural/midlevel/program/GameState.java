@@ -72,15 +72,15 @@ public final class GameState {
 
     }
 
-    public static boolean unblockedShapePosition(int x, int y, int shape) {
-        boolean[] matrix = Shapes.shapeOccupationMatrices[shape];
+    public static boolean unblockedShapePosition() {
+        boolean[] matrix = Shapes.shapeOccupationMatrices[Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff];
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
                 if (!matrix[j * 4 + i]) {
                     continue;
                 }
-                int x2 = x + i;
-                int y2 = y + j;
+                int x2 = shapeX + i;
+                int y2 = shapeY + j;
                 if (x2 < 0 || x2 > 9 || y2 > 19) {
                     return false;
                 }
@@ -92,14 +92,6 @@ public final class GameState {
                 }
             }
         }
-        return true;
-    }
-
-    public static boolean moveCurrentShapeDown() {
-        if (!unblockedShapePosition(shapeX, shapeY + 1, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff)) {
-            return false;
-        }
-        shapeY++;
         return true;
     }
 
