@@ -124,82 +124,78 @@ public final class Engine {
 
         } else {
 
-            //region left/right movement and rotation
-
+            // undraw shape and remember position and shape
             Draw.drawShapeOnGameArea(GameState.shapeX, GameState.shapeY, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff, 0);
-
             GameState.oldShapeX = GameState.shapeX;
             GameState.oldShapeY = GameState.shapeY;
             GameState.oldShape = Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff;
 
+            // perform movement as if unblocked
             if (Devices.buttonStates[Constants.BUTTON_INDEX_LEFT] && (mainStepCounter & 3) == 0) {
                 GameState.shapeX--;
             }
-
             if (Devices.buttonStates[Constants.BUTTON_INDEX_RIGHT] && (mainStepCounter & 3) == 0) {
                 GameState.shapeX++;
             }
-
             if (Devices.buttonStates[Constants.BUTTON_INDEX_ROTATE_CW]) {
                 Devices.buttonStates[Constants.BUTTON_INDEX_ROTATE_CW] = false;
                 int newShape = Shapes.shapeRotatedClockwise[Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff];
                 Devices.memory[MemoryMap.CURRENT_SHAPE] = (byte)newShape;
             }
-
             if (Devices.buttonStates[Constants.BUTTON_INDEX_ROTATE_CCW]) {
                 Devices.buttonStates[Constants.BUTTON_INDEX_ROTATE_CCW] = false;
                 int newShape = Shapes.shapeRotatedCounterClockwise[Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff];
                 Devices.memory[MemoryMap.CURRENT_SHAPE] = (byte)newShape;
             }
 
-            if (!GameState.unblockedShapePosition(GameState.shapeX, GameState.shapeY, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff)) {
+            // If now unblocked, remember new position and shape. If blocked, restore old position and shape
+            if (GameState.unblockedShapePosition(GameState.shapeX, GameState.shapeY, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff)) {
+                GameState.oldShapeX = GameState.shapeX;
+                GameState.oldShapeY = GameState.shapeY;
+                GameState.oldShape = Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff;
+            } else {
                 GameState.shapeX = GameState.oldShapeX;
                 GameState.shapeY = GameState.oldShapeY;
                 Devices.memory[MemoryMap.CURRENT_SHAPE] = (byte)GameState.oldShape;
             }
 
+            // perform downward movement
+            if (Devices.buttonStates[Constants.BUTTON_INDEX_DOWN] || (GameState.level > delayLevels) || (mainStepCounter % delayByLevel[GameState.level] == 0)) {
+                GameState.shapeY++;
+            }
+
+            // if now blocked, restore old position and shape. Also remember that since it means the shape has landed.
+            boolean landed = !GameState.unblockedShapePosition(GameState.shapeX, GameState.shapeY, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff);
+            if (landed) {
+                // TODO only y can change, so restoring x and shape is not necessary
+                GameState.shapeX = GameState.oldShapeX;
+                GameState.shapeY = GameState.oldShapeY;
+                Devices.memory[MemoryMap.CURRENT_SHAPE] = (byte)GameState.oldShape;
+            }
+
+            // draw shape at new position
             Draw.drawShapeOnGameArea(GameState.shapeX, GameState.shapeY, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff, Devices.memory[MemoryMap.CURRENT_COLOR] & 0xff);
 
-            //endregion
+            // handle landing
+            if (landed) {
+                int[] completedRows = new int[4];
+                int count;
 
-            //region down movement
-
-            boolean moveDown = false;
-            if (Devices.buttonStates[Constants.BUTTON_INDEX_DOWN]) {
-                moveDown = true;
-            } else {
-                int level = GameState.level;
-                if ((level > delayLevels) || (mainStepCounter % delayByLevel[level] == 0)) {
-                    moveDown = true;
+                if (GameState.pasteCurrentShape()) {
+                    gameOver = true;
+                    gameOverFill();
+                    return;
                 }
-            }
-            if (moveDown) {
-                if (GameState.moveCurrentShapeDown()) {
-                    Draw.drawShapeOnGameArea(GameState.shapeX, GameState.shapeY - 1, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff, 0);
-                    Draw.drawShapeOnGameArea(GameState.shapeX, GameState.shapeY, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff, Devices.memory[MemoryMap.CURRENT_COLOR] & 0xff);
+
+                count = GameState.findCompletedRows(GameState.shapeY, 4, completedRows);
+                if (count == 0) {
+                    clearPreview();
+                    GameState.nextPiece();
+                    drawPreview();
                 } else {
-                    int[] completedRows = new int[4];
-                    int count;
-
-                    if (GameState.pasteCurrentShape()) {
-                        gameOver = true;
-                        gameOverFill();
-                        return;
-                    }
-
-                    count = GameState.findCompletedRows(GameState.shapeY, 4, completedRows);
-                    if (count == 0) {
-                        clearPreview();
-                        GameState.nextPiece();
-                        drawPreview();
-                    } else {
-                        flashRowsEffect = 1;
-                    }
-
+                    flashRowsEffect = 1;
                 }
             }
-
-            //endregion
 
         }
     }
