@@ -150,34 +150,37 @@ public final class Engine {
 
         } else {
 
+            GameState.oldShapeX = GameState.shapeX;
+            GameState.oldShapeY = GameState.shapeY;
+            GameState.oldShape = Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff;
+
             if (Devices.buttonStates[Constants.BUTTON_INDEX_LEFT] && (mainStepCounter & 3) == 0) {
-                if (GameState.moveCurrentShapeLeft()) {
-                    Draw.drawShapeOnGameArea(GameState.shapeX + 1, GameState.shapeY, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff, 0);
-                    Draw.drawShapeOnGameArea(GameState.shapeX, GameState.shapeY, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff, Devices.memory[MemoryMap.CURRENT_COLOR] & 0xff);
-                }
+                GameState.shapeX--;
             }
 
             if (Devices.buttonStates[Constants.BUTTON_INDEX_RIGHT] && (mainStepCounter & 3) == 0) {
-                if (GameState.moveCurrentShapeRight()) {
-                    Draw.drawShapeOnGameArea(GameState.shapeX - 1, GameState.shapeY, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff, 0);
-                    Draw.drawShapeOnGameArea(GameState.shapeX, GameState.shapeY, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff, Devices.memory[MemoryMap.CURRENT_COLOR] & 0xff);
-                }
+                GameState.shapeX++;
             }
 
             if (Devices.buttonStates[Constants.BUTTON_INDEX_ROTATE_CW]) {
                 Devices.buttonStates[Constants.BUTTON_INDEX_ROTATE_CW] = false;
-                if (GameState.rotateCurrentShapeClockwise()) {
-                    Draw.drawShapeOnGameArea(GameState.shapeX, GameState.shapeY, Shapes.shapeRotatedCounterClockwise[Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff], 0);
-                    Draw.drawShapeOnGameArea(GameState.shapeX, GameState.shapeY, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff, Devices.memory[MemoryMap.CURRENT_COLOR] & 0xff);
-                }
+                int newShape = Shapes.shapeRotatedClockwise[Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff];
+                Devices.memory[MemoryMap.CURRENT_SHAPE] = (byte)newShape;
             }
 
             if (Devices.buttonStates[Constants.BUTTON_INDEX_ROTATE_CCW]) {
                 Devices.buttonStates[Constants.BUTTON_INDEX_ROTATE_CCW] = false;
-                if (GameState.rotateCurrentShapeCounterClockwise()) {
-                    Draw.drawShapeOnGameArea(GameState.shapeX, GameState.shapeY, Shapes.shapeRotatedClockwise[Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff], 0);
-                    Draw.drawShapeOnGameArea(GameState.shapeX, GameState.shapeY, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff, Devices.memory[MemoryMap.CURRENT_COLOR] & 0xff);
-                }
+                int newShape = Shapes.shapeRotatedCounterClockwise[Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff];
+                Devices.memory[MemoryMap.CURRENT_SHAPE] = (byte)newShape;
+            }
+
+            if (GameState.unblockedShapePosition(GameState.shapeX, GameState.shapeY, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff)) {
+                Draw.drawShapeOnGameArea(GameState.oldShapeX, GameState.oldShapeY, GameState.oldShape & 0xff, 0);
+                Draw.drawShapeOnGameArea(GameState.shapeX, GameState.shapeY, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff, Devices.memory[MemoryMap.CURRENT_COLOR] & 0xff);
+            } else {
+                GameState.shapeX = GameState.oldShapeX;
+                GameState.shapeY = GameState.oldShapeY;
+                Devices.memory[MemoryMap.CURRENT_SHAPE] = (byte)GameState.oldShape;
             }
 
             if (Devices.buttonStates[Constants.BUTTON_INDEX_DOWN]) {

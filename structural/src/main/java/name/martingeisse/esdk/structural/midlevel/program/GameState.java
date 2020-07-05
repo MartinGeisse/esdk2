@@ -20,6 +20,9 @@ public final class GameState {
      */
     public static int shapeX, shapeY;
 
+    public static int oldShape;
+    public static int oldShapeX, oldShapeY;
+
     public static void initializeGameState() {
         clearGameArea();
         Devices.memory[MemoryMap.PREVIEW_PIECE_0] = (byte)Random.getRandom(Shapes.numPieces);
@@ -97,40 +100,6 @@ public final class GameState {
             return false;
         }
         shapeY++;
-        return true;
-    }
-
-    public static boolean moveCurrentShapeLeft() {
-        if (!unblockedShapePosition(shapeX - 1, shapeY, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff)) {
-            return false;
-        }
-        shapeX--;
-        return true;
-    }
-
-    public static boolean moveCurrentShapeRight() {
-        if (!unblockedShapePosition(shapeX + 1, shapeY, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff)) {
-            return false;
-        }
-        shapeX++;
-        return true;
-    }
-
-    public static boolean rotateCurrentShapeClockwise() {
-        int newShape = Shapes.shapeRotatedClockwise[Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff];
-        if (!unblockedShapePosition(shapeX, shapeY, newShape)) {
-            return false;
-        }
-        Devices.memory[MemoryMap.CURRENT_SHAPE] = (byte)newShape;
-        return true;
-    }
-
-    public static boolean rotateCurrentShapeCounterClockwise() {
-        int newShape = Shapes.shapeRotatedCounterClockwise[Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff];
-        if (!unblockedShapePosition(shapeX, shapeY, newShape)) {
-            return false;
-        }
-        Devices.memory[MemoryMap.CURRENT_SHAPE] = (byte)newShape;
         return true;
     }
 
