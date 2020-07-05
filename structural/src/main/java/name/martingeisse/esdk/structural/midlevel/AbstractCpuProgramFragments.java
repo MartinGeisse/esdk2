@@ -148,10 +148,9 @@ public abstract class AbstractCpuProgramFragments {
         ADD, ADDC, SUB, SUBC, AND, OR, XOR, XNOR, LEFT, RIGHT
     }
 
-    // note: affects the carry flag!
+    // note: addition and subtraction affect the carry flag, all others leave it alone!
     private int performOperation(Operation operation, int left, int right) {
         boolean oldCarry = carry;
-        carry = false;
         switch (operation) {
 
             case ADD:
@@ -256,6 +255,9 @@ public abstract class AbstractCpuProgramFragments {
         operation(Operation.RIGHT, AddressingMode.Y, Destination.X, 0);
     }
 
+    public void clc() {
+        operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.X, 0);
+    }
 
 //endregion
 //region store instructions

@@ -50,6 +50,7 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
 
     public void clearScreen() {
         lyi(0);
+        clc();
         loadFa8();
         while (true) {
             lxi(0);
@@ -75,6 +76,7 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
     public void drawTitleScreen() {
 
         lxi(1);
+        clc();
         loadFa8();
         sxa(1, 0x11);
         sxa(1, 0x12);
@@ -169,6 +171,7 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
         sxa(1, 0x24);
 
         lxi(4);
+        clc();
         loadFa8();
         sxa(1, 0xb9);
         sxa(1, 0xba);
@@ -274,6 +277,7 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
     public void drawBackground() {
 
         lyi(0);
+        clc();
         loadFa8();
         while (true) {
             lxi(7);
@@ -314,6 +318,7 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
         }
 
         lyi(0x10);
+        clc();
         loadFa8();
         while (true) {
             lxi(7);
@@ -392,6 +397,7 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
         }
 
         lxi(7);
+        clc();
         loadFa8();
         sxa(1, 0x63);
         sxa(1, 0x64);
