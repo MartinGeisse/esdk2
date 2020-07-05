@@ -181,7 +181,7 @@ public final class Engine {
                 int[] completedRows = new int[4];
                 int count;
 
-                if (GameState.pasteCurrentShape()) {
+                if (GameState.pasteShape()) {
                     gameOver = true;
                     gameOverFill();
                     return;

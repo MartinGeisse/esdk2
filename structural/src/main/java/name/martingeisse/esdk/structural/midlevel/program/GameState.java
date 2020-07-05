@@ -95,7 +95,8 @@ public final class GameState {
         return true;
     }
 
-    public static boolean pasteShape(int x, int y, int shapeIndex, int shapeColor) {
+    public static boolean pasteShape() {
+        int shapeIndex = Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff;
         boolean[] matrix = Shapes.shapeOccupationMatrices[shapeIndex];
         boolean crossedBorder = false;
         for (int i = 0; i < 4; i++) {
@@ -103,20 +104,16 @@ public final class GameState {
                 if (!matrix[j * 4 + i]) {
                     continue;
                 }
-                int x2 = x + i;
-                int y2 = y + j;
+                int x2 = shapeX + i;
+                int y2 = shapeY + j;
                 if (x2 < 0 || x2 > 9 || y2 < 0 || y2 > 19) {
                     crossedBorder = true;
                     continue;
                 }
-                Devices.memory[y2 * 10 + x2] = (byte) shapeColor;
+                Devices.memory[y2 * 10 + x2] = Devices.memory[MemoryMap.CURRENT_COLOR];
             }
         }
         return crossedBorder;
-    }
-
-    public static boolean pasteCurrentShape() {
-        return pasteShape(shapeX, shapeY, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff, Devices.memory[MemoryMap.CURRENT_COLOR] & 0xff);
     }
 
     public static boolean isRowCompleted(int rowIndex) {
