@@ -97,20 +97,6 @@ public final class Engine {
         drawPreview();
     }
 
-    public static void engineLeft() {
-        if (GameState.moveCurrentShapeLeft()) {
-            Draw.drawShapeOnGameArea(GameState.shapeX + 1, GameState.shapeY, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff, 0);
-            Draw.drawShapeOnGameArea(GameState.shapeX, GameState.shapeY, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff, Devices.memory[MemoryMap.CURRENT_COLOR] & 0xff);
-        }
-    }
-
-    public static void engineRight() {
-        if (GameState.moveCurrentShapeRight()) {
-            Draw.drawShapeOnGameArea(GameState.shapeX - 1, GameState.shapeY, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff, 0);
-            Draw.drawShapeOnGameArea(GameState.shapeX, GameState.shapeY, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff, Devices.memory[MemoryMap.CURRENT_COLOR] & 0xff);
-        }
-    }
-
     public static void engineDown() {
         if (GameState.moveCurrentShapeDown()) {
             Draw.drawShapeOnGameArea(GameState.shapeX, GameState.shapeY - 1, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff, 0);
@@ -134,20 +120,6 @@ public final class Engine {
                 flashRowsEffect = 1;
             }
 
-        }
-    }
-
-    public static void engineRotateClockwise() {
-        if (GameState.rotateCurrentShapeClockwise()) {
-            Draw.drawShapeOnGameArea(GameState.shapeX, GameState.shapeY, Shapes.shapeRotatedCounterClockwise[Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff], 0);
-            Draw.drawShapeOnGameArea(GameState.shapeX, GameState.shapeY, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff, Devices.memory[MemoryMap.CURRENT_COLOR] & 0xff);
-        }
-    }
-
-    public static void engineRotateCounterClockwise() {
-        if (GameState.rotateCurrentShapeCounterClockwise()) {
-            Draw.drawShapeOnGameArea(GameState.shapeX, GameState.shapeY, Shapes.shapeRotatedClockwise[Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff], 0);
-            Draw.drawShapeOnGameArea(GameState.shapeX, GameState.shapeY, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff, Devices.memory[MemoryMap.CURRENT_COLOR] & 0xff);
         }
     }
 
@@ -180,11 +152,17 @@ public final class Engine {
         }
 
         if (Devices.buttonStates[Constants.BUTTON_INDEX_LEFT] && (mainStepCounter & 3) == 0) {
-            engineLeft();
+            if (GameState.moveCurrentShapeLeft()) {
+                Draw.drawShapeOnGameArea(GameState.shapeX + 1, GameState.shapeY, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff, 0);
+                Draw.drawShapeOnGameArea(GameState.shapeX, GameState.shapeY, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff, Devices.memory[MemoryMap.CURRENT_COLOR] & 0xff);
+            }
         }
 
         if (Devices.buttonStates[Constants.BUTTON_INDEX_RIGHT] && (mainStepCounter & 3) == 0) {
-            engineRight();
+            if (GameState.moveCurrentShapeRight()) {
+                Draw.drawShapeOnGameArea(GameState.shapeX - 1, GameState.shapeY, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff, 0);
+                Draw.drawShapeOnGameArea(GameState.shapeX, GameState.shapeY, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff, Devices.memory[MemoryMap.CURRENT_COLOR] & 0xff);
+            }
         }
 
         if (Devices.buttonStates[Constants.BUTTON_INDEX_DOWN]) {
@@ -198,12 +176,18 @@ public final class Engine {
 
         if (Devices.buttonStates[Constants.BUTTON_INDEX_ROTATE_CW]) {
             Devices.buttonStates[Constants.BUTTON_INDEX_ROTATE_CW] = false;
-            engineRotateClockwise();
+            if (GameState.rotateCurrentShapeClockwise()) {
+                Draw.drawShapeOnGameArea(GameState.shapeX, GameState.shapeY, Shapes.shapeRotatedCounterClockwise[Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff], 0);
+                Draw.drawShapeOnGameArea(GameState.shapeX, GameState.shapeY, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff, Devices.memory[MemoryMap.CURRENT_COLOR] & 0xff);
+            }
         }
 
         if (Devices.buttonStates[Constants.BUTTON_INDEX_ROTATE_CCW]) {
             Devices.buttonStates[Constants.BUTTON_INDEX_ROTATE_CCW] = false;
-            engineRotateCounterClockwise();
+            if (GameState.rotateCurrentShapeCounterClockwise()) {
+                Draw.drawShapeOnGameArea(GameState.shapeX, GameState.shapeY, Shapes.shapeRotatedClockwise[Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff], 0);
+                Draw.drawShapeOnGameArea(GameState.shapeX, GameState.shapeY, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff, Devices.memory[MemoryMap.CURRENT_COLOR] & 0xff);
+            }
         }
 
     }
