@@ -34,5 +34,10 @@ public final class MemoryMap {
     public static final int RNG_CURRENT_2 = 217;
     public static final int RNG_CURRENT_3 = 218;
 
+    public static final int TEMP_3 = 219;
+    public static final int TEMP_4 = 220;
+    public static final int TEMP_5 = 221;
+    public static final int TEMP_6 = 222;
+    public static final int TEMP_7 = 223;
 
 }

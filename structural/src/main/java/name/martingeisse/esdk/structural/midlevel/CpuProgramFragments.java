@@ -534,6 +534,176 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
 
     public void getRandom() {
 
+        //
+        // multiply by 1664525 (binary: 0000.0000 0001.1001 0110.0110 0000.1101)
+        //
+
+        // Copy to TEMP_0..3. That will keep the original number for now, while RNG_CURRENT_* will
+        // accumulate the multiplication result, initialized to x1 to the LSB is already accounted for.
+        lxa(MemoryMap.RNG_CURRENT_0);
+        sxa(MemoryMap.TEMP_0);
+        lxa(MemoryMap.RNG_CURRENT_1);
+        sxa(MemoryMap.TEMP_1);
+        lxa(MemoryMap.RNG_CURRENT_2);
+        sxa(MemoryMap.TEMP_2);
+        lxa(MemoryMap.RNG_CURRENT_3);
+        sxa(MemoryMap.TEMP_3);
+        // remaining multiplier: 0000.0000 0001.1001 0110.0110 0000.1100
+
+        // add *2^16 to the result
+        lxa(MemoryMap.RNG_CURRENT_2);
+        operation(Operation.ADD, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_0);
+        sxa(MemoryMap.RNG_CURRENT_2);
+        lxa(MemoryMap.RNG_CURRENT_3);
+        operation(Operation.ADDC, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_1);
+        sxa(MemoryMap.RNG_CURRENT_3);
+        // remaining multiplier: 0000.0000 0001.1000 0110.0110 0000.1100
+
+        // next, set TEMP_4..7 to 3x the original number (0000.0011)
+        lxa(MemoryMap.TEMP_0);
+        operation(Operation.ADD, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_0);
+        sxa(MemoryMap.TEMP_4);
+        lxa(MemoryMap.TEMP_1);
+        operation(Operation.ADDC, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_1);
+        sxa(MemoryMap.TEMP_5);
+        lxa(MemoryMap.TEMP_2);
+        operation(Operation.ADDC, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_2);
+        sxa(MemoryMap.TEMP_6);
+        lxa(MemoryMap.TEMP_3);
+        operation(Operation.ADDC, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_3);
+        sxa(MemoryMap.TEMP_7);
+        //
+        lxa(MemoryMap.TEMP_0);
+        operation(Operation.ADD, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_4);
+        sxa(MemoryMap.TEMP_4);
+        lxa(MemoryMap.TEMP_1);
+        operation(Operation.ADDC, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_5);
+        sxa(MemoryMap.TEMP_5);
+        lxa(MemoryMap.TEMP_2);
+        operation(Operation.ADDC, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_6);
+        sxa(MemoryMap.TEMP_6);
+        lxa(MemoryMap.TEMP_3);
+        operation(Operation.ADDC, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_7);
+        sxa(MemoryMap.TEMP_7);
+
+        // shift TEMP4..7 to (0000.0110)
+        lxa(MemoryMap.TEMP_4);
+        operation(Operation.ADD, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_4);
+        sxa(MemoryMap.TEMP_4);
+        lxa(MemoryMap.TEMP_5);
+        operation(Operation.ADDC, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_5);
+        sxa(MemoryMap.TEMP_5);
+        lxa(MemoryMap.TEMP_6);
+        operation(Operation.ADDC, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_6);
+        sxa(MemoryMap.TEMP_6);
+        lxa(MemoryMap.TEMP_7);
+        operation(Operation.ADDC, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_7);
+        sxa(MemoryMap.TEMP_7);
+
+        // add *2^8
+        lxa(MemoryMap.RNG_CURRENT_1);
+        operation(Operation.ADD, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_4);
+        sxa(MemoryMap.RNG_CURRENT_1);
+        lxa(MemoryMap.RNG_CURRENT_2);
+        operation(Operation.ADDC, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_5);
+        sxa(MemoryMap.RNG_CURRENT_2);
+        lxa(MemoryMap.RNG_CURRENT_3);
+        operation(Operation.ADDC, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_6);
+        sxa(MemoryMap.RNG_CURRENT_3);
+        // remaining multiplier: 0000.0000 0001.1000 0110.0000 0000.1100
+
+        // shift TEMP4..7 to (0000.1100)
+        lxa(MemoryMap.TEMP_4);
+        operation(Operation.ADD, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_4);
+        sxa(MemoryMap.TEMP_4);
+        lxa(MemoryMap.TEMP_5);
+        operation(Operation.ADDC, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_5);
+        sxa(MemoryMap.TEMP_5);
+        lxa(MemoryMap.TEMP_6);
+        operation(Operation.ADDC, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_6);
+        sxa(MemoryMap.TEMP_6);
+        lxa(MemoryMap.TEMP_7);
+        operation(Operation.ADDC, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_7);
+        sxa(MemoryMap.TEMP_7);
+
+        // add *1
+        lxa(MemoryMap.RNG_CURRENT_0);
+        operation(Operation.ADD, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_4);
+        sxa(MemoryMap.RNG_CURRENT_0);
+        lxa(MemoryMap.RNG_CURRENT_1);
+        operation(Operation.ADDC, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_5);
+        sxa(MemoryMap.RNG_CURRENT_1);
+        lxa(MemoryMap.RNG_CURRENT_2);
+        operation(Operation.ADDC, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_6);
+        sxa(MemoryMap.RNG_CURRENT_2);
+        lxa(MemoryMap.RNG_CURRENT_3);
+        operation(Operation.ADDC, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_7);
+        sxa(MemoryMap.RNG_CURRENT_3);
+        // remaining multiplier: 0000.0000 0001.1000 0110.0000 0000.0000
+
+        // shift TEMP4..7 to (0001.1000)
+        lxa(MemoryMap.TEMP_4);
+        operation(Operation.ADD, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_4);
+        sxa(MemoryMap.TEMP_4);
+        lxa(MemoryMap.TEMP_5);
+        operation(Operation.ADDC, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_5);
+        sxa(MemoryMap.TEMP_5);
+        lxa(MemoryMap.TEMP_6);
+        operation(Operation.ADDC, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_6);
+        sxa(MemoryMap.TEMP_6);
+        lxa(MemoryMap.TEMP_7);
+        operation(Operation.ADDC, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_7);
+        sxa(MemoryMap.TEMP_7);
+
+        // add *2^16
+        lxa(MemoryMap.RNG_CURRENT_2);
+        operation(Operation.ADD, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_4);
+        sxa(MemoryMap.RNG_CURRENT_2);
+        lxa(MemoryMap.RNG_CURRENT_3);
+        operation(Operation.ADDC, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_5);
+        sxa(MemoryMap.RNG_CURRENT_3);
+        // remaining multiplier: 0000.0000 0000.0000 0110.0000 0000.0000
+
+        // shift TEMP4..7 to (0011.0000)
+        lxa(MemoryMap.TEMP_4);
+        operation(Operation.ADD, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_4);
+        sxa(MemoryMap.TEMP_4);
+        lxa(MemoryMap.TEMP_5);
+        operation(Operation.ADDC, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_5);
+        sxa(MemoryMap.TEMP_5);
+        lxa(MemoryMap.TEMP_6);
+        operation(Operation.ADDC, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_6);
+        sxa(MemoryMap.TEMP_6);
+        lxa(MemoryMap.TEMP_7);
+        operation(Operation.ADDC, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_7);
+        sxa(MemoryMap.TEMP_7);
+
+        // shift TEMP4..7 to (0110.0000)
+        lxa(MemoryMap.TEMP_4);
+        operation(Operation.ADD, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_4);
+        sxa(MemoryMap.TEMP_4);
+        lxa(MemoryMap.TEMP_5);
+        operation(Operation.ADDC, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_5);
+        sxa(MemoryMap.TEMP_5);
+        lxa(MemoryMap.TEMP_6);
+        operation(Operation.ADDC, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_6);
+        sxa(MemoryMap.TEMP_6);
+        lxa(MemoryMap.TEMP_7);
+        operation(Operation.ADDC, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_7);
+        sxa(MemoryMap.TEMP_7);
+
+        // add *2^8
+        lxa(MemoryMap.RNG_CURRENT_1);
+        operation(Operation.ADD, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_4);
+        sxa(MemoryMap.RNG_CURRENT_1);
+        lxa(MemoryMap.RNG_CURRENT_2);
+        operation(Operation.ADDC, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_5);
+        sxa(MemoryMap.RNG_CURRENT_2);
+        lxa(MemoryMap.RNG_CURRENT_3);
+        operation(Operation.ADDC, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_6);
+        sxa(MemoryMap.RNG_CURRENT_3);
+        // remaining multiplier: 0000.0000 0000.0000 0000.0000 0000.0000 -> done
+
         // add 1013904223 (0x 3C 6E F3 5F)
         lxa(MemoryMap.RNG_CURRENT_0);
         operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.X, 0x5f);
@@ -547,6 +717,31 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
         lxa(MemoryMap.RNG_CURRENT_3);
         operation(Operation.ADDC, AddressingMode.IMMEDIATE, Destination.X, 0x3c);
         sxa(MemoryMap.RNG_CURRENT_3);
+
+    }
+
+    /**
+     * after getRanodm(), this takes the current random number mod 7. (that is, this function does not generate
+     * a new number). The result is stored in TEMP_0..3.
+     */
+    public void randomMod7() {
+
+        // TODO
+
+        int currentNumber = (Devices.memory[MemoryMap.TEMP_0] & 0xff);
+        currentNumber |= (Devices.memory[MemoryMap.TEMP_1] & 0xff) << 8;
+        currentNumber |= (Devices.memory[MemoryMap.TEMP_2] & 0xff) << 16;
+        currentNumber |= (Devices.memory[MemoryMap.TEMP_3] & 0xff) << 24;
+
+        currentNumber = currentNumber % 7;
+        if (currentNumber < 0) {
+            currentNumber += 7;
+        }
+
+        Devices.memory[MemoryMap.TEMP_0] = (byte)currentNumber;
+        Devices.memory[MemoryMap.TEMP_1] = (byte)(currentNumber >> 8);
+        Devices.memory[MemoryMap.TEMP_2] = (byte)(currentNumber >> 16);
+        Devices.memory[MemoryMap.TEMP_3] = (byte)(currentNumber >> 24);
 
     }
 
