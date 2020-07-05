@@ -532,6 +532,24 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
         sxa(MemoryMap.RNG_CURRENT_3);
     }
 
+    public void getRandom() {
+
+        // add 1013904223 (0x 3C 6E F3 5F)
+        lxa(MemoryMap.RNG_CURRENT_0);
+        operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.X, 0x5f);
+        sxa(MemoryMap.RNG_CURRENT_0);
+        lxa(MemoryMap.RNG_CURRENT_1);
+        operation(Operation.ADDC, AddressingMode.IMMEDIATE, Destination.X, 0xf3);
+        sxa(MemoryMap.RNG_CURRENT_1);
+        lxa(MemoryMap.RNG_CURRENT_2);
+        operation(Operation.ADDC, AddressingMode.IMMEDIATE, Destination.X, 0x6e);
+        sxa(MemoryMap.RNG_CURRENT_2);
+        lxa(MemoryMap.RNG_CURRENT_3);
+        operation(Operation.ADDC, AddressingMode.IMMEDIATE, Destination.X, 0x3c);
+        sxa(MemoryMap.RNG_CURRENT_3);
+
+    }
+
 //endregion
 
 }

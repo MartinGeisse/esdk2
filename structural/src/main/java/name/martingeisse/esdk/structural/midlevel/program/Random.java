@@ -21,14 +21,15 @@ public final class Random {
         currentNumber |= (Devices.memory[MemoryMap.RNG_CURRENT_2] & 0xff) << 16;
         currentNumber |= (Devices.memory[MemoryMap.RNG_CURRENT_3] & 0xff) << 24;
 
-        currentNumber = currentNumber * 1664525 + 1013904223;
+        currentNumber = currentNumber * 1664525;
 
         Devices.memory[MemoryMap.RNG_CURRENT_0] = (byte)currentNumber;
         Devices.memory[MemoryMap.RNG_CURRENT_1] = (byte)(currentNumber >> 8);
         Devices.memory[MemoryMap.RNG_CURRENT_2] = (byte)(currentNumber >> 16);
         Devices.memory[MemoryMap.RNG_CURRENT_3] = (byte)(currentNumber >> 24);
 
-        // TODO add 1013904223
+        // add 1013904223
+        CpuProgramFragments.INSTANCE.getRandom();
 
 
         // compute remainder
