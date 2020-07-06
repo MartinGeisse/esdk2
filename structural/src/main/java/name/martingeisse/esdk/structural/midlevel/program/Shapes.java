@@ -46,7 +46,7 @@ public final class Shapes {
      * and also the initial shape to appear when the piece drops into the
      * game area.
      */
-    public static final int[] normalShapeByPiece = new int[]{
+    public static final byte[] normalShapeByPiece = new byte[]{
             0, 2, 6, 7, 11, 16, 18
     };
 

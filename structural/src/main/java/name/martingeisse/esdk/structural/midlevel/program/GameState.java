@@ -58,15 +58,16 @@ public final class GameState {
         Devices.memory[MemoryMap.PREVIEW_COLOR_1] = Devices.memory[MemoryMap.PREVIEW_COLOR_2];
         Devices.memory[MemoryMap.PREVIEW_COLOR_2] = (byte)(Random.nextRandomMod7() + 1);
 
-        // shift piece
-        Devices.memory[MemoryMap.TEMP_0] = Devices.memory[MemoryMap.PREVIEW_PIECE_0];
+        // shift piece (note: CURRENT_SHAPE temporarily contains the piece, not the shape)
+        Devices.memory[MemoryMap.CURRENT_SHAPE] = Devices.memory[MemoryMap.PREVIEW_PIECE_0];
         Devices.memory[MemoryMap.PREVIEW_PIECE_0] = Devices.memory[MemoryMap.PREVIEW_PIECE_1];
         Devices.memory[MemoryMap.PREVIEW_PIECE_1] = Devices.memory[MemoryMap.PREVIEW_PIECE_2];
         Devices.memory[MemoryMap.PREVIEW_PIECE_2] = (byte) Random.nextRandomMod7();
 
+        // now turn the piece into its normal shape
+        Devices.memory[MemoryMap.CURRENT_SHAPE] = Shapes.normalShapeByPiece[Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff];
+
         // place the new piece at the top of the game area
-        int piece = Devices.memory[MemoryMap.TEMP_0] & 0xff;
-        Devices.memory[MemoryMap.CURRENT_SHAPE] = (byte)Shapes.normalShapeByPiece[piece];
         shapeX = 3;
         shapeY = -4;
 
