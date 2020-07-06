@@ -15,15 +15,10 @@ public final class Random {
     }
 
     // all invocations happen to be mod 7
-    public static int getRandomMod7() {
-        CpuProgramFragments.INSTANCE.getRandom();
+    public static int nextRandomMod7() {
+        CpuProgramFragments.INSTANCE.nextRandom();
         CpuProgramFragments.INSTANCE.randomMod7();
-
-        int currentNumber = (Devices.memory[MemoryMap.TEMP_0] & 0xff);
-        currentNumber |= (Devices.memory[MemoryMap.TEMP_1] & 0xff) << 8;
-        currentNumber |= (Devices.memory[MemoryMap.TEMP_2] & 0xff) << 16;
-        currentNumber |= (Devices.memory[MemoryMap.TEMP_3] & 0xff) << 24;
-        return currentNumber;
+        return Devices.memory[MemoryMap.TEMP_0];
     }
 
     private Random() {

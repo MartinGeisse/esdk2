@@ -532,7 +532,7 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
         sxa(MemoryMap.RNG_CURRENT_3);
     }
 
-    public void getRandom() {
+    public void nextRandom() {
 
         //
         // multiply by 1664525 (binary: 0000.0000 0001.1001 0110.0110 0000.1101)
@@ -721,27 +721,86 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
     }
 
     /**
-     * after getRanodm(), this takes the current random number mod 7. (that is, this function does not generate
-     * a new number). The result is stored in TEMP_0..3.
+     * Takes the current random number (stored in RNG_CURRENT_0..3), computes the remainder for division by 7 (all
+     * invocations happen to use 7), and stores the result in TEMP_0.
      */
     public void randomMod7() {
 
-        // TODO
+        // copy the current number to TEMP_4..7
+        lxa(MemoryMap.RNG_CURRENT_0);
+        sxa(MemoryMap.TEMP_4);
+        lxa(MemoryMap.RNG_CURRENT_1);
+        sxa(MemoryMap.TEMP_5);
+        lxa(MemoryMap.RNG_CURRENT_2);
+        sxa(MemoryMap.TEMP_6);
+        lxa(MemoryMap.RNG_CURRENT_3);
+        sxa(MemoryMap.TEMP_7);
 
-        int currentNumber = (Devices.memory[MemoryMap.TEMP_0] & 0xff);
-        currentNumber |= (Devices.memory[MemoryMap.TEMP_1] & 0xff) << 8;
-        currentNumber |= (Devices.memory[MemoryMap.TEMP_2] & 0xff) << 16;
-        currentNumber |= (Devices.memory[MemoryMap.TEMP_3] & 0xff) << 24;
+        // initialize the shift-in byte (TEMP_0) to zero
+        lxi(0);
+        sxa(MemoryMap.TEMP_0);
 
-        currentNumber = currentNumber % 7;
-        if (currentNumber < 0) {
-            currentNumber += 7;
+        // initialize the digit counter (TEMP_1) to 31
+        lxi(31);
+        sxa(MemoryMap.TEMP_1);
+
+        // division loop
+        // System.out.println("***");
+        int verificationShift = 0; // not used for the actual algorithm, just for debug output. TODO remove
+        while (true) {
+
+            {
+                long currentNumber = (long)(Devices.memory[MemoryMap.TEMP_4] & 0xff);
+                currentNumber |= (long)(Devices.memory[MemoryMap.TEMP_5] & 0xff) << 8;
+                currentNumber |= (long)(Devices.memory[MemoryMap.TEMP_6] & 0xff) << 16;
+                currentNumber |= (long)(Devices.memory[MemoryMap.TEMP_7] & 0xff) << 24;
+                currentNumber |= (long)(Devices.memory[MemoryMap.TEMP_0] & 0xff) << 32;
+                String s = "0000000000000000000000000000000000000000" + Long.toBinaryString(currentNumber);
+                // System.out.println(s.substring(s.length() - 40) + " / " + ((currentNumber >> verificationShift) % 7));
+            }
+
+            // shift left by 1, then subtract 7 from the shift-in byte if possible
+            lxa(MemoryMap.TEMP_4);
+            operation(Operation.ADD, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_4);
+            sxa(MemoryMap.TEMP_4);
+            lxa(MemoryMap.TEMP_5);
+            operation(Operation.ADDC, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_5);
+            sxa(MemoryMap.TEMP_5);
+            lxa(MemoryMap.TEMP_6);
+            operation(Operation.ADDC, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_6);
+            sxa(MemoryMap.TEMP_6);
+            lxa(MemoryMap.TEMP_7);
+            operation(Operation.ADDC, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_7);
+            sxa(MemoryMap.TEMP_7);
+            lxa(MemoryMap.TEMP_0);
+            operation(Operation.ADDC, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_0);
+            operation(Operation.SUB, AddressingMode.IMMEDIATE, Destination.X, 7);
+            if (!isCarry()) {
+                operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.X, 7);
+            }
+            sxa(MemoryMap.TEMP_0);
+
+            // loop 32 times
+            lxa(MemoryMap.TEMP_1);
+            operation(Operation.SUB, AddressingMode.IMMEDIATE, Destination.X, 1);
+            if (!isCarry()) {
+                break;
+            }
+            sxa(MemoryMap.TEMP_1);
+
+            verificationShift++;
         }
+        // System.out.println("***");
 
-        Devices.memory[MemoryMap.TEMP_0] = (byte)currentNumber;
-        Devices.memory[MemoryMap.TEMP_1] = (byte)(currentNumber >> 8);
-        Devices.memory[MemoryMap.TEMP_2] = (byte)(currentNumber >> 16);
-        Devices.memory[MemoryMap.TEMP_3] = (byte)(currentNumber >> 24);
+        {
+            long currentNumber = (long)(Devices.memory[MemoryMap.TEMP_4] & 0xff);
+            currentNumber |= (long)(Devices.memory[MemoryMap.TEMP_5] & 0xff) << 8;
+            currentNumber |= (long)(Devices.memory[MemoryMap.TEMP_6] & 0xff) << 16;
+            currentNumber |= (long)(Devices.memory[MemoryMap.TEMP_7] & 0xff) << 24;
+            currentNumber |= (long)(Devices.memory[MemoryMap.TEMP_0] & 0xff) << 32;
+            String s = "0000000000000000000000000000000000000000" + Long.toBinaryString(currentNumber);
+            // System.out.println(s.substring(s.length() - 40) + " / " + ((currentNumber >> 32) % 7));
+        }
 
     }
 

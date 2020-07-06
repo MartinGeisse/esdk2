@@ -25,12 +25,12 @@ public final class GameState {
 
     public static void initializeGameState() {
         clearGameArea();
-        Devices.memory[MemoryMap.PREVIEW_PIECE_0] = (byte)Random.getRandomMod7();
-        Devices.memory[MemoryMap.PREVIEW_COLOR_0] = (byte)(Random.getRandomMod7() + 1);
-        Devices.memory[MemoryMap.PREVIEW_PIECE_1] = (byte)Random.getRandomMod7();
-        Devices.memory[MemoryMap.PREVIEW_COLOR_1] = (byte)(Random.getRandomMod7() + 1);
-        Devices.memory[MemoryMap.PREVIEW_PIECE_2] = (byte)Random.getRandomMod7();
-        Devices.memory[MemoryMap.PREVIEW_COLOR_2] = (byte)(Random.getRandomMod7() + 1);
+        Devices.memory[MemoryMap.PREVIEW_PIECE_0] = (byte)Random.nextRandomMod7();
+        Devices.memory[MemoryMap.PREVIEW_COLOR_0] = (byte)(Random.nextRandomMod7() + 1);
+        Devices.memory[MemoryMap.PREVIEW_PIECE_1] = (byte)Random.nextRandomMod7();
+        Devices.memory[MemoryMap.PREVIEW_COLOR_1] = (byte)(Random.nextRandomMod7() + 1);
+        Devices.memory[MemoryMap.PREVIEW_PIECE_2] = (byte)Random.nextRandomMod7();
+        Devices.memory[MemoryMap.PREVIEW_COLOR_2] = (byte)(Random.nextRandomMod7() + 1);
         rows = 0;
         level = 0;
         nextPiece();
@@ -56,13 +56,13 @@ public final class GameState {
         Devices.memory[MemoryMap.CURRENT_COLOR] = Devices.memory[MemoryMap.PREVIEW_COLOR_0];
         Devices.memory[MemoryMap.PREVIEW_COLOR_0] = Devices.memory[MemoryMap.PREVIEW_COLOR_1];
         Devices.memory[MemoryMap.PREVIEW_COLOR_1] = Devices.memory[MemoryMap.PREVIEW_COLOR_2];
-        Devices.memory[MemoryMap.PREVIEW_COLOR_2] = (byte)(Random.getRandomMod7() + 1);
+        Devices.memory[MemoryMap.PREVIEW_COLOR_2] = (byte)(Random.nextRandomMod7() + 1);
 
         // shift piece
         Devices.memory[MemoryMap.TEMP_0] = Devices.memory[MemoryMap.PREVIEW_PIECE_0];
         Devices.memory[MemoryMap.PREVIEW_PIECE_0] = Devices.memory[MemoryMap.PREVIEW_PIECE_1];
         Devices.memory[MemoryMap.PREVIEW_PIECE_1] = Devices.memory[MemoryMap.PREVIEW_PIECE_2];
-        Devices.memory[MemoryMap.PREVIEW_PIECE_2] = (byte) Random.getRandomMod7();
+        Devices.memory[MemoryMap.PREVIEW_PIECE_2] = (byte) Random.nextRandomMod7();
 
         // place the new piece at the top of the game area
         int piece = Devices.memory[MemoryMap.TEMP_0] & 0xff;
