@@ -745,19 +745,7 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
         sxa(MemoryMap.TEMP_1);
 
         // division loop
-        // System.out.println("***");
-        int verificationShift = 0; // not used for the actual algorithm, just for debug output. TODO remove
         while (true) {
-
-            {
-                long currentNumber = (long)(Devices.memory[MemoryMap.TEMP_4] & 0xff);
-                currentNumber |= (long)(Devices.memory[MemoryMap.TEMP_5] & 0xff) << 8;
-                currentNumber |= (long)(Devices.memory[MemoryMap.TEMP_6] & 0xff) << 16;
-                currentNumber |= (long)(Devices.memory[MemoryMap.TEMP_7] & 0xff) << 24;
-                currentNumber |= (long)(Devices.memory[MemoryMap.TEMP_0] & 0xff) << 32;
-                String s = "0000000000000000000000000000000000000000" + Long.toBinaryString(currentNumber);
-                // System.out.println(s.substring(s.length() - 40) + " / " + ((currentNumber >> verificationShift) % 7));
-            }
 
             // shift left by 1, then subtract 7 from the shift-in byte if possible
             lxa(MemoryMap.TEMP_4);
@@ -788,18 +776,6 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
             }
             sxa(MemoryMap.TEMP_1);
 
-            verificationShift++;
-        }
-        // System.out.println("***");
-
-        {
-            long currentNumber = (long)(Devices.memory[MemoryMap.TEMP_4] & 0xff);
-            currentNumber |= (long)(Devices.memory[MemoryMap.TEMP_5] & 0xff) << 8;
-            currentNumber |= (long)(Devices.memory[MemoryMap.TEMP_6] & 0xff) << 16;
-            currentNumber |= (long)(Devices.memory[MemoryMap.TEMP_7] & 0xff) << 24;
-            currentNumber |= (long)(Devices.memory[MemoryMap.TEMP_0] & 0xff) << 32;
-            String s = "0000000000000000000000000000000000000000" + Long.toBinaryString(currentNumber);
-            // System.out.println(s.substring(s.length() - 40) + " / " + ((currentNumber >> 32) % 7));
         }
 
     }
