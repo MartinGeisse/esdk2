@@ -1,7 +1,5 @@
 package name.martingeisse.esdk.structural.midlevel;
 
-import name.martingeisse.esdk.structural.midlevel.program.Draw;
-
 public final class CpuProgramFragments extends AbstractCpuProgramFragments {
 
     public static final CpuProgramFragments INSTANCE = new CpuProgramFragments();
