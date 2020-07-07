@@ -57,7 +57,7 @@ public final class Engine {
                 }
             }
         }
-        Draw.drawGameArea();
+        CpuProgramFragments.INSTANCE.drawGameArea();
     }
 
     public static void newLevel() {
@@ -106,7 +106,7 @@ public final class Engine {
                 if (GameState.addRows(count)) {
                     newLevel();
                 } else {
-                    Draw.drawGameArea();
+                    CpuProgramFragments.INSTANCE.drawGameArea();
                 }
                 clearPreview();
                 GameState.nextPiece();

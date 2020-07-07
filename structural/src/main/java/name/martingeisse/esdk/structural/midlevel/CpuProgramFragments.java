@@ -1,5 +1,7 @@
 package name.martingeisse.esdk.structural.midlevel;
 
+import name.martingeisse.esdk.structural.midlevel.program.Draw;
+
 public final class CpuProgramFragments extends AbstractCpuProgramFragments {
 
     public static final CpuProgramFragments INSTANCE = new CpuProgramFragments();
@@ -496,6 +498,16 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
             operation(Operation.SUB, AddressingMode.IMMEDIATE, Destination.X, 1);
             if (!isCarry()) {
                 break;
+            }
+        }
+    }
+
+    public void drawGameArea() {
+        int dx, dy;
+        for (dx = 0; dx < 10; dx++) {
+            for (dy = 0; dy < 20; dy++) {
+                Devices.frameBuffer[(Draw.GAME_AREA_Y_ON_SCREEN + dy) * 40 + Draw.GAME_AREA_X_ON_SCREEN + dx] =
+                        Devices.memory[dy * 10 + dx];
             }
         }
     }

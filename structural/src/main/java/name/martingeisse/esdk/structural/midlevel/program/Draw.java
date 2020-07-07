@@ -79,13 +79,5 @@ public final class Draw {
         }
     }
 
-    public static void drawGameArea() {
-        int dx, dy;
-        for (dx = 0; dx < 10; dx++) {
-            for (dy = 0; dy < 20; dy++) {
-                Devices.frameBuffer[(GAME_AREA_Y_ON_SCREEN + dy) * 40 + GAME_AREA_X_ON_SCREEN + dx] = Devices.memory[dy * 10 + dx];
-            }
-        }
-    }
 
 }
