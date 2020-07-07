@@ -532,7 +532,10 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
         sxa(MemoryMap.RNG_CURRENT_3);
     }
 
-    public void nextRandom() {
+    /**
+     * Computes a new random number mod 7 (all invocations happen to use 7), and stores the result in TEMP_0.
+     */
+    public void nextRandomMod7() {
 
         //
         // multiply by 1664525 (binary: 0000.0000 0001.1001 0110.0110 0000.1101)
@@ -717,14 +720,6 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
         lxa(MemoryMap.RNG_CURRENT_3);
         operation(Operation.ADDC, AddressingMode.IMMEDIATE, Destination.X, 0x3c);
         sxa(MemoryMap.RNG_CURRENT_3);
-
-    }
-
-    /**
-     * Takes the current random number (stored in RNG_CURRENT_0..3), computes the remainder for division by 7 (all
-     * invocations happen to use 7), and stores the result in TEMP_0.
-     */
-    public void randomMod7() {
 
         // copy the current number to TEMP_4..7
         lxa(MemoryMap.RNG_CURRENT_0);

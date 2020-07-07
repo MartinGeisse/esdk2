@@ -1,6 +1,7 @@
 package name.martingeisse.esdk.structural.midlevel.program;
 
 import name.martingeisse.esdk.structural.midlevel.Constants;
+import name.martingeisse.esdk.structural.midlevel.CpuProgramFragments;
 import name.martingeisse.esdk.structural.midlevel.Devices;
 import name.martingeisse.esdk.structural.midlevel.MemoryMap;
 
@@ -217,12 +218,12 @@ public final class Engine {
                     anyButtonPressed |= Devices.buttonStates[i];
                 }
                 if (anyButtonPressed) {
-                    Random.autoSeedRandom();
+                    CpuProgramFragments.INSTANCE.autoSeedRandom();
                     gameRunning = true;
                     engineNewGame();
                     break;
                 }
-                Random.randomAutoSeederTick();
+                CpuProgramFragments.INSTANCE.randomAutoSeederTick();
             }
         }
     }
