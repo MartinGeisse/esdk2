@@ -503,13 +503,85 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
     }
 
     public void drawGameArea() {
-        int dx, dy;
-        for (dx = 0; dx < 10; dx++) {
-            for (dy = 0; dy < 20; dy++) {
-                Devices.frameBuffer[(Draw.GAME_AREA_Y_ON_SCREEN + dy) * 40 + Draw.GAME_AREA_X_ON_SCREEN + dx] =
-                        Devices.memory[dy * 10 + dx];
+
+        // set source pointer to 199
+        lxi(199);
+        sxa(MemoryMap.TEMP_0);
+
+        // set row index to 19
+        lxi(19);
+        sxa(MemoryMap.TEMP_1);
+
+        // row loop
+        while (true) {
+
+            // set column index to 9
+            lxi(9);
+            sxa(MemoryMap.TEMP_2);
+
+            // column loop
+            while (true) {
+
+                // compute destination row base address, possibly set fa8 (first step)
+                lxa(MemoryMap.TEMP_1);
+                operation(Operation.ADD, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_1);
+                sxa(MemoryMap.TEMP_3);
+                operation(Operation.ADD, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_3);
+                sxa(MemoryMap.TEMP_3);
+                operation(Operation.ADD, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_3);
+                sxa(MemoryMap.TEMP_3);
+                operation(Operation.ADD, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_3);
+                loadFa8();
+
+                // x += 0x93, set fa8 on overflow
+                operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.X, 0x93);
+                if (isCarry()) {
+                    loadFa8();
+                }
+
+                // add column index, set fa8 on overflow
+                operation(Operation.ADD, AddressingMode.ABSOLUTE, Destination.X, MemoryMap.TEMP_2);
+                if (isCarry()) {
+                    loadFa8();
+                }
+
+                // store computed address, then load block to transfer to X
+                sxa(MemoryMap.TEMP_3);
+                lya(MemoryMap.TEMP_0);
+                lxn();
+
+                // re-load destination address to Y
+                lya(MemoryMap.TEMP_3);
+
+                // save the block
+                sxn(1);
+
+                // move source pointer
+                lxa(MemoryMap.TEMP_0);
+                operation(Operation.SUB, AddressingMode.IMMEDIATE, Destination.X, 1);
+                sxa(MemoryMap.TEMP_0);
+
+                // decrease the column index and loop
+                lxa(MemoryMap.TEMP_2);
+                operation(Operation.SUB, AddressingMode.IMMEDIATE, Destination.X, 1);
+                if (!isCarry()) {
+                    break;
+                }
+                sxa(MemoryMap.TEMP_2);
+
             }
+
+
+            // decrease the row index and loop
+            lxa(MemoryMap.TEMP_1);
+            operation(Operation.SUB, AddressingMode.IMMEDIATE, Destination.X, 1);
+            if (!isCarry()) {
+                break;
+            }
+            sxa(MemoryMap.TEMP_1);
+
         }
+
     }
 
 //endregion
