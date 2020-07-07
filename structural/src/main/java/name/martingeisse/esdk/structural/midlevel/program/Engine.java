@@ -61,13 +61,27 @@ public final class Engine {
     }
 
     public static void newLevel() {
-        for (int i = 0; i < 3; i++) {
-            for (int j = 1; j < 8; j++) {
-                recolorTiles(j);
+        int remainingColorLoops = 2;
+        while (true) {
+
+            int color = 7;
+            while (true) {
+
+                recolorTiles(color);
                 delayFrames(2);
+
+                color -= 2;
+                if (color < 0) {
+                    break;
+                }
+                color++;
+            }
+
+            remainingColorLoops--;
+            if (remainingColorLoops < 0) {
+                break;
             }
         }
-        recolorTiles(1);
         delayFrames(5);
     }
 
