@@ -25,12 +25,12 @@ public final class GameState {
 
     public static void initializeGameState() {
         clearGameArea();
-        Devices.memory[MemoryMap.PREVIEW_PIECE_0] = (byte)Random.nextRandomMod7();
-        Devices.memory[MemoryMap.PREVIEW_COLOR_0] = (byte)(Random.nextRandomMod7() + 1);
-        Devices.memory[MemoryMap.PREVIEW_PIECE_1] = (byte)Random.nextRandomMod7();
-        Devices.memory[MemoryMap.PREVIEW_COLOR_1] = (byte)(Random.nextRandomMod7() + 1);
-        Devices.memory[MemoryMap.PREVIEW_PIECE_2] = (byte)Random.nextRandomMod7();
-        Devices.memory[MemoryMap.PREVIEW_COLOR_2] = (byte)(Random.nextRandomMod7() + 1);
+        Devices.memory[MemoryMap.PREVIEW_PIECE_0] = (byte)nextRandomMod7();
+        Devices.memory[MemoryMap.PREVIEW_COLOR_0] = (byte)(nextRandomMod7() + 1);
+        Devices.memory[MemoryMap.PREVIEW_PIECE_1] = (byte)nextRandomMod7();
+        Devices.memory[MemoryMap.PREVIEW_COLOR_1] = (byte)(nextRandomMod7() + 1);
+        Devices.memory[MemoryMap.PREVIEW_PIECE_2] = (byte)nextRandomMod7();
+        Devices.memory[MemoryMap.PREVIEW_COLOR_2] = (byte)(nextRandomMod7() + 1);
         rows = 0;
         level = 0;
         nextPiece();
@@ -56,13 +56,13 @@ public final class GameState {
         Devices.memory[MemoryMap.CURRENT_COLOR] = Devices.memory[MemoryMap.PREVIEW_COLOR_0];
         Devices.memory[MemoryMap.PREVIEW_COLOR_0] = Devices.memory[MemoryMap.PREVIEW_COLOR_1];
         Devices.memory[MemoryMap.PREVIEW_COLOR_1] = Devices.memory[MemoryMap.PREVIEW_COLOR_2];
-        Devices.memory[MemoryMap.PREVIEW_COLOR_2] = (byte)(Random.nextRandomMod7() + 1);
+        Devices.memory[MemoryMap.PREVIEW_COLOR_2] = (byte)(nextRandomMod7() + 1);
 
         // shift piece (note: CURRENT_SHAPE temporarily contains the piece, not the shape)
         Devices.memory[MemoryMap.CURRENT_SHAPE] = Devices.memory[MemoryMap.PREVIEW_PIECE_0];
         Devices.memory[MemoryMap.PREVIEW_PIECE_0] = Devices.memory[MemoryMap.PREVIEW_PIECE_1];
         Devices.memory[MemoryMap.PREVIEW_PIECE_1] = Devices.memory[MemoryMap.PREVIEW_PIECE_2];
-        Devices.memory[MemoryMap.PREVIEW_PIECE_2] = (byte) Random.nextRandomMod7();
+        Devices.memory[MemoryMap.PREVIEW_PIECE_2] = (byte) nextRandomMod7();
 
         // now turn the piece into its normal shape
         Devices.memory[MemoryMap.CURRENT_SHAPE] = Shapes.normalShapeByPiece[Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff];
@@ -175,6 +175,12 @@ public final class GameState {
             clearRow(stack);
             stack--;
         }
+    }
+
+    // all invocations happen to be mod 7
+    public static int nextRandomMod7() {
+        CpuProgramFragments.INSTANCE.nextRandomMod7();
+        return Devices.memory[MemoryMap.TEMP_0];
     }
 
 }
