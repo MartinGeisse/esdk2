@@ -1,5 +1,12 @@
 package name.martingeisse.esdk.structural.midlevel;
 
+/**
+ * The TEMP_* cells can be overwritten by any function at any time, so they can only be used between function calls
+ * (including the whole of a leaf function).
+ *
+ * The UTIL_* cells are similar, multi-purpose cells but are used for "outer" functions. Any utility cell gets shared
+ * only between a few places, which are clearly specified for each cell.
+ */
 public final class MemoryMap {
 
     private MemoryMap() {
@@ -39,5 +46,23 @@ public final class MemoryMap {
     public static final int TEMP_5 = 221;
     public static final int TEMP_6 = 222;
     public static final int TEMP_7 = 223;
+
+    /**
+     * This cell contains a site-specific value that indicates which place to return to from a function. Since my CPU
+     * does not have indirect jumps, each function that gets called from multiple sites must return to a site selected
+     * by an if-elseif-else chain based on the value of this cell. Possible values and their meanings are defined
+     * individually for each function that gets called from multiple sites.
+     *
+     * NOTE: This might stay unused in the "midlevel" implementation since control flow happens in Java code, but it's
+     * a good move anyway to reserve a memory cell for it.
+     */
+    public static final int RETURN_SELECTOR = 224;
+
+    /**
+     * Uses:
+     * - "game over fill": row counter
+     */
+    public static final int UTIL_0 = 225;
+
 
 }

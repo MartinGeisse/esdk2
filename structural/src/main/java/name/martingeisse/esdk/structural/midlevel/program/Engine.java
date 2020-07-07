@@ -71,13 +71,6 @@ public final class Engine {
         delayFrames(5);
     }
 
-    public static void gameOverFill() {
-        for (int i = 19; i >= 0; i--) {
-            Draw.fillGameRow(i, 7);
-            delayFrames(5);
-        }
-    }
-
     private static void clearPreview() {
         Draw.drawPieceInPreview(0, Devices.memory[MemoryMap.PREVIEW_PIECE_0] & 0xff, 0);
         Draw.drawPieceInPreview(1, Devices.memory[MemoryMap.PREVIEW_PIECE_1] & 0xff, 0);
@@ -184,7 +177,7 @@ public final class Engine {
 
                 if (GameState.pasteShape()) {
                     gameOver = true;
-                    gameOverFill();
+                    CpuProgramFragments.INSTANCE.drawGameOver();
                     return;
                 }
 

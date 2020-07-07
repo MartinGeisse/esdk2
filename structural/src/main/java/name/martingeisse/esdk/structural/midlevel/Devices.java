@@ -13,6 +13,12 @@ public final class Devices {
     public static Runnable displayRepaintCallback;
     public static byte[] memory = new byte[256];
 
+    public static void delay(int frames) {
+        for (int i = 0; i < frames; i++) {
+            delay();
+        }
+    }
+
     public static void delay() {
         displayRepaintCallback.run();
         try {

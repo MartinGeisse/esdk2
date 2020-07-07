@@ -482,6 +482,24 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
         sxn(1);
     }
 
+    public void drawGameOver() {
+        lxi(19);
+        // invariant: X register contains the current row index
+        while (true) {
+            sxa(MemoryMap.UTIL_0);
+            sxa(MemoryMap.TEMP_0);
+            lxi(7);
+            sxa(MemoryMap.TEMP_1);
+            fillGameRow();
+            Devices.delay(5);
+            lxa(MemoryMap.UTIL_0);
+            operation(Operation.SUB, AddressingMode.IMMEDIATE, Destination.X, 1);
+            if (!isCarry()) {
+                break;
+            }
+        }
+    }
+
 //endregion
 //region game state
 
@@ -499,7 +517,7 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
     }
 
 //endregion
-//random number generator
+//region random number generator
 
     public void randomAutoSeederTick() {
 
