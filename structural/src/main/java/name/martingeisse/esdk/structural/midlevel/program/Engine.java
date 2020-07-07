@@ -57,7 +57,7 @@ public final class Engine {
                 }
             }
         }
-        Draw.drawGameArea(Devices.memory);
+        Draw.drawGameArea();
     }
 
     public static void newLevel() {
@@ -106,7 +106,7 @@ public final class Engine {
                 if (GameState.addRows(count)) {
                     newLevel();
                 } else {
-                    Draw.drawGameArea(Devices.memory);
+                    Draw.drawGameArea();
                 }
                 clearPreview();
                 GameState.nextPiece();
