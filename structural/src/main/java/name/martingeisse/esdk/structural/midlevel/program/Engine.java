@@ -19,12 +19,9 @@ public final class Engine {
 
     private static final int delayLevels = 10;
 
-    private static final int[] flashRowsEffectColors = new int[]{7, 3, 0, 3, 7, 3, 0};
+    private static final int[] flashRowsEffectColors = new int[]{0, 3, 7, 3, 0, 3, 7};
 
     private static final int flashRowsEffectTotalLength = 35;
-
-    //
-    public static int flashRowsEffect;
 
     public static void delayFrame() {
         Devices.delay();
@@ -91,22 +88,25 @@ public final class Engine {
     public static void engineNewGame() {
         GameState.initializeGameState();
         Devices.memory[MemoryMap.GAME_RUNNING] = 1;
-        flashRowsEffect = 0;
+        Devices.memory[MemoryMap.FLASH_ROWS_EFFECT] = -1;
         Draw.drawBackground();
         drawPreview();
     }
 
     public static void gameStep() {
-        if (flashRowsEffect > 0) {
+        if (Devices.memory[MemoryMap.FLASH_ROWS_EFFECT] >= 0) {
 
             // find completed rows
             int[] completedRows = new int[4];
             int count = GameState.findCompletedRows(GameState.shapeY, 4, completedRows);
             completedRows = Arrays.copyOf(completedRows, count);
 
+            // draw effect
+            drawFlashRowsEffect(completedRows, Devices.memory[MemoryMap.FLASH_ROWS_EFFECT]);
+
             // check for end of flash effect
-            if (flashRowsEffect == flashRowsEffectTotalLength) {
-                flashRowsEffect = 0;
+            Devices.memory[MemoryMap.FLASH_ROWS_EFFECT]--;
+            if (Devices.memory[MemoryMap.FLASH_ROWS_EFFECT] < 0) {
                 GameState.removeRows(completedRows);
                 if (GameState.addRows(count)) {
                     newLevel();
@@ -116,9 +116,6 @@ public final class Engine {
                 clearPreview();
                 GameState.nextPiece();
                 drawPreview();
-            } else {
-                drawFlashRowsEffect(completedRows, flashRowsEffect);
-                flashRowsEffect++;
             }
 
         } else {
@@ -192,7 +189,7 @@ public final class Engine {
                     GameState.nextPiece();
                     drawPreview();
                 } else {
-                    flashRowsEffect = 1;
+                    Devices.memory[MemoryMap.FLASH_ROWS_EFFECT] = flashRowsEffectTotalLength - 1;
                 }
             }
 
