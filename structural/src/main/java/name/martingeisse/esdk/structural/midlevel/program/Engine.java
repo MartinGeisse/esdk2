@@ -26,9 +26,6 @@ public final class Engine {
     //
     public static int flashRowsEffect;
 
-    //
-    private static long mainStepCounter = 0;
-
     public static void delayFrame() {
         Devices.delay();
     }
@@ -133,10 +130,10 @@ public final class Engine {
             GameState.oldShape = Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff;
 
             // perform movement as if unblocked
-            if (Devices.buttonStates[Constants.BUTTON_INDEX_LEFT] && (mainStepCounter & 3) == 0) {
+            if (Devices.buttonStates[Constants.BUTTON_INDEX_LEFT] && Devices.memory[MemoryMap.MOVEMENT_DELAY_COUNTER] == 0) {
                 GameState.shapeX--;
             }
-            if (Devices.buttonStates[Constants.BUTTON_INDEX_RIGHT] && (mainStepCounter & 3) == 0) {
+            if (Devices.buttonStates[Constants.BUTTON_INDEX_RIGHT] && Devices.memory[MemoryMap.MOVEMENT_DELAY_COUNTER] == 0) {
                 GameState.shapeX++;
             }
             if (Devices.buttonStates[Constants.BUTTON_INDEX_ROTATE_CW]) {
@@ -162,7 +159,7 @@ public final class Engine {
             }
 
             // perform downward movement
-            if (Devices.buttonStates[Constants.BUTTON_INDEX_DOWN] || (GameState.level > delayLevels) || (mainStepCounter % delayByLevel[GameState.level] == 0)) {
+            if (Devices.buttonStates[Constants.BUTTON_INDEX_DOWN] || Devices.memory[MemoryMap.GAME_DELAY_COUNTER] == 0) {
                 GameState.shapeY++;
             }
 
@@ -206,7 +203,19 @@ public final class Engine {
         if (Devices.memory[MemoryMap.GAME_RUNNING] != 0) {
             delayFrame();
             gameStep();
-            mainStepCounter++;
+
+            // game delay depends on the current level
+            Devices.memory[MemoryMap.GAME_DELAY_COUNTER]++;
+            if (GameState.level > delayLevels || Devices.memory[MemoryMap.GAME_DELAY_COUNTER] >= delayByLevel[GameState.level]) {
+                Devices.memory[MemoryMap.GAME_DELAY_COUNTER] = 0;
+            }
+
+            // movement delay is fixed to 3 frames
+            Devices.memory[MemoryMap.MOVEMENT_DELAY_COUNTER]++;
+            if (Devices.memory[MemoryMap.MOVEMENT_DELAY_COUNTER] == 3) {
+                Devices.memory[MemoryMap.MOVEMENT_DELAY_COUNTER] = 0;
+            }
+
         } else {
             Draw.drawTitleScreen();
             while (true) {
