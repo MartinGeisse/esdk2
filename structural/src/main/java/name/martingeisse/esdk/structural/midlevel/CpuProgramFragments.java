@@ -1,5 +1,6 @@
 package name.martingeisse.esdk.structural.midlevel;
 
+import name.martingeisse.esdk.structural.midlevel.program.Draw;
 import name.martingeisse.esdk.structural.midlevel.program.Engine;
 
 public final class CpuProgramFragments extends AbstractCpuProgramFragments {
@@ -486,7 +487,7 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
         sxn(1);
     }
 
-    public void drawGameOver() {
+    public void gameOver() {
         lxi(19);
         // invariant: X register contains the current row index
         while (true) {
@@ -502,6 +503,7 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
                 break;
             }
         }
+        label = Label.TITLE_SCREEN;
     }
 
     public void drawGameArea() {
@@ -883,7 +885,7 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
 //region main
 
     public void main() {
-        label = Label.START;
+        label = Label.TITLE_SCREEN;
         while (true) {
             // set the label to null while switching, so if we forget to set it again, we get an exception
             if (label == null) {
@@ -893,10 +895,30 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
             label = null;
             switch (previousLabel) {
 
-                case START:
-                    Engine.mainLoopTick();
-                    Devices.displayRepaintCallback.run();
-                    label = Label.START;
+                case TITLE_SCREEN:
+                    Draw.drawTitleScreen();
+                    label = Label.TITLE_SCREEN_LOOP;
+                    break;
+
+                case TITLE_SCREEN_LOOP:
+                    boolean anyButtonPressed = false;
+                    for (int i = 0; i < Devices.buttonStates.length; i++) {
+                        anyButtonPressed |= Devices.buttonStates[i];
+                    }
+                    if (anyButtonPressed) {
+                        CpuProgramFragments.INSTANCE.autoSeedRandom();
+                        Engine.engineNewGame();
+                        label = Label.GAME_LOOP;
+                        break;
+                    }
+                    CpuProgramFragments.INSTANCE.randomAutoSeederTick();
+                    Devices.delay();
+                    label = Label.TITLE_SCREEN_LOOP;
+                    break;
+
+                case GAME_LOOP:
+                    label = Label.GAME_LOOP;
+                    Engine.gameTick();
                     break;
 
                 default:
@@ -907,7 +929,9 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
     }
 
     private enum Label {
-        START
+        TITLE_SCREEN,
+        TITLE_SCREEN_LOOP,
+        GAME_LOOP,
     }
 
 //endregion

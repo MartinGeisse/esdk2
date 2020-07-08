@@ -87,7 +87,6 @@ public final class Engine {
 
     public static void engineNewGame() {
         GameState.initializeGameState();
-        Devices.memory[MemoryMap.GAME_RUNNING] = 1;
         Devices.memory[MemoryMap.FLASH_ROWS_EFFECT] = -1;
         Draw.drawBackground();
         drawPreview();
@@ -182,8 +181,7 @@ public final class Engine {
                 int count;
 
                 if (!GameState.pasteShape()) {
-                    Devices.memory[MemoryMap.GAME_RUNNING] = 0;
-                    CpuProgramFragments.INSTANCE.drawGameOver();
+                    CpuProgramFragments.INSTANCE.gameOver();
                     return;
                 }
 
@@ -212,26 +210,6 @@ public final class Engine {
             Devices.memory[MemoryMap.MOVEMENT_DELAY_COUNTER] = 0;
         }
 
-    }
-
-    public static void mainLoopTick() {
-        if (Devices.memory[MemoryMap.GAME_RUNNING] != 0) {
-            gameTick();
-        } else {
-            Draw.drawTitleScreen();
-            while (true) {
-                boolean anyButtonPressed = false;
-                for (int i = 0; i < Devices.buttonStates.length; i++) {
-                    anyButtonPressed |= Devices.buttonStates[i];
-                }
-                if (anyButtonPressed) {
-                    CpuProgramFragments.INSTANCE.autoSeedRandom();
-                    engineNewGame();
-                    break;
-                }
-                CpuProgramFragments.INSTANCE.randomAutoSeederTick();
-            }
-        }
     }
 
 }
