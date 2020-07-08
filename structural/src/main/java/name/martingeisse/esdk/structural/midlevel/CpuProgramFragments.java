@@ -1,5 +1,7 @@
 package name.martingeisse.esdk.structural.midlevel;
 
+import name.martingeisse.esdk.structural.midlevel.program.Engine;
+
 public final class CpuProgramFragments extends AbstractCpuProgramFragments {
 
     public static final CpuProgramFragments INSTANCE = new CpuProgramFragments();
@@ -873,6 +875,37 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
 
         }
 
+    }
+
+//endregion
+//region main
+
+    public void main() {
+        Label label = Label.START;
+        while (true) {
+            // set the label to null while switching, so if we forget to set it again, we get an exception
+            if (label == null) {
+                throw new RuntimeException("no label set");
+            }
+            Label previousLabel = label;
+            label = null;
+            switch (previousLabel) {
+
+                case START:
+                    Engine.mainLoopTick();
+                    Devices.displayRepaintCallback.run();
+                    label = Label.START;
+                    break;
+
+                default:
+                    throw new RuntimeException("unknown label: " + label);
+
+            }
+        }
+    }
+
+    private enum Label {
+        START
     }
 
 //endregion
