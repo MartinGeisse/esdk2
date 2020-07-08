@@ -23,9 +23,6 @@ public final class Engine {
 
     private static final int flashRowsEffectTotalLength = 35;
 
-    // this flag signals outwards to stop immediately
-    public static boolean gameOver;
-
     //
     public static int flashRowsEffect;
 
@@ -99,7 +96,7 @@ public final class Engine {
 
     public static void engineNewGame() {
         GameState.initializeGameState();
-        gameOver = false;
+        gameRunning = true;
         flashRowsEffect = 0;
         Draw.drawBackground();
         drawPreview();
@@ -190,7 +187,7 @@ public final class Engine {
                 int count;
 
                 if (GameState.pasteShape()) {
-                    gameOver = true;
+                    gameRunning = false;
                     CpuProgramFragments.INSTANCE.drawGameOver();
                     return;
                 }
@@ -210,13 +207,9 @@ public final class Engine {
 
     public static void mainLoopTick() {
         if (gameRunning) {
-            if (gameOver) {
-                gameRunning = false;
-            } else {
-                delayFrame();
-                gameStep();
-                mainStepCounter++;
-            }
+            delayFrame();
+            gameStep();
+            mainStepCounter++;
         } else {
             Draw.drawTitleScreen();
             while (true) {
@@ -226,7 +219,6 @@ public final class Engine {
                 }
                 if (anyButtonPressed) {
                     CpuProgramFragments.INSTANCE.autoSeedRandom();
-                    gameRunning = true;
                     engineNewGame();
                     break;
                 }
