@@ -122,8 +122,8 @@ public final class Engine {
 
             // undraw shape and remember position and shape
             Draw.drawShapeOnGameArea(GameState.shapeX, GameState.shapeY, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff, 0);
-            GameState.oldShapeX = GameState.shapeX;
-            GameState.oldShapeY = GameState.shapeY;
+            Devices.memory[MemoryMap.OLD_X] = (byte)GameState.shapeX;
+            Devices.memory[MemoryMap.OLD_Y] = (byte)GameState.shapeY;
             Devices.memory[MemoryMap.OLD_SHAPE] = Devices.memory[MemoryMap.CURRENT_SHAPE];
 
             // perform movement as if unblocked
@@ -146,12 +146,12 @@ public final class Engine {
 
             // If now unblocked, remember new position and shape. If blocked, restore old position and shape
             if (GameState.unblockedShapePosition()) {
-                GameState.oldShapeX = GameState.shapeX;
-                GameState.oldShapeY = GameState.shapeY;
+                Devices.memory[MemoryMap.OLD_X] = (byte)GameState.shapeX;
+                Devices.memory[MemoryMap.OLD_Y] = (byte)GameState.shapeY;
                 Devices.memory[MemoryMap.OLD_SHAPE] = Devices.memory[MemoryMap.CURRENT_SHAPE];
             } else {
-                GameState.shapeX = GameState.oldShapeX;
-                GameState.shapeY = GameState.oldShapeY;
+                GameState.shapeX = Devices.memory[MemoryMap.OLD_X];
+                GameState.shapeY = Devices.memory[MemoryMap.OLD_Y];
                 Devices.memory[MemoryMap.CURRENT_SHAPE] = Devices.memory[MemoryMap.OLD_SHAPE];
             }
 
@@ -164,8 +164,8 @@ public final class Engine {
             boolean landed = !GameState.unblockedShapePosition();
             if (landed) {
                 // TODO only y can change, so restoring x and shape is not necessary
-                GameState.shapeX = GameState.oldShapeX;
-                GameState.shapeY = GameState.oldShapeY;
+                GameState.shapeX = Devices.memory[MemoryMap.OLD_X];
+                GameState.shapeY = Devices.memory[MemoryMap.OLD_Y];
                 Devices.memory[MemoryMap.CURRENT_SHAPE] = Devices.memory[MemoryMap.OLD_SHAPE];
             }
 

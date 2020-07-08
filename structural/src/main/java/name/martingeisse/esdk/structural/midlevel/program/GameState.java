@@ -15,7 +15,6 @@ public final class GameState {
      * Also, when entering the game area, the actual shape also crosses the y=0 border.
      */
     public static int shapeX, shapeY;
-    public static int oldShapeX, oldShapeY;
 
     public static void initializeGameState() {
         clearGameArea();

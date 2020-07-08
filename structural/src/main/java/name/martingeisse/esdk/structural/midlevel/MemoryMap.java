@@ -78,7 +78,7 @@ public final class MemoryMap {
     // public static final int CURRENT_X = 233;
     // public static final int CURRENT_Y = 234;
     public static final int OLD_SHAPE = 235;
-    // public static final int OLD_X = 236;
-    // public static final int OLD_Y = 237;
+    public static final int OLD_X = 236;
+    public static final int OLD_Y = 237;
 
 }
