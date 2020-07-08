@@ -98,7 +98,7 @@ public final class Engine {
 
             // find completed rows
             int[] completedRows = new int[4];
-            int count = GameState.findCompletedRows(GameState.shapeY, 4, completedRows);
+            int count = GameState.findCompletedRows(Devices.memory[MemoryMap.CURRENT_Y], 4, completedRows);
             completedRows = Arrays.copyOf(completedRows, count);
 
             // draw effect
@@ -121,17 +121,18 @@ public final class Engine {
         } else {
 
             // undraw shape and remember position and shape
-            Draw.drawShapeOnGameArea(GameState.shapeX, GameState.shapeY, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff, 0);
-            Devices.memory[MemoryMap.OLD_X] = (byte)GameState.shapeX;
-            Devices.memory[MemoryMap.OLD_Y] = (byte)GameState.shapeY;
+            Draw.drawShapeOnGameArea(Devices.memory[MemoryMap.CURRENT_X], Devices.memory[MemoryMap.CURRENT_Y],
+                    Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff, 0);
+            Devices.memory[MemoryMap.OLD_X] = Devices.memory[MemoryMap.CURRENT_X];
+            Devices.memory[MemoryMap.OLD_Y] = Devices.memory[MemoryMap.CURRENT_Y];
             Devices.memory[MemoryMap.OLD_SHAPE] = Devices.memory[MemoryMap.CURRENT_SHAPE];
 
             // perform movement as if unblocked
             if (Devices.buttonStates[Constants.BUTTON_INDEX_LEFT] && Devices.memory[MemoryMap.MOVEMENT_DELAY_COUNTER] == 0) {
-                GameState.shapeX--;
+                Devices.memory[MemoryMap.CURRENT_X]--;
             }
             if (Devices.buttonStates[Constants.BUTTON_INDEX_RIGHT] && Devices.memory[MemoryMap.MOVEMENT_DELAY_COUNTER] == 0) {
-                GameState.shapeX++;
+                Devices.memory[MemoryMap.CURRENT_X]++;
             }
             if (Devices.buttonStates[Constants.BUTTON_INDEX_ROTATE_CW]) {
                 Devices.buttonStates[Constants.BUTTON_INDEX_ROTATE_CW] = false;
@@ -146,44 +147,45 @@ public final class Engine {
 
             // If now unblocked, remember new position and shape. If blocked, restore old position and shape
             if (GameState.unblockedShapePosition()) {
-                Devices.memory[MemoryMap.OLD_X] = (byte)GameState.shapeX;
-                Devices.memory[MemoryMap.OLD_Y] = (byte)GameState.shapeY;
+                Devices.memory[MemoryMap.OLD_X] = Devices.memory[MemoryMap.CURRENT_X];
+                Devices.memory[MemoryMap.OLD_Y] = Devices.memory[MemoryMap.CURRENT_Y];
                 Devices.memory[MemoryMap.OLD_SHAPE] = Devices.memory[MemoryMap.CURRENT_SHAPE];
             } else {
-                GameState.shapeX = Devices.memory[MemoryMap.OLD_X];
-                GameState.shapeY = Devices.memory[MemoryMap.OLD_Y];
+                Devices.memory[MemoryMap.CURRENT_X] = Devices.memory[MemoryMap.OLD_X];
+                Devices.memory[MemoryMap.CURRENT_Y] = Devices.memory[MemoryMap.OLD_Y];
                 Devices.memory[MemoryMap.CURRENT_SHAPE] = Devices.memory[MemoryMap.OLD_SHAPE];
             }
 
             // perform downward movement
             if (Devices.buttonStates[Constants.BUTTON_INDEX_DOWN] || Devices.memory[MemoryMap.GAME_DELAY_COUNTER] == 0) {
-                GameState.shapeY++;
+                Devices.memory[MemoryMap.CURRENT_Y]++;
             }
 
             // if now blocked, restore old position and shape. Also remember that since it means the shape has landed.
             boolean landed = !GameState.unblockedShapePosition();
             if (landed) {
                 // TODO only y can change, so restoring x and shape is not necessary
-                GameState.shapeX = Devices.memory[MemoryMap.OLD_X];
-                GameState.shapeY = Devices.memory[MemoryMap.OLD_Y];
+                Devices.memory[MemoryMap.CURRENT_X] = Devices.memory[MemoryMap.OLD_X];
+                Devices.memory[MemoryMap.CURRENT_Y] = Devices.memory[MemoryMap.OLD_Y];
                 Devices.memory[MemoryMap.CURRENT_SHAPE] = Devices.memory[MemoryMap.OLD_SHAPE];
             }
 
             // draw shape at new position
-            Draw.drawShapeOnGameArea(GameState.shapeX, GameState.shapeY, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff, Devices.memory[MemoryMap.CURRENT_COLOR] & 0xff);
+            Draw.drawShapeOnGameArea(Devices.memory[MemoryMap.CURRENT_X], Devices.memory[MemoryMap.CURRENT_Y],
+                    Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff, Devices.memory[MemoryMap.CURRENT_COLOR] & 0xff);
 
             // handle landing
             if (landed) {
                 int[] completedRows = new int[4];
                 int count;
 
-                if (GameState.pasteShape()) {
+                if (!GameState.pasteShape()) {
                     Devices.memory[MemoryMap.GAME_RUNNING] = 0;
                     CpuProgramFragments.INSTANCE.drawGameOver();
                     return;
                 }
 
-                count = GameState.findCompletedRows(GameState.shapeY, 4, completedRows);
+                count = GameState.findCompletedRows(Devices.memory[MemoryMap.CURRENT_Y], 4, completedRows);
                 if (count == 0) {
                     clearPreview();
                     GameState.nextPiece();

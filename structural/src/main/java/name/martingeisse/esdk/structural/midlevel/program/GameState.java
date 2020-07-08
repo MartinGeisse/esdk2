@@ -10,12 +10,6 @@ public final class GameState {
     private GameState() {
     }
 
-    /* Position of the currently moving shape. These values may be negative and/or exceed 9 since they only
-     * indicate the position of the upper left corner of the shape's 4x4 box, not of the shape itself.
-     * Also, when entering the game area, the actual shape also crosses the y=0 border.
-     */
-    public static int shapeX, shapeY;
-
     public static void initializeGameState() {
         clearGameArea();
         Devices.memory[MemoryMap.PREVIEW_PIECE_0] = (byte)nextRandomMod7();
@@ -61,8 +55,8 @@ public final class GameState {
         Devices.memory[MemoryMap.CURRENT_SHAPE] = Shapes.normalShapeByPiece[Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff];
 
         // place the new piece at the top of the game area
-        shapeX = 3;
-        shapeY = -4;
+        Devices.memory[MemoryMap.CURRENT_X] = 3;
+        Devices.memory[MemoryMap.CURRENT_Y] = -4;
 
     }
 
@@ -73,8 +67,8 @@ public final class GameState {
                 if (!matrix[j * 4 + i]) {
                     continue;
                 }
-                int x2 = shapeX + i;
-                int y2 = shapeY + j;
+                int x2 = Devices.memory[MemoryMap.CURRENT_X] + i;
+                int y2 = Devices.memory[MemoryMap.CURRENT_Y] + j;
                 if (x2 < 0 || x2 > 9 || y2 > 19) {
                     return false;
                 }
@@ -92,22 +86,20 @@ public final class GameState {
     public static boolean pasteShape() {
         int shapeIndex = Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff;
         boolean[] matrix = Shapes.shapeOccupationMatrices[shapeIndex];
-        boolean crossedBorder = false;
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
                 if (!matrix[j * 4 + i]) {
                     continue;
                 }
-                int x2 = shapeX + i;
-                int y2 = shapeY + j;
+                int x2 = Devices.memory[MemoryMap.CURRENT_X] + i;
+                int y2 = Devices.memory[MemoryMap.CURRENT_Y] + j;
                 if (x2 < 0 || x2 > 9 || y2 < 0 || y2 > 19) {
-                    crossedBorder = true;
-                    continue;
+                    return false;
                 }
                 Devices.memory[y2 * 10 + x2] = Devices.memory[MemoryMap.CURRENT_COLOR];
             }
         }
-        return crossedBorder;
+        return true;
     }
 
     public static boolean isRowCompleted(int rowIndex) {
