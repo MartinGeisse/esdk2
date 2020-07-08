@@ -6,6 +6,8 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
 
     public static final CpuProgramFragments INSTANCE = new CpuProgramFragments();
 
+    private Label label;
+
 //region memory access
 
     @Override
@@ -881,7 +883,7 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
 //region main
 
     public void main() {
-        Label label = Label.START;
+        label = Label.START;
         while (true) {
             // set the label to null while switching, so if we forget to set it again, we get an exception
             if (label == null) {
