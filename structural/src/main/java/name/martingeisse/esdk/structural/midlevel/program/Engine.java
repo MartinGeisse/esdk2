@@ -27,9 +27,6 @@ public final class Engine {
     public static int flashRowsEffect;
 
     //
-    private static boolean gameRunning = false;
-
-    //
     private static long mainStepCounter = 0;
 
     public static void delayFrame() {
@@ -96,7 +93,7 @@ public final class Engine {
 
     public static void engineNewGame() {
         GameState.initializeGameState();
-        gameRunning = true;
+        Devices.memory[MemoryMap.GAME_RUNNING] = 1;
         flashRowsEffect = 0;
         Draw.drawBackground();
         drawPreview();
@@ -187,7 +184,7 @@ public final class Engine {
                 int count;
 
                 if (GameState.pasteShape()) {
-                    gameRunning = false;
+                    Devices.memory[MemoryMap.GAME_RUNNING] = 0;
                     CpuProgramFragments.INSTANCE.drawGameOver();
                     return;
                 }
@@ -206,7 +203,7 @@ public final class Engine {
     }
 
     public static void mainLoopTick() {
-        if (gameRunning) {
+        if (Devices.memory[MemoryMap.GAME_RUNNING] != 0) {
             delayFrame();
             gameStep();
             mainStepCounter++;

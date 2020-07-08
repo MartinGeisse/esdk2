@@ -64,5 +64,10 @@ public final class MemoryMap {
      */
     public static final int UTIL_0 = 225;
 
+    // main loop state
+    public static final int GAME_RUNNING = 226;
+    // TODO public static final int GAME_DELAY_COUNTER = 228;
+    // TODO public static final int FLASH_ROWS_EFFECT = 229;
+
 
 }
