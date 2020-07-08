@@ -10,10 +10,6 @@ public final class GameState {
     private GameState() {
     }
 
-    // completed rows for this level
-    public static int rows;
-    public static int level;
-
     /* Position of the currently moving shape. These values may be negative and/or exceed 9 since they only
      * indicate the position of the upper left corner of the shape's 4x4 box, not of the shape itself.
      * Also, when entering the game area, the actual shape also crosses the y=0 border.
@@ -31,8 +27,8 @@ public final class GameState {
         Devices.memory[MemoryMap.PREVIEW_COLOR_1] = (byte)(nextRandomMod7() + 1);
         Devices.memory[MemoryMap.PREVIEW_PIECE_2] = (byte)nextRandomMod7();
         Devices.memory[MemoryMap.PREVIEW_COLOR_2] = (byte)(nextRandomMod7() + 1);
-        rows = 0;
-        level = 0;
+        Devices.memory[MemoryMap.ROW_COUNTER] = 0;
+        Devices.memory[MemoryMap.LEVEL] = 0;
         nextPiece();
     }
 
@@ -41,12 +37,12 @@ public final class GameState {
     }
 
     public static boolean addRows(int num) {
-        rows += num;
-        if (rows < 10) {
+        Devices.memory[MemoryMap.ROW_COUNTER] += num;
+        if (Devices.memory[MemoryMap.ROW_COUNTER] < 10) {
             return false;
         }
-        rows -= 10;
-        level++;
+        Devices.memory[MemoryMap.ROW_COUNTER] -= 10;
+        Devices.memory[MemoryMap.LEVEL]++;
         return true;
     }
 

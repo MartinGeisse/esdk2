@@ -203,7 +203,8 @@ public final class Engine {
 
             // game delay depends on the current level
             Devices.memory[MemoryMap.GAME_DELAY_COUNTER]++;
-            if (GameState.level > delayLevels || Devices.memory[MemoryMap.GAME_DELAY_COUNTER] >= delayByLevel[GameState.level]) {
+            if (Devices.memory[MemoryMap.LEVEL] > delayLevels ||
+                    Devices.memory[MemoryMap.GAME_DELAY_COUNTER] >= delayByLevel[Devices.memory[MemoryMap.LEVEL]]) {
                 Devices.memory[MemoryMap.GAME_DELAY_COUNTER] = 0;
             }
 

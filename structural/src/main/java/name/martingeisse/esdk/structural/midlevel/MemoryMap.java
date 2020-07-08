@@ -70,5 +70,9 @@ public final class MemoryMap {
     public static final int MOVEMENT_DELAY_COUNTER = 229;
     public static final int FLASH_ROWS_EFFECT = 230;
 
+    // accumulated rows for current level, and level counter
+    public static final int ROW_COUNTER = 231;
+    public static final int LEVEL = 232;
+
 
 }
