@@ -893,7 +893,7 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
             }
             Label previousLabel = label;
             label = null;
-            switch (previousLabel) {
+            labelSwitch: switch (previousLabel) {
 
                 case TITLE_SCREEN:
                     Draw.drawTitleScreen();
@@ -901,19 +901,21 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
                     break;
 
                 case TITLE_SCREEN_LOOP:
-                    boolean anyButtonPressed = false;
                     for (int i = 0; i < Devices.buttonStates.length; i++) {
-                        anyButtonPressed |= Devices.buttonStates[i];
-                    }
-                    if (anyButtonPressed) {
-                        CpuProgramFragments.INSTANCE.autoSeedRandom();
-                        Engine.engineNewGame();
-                        label = Label.GAME_LOOP;
-                        break;
+                        if (Devices.buttonStates[i]) {
+                            label = Label.START_GAME;
+                            break labelSwitch;
+                        }
                     }
                     CpuProgramFragments.INSTANCE.randomAutoSeederTick();
                     Devices.delay();
                     label = Label.TITLE_SCREEN_LOOP;
+                    break;
+
+                case START_GAME:
+                    CpuProgramFragments.INSTANCE.autoSeedRandom();
+                    Engine.engineNewGame();
+                    label = Label.GAME_LOOP;
                     break;
 
                 case GAME_LOOP:
@@ -931,6 +933,7 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
     private enum Label {
         TITLE_SCREEN,
         TITLE_SCREEN_LOOP,
+        START_GAME,
         GAME_LOOP,
     }
 
