@@ -74,5 +74,11 @@ public final class MemoryMap {
     public static final int ROW_COUNTER = 231;
     public static final int LEVEL = 232;
 
+    // TODO shape and backup, move together
+    // public static final int CURRENT_X = 233;
+    // public static final int CURRENT_Y = 234;
+    public static final int OLD_SHAPE = 235;
+    // public static final int OLD_X = 236;
+    // public static final int OLD_Y = 237;
 
 }

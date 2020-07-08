@@ -124,7 +124,7 @@ public final class Engine {
             Draw.drawShapeOnGameArea(GameState.shapeX, GameState.shapeY, Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff, 0);
             GameState.oldShapeX = GameState.shapeX;
             GameState.oldShapeY = GameState.shapeY;
-            GameState.oldShape = Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff;
+            Devices.memory[MemoryMap.OLD_SHAPE] = Devices.memory[MemoryMap.CURRENT_SHAPE];
 
             // perform movement as if unblocked
             if (Devices.buttonStates[Constants.BUTTON_INDEX_LEFT] && Devices.memory[MemoryMap.MOVEMENT_DELAY_COUNTER] == 0) {
@@ -148,11 +148,11 @@ public final class Engine {
             if (GameState.unblockedShapePosition()) {
                 GameState.oldShapeX = GameState.shapeX;
                 GameState.oldShapeY = GameState.shapeY;
-                GameState.oldShape = Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff;
+                Devices.memory[MemoryMap.OLD_SHAPE] = Devices.memory[MemoryMap.CURRENT_SHAPE];
             } else {
                 GameState.shapeX = GameState.oldShapeX;
                 GameState.shapeY = GameState.oldShapeY;
-                Devices.memory[MemoryMap.CURRENT_SHAPE] = (byte)GameState.oldShape;
+                Devices.memory[MemoryMap.CURRENT_SHAPE] = Devices.memory[MemoryMap.OLD_SHAPE];
             }
 
             // perform downward movement
@@ -166,7 +166,7 @@ public final class Engine {
                 // TODO only y can change, so restoring x and shape is not necessary
                 GameState.shapeX = GameState.oldShapeX;
                 GameState.shapeY = GameState.oldShapeY;
-                Devices.memory[MemoryMap.CURRENT_SHAPE] = (byte)GameState.oldShape;
+                Devices.memory[MemoryMap.CURRENT_SHAPE] = Devices.memory[MemoryMap.OLD_SHAPE];
             }
 
             // draw shape at new position
