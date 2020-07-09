@@ -1,5 +1,6 @@
 package name.martingeisse.esdk.structural.midlevel.program;
 
+import name.martingeisse.esdk.structural.midlevel.Constants;
 import name.martingeisse.esdk.structural.midlevel.CpuProgramFragments;
 import name.martingeisse.esdk.structural.midlevel.Devices;
 
@@ -8,17 +9,6 @@ public final class Draw {
 
     private Draw() {
     }
-
-    // offet of the game area in screen coordinates
-    public static final int GAME_AREA_X_ON_SCREEN = 3;
-    public static final int GAME_AREA_Y_ON_SCREEN = 9;
-
-    // offet of the (leftmost) preview box screen coordinates
-    public static final int PREVIEW_X_ON_SCREEN = 1;
-    public static final int PREVIEW_Y_ON_SCREEN = 1;
-
-    // x offset of one preview box to the next
-    public static final int PREVIEW_X_DELTA = 5;
 
     public static void drawClippedShapeOnScreen(int x, int y, int shapeIndex, int c, int minx, int miny, int maxx, int maxy) {
         boolean[] occupationMatrix = Shapes.shapeOccupationMatrices[shapeIndex];
@@ -45,14 +35,15 @@ public final class Draw {
 
 
     public static void drawShapeOnGameArea(int x, int y, int shapeIndex, int c) {
-        drawClippedShapeOnScreen(x + GAME_AREA_X_ON_SCREEN, y + GAME_AREA_Y_ON_SCREEN,
+        drawClippedShapeOnScreen(x + Constants.GAME_AREA_X_ON_SCREEN, y + Constants.GAME_AREA_Y_ON_SCREEN,
                 shapeIndex, c,
-                GAME_AREA_X_ON_SCREEN, GAME_AREA_Y_ON_SCREEN,
-                GAME_AREA_X_ON_SCREEN + 9, GAME_AREA_Y_ON_SCREEN + 19);
+                Constants.GAME_AREA_X_ON_SCREEN, Constants.GAME_AREA_Y_ON_SCREEN,
+                Constants.GAME_AREA_X_ON_SCREEN + 9, Constants.GAME_AREA_Y_ON_SCREEN + 19);
     }
 
     public static void drawShapeInPreview(int previewIndex, int shapeIndex, int c) {
-        drawShapeOnScreen(PREVIEW_X_ON_SCREEN + previewIndex * PREVIEW_X_DELTA, PREVIEW_Y_ON_SCREEN, shapeIndex, c);
+        drawShapeOnScreen(Constants.PREVIEW_X_ON_SCREEN + previewIndex * Constants.PREVIEW_X_DELTA,
+                Constants.PREVIEW_Y_ON_SCREEN, shapeIndex, c);
     }
 
     public static void drawPieceInPreview(int previewIndex, int pieceIndex, int c) {
