@@ -33,10 +33,6 @@ public final class Engine {
         }
     }
 
-    public static void drawFlashRowsEffect(int[] rows, int frame) {
-        Draw.fillGameRows(rows, flashRowsEffectColors[frame / 5]);
-    }
-
     public static void recolorTiles(int color) {
         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < 20; j++) {

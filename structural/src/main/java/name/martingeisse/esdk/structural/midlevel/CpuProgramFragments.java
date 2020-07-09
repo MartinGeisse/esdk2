@@ -1078,7 +1078,9 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
                     }
 
                     // draw effect
-                    Engine.drawFlashRowsEffect(completedRows, Devices.memory[MemoryMap.FLASH_ROWS_EFFECT]);
+                    for (int row : completedRows) {
+                        Draw.fillGameRow(row, Engine.flashRowsEffectColors[Devices.memory[MemoryMap.FLASH_ROWS_EFFECT] / 5]);
+                    }
 
                     // loop until end of effect
                     Devices.memory[MemoryMap.FLASH_ROWS_EFFECT]--;

@@ -63,11 +63,4 @@ public final class Draw {
         CpuProgramFragments.INSTANCE.fillGameRow(y, c);
     }
 
-    public static void fillGameRows(int[] rows, int c) {
-        for (int row : rows) {
-            fillGameRow(row, c);
-        }
-    }
-
-
 }
