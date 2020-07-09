@@ -417,15 +417,6 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
 //region other drawing
 
     /**
-     * Convenience wrapper.
-     */
-    public void fillGameRow(int y, int c) {
-        Devices.memory[MemoryMap.TEMP_0] = (byte) y;
-        Devices.memory[MemoryMap.TEMP_1] = (byte) c;
-        fillGameRow();
-    }
-
-    /**
      * TEMP_0 must contain the row index, TEMP_1 the color to fill. Does not overwrite other TEMP_* registers.
      */
     public void fillGameRow() {

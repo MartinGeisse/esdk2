@@ -59,8 +59,4 @@ public final class Draw {
         drawShapeInPreview(previewIndex, Shapes.normalShapeByPiece[pieceIndex], c);
     }
 
-    public static void fillGameRow(int y, int c) {
-        CpuProgramFragments.INSTANCE.fillGameRow(y, c);
-    }
-
 }
