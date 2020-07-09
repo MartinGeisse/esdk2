@@ -20,29 +20,6 @@ public final class GameState {
         return true;
     }
 
-    public static void nextPiece() {
-
-        // shift color
-        Devices.memory[MemoryMap.CURRENT_COLOR] = Devices.memory[MemoryMap.PREVIEW_COLOR_0];
-        Devices.memory[MemoryMap.PREVIEW_COLOR_0] = Devices.memory[MemoryMap.PREVIEW_COLOR_1];
-        Devices.memory[MemoryMap.PREVIEW_COLOR_1] = Devices.memory[MemoryMap.PREVIEW_COLOR_2];
-        Devices.memory[MemoryMap.PREVIEW_COLOR_2] = (byte)(nextRandomMod7() + 1);
-
-        // shift piece (note: CURRENT_SHAPE temporarily contains the piece, not the shape)
-        Devices.memory[MemoryMap.CURRENT_SHAPE] = Devices.memory[MemoryMap.PREVIEW_PIECE_0];
-        Devices.memory[MemoryMap.PREVIEW_PIECE_0] = Devices.memory[MemoryMap.PREVIEW_PIECE_1];
-        Devices.memory[MemoryMap.PREVIEW_PIECE_1] = Devices.memory[MemoryMap.PREVIEW_PIECE_2];
-        Devices.memory[MemoryMap.PREVIEW_PIECE_2] = (byte) nextRandomMod7();
-
-        // now turn the piece into its normal shape
-        Devices.memory[MemoryMap.CURRENT_SHAPE] = Shapes.normalShapeByPiece[Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff];
-
-        // place the new piece at the top of the game area
-        Devices.memory[MemoryMap.CURRENT_X] = 3;
-        Devices.memory[MemoryMap.CURRENT_Y] = -4;
-
-    }
-
     public static boolean unblockedShapePosition() {
         boolean[] matrix = Shapes.shapeOccupationMatrices[Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff];
         for (int i = 0; i < 4; i++) {

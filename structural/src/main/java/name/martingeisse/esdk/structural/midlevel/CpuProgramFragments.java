@@ -1127,7 +1127,26 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
                 //endregion
 
                 case NEXT_PIECE:
-                    GameState.nextPiece();
+
+                    // shift color
+                    Devices.memory[MemoryMap.CURRENT_COLOR] = Devices.memory[MemoryMap.PREVIEW_COLOR_0];
+                    Devices.memory[MemoryMap.PREVIEW_COLOR_0] = Devices.memory[MemoryMap.PREVIEW_COLOR_1];
+                    Devices.memory[MemoryMap.PREVIEW_COLOR_1] = Devices.memory[MemoryMap.PREVIEW_COLOR_2];
+                    Devices.memory[MemoryMap.PREVIEW_COLOR_2] = (byte)(GameState.nextRandomMod7() + 1);
+
+                    // shift piece (note: CURRENT_SHAPE temporarily contains the piece, not the shape)
+                    Devices.memory[MemoryMap.CURRENT_SHAPE] = Devices.memory[MemoryMap.PREVIEW_PIECE_0];
+                    Devices.memory[MemoryMap.PREVIEW_PIECE_0] = Devices.memory[MemoryMap.PREVIEW_PIECE_1];
+                    Devices.memory[MemoryMap.PREVIEW_PIECE_1] = Devices.memory[MemoryMap.PREVIEW_PIECE_2];
+                    Devices.memory[MemoryMap.PREVIEW_PIECE_2] = (byte) GameState.nextRandomMod7();
+
+                    // now turn the piece into its normal shape
+                    Devices.memory[MemoryMap.CURRENT_SHAPE] = Shapes.normalShapeByPiece[Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff];
+
+                    // place the new piece at the top of the game area
+                    Devices.memory[MemoryMap.CURRENT_X] = 3;
+                    Devices.memory[MemoryMap.CURRENT_Y] = -4;
+
                     if (Devices.memory[MemoryMap.RETURN_SELECTOR_NONLEAF_1] == 0) {
                         label = Label.NEXT_PIECE_RETURN_0;
                     } else {
