@@ -1136,29 +1136,44 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
                 case NEXT_PIECE_1:
 
                     // shift color
-                    Devices.memory[MemoryMap.CURRENT_COLOR] = Devices.memory[MemoryMap.PREVIEW_COLOR_0];
-                    Devices.memory[MemoryMap.PREVIEW_COLOR_0] = Devices.memory[MemoryMap.PREVIEW_COLOR_1];
-                    Devices.memory[MemoryMap.PREVIEW_COLOR_1] = Devices.memory[MemoryMap.PREVIEW_COLOR_2];
-                    Devices.memory[MemoryMap.RETURN_SELECTOR] = 0;
+                    lxa(MemoryMap.PREVIEW_COLOR_0);
+                    sxa(MemoryMap.CURRENT_COLOR);
+                    lxa(MemoryMap.PREVIEW_COLOR_1);
+                    sxa(MemoryMap.PREVIEW_COLOR_0);
+                    lxa(MemoryMap.PREVIEW_COLOR_2);
+                    sxa(MemoryMap.PREVIEW_COLOR_1);
+                    lxi(0);
+                    sxa(MemoryMap.RETURN_SELECTOR);
                     label = Label.NEXT_RANDOM_MOD_7;
                     break;
 
                 case NEXT_PIECE_2:
-                    Devices.memory[MemoryMap.PREVIEW_COLOR_2] = (byte)(Devices.memory[MemoryMap.TEMP_0] + 1);
+                    // shift color (continued)
+                    lxa(MemoryMap.TEMP_0);
+                    operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.X, 1);
+                    sxa(MemoryMap.PREVIEW_COLOR_2);
 
                     // shift piece (note: CURRENT_SHAPE temporarily contains the piece, not the shape)
-                    Devices.memory[MemoryMap.CURRENT_SHAPE] = Devices.memory[MemoryMap.PREVIEW_PIECE_0];
-                    Devices.memory[MemoryMap.PREVIEW_PIECE_0] = Devices.memory[MemoryMap.PREVIEW_PIECE_1];
-                    Devices.memory[MemoryMap.PREVIEW_PIECE_1] = Devices.memory[MemoryMap.PREVIEW_PIECE_2];
-                    Devices.memory[MemoryMap.RETURN_SELECTOR] = 1;
+                    lxa(MemoryMap.PREVIEW_PIECE_0);
+                    sxa(MemoryMap.CURRENT_SHAPE);
+                    lxa(MemoryMap.PREVIEW_PIECE_1);
+                    sxa(MemoryMap.PREVIEW_PIECE_0);
+                    lxa(MemoryMap.PREVIEW_PIECE_2);
+                    sxa(MemoryMap.PREVIEW_PIECE_1);
+                    lxi(1);
+                    sxa(MemoryMap.RETURN_SELECTOR);
                     label = Label.NEXT_RANDOM_MOD_7;
                     break;
 
                 case NEXT_PIECE_3:
-                    Devices.memory[MemoryMap.PREVIEW_PIECE_2] = (byte) Devices.memory[MemoryMap.TEMP_0];
+                    // shift piece (continued)
+                    lxa(MemoryMap.TEMP_0);
+                    sxa(MemoryMap.PREVIEW_PIECE_2);
 
                     // now turn the piece into its normal shape
-                    Devices.memory[MemoryMap.CURRENT_SHAPE] = Shapes.normalShapeByPiece[Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff];
+                    lxa(MemoryMap.CURRENT_SHAPE);
+                    setX(Shapes.normalShapeByPiece[getX()]);// TODO
+                    sxa(MemoryMap.CURRENT_SHAPE);
 
                     // place the new piece at the top of the game area
                     Devices.memory[MemoryMap.CURRENT_X] = 3;
