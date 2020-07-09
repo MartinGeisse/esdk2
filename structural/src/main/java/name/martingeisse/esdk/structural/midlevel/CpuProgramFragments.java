@@ -1172,7 +1172,48 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
 
                     // now turn the piece into its normal shape
                     lxa(MemoryMap.CURRENT_SHAPE);
-                    setX(Shapes.normalShapeByPiece[getX()]);// TODO
+                    lyi(0);
+                    operation(Operation.SUB, AddressingMode.IMMEDIATE, Destination.X, 1);
+                    if (!isCarry()) {
+                        label = Label.NEXT_PIECE_4;
+                        break;
+                    }
+                    lyi(2);
+                    operation(Operation.SUB, AddressingMode.IMMEDIATE, Destination.X, 1);
+                    if (!isCarry()) {
+                        label = Label.NEXT_PIECE_4;
+                        break;
+                    }
+                    lyi(6);
+                    operation(Operation.SUB, AddressingMode.IMMEDIATE, Destination.X, 1);
+                    if (!isCarry()) {
+                        label = Label.NEXT_PIECE_4;
+                        break;
+                    }
+                    lyi(7);
+                    operation(Operation.SUB, AddressingMode.IMMEDIATE, Destination.X, 1);
+                    if (!isCarry()) {
+                        label = Label.NEXT_PIECE_4;
+                        break;
+                    }
+                    lyi(11);
+                    operation(Operation.SUB, AddressingMode.IMMEDIATE, Destination.X, 1);
+                    if (!isCarry()) {
+                        label = Label.NEXT_PIECE_4;
+                        break;
+                    }
+                    lyi(16);
+                    operation(Operation.SUB, AddressingMode.IMMEDIATE, Destination.X, 1);
+                    if (!isCarry()) {
+                        label = Label.NEXT_PIECE_4;
+                        break;
+                    }
+                    lyi(18);
+                    label = Label.NEXT_PIECE_4;
+                    break;
+
+                case NEXT_PIECE_4:
+                    lxy();
                     sxa(MemoryMap.CURRENT_SHAPE);
 
                     // place the new piece at the top of the game area
@@ -1227,6 +1268,7 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
         NEXT_PIECE_1,
         NEXT_PIECE_2,
         NEXT_PIECE_3,
+        NEXT_PIECE_4,
         NEXT_RANDOM_MOD_7,
 
         DRAW_PREVIEW_THEN_RETURN_TO_GAME,
