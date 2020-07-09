@@ -1,6 +1,5 @@
 package name.martingeisse.esdk.structural.midlevel;
 
-import name.martingeisse.esdk.structural.midlevel.program.Draw;
 import name.martingeisse.esdk.structural.midlevel.program.Engine;
 import name.martingeisse.esdk.structural.midlevel.program.GameState;
 
@@ -869,6 +868,7 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
 //endregion
 //region main
 
+    @SuppressWarnings("UnnecessaryLabelOnBreakStatement")
     public void main() {
         label = Label.TITLE_SCREEN;
         while (true) {
@@ -916,26 +916,26 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
                     // clear game area in memory (no need to clear it on screen since drawing the game background
                     // will leave the on-screen game area blank anyway).
                     lyi(199);
-                    while (true) {
-                        lxi(0);
-                        sxn();
-                        lxy();
-                        operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.Y, 255);
-                        if (!isCarry()) {
-                            break;
-                        }
+                case START_GAME_1:
+                    lxi(0);
+                    sxn();
+                    lxy();
+                    operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.Y, 255);
+                    if (isCarry()) {
+                        label = Label.START_GAME_1;
+                        break labelSwitch;
                     }
 
                     // randomize the current and thee preview pieces
                     lxi(3);
-                    while (true) {
-                        sxa(MemoryMap.UTIL_0);
-                        GameState.nextPiece();
-                        lxa(MemoryMap.UTIL_0);
-                        operation(Operation.SUB, AddressingMode.IMMEDIATE, Destination.X, 1);
-                        if (!isCarry()) {
-                            break;
-                        }
+                case START_GAME_2:
+                    sxa(MemoryMap.UTIL_0);
+                    GameState.nextPiece();
+                    lxa(MemoryMap.UTIL_0);
+                    operation(Operation.SUB, AddressingMode.IMMEDIATE, Destination.X, 1);
+                    if (isCarry()) {
+                        label = Label.START_GAME_2;
+                        break labelSwitch;
                     }
 
                     // draw game screen
@@ -943,7 +943,7 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
                     label = Label.CLEAR_SCREEN;
                     break;
 
-                case START_GAME_X:
+                case START_GAME_3:
                     CpuProgramFragments.INSTANCE.drawBackground();
                     Engine.drawPreview();
 
@@ -960,7 +960,7 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
                     if (Devices.memory[MemoryMap.RETURN_SELECTOR] == 0) {
                         label = Label.TITLE_SCREEN_1;
                     } else {
-                        label = Label.START_GAME_X;
+                        label = Label.START_GAME_3;
                     }
                     break;
 
@@ -978,7 +978,9 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
         TITLE_SCREEN_LOOP,
 
         START_GAME,
-        START_GAME_X,
+        START_GAME_1,
+        START_GAME_2,
+        START_GAME_3,
         GAME_LOOP,
 
         CLEAR_SCREEN,
