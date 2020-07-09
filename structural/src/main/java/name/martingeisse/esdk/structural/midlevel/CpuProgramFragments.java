@@ -1132,14 +1132,22 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
                     Devices.memory[MemoryMap.CURRENT_COLOR] = Devices.memory[MemoryMap.PREVIEW_COLOR_0];
                     Devices.memory[MemoryMap.PREVIEW_COLOR_0] = Devices.memory[MemoryMap.PREVIEW_COLOR_1];
                     Devices.memory[MemoryMap.PREVIEW_COLOR_1] = Devices.memory[MemoryMap.PREVIEW_COLOR_2];
-                    CpuProgramFragments.INSTANCE.nextRandomMod7();
+                    Devices.memory[MemoryMap.RETURN_SELECTOR] = 0;
+                    label = Label.NEXT_RANDOM_MOD_7;
+                    break;
+
+                case NEXT_PIECE_1:
                     Devices.memory[MemoryMap.PREVIEW_COLOR_2] = (byte)(Devices.memory[MemoryMap.TEMP_0] + 1);
 
                     // shift piece (note: CURRENT_SHAPE temporarily contains the piece, not the shape)
                     Devices.memory[MemoryMap.CURRENT_SHAPE] = Devices.memory[MemoryMap.PREVIEW_PIECE_0];
                     Devices.memory[MemoryMap.PREVIEW_PIECE_0] = Devices.memory[MemoryMap.PREVIEW_PIECE_1];
                     Devices.memory[MemoryMap.PREVIEW_PIECE_1] = Devices.memory[MemoryMap.PREVIEW_PIECE_2];
-                    CpuProgramFragments.INSTANCE.nextRandomMod7();
+                    Devices.memory[MemoryMap.RETURN_SELECTOR] = 1;
+                    label = Label.NEXT_RANDOM_MOD_7;
+                    break;
+
+                case NEXT_PIECE_2:
                     Devices.memory[MemoryMap.PREVIEW_PIECE_2] = (byte) Devices.memory[MemoryMap.TEMP_0];
 
                     // now turn the piece into its normal shape
@@ -1162,6 +1170,14 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
                     label = Label.GAME_LOOP;
                     break;
 
+                case NEXT_RANDOM_MOD_7:
+                    CpuProgramFragments.INSTANCE.nextRandomMod7();
+                    if (Devices.memory[MemoryMap.RETURN_SELECTOR] == 0) {
+                        label = Label.NEXT_PIECE_1;
+                    } else {
+                        label = Label.NEXT_PIECE_2;
+                    }
+                    break;
 
                 default:
                     throw new RuntimeException("unknown label: " + label);
@@ -1190,6 +1206,7 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
         NEXT_PIECE_2,
         NEXT_PIECE_RETURN_0, // continue generating pieces to start the game
         NEXT_PIECE_RETURN_1, // draw preview, then continue with the game
+        NEXT_RANDOM_MOD_7,
 
     }
 
