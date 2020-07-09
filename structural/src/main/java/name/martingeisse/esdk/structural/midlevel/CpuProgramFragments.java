@@ -960,6 +960,7 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
                 //region in-game
 
                 case GAME_LOOP:
+                    Engine.delayFrame();
                     label = Label.GAME_LOOP;
                     Engine.gameTick();
                     break;

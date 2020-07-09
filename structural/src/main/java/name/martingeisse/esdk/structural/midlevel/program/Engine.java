@@ -86,8 +86,6 @@ public final class Engine {
     }
 
     public static void gameTick() {
-        delayFrame();
-
         if (Devices.memory[MemoryMap.FLASH_ROWS_EFFECT] >= 0) {
 
             // find completed rows
@@ -188,21 +186,20 @@ public final class Engine {
                 }
             }
 
-        }
+            // game delay depends on the current level
+            Devices.memory[MemoryMap.GAME_DELAY_COUNTER]++;
+            if (Devices.memory[MemoryMap.LEVEL] > delayLevels ||
+                    Devices.memory[MemoryMap.GAME_DELAY_COUNTER] >= delayByLevel[Devices.memory[MemoryMap.LEVEL]]) {
+                Devices.memory[MemoryMap.GAME_DELAY_COUNTER] = 0;
+            }
 
-        // game delay depends on the current level
-        Devices.memory[MemoryMap.GAME_DELAY_COUNTER]++;
-        if (Devices.memory[MemoryMap.LEVEL] > delayLevels ||
-                Devices.memory[MemoryMap.GAME_DELAY_COUNTER] >= delayByLevel[Devices.memory[MemoryMap.LEVEL]]) {
-            Devices.memory[MemoryMap.GAME_DELAY_COUNTER] = 0;
-        }
+            // movement delay is fixed to 3 frames
+            Devices.memory[MemoryMap.MOVEMENT_DELAY_COUNTER]++;
+            if (Devices.memory[MemoryMap.MOVEMENT_DELAY_COUNTER] == 3) {
+                Devices.memory[MemoryMap.MOVEMENT_DELAY_COUNTER] = 0;
+            }
 
-        // movement delay is fixed to 3 frames
-        Devices.memory[MemoryMap.MOVEMENT_DELAY_COUNTER]++;
-        if (Devices.memory[MemoryMap.MOVEMENT_DELAY_COUNTER] == 3) {
-            Devices.memory[MemoryMap.MOVEMENT_DELAY_COUNTER] = 0;
         }
-
     }
 
 }
