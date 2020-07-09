@@ -10,16 +10,6 @@ public final class GameState {
     private GameState() {
     }
 
-    public static boolean addRows(int num) {
-        Devices.memory[MemoryMap.ROW_COUNTER] += num;
-        if (Devices.memory[MemoryMap.ROW_COUNTER] < 10) {
-            return false;
-        }
-        Devices.memory[MemoryMap.ROW_COUNTER] -= 10;
-        Devices.memory[MemoryMap.LEVEL]++;
-        return true;
-    }
-
     public static boolean unblockedShapePosition() {
         boolean[] matrix = Shapes.shapeOccupationMatrices[Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff];
         for (int i = 0; i < 4; i++) {

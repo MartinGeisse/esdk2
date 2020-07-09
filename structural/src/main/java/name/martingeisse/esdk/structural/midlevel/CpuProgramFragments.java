@@ -1086,16 +1086,18 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
 
                     // end of effect: remove completed rows, possibly reach next level
                     GameState.removeRows(completedRows);
-                    if (GameState.addRows(Devices.memory[MemoryMap.COMPLETED_ROW_COUNT])) {
-                        Engine.newLevel();
+                    Devices.memory[MemoryMap.ROW_COUNTER] += Devices.memory[MemoryMap.COMPLETED_ROW_COUNT];
+                    if (Devices.memory[MemoryMap.ROW_COUNTER] < 10) {
+                        drawGameArea();
                     } else {
-                        CpuProgramFragments.INSTANCE.drawGameArea();
+                        Devices.memory[MemoryMap.ROW_COUNTER] -= 10;
+                        Devices.memory[MemoryMap.LEVEL]++;
+                        Engine.newLevel();
                     }
 
                     // shift in next piece
                     Devices.memory[MemoryMap.RETURN_SELECTOR_NONLEAF_1] = 1;
                     label = Label.NEXT_PIECE;
-
                     break;
                 }
 
