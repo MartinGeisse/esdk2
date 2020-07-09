@@ -1097,9 +1097,12 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
                     } else {
                         CpuProgramFragments.INSTANCE.drawGameArea();
                     }
+
+                    // shift in next piece
                     Engine.clearPreview();
                     GameState.nextPiece();
                     Engine.drawPreview();
+
                     label = Label.GAME_LOOP;
                     break;
                 }
