@@ -872,6 +872,19 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
 
     public void gameTick() {
 
+        // game delay depends on the current level
+        Devices.memory[MemoryMap.GAME_DELAY_COUNTER]++;
+        if (Devices.memory[MemoryMap.LEVEL] > Engine.delayLevels ||
+                Devices.memory[MemoryMap.GAME_DELAY_COUNTER] >= Engine.delayByLevel[Devices.memory[MemoryMap.LEVEL]]) {
+            Devices.memory[MemoryMap.GAME_DELAY_COUNTER] = 0;
+        }
+
+        // movement delay is fixed to 3 frames
+        Devices.memory[MemoryMap.MOVEMENT_DELAY_COUNTER]++;
+        if (Devices.memory[MemoryMap.MOVEMENT_DELAY_COUNTER] == 3) {
+            Devices.memory[MemoryMap.MOVEMENT_DELAY_COUNTER] = 0;
+        }
+
         // undraw shape and remember position and shape
         Draw.drawShapeOnGameArea(Devices.memory[MemoryMap.CURRENT_X], Devices.memory[MemoryMap.CURRENT_Y],
                 Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff, 0);
@@ -952,19 +965,6 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
                 Devices.memory[MemoryMap.FLASH_ROWS_EFFECT] = Engine.flashRowsEffectTotalLength - 1;
                 label = Label.FLASH_COMPLETED_ROWS;
             }
-        }
-
-        // game delay depends on the current level
-        Devices.memory[MemoryMap.GAME_DELAY_COUNTER]++;
-        if (Devices.memory[MemoryMap.LEVEL] > Engine.delayLevels ||
-                Devices.memory[MemoryMap.GAME_DELAY_COUNTER] >= Engine.delayByLevel[Devices.memory[MemoryMap.LEVEL]]) {
-            Devices.memory[MemoryMap.GAME_DELAY_COUNTER] = 0;
-        }
-
-        // movement delay is fixed to 3 frames
-        Devices.memory[MemoryMap.MOVEMENT_DELAY_COUNTER]++;
-        if (Devices.memory[MemoryMap.MOVEMENT_DELAY_COUNTER] == 3) {
-            Devices.memory[MemoryMap.MOVEMENT_DELAY_COUNTER] = 0;
         }
 
     }
