@@ -12,15 +12,16 @@ public final class GameState {
 
     public static void initializeGameState() {
         clearGameArea();
-        Devices.memory[MemoryMap.PREVIEW_PIECE_0] = (byte)nextRandomMod7();
-        Devices.memory[MemoryMap.PREVIEW_COLOR_0] = (byte)(nextRandomMod7() + 1);
-        Devices.memory[MemoryMap.PREVIEW_PIECE_1] = (byte)nextRandomMod7();
-        Devices.memory[MemoryMap.PREVIEW_COLOR_1] = (byte)(nextRandomMod7() + 1);
-        Devices.memory[MemoryMap.PREVIEW_PIECE_2] = (byte)nextRandomMod7();
-        Devices.memory[MemoryMap.PREVIEW_COLOR_2] = (byte)(nextRandomMod7() + 1);
         Devices.memory[MemoryMap.ROW_COUNTER] = 0;
         Devices.memory[MemoryMap.LEVEL] = 0;
-        nextPiece();
+        int i = 3;
+        while (true) {
+            nextPiece();
+            i--;
+            if (i < 0) {
+                break;
+            }
+        }
     }
 
     public static void clearGameArea() {

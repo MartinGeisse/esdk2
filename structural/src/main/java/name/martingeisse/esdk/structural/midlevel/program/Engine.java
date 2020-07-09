@@ -79,17 +79,10 @@ public final class Engine {
         Draw.drawPieceInPreview(2, Devices.memory[MemoryMap.PREVIEW_PIECE_2] & 0xff, 0);
     }
 
-    private static void drawPreview() {
+    public static void drawPreview() {
         Draw.drawPieceInPreview(0, Devices.memory[MemoryMap.PREVIEW_PIECE_0] & 0xff, Devices.memory[MemoryMap.PREVIEW_COLOR_0] & 0xff);
         Draw.drawPieceInPreview(1, Devices.memory[MemoryMap.PREVIEW_PIECE_1] & 0xff, Devices.memory[MemoryMap.PREVIEW_COLOR_1] & 0xff);
         Draw.drawPieceInPreview(2, Devices.memory[MemoryMap.PREVIEW_PIECE_2] & 0xff, Devices.memory[MemoryMap.PREVIEW_COLOR_2] & 0xff);
-    }
-
-    public static void engineNewGame() {
-        GameState.initializeGameState();
-        Devices.memory[MemoryMap.FLASH_ROWS_EFFECT] = -1;
-        Draw.drawBackground();
-        drawPreview();
     }
 
     public static void gameTick() {

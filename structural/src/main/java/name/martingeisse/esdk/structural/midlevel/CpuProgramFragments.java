@@ -2,6 +2,7 @@ package name.martingeisse.esdk.structural.midlevel;
 
 import name.martingeisse.esdk.structural.midlevel.program.Draw;
 import name.martingeisse.esdk.structural.midlevel.program.Engine;
+import name.martingeisse.esdk.structural.midlevel.program.GameState;
 
 public final class CpuProgramFragments extends AbstractCpuProgramFragments {
 
@@ -915,7 +916,10 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
 
                 case START_GAME:
                     CpuProgramFragments.INSTANCE.autoSeedRandom();
-                    Engine.engineNewGame();
+                    GameState.initializeGameState();
+                    Devices.memory[MemoryMap.FLASH_ROWS_EFFECT] = -1;
+                    Draw.drawBackground();
+                    Engine.drawPreview();
                     label = Label.GAME_LOOP;
                     break;
 
