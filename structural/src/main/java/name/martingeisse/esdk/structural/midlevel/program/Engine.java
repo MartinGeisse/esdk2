@@ -89,9 +89,10 @@ public final class Engine {
         if (Devices.memory[MemoryMap.FLASH_ROWS_EFFECT] >= 0) {
 
             // find completed rows
-            int[] completedRows = new int[4];
-            int count = GameState.findCompletedRows(Devices.memory[MemoryMap.CURRENT_Y], 4, completedRows);
-            completedRows = Arrays.copyOf(completedRows, count);
+            int[] completedRows = new int[Devices.memory[MemoryMap.COMPLETED_ROW_COUNT]];
+            for (int i = 0; i < completedRows.length; i++) {
+                completedRows[i] = Devices.memory[MemoryMap.COMPLETED_ROW_INDEX_0 + i];
+            }
 
             // draw effect
             drawFlashRowsEffect(completedRows, Devices.memory[MemoryMap.FLASH_ROWS_EFFECT]);
@@ -100,7 +101,7 @@ public final class Engine {
             Devices.memory[MemoryMap.FLASH_ROWS_EFFECT]--;
             if (Devices.memory[MemoryMap.FLASH_ROWS_EFFECT] < 0) {
                 GameState.removeRows(completedRows);
-                if (GameState.addRows(count)) {
+                if (GameState.addRows(Devices.memory[MemoryMap.COMPLETED_ROW_COUNT])) {
                     newLevel();
                 } else {
                     CpuProgramFragments.INSTANCE.drawGameArea();
@@ -182,6 +183,13 @@ public final class Engine {
                     GameState.nextPiece();
                     drawPreview();
                 } else {
+                    Devices.memory[MemoryMap.COMPLETED_ROW_COUNT] = (byte)count;
+                    for (int i = 0; i < count; i++) {
+                        Devices.memory[MemoryMap.COMPLETED_ROW_INDEX_0 + i] = (byte)completedRows[i];
+                    }
+                    for (int i = count; i < 5; i++) {
+                        Devices.memory[MemoryMap.COMPLETED_ROW_INDEX_0 + i] = (byte)completedRows[count - 1];
+                    }
                     Devices.memory[MemoryMap.FLASH_ROWS_EFFECT] = flashRowsEffectTotalLength - 1;
                 }
             }

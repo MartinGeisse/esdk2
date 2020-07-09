@@ -82,4 +82,13 @@ public final class MemoryMap {
     public static final int OLD_X = 236;
     public static final int OLD_Y = 237;
 
+    // number and indices of completed rows. Indices must be in ascending order, and the last index is repeated to fill
+    // a total of 5 index cells. This simplifies the remaining logic.
+    public static final int COMPLETED_ROW_COUNT = 238;
+    public static final int COMPLETED_ROW_INDEX_0 = 239;
+    public static final int COMPLETED_ROW_INDEX_1 = 240;
+    public static final int COMPLETED_ROW_INDEX_2 = 241;
+    public static final int COMPLETED_ROW_INDEX_3 = 242;
+    public static final int COMPLETED_ROW_INDEX_4 = 243;
+
 }
