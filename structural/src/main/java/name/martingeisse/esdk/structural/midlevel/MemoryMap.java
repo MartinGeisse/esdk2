@@ -52,9 +52,6 @@ public final class MemoryMap {
      * does not have indirect jumps, each function that gets called from multiple sites must return to a site selected
      * by an if-elseif-else chain based on the value of this cell. Possible values and their meanings are defined
      * individually for each function that gets called from multiple sites.
-     *
-     * NOTE: This might stay unused in the "midlevel" implementation since control flow happens in Java code, but it's
-     * a good move anyway to reserve a memory cell for it.
      */
     public static final int RETURN_SELECTOR = 224;
 
@@ -90,5 +87,8 @@ public final class MemoryMap {
     public static final int COMPLETED_ROW_INDEX_2 = 241;
     public static final int COMPLETED_ROW_INDEX_3 = 242;
     public static final int COMPLETED_ROW_INDEX_4 = 243;
+
+    // return selector for non-leaf functions with depth 1
+    public static final int RETURN_SELECTOR_NONLEAF_1 = 244;
 
 }

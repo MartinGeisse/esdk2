@@ -952,7 +952,7 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
             count = GameState.findCompletedRows(Devices.memory[MemoryMap.CURRENT_Y], 4, completedRows);
             if (count == 0) {
                 Engine.clearPreview();
-                Devices.memory[MemoryMap.RETURN_SELECTOR] = 1;
+                Devices.memory[MemoryMap.RETURN_SELECTOR_NONLEAF_1] = 1;
                 label = Label.NEXT_PIECE;
             } else {
                 Devices.memory[MemoryMap.COMPLETED_ROW_COUNT] = (byte)count;
@@ -1038,7 +1038,7 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
                     lxi(3);
                 case START_GAME_2:
                     sxa(MemoryMap.UTIL_0);
-                    Devices.memory[MemoryMap.RETURN_SELECTOR] = 0;
+                    Devices.memory[MemoryMap.RETURN_SELECTOR_NONLEAF_1] = 0;
                     label = Label.NEXT_PIECE;
                     break;
 
@@ -1106,7 +1106,7 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
 
                     // shift in next piece
                     Engine.clearPreview();
-                    Devices.memory[MemoryMap.RETURN_SELECTOR] = 1;
+                    Devices.memory[MemoryMap.RETURN_SELECTOR_NONLEAF_1] = 1;
                     label = Label.NEXT_PIECE;
 
                     break;
@@ -1128,7 +1128,7 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
 
                 case NEXT_PIECE:
                     GameState.nextPiece();
-                    if (Devices.memory[MemoryMap.RETURN_SELECTOR] == 0) {
+                    if (Devices.memory[MemoryMap.RETURN_SELECTOR_NONLEAF_1] == 0) {
                         label = Label.NEXT_PIECE_RETURN_0;
                     } else {
                         label = Label.NEXT_PIECE_RETURN_1;
