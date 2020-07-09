@@ -901,10 +901,12 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
                 case START_GAME:
                     CpuProgramFragments.INSTANCE.autoSeedRandom();
 
-                    // reset game stats
+                    // reset various in-game variables
                     lxi(0);
                     sxa(MemoryMap.ROW_COUNTER);
                     sxa(MemoryMap.LEVEL);
+                    lxi(-1);
+                    sxa(MemoryMap.FLASH_ROWS_EFFECT);
 
                     // clear game area in memory (no need to clear it on screen since drawing the game background
                     // will leave the on-screen game area blank anyway).
@@ -930,9 +932,11 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
                             }
                         }
                     }
-                    Devices.memory[MemoryMap.FLASH_ROWS_EFFECT] = -1;
+
+                    // draw game screen
                     Draw.drawBackground();
                     Engine.drawPreview();
+
                     label = Label.GAME_LOOP;
                     break;
 
