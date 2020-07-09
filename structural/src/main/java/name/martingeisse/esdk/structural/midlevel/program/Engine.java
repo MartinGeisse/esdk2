@@ -1,11 +1,8 @@
 package name.martingeisse.esdk.structural.midlevel.program;
 
-import name.martingeisse.esdk.structural.midlevel.Constants;
 import name.martingeisse.esdk.structural.midlevel.CpuProgramFragments;
 import name.martingeisse.esdk.structural.midlevel.Devices;
 import name.martingeisse.esdk.structural.midlevel.MemoryMap;
-
-import java.util.Arrays;
 
 @SuppressWarnings("ExplicitArrayFilling")
 public final class Engine {
@@ -13,15 +10,6 @@ public final class Engine {
     private Engine() {
     }
 
-    public static final int delayByLevel[] = {
-            30, 27, 24, 21, 18, 15, 12, 8, 5, 2
-    };
-
-    public static final int delayLevels = 10;
-
-    public static final int[] flashRowsEffectColors = new int[]{0, 3, 7, 3, 0, 3, 7};
-
-    public static final int flashRowsEffectTotalLength = 35;
 
     public static void delayFrame() {
         Devices.delay();

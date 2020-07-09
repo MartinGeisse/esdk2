@@ -865,8 +865,8 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
 
         // game delay depends on the current level
         Devices.memory[MemoryMap.GAME_DELAY_COUNTER]++;
-        if (Devices.memory[MemoryMap.LEVEL] > Engine.delayLevels ||
-                Devices.memory[MemoryMap.GAME_DELAY_COUNTER] >= Engine.delayByLevel[Devices.memory[MemoryMap.LEVEL]]) {
+        if (Devices.memory[MemoryMap.LEVEL] > Constants.delayLevels ||
+                Devices.memory[MemoryMap.GAME_DELAY_COUNTER] >= Constants.delayByLevel[Devices.memory[MemoryMap.LEVEL]]) {
             Devices.memory[MemoryMap.GAME_DELAY_COUNTER] = 0;
         }
 
@@ -952,7 +952,7 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
                 for (int i = count; i < 5; i++) {
                     Devices.memory[MemoryMap.COMPLETED_ROW_INDEX_0 + i] = (byte)completedRows[count - 1];
                 }
-                Devices.memory[MemoryMap.FLASH_ROWS_EFFECT] = Engine.flashRowsEffectTotalLength - 1;
+                Devices.memory[MemoryMap.FLASH_ROWS_EFFECT] = Constants.flashRowsEffectTotalLength - 1;
                 label = Label.FLASH_COMPLETED_ROWS;
             }
         }
@@ -1066,7 +1066,7 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
                     // draw effect
                     for (int i = 0; i < Devices.memory[MemoryMap.COMPLETED_ROW_COUNT]; i++) {
                         Devices.memory[MemoryMap.TEMP_0] = Devices.memory[MemoryMap.COMPLETED_ROW_INDEX_0 + i];
-                        Devices.memory[MemoryMap.TEMP_1] = (byte)Engine.flashRowsEffectColors[Devices.memory[MemoryMap.FLASH_ROWS_EFFECT] / 5];
+                        Devices.memory[MemoryMap.TEMP_1] = (byte)Constants.flashRowsEffectColors[Devices.memory[MemoryMap.FLASH_ROWS_EFFECT] / 5];
                         // note: this function does not overwrite other TEMP_* registers than TEMP_0 and TEMP_1.
                         fillGameRow();
                     }

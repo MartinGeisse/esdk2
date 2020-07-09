@@ -24,4 +24,16 @@ public class Constants {
     // x offset of one preview box to the next
     public static final int PREVIEW_X_DELTA = 5;
 
+    public static final int delayByLevel[] = {
+            30, 27, 24, 21, 18, 15, 12, 8, 5, 2
+    };
+
+    public static final int delayLevels = 10;
+
+    public static final int[] flashRowsEffectColors = new int[]{
+            0, 3, 7, 3, 0, 3, 7
+    };
+
+    public static final int flashRowsEffectTotalLength = 35;
+
 }
