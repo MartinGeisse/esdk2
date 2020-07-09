@@ -426,7 +426,7 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
     }
 
     /**
-     * TEMP_0 must contain the row index, TEMP_1 the color to fill.
+     * TEMP_0 must contain the row index, TEMP_1 the color to fill. Does not overwrite other TEMP_* registers.
      */
     public void fillGameRow() {
 
@@ -1071,16 +1071,12 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
                 {
                     Engine.delayFrame();
 
-                    // find completed rows
-                    int[] completedRows = new int[Devices.memory[MemoryMap.COMPLETED_ROW_COUNT]];
-                    for (int i = 0; i < completedRows.length; i++) {
-                        completedRows[i] = Devices.memory[MemoryMap.COMPLETED_ROW_INDEX_0 + i];
-                    }
-
                     // draw effect
                     for (int i = 0; i < Devices.memory[MemoryMap.COMPLETED_ROW_COUNT]; i++) {
-                        Draw.fillGameRow(Devices.memory[MemoryMap.COMPLETED_ROW_INDEX_0 + i],
-                                Engine.flashRowsEffectColors[Devices.memory[MemoryMap.FLASH_ROWS_EFFECT] / 5]);
+                        Devices.memory[MemoryMap.TEMP_0] = Devices.memory[MemoryMap.COMPLETED_ROW_INDEX_0 + i];
+                        Devices.memory[MemoryMap.TEMP_1] = (byte)Engine.flashRowsEffectColors[Devices.memory[MemoryMap.FLASH_ROWS_EFFECT] / 5];
+                        // note: this function does not overwrite other TEMP_* registers than TEMP_0 and TEMP_1.
+                        fillGameRow();
                     }
 
                     // loop until end of effect
@@ -1088,6 +1084,12 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
                     if (Devices.memory[MemoryMap.FLASH_ROWS_EFFECT] >= 0) {
                         label = Label.FLASH_COMPLETED_ROWS;
                         break;
+                    }
+
+                    // find completed rows
+                    int[] completedRows = new int[Devices.memory[MemoryMap.COMPLETED_ROW_COUNT]];
+                    for (int i = 0; i < completedRows.length; i++) {
+                        completedRows[i] = Devices.memory[MemoryMap.COMPLETED_ROW_INDEX_0 + i];
                     }
 
                     // end of effect: remove completed rows, possibly reach next level
