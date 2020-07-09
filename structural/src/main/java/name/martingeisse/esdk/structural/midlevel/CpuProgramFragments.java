@@ -951,7 +951,6 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
 
             count = GameState.findCompletedRows(Devices.memory[MemoryMap.CURRENT_Y], 4, completedRows);
             if (count == 0) {
-                Engine.clearPreview();
                 Devices.memory[MemoryMap.RETURN_SELECTOR_NONLEAF_1] = 1;
                 label = Label.NEXT_PIECE;
             } else {
@@ -1103,7 +1102,6 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
                     }
 
                     // shift in next piece
-                    Engine.clearPreview();
                     Devices.memory[MemoryMap.RETURN_SELECTOR_NONLEAF_1] = 1;
                     label = Label.NEXT_PIECE;
 
@@ -1125,6 +1123,11 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
                 //endregion
 
                 case NEXT_PIECE:
+
+                    // undraw old piece, unless called from startup code
+                    if (Devices.memory[MemoryMap.RETURN_SELECTOR_NONLEAF_1] != 0) {
+                        Engine.clearPreview();
+                    }
 
                     // shift color
                     Devices.memory[MemoryMap.CURRENT_COLOR] = Devices.memory[MemoryMap.PREVIEW_COLOR_0];
