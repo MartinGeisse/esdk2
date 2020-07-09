@@ -870,11 +870,6 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
             Devices.memory[MemoryMap.GAME_DELAY_COUNTER] = 0;
         }
 
-        // movement delay is fixed to 3 frames
-        Devices.memory[MemoryMap.MOVEMENT_DELAY_COUNTER]++;
-        if (Devices.memory[MemoryMap.MOVEMENT_DELAY_COUNTER] == 3) {
-            Devices.memory[MemoryMap.MOVEMENT_DELAY_COUNTER] = 0;
-        }
 
         // undraw shape and remember position and shape
         Draw.drawShapeOnGameArea(Devices.memory[MemoryMap.CURRENT_X], Devices.memory[MemoryMap.CURRENT_Y],
@@ -1055,6 +1050,20 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
 
                 case GAME_LOOP:
                     Engine.delayFrame();
+
+                    // movement delay is fixed to 3 frames
+                    lxa(MemoryMap.MOVEMENT_DELAY_COUNTER);
+                    operation(Operation.SUB, AddressingMode.IMMEDIATE, Destination.X, 1);
+                    if (isCarry()) {
+                        label = Label.GAME_LOOP_1;
+                        break;
+                    }
+                    lxi(2);
+
+                case GAME_LOOP_1:
+                    sxa(MemoryMap.MOVEMENT_DELAY_COUNTER);
+
+                    // TODO
                     label = Label.GAME_LOOP;
                     gameTick();
                     break;
@@ -1257,7 +1266,9 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
         START_GAME_2,
         START_GAME_3,
         START_GAME_4,
+
         GAME_LOOP,
+        GAME_LOOP_1,
 
         CLEAR_SCREEN,
         FLASH_COMPLETED_ROWS,
