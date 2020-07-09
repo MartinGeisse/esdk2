@@ -901,11 +901,12 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
                     break;
 
                 case TITLE_SCREEN_LOOP:
-                    for (int i = 0; i < Devices.buttonStates.length; i++) {
-                        if (Devices.buttonStates[i]) {
-                            label = Label.START_GAME;
-                            break labelSwitch;
-                        }
+                    // start game if any button pressed
+                    operation(Operation.RIGHT, AddressingMode.ABSOLUTE, 1, Destination.X, 0);
+                    operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.X, 255);
+                    if (isCarry()) {
+                        label = Label.START_GAME;
+                        break labelSwitch;
                     }
                     CpuProgramFragments.INSTANCE.randomAutoSeederTick();
                     Devices.delay();
