@@ -952,8 +952,8 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
             count = GameState.findCompletedRows(Devices.memory[MemoryMap.CURRENT_Y], 4, completedRows);
             if (count == 0) {
                 Engine.clearPreview();
-                GameState.nextPiece();
-                Engine.drawPreview();
+                Devices.memory[MemoryMap.RETURN_SELECTOR] = 1;
+                label = Label.NEXT_PIECE;
             } else {
                 Devices.memory[MemoryMap.COMPLETED_ROW_COUNT] = (byte)count;
                 for (int i = 0; i < count; i++) {
@@ -1038,7 +1038,11 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
                     lxi(3);
                 case START_GAME_2:
                     sxa(MemoryMap.UTIL_0);
-                    GameState.nextPiece();
+                    Devices.memory[MemoryMap.RETURN_SELECTOR] = 0;
+                    label = Label.NEXT_PIECE;
+                    break;
+
+                case NEXT_PIECE_RETURN_0:
                     lxa(MemoryMap.UTIL_0);
                     operation(Operation.SUB, AddressingMode.IMMEDIATE, Destination.X, 1);
                     if (isCarry()) {
@@ -1102,10 +1106,9 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
 
                     // shift in next piece
                     Engine.clearPreview();
-                    GameState.nextPiece();
-                    Engine.drawPreview();
+                    Devices.memory[MemoryMap.RETURN_SELECTOR] = 1;
+                    label = Label.NEXT_PIECE;
 
-                    label = Label.GAME_LOOP;
                     break;
                 }
 
@@ -1122,6 +1125,22 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
                     break;
 
                 //endregion
+
+                case NEXT_PIECE:
+                    GameState.nextPiece();
+                    if (Devices.memory[MemoryMap.RETURN_SELECTOR] == 0) {
+                        label = Label.NEXT_PIECE_RETURN_0;
+                    } else {
+                        label = Label.NEXT_PIECE_RETURN_1;
+                    }
+                    break;
+
+                // note: NEXT_PIECE_RETURN_0 is located in game start code, not here
+                case NEXT_PIECE_RETURN_1:
+                    Engine.drawPreview();
+                    label = Label.GAME_LOOP;
+                    break;
+
 
                 default:
                     throw new RuntimeException("unknown label: " + label);
@@ -1144,6 +1163,10 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
 
         CLEAR_SCREEN,
         FLASH_COMPLETED_ROWS,
+
+        NEXT_PIECE,
+        NEXT_PIECE_RETURN_0, // continue generating pieces to start the game
+        NEXT_PIECE_RETURN_1, // draw preview, then continue with the game
 
     }
 
