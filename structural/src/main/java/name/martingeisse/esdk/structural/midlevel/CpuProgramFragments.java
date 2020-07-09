@@ -1114,6 +1114,7 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
                     break;
 
                 //endregion
+                //region piece randomizer
 
                 case NEXT_PIECE:
 
@@ -1235,6 +1236,8 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
                     Engine.drawPreview();
                     label = Label.GAME_LOOP;
                     break;
+
+                //endregion
 
                 default:
                     throw new RuntimeException("unknown label: " + label);
