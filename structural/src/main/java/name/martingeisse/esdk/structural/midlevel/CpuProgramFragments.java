@@ -1132,13 +1132,15 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
                     Devices.memory[MemoryMap.CURRENT_COLOR] = Devices.memory[MemoryMap.PREVIEW_COLOR_0];
                     Devices.memory[MemoryMap.PREVIEW_COLOR_0] = Devices.memory[MemoryMap.PREVIEW_COLOR_1];
                     Devices.memory[MemoryMap.PREVIEW_COLOR_1] = Devices.memory[MemoryMap.PREVIEW_COLOR_2];
-                    Devices.memory[MemoryMap.PREVIEW_COLOR_2] = (byte)(GameState.nextRandomMod7() + 1);
+                    CpuProgramFragments.INSTANCE.nextRandomMod7();
+                    Devices.memory[MemoryMap.PREVIEW_COLOR_2] = (byte)(Devices.memory[MemoryMap.TEMP_0] + 1);
 
                     // shift piece (note: CURRENT_SHAPE temporarily contains the piece, not the shape)
                     Devices.memory[MemoryMap.CURRENT_SHAPE] = Devices.memory[MemoryMap.PREVIEW_PIECE_0];
                     Devices.memory[MemoryMap.PREVIEW_PIECE_0] = Devices.memory[MemoryMap.PREVIEW_PIECE_1];
                     Devices.memory[MemoryMap.PREVIEW_PIECE_1] = Devices.memory[MemoryMap.PREVIEW_PIECE_2];
-                    Devices.memory[MemoryMap.PREVIEW_PIECE_2] = (byte) GameState.nextRandomMod7();
+                    CpuProgramFragments.INSTANCE.nextRandomMod7();
+                    Devices.memory[MemoryMap.PREVIEW_PIECE_2] = (byte) Devices.memory[MemoryMap.TEMP_0];
 
                     // now turn the piece into its normal shape
                     Devices.memory[MemoryMap.CURRENT_SHAPE] = Shapes.normalShapeByPiece[Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff];
@@ -1184,6 +1186,8 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
         FLASH_COMPLETED_ROWS,
 
         NEXT_PIECE,
+        NEXT_PIECE_1,
+        NEXT_PIECE_2,
         NEXT_PIECE_RETURN_0, // continue generating pieces to start the game
         NEXT_PIECE_RETURN_1, // draw preview, then continue with the game
 

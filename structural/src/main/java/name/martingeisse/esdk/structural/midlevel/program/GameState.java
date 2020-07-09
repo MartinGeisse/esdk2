@@ -122,10 +122,4 @@ public final class GameState {
         }
     }
 
-    // all invocations happen to be mod 7
-    public static int nextRandomMod7() {
-        CpuProgramFragments.INSTANCE.nextRandomMod7();
-        return Devices.memory[MemoryMap.TEMP_0];
-    }
-
 }
