@@ -1217,8 +1217,10 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
                     sxa(MemoryMap.CURRENT_SHAPE);
 
                     // place the new piece at the top of the game area
-                    Devices.memory[MemoryMap.CURRENT_X] = 3;
-                    Devices.memory[MemoryMap.CURRENT_Y] = -4;
+                    lxi(3);
+                    sxa(MemoryMap.CURRENT_X);
+                    lxi(-4);
+                    sxa(MemoryMap.CURRENT_Y);
 
                     if (Devices.memory[MemoryMap.RETURN_SELECTOR_NONLEAF_1] == 0) {
                         label = Label.START_GAME_3;
