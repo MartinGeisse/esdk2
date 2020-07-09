@@ -881,7 +881,11 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
             labelSwitch: switch (previousLabel) {
 
                 case TITLE_SCREEN:
-                    clearScreen();
+                    Devices.memory[MemoryMap.RETURN_SELECTOR] = 0;
+                    label = Label.CLEAR_SCREEN;
+                    break;
+
+                case TITLE_SCREEN_1:
                     drawTitleScreen();
                     label = Label.TITLE_SCREEN_LOOP;
                     break;
@@ -935,7 +939,11 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
                     }
 
                     // draw game screen
-                    CpuProgramFragments.INSTANCE.clearScreen();
+                    Devices.memory[MemoryMap.RETURN_SELECTOR] = 1;
+                    label = Label.CLEAR_SCREEN;
+                    break;
+
+                case START_GAME_X:
                     CpuProgramFragments.INSTANCE.drawBackground();
                     Engine.drawPreview();
 
@@ -947,6 +955,15 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
                     Engine.gameTick();
                     break;
 
+                case CLEAR_SCREEN:
+                    clearScreen();
+                    if (Devices.memory[MemoryMap.RETURN_SELECTOR] == 0) {
+                        label = Label.TITLE_SCREEN_1;
+                    } else {
+                        label = Label.START_GAME_X;
+                    }
+                    break;
+
                 default:
                     throw new RuntimeException("unknown label: " + label);
 
@@ -955,10 +972,17 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
     }
 
     private enum Label {
+
         TITLE_SCREEN,
+        TITLE_SCREEN_1,
         TITLE_SCREEN_LOOP,
+
         START_GAME,
+        START_GAME_X,
         GAME_LOOP,
+
+        CLEAR_SCREEN,
+
     }
 
 //endregion
