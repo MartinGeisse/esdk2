@@ -881,7 +881,8 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
             labelSwitch: switch (previousLabel) {
 
                 case TITLE_SCREEN:
-                    Draw.drawTitleScreen();
+                    clearScreen();
+                    drawTitleScreen();
                     label = Label.TITLE_SCREEN_LOOP;
                     break;
 
@@ -934,7 +935,8 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
                     }
 
                     // draw game screen
-                    Draw.drawBackground();
+                    CpuProgramFragments.INSTANCE.clearScreen();
+                    CpuProgramFragments.INSTANCE.drawBackground();
                     Engine.drawPreview();
 
                     label = Label.GAME_LOOP;

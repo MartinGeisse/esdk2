@@ -20,16 +20,6 @@ public final class Draw {
     // x offset of one preview box to the next
     public static final int PREVIEW_X_DELTA = 5;
 
-    public static void drawBackground() {
-        CpuProgramFragments.INSTANCE.clearScreen();
-        CpuProgramFragments.INSTANCE.drawBackground();
-    }
-
-    public static void drawTitleScreen() {
-        CpuProgramFragments.INSTANCE.clearScreen();
-        CpuProgramFragments.INSTANCE.drawTitleScreen();
-    }
-
     public static void drawClippedShapeOnScreen(int x, int y, int shapeIndex, int c, int minx, int miny, int maxx, int maxy) {
         boolean[] occupationMatrix = Shapes.shapeOccupationMatrices[shapeIndex];
         for (int dx = 0; dx < 4; dx++) {
