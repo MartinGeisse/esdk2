@@ -60,7 +60,9 @@ public final class MemoryMap {
 
     /**
      * Uses:
+     * - new game: preview shift-in counter
      * - "game over fill": row counter
+     *
      */
     public static final int UTIL_0 = 225;
 

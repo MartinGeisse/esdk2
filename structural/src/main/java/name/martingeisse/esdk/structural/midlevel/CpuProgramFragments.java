@@ -922,14 +922,14 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
                     }
 
                     // randomize the current and thee preview pieces
-                    {
-                        int i = 3;
-                        while (true) {
-                            GameState.nextPiece();
-                            i--;
-                            if (i < 0) {
-                                break;
-                            }
+                    lxi(3);
+                    while (true) {
+                        sxa(MemoryMap.UTIL_0);
+                        GameState.nextPiece();
+                        lxa(MemoryMap.UTIL_0);
+                        operation(Operation.SUB, AddressingMode.IMMEDIATE, Destination.X, 1);
+                        if (!isCarry()) {
+                            break;
                         }
                     }
 
