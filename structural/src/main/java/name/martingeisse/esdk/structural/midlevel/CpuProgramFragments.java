@@ -878,7 +878,10 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
             }
             Label previousLabel = label;
             label = null;
-            labelSwitch: switch (previousLabel) {
+            labelSwitch:
+            switch (previousLabel) {
+
+                //region title screen
 
                 case TITLE_SCREEN:
                     Devices.memory[MemoryMap.RETURN_SELECTOR] = 0;
@@ -902,6 +905,9 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
                     Devices.delay();
                     label = Label.TITLE_SCREEN_LOOP;
                     break;
+
+                //endregion
+                //region start game
 
                 case START_GAME:
                     CpuProgramFragments.INSTANCE.autoSeedRandom();
@@ -950,10 +956,16 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
                     label = Label.GAME_LOOP;
                     break;
 
+                //endregion
+                //region in-game
+
                 case GAME_LOOP:
                     label = Label.GAME_LOOP;
                     Engine.gameTick();
                     break;
+
+                //endregion
+                //region drawing routines
 
                 case CLEAR_SCREEN:
                     clearScreen();
@@ -963,6 +975,8 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
                         label = Label.START_GAME_3;
                     }
                     break;
+
+                //endregion
 
                 default:
                     throw new RuntimeException("unknown label: " + label);
