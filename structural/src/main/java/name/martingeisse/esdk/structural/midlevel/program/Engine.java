@@ -13,15 +13,15 @@ public final class Engine {
     private Engine() {
     }
 
-    private static final int delayByLevel[] = {
+    public static final int delayByLevel[] = {
             30, 27, 24, 21, 18, 15, 12, 8, 5, 2
     };
 
-    private static final int delayLevels = 10;
+    public static final int delayLevels = 10;
 
-    private static final int[] flashRowsEffectColors = new int[]{0, 3, 7, 3, 0, 3, 7};
+    public static final int[] flashRowsEffectColors = new int[]{0, 3, 7, 3, 0, 3, 7};
 
-    private static final int flashRowsEffectTotalLength = 35;
+    public static final int flashRowsEffectTotalLength = 35;
 
     public static void delayFrame() {
         Devices.delay();
@@ -73,7 +73,7 @@ public final class Engine {
         delayFrames(5);
     }
 
-    private static void clearPreview() {
+    public static void clearPreview() {
         Draw.drawPieceInPreview(0, Devices.memory[MemoryMap.PREVIEW_PIECE_0] & 0xff, 0);
         Draw.drawPieceInPreview(1, Devices.memory[MemoryMap.PREVIEW_PIECE_1] & 0xff, 0);
         Draw.drawPieceInPreview(2, Devices.memory[MemoryMap.PREVIEW_PIECE_2] & 0xff, 0);
@@ -85,129 +85,5 @@ public final class Engine {
         Draw.drawPieceInPreview(2, Devices.memory[MemoryMap.PREVIEW_PIECE_2] & 0xff, Devices.memory[MemoryMap.PREVIEW_COLOR_2] & 0xff);
     }
 
-    public static void gameTick() {
-        if (Devices.memory[MemoryMap.FLASH_ROWS_EFFECT] >= 0) {
-
-            // find completed rows
-            int[] completedRows = new int[Devices.memory[MemoryMap.COMPLETED_ROW_COUNT]];
-            for (int i = 0; i < completedRows.length; i++) {
-                completedRows[i] = Devices.memory[MemoryMap.COMPLETED_ROW_INDEX_0 + i];
-            }
-
-            // draw effect
-            drawFlashRowsEffect(completedRows, Devices.memory[MemoryMap.FLASH_ROWS_EFFECT]);
-
-            // check for end of flash effect
-            Devices.memory[MemoryMap.FLASH_ROWS_EFFECT]--;
-            if (Devices.memory[MemoryMap.FLASH_ROWS_EFFECT] < 0) {
-                GameState.removeRows(completedRows);
-                if (GameState.addRows(Devices.memory[MemoryMap.COMPLETED_ROW_COUNT])) {
-                    newLevel();
-                } else {
-                    CpuProgramFragments.INSTANCE.drawGameArea();
-                }
-                clearPreview();
-                GameState.nextPiece();
-                drawPreview();
-            }
-
-        } else {
-
-            // undraw shape and remember position and shape
-            Draw.drawShapeOnGameArea(Devices.memory[MemoryMap.CURRENT_X], Devices.memory[MemoryMap.CURRENT_Y],
-                    Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff, 0);
-            Devices.memory[MemoryMap.OLD_X] = Devices.memory[MemoryMap.CURRENT_X];
-            Devices.memory[MemoryMap.OLD_Y] = Devices.memory[MemoryMap.CURRENT_Y];
-            Devices.memory[MemoryMap.OLD_SHAPE] = Devices.memory[MemoryMap.CURRENT_SHAPE];
-
-            // perform movement as if unblocked
-            if (Devices.buttonStates[Constants.BUTTON_INDEX_LEFT] && Devices.memory[MemoryMap.MOVEMENT_DELAY_COUNTER] == 0) {
-                Devices.memory[MemoryMap.CURRENT_X]--;
-            }
-            if (Devices.buttonStates[Constants.BUTTON_INDEX_RIGHT] && Devices.memory[MemoryMap.MOVEMENT_DELAY_COUNTER] == 0) {
-                Devices.memory[MemoryMap.CURRENT_X]++;
-            }
-            if (Devices.buttonStates[Constants.BUTTON_INDEX_ROTATE_CW]) {
-                Devices.buttonStates[Constants.BUTTON_INDEX_ROTATE_CW] = false;
-                int newShape = Shapes.shapeRotatedClockwise[Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff];
-                Devices.memory[MemoryMap.CURRENT_SHAPE] = (byte)newShape;
-            }
-            if (Devices.buttonStates[Constants.BUTTON_INDEX_ROTATE_CCW]) {
-                Devices.buttonStates[Constants.BUTTON_INDEX_ROTATE_CCW] = false;
-                int newShape = Shapes.shapeRotatedCounterClockwise[Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff];
-                Devices.memory[MemoryMap.CURRENT_SHAPE] = (byte)newShape;
-            }
-
-            // If now unblocked, remember new position and shape. If blocked, restore old position and shape
-            if (GameState.unblockedShapePosition()) {
-                Devices.memory[MemoryMap.OLD_X] = Devices.memory[MemoryMap.CURRENT_X];
-                Devices.memory[MemoryMap.OLD_Y] = Devices.memory[MemoryMap.CURRENT_Y];
-                Devices.memory[MemoryMap.OLD_SHAPE] = Devices.memory[MemoryMap.CURRENT_SHAPE];
-            } else {
-                Devices.memory[MemoryMap.CURRENT_X] = Devices.memory[MemoryMap.OLD_X];
-                Devices.memory[MemoryMap.CURRENT_Y] = Devices.memory[MemoryMap.OLD_Y];
-                Devices.memory[MemoryMap.CURRENT_SHAPE] = Devices.memory[MemoryMap.OLD_SHAPE];
-            }
-
-            // perform downward movement
-            if (Devices.buttonStates[Constants.BUTTON_INDEX_DOWN] || Devices.memory[MemoryMap.GAME_DELAY_COUNTER] == 0) {
-                Devices.memory[MemoryMap.CURRENT_Y]++;
-            }
-
-            // if now blocked, restore old position and shape. Also remember that since it means the shape has landed.
-            boolean landed = !GameState.unblockedShapePosition();
-            if (landed) {
-                // TODO only y can change, so restoring x and shape is not necessary
-                Devices.memory[MemoryMap.CURRENT_X] = Devices.memory[MemoryMap.OLD_X];
-                Devices.memory[MemoryMap.CURRENT_Y] = Devices.memory[MemoryMap.OLD_Y];
-                Devices.memory[MemoryMap.CURRENT_SHAPE] = Devices.memory[MemoryMap.OLD_SHAPE];
-            }
-
-            // draw shape at new position
-            Draw.drawShapeOnGameArea(Devices.memory[MemoryMap.CURRENT_X], Devices.memory[MemoryMap.CURRENT_Y],
-                    Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff, Devices.memory[MemoryMap.CURRENT_COLOR] & 0xff);
-
-            // handle landing
-            if (landed) {
-                int[] completedRows = new int[4];
-                int count;
-
-                if (!GameState.pasteShape()) {
-                    CpuProgramFragments.INSTANCE.gameOver();
-                    return;
-                }
-
-                count = GameState.findCompletedRows(Devices.memory[MemoryMap.CURRENT_Y], 4, completedRows);
-                if (count == 0) {
-                    clearPreview();
-                    GameState.nextPiece();
-                    drawPreview();
-                } else {
-                    Devices.memory[MemoryMap.COMPLETED_ROW_COUNT] = (byte)count;
-                    for (int i = 0; i < count; i++) {
-                        Devices.memory[MemoryMap.COMPLETED_ROW_INDEX_0 + i] = (byte)completedRows[i];
-                    }
-                    for (int i = count; i < 5; i++) {
-                        Devices.memory[MemoryMap.COMPLETED_ROW_INDEX_0 + i] = (byte)completedRows[count - 1];
-                    }
-                    Devices.memory[MemoryMap.FLASH_ROWS_EFFECT] = flashRowsEffectTotalLength - 1;
-                }
-            }
-
-            // game delay depends on the current level
-            Devices.memory[MemoryMap.GAME_DELAY_COUNTER]++;
-            if (Devices.memory[MemoryMap.LEVEL] > delayLevels ||
-                    Devices.memory[MemoryMap.GAME_DELAY_COUNTER] >= delayByLevel[Devices.memory[MemoryMap.LEVEL]]) {
-                Devices.memory[MemoryMap.GAME_DELAY_COUNTER] = 0;
-            }
-
-            // movement delay is fixed to 3 frames
-            Devices.memory[MemoryMap.MOVEMENT_DELAY_COUNTER]++;
-            if (Devices.memory[MemoryMap.MOVEMENT_DELAY_COUNTER] == 3) {
-                Devices.memory[MemoryMap.MOVEMENT_DELAY_COUNTER] = 0;
-            }
-
-        }
-    }
 
 }
