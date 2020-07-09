@@ -1042,7 +1042,7 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
                     label = Label.NEXT_PIECE;
                     break;
 
-                case NEXT_PIECE_RETURN_0:
+                case START_GAME_3:
                     lxa(MemoryMap.UTIL_0);
                     operation(Operation.SUB, AddressingMode.IMMEDIATE, Destination.X, 1);
                     if (isCarry()) {
@@ -1055,11 +1055,9 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
                     label = Label.CLEAR_SCREEN;
                     break;
 
-                case START_GAME_3:
+                case START_GAME_4:
                     CpuProgramFragments.INSTANCE.drawBackground();
-                    Engine.drawPreview();
-
-                    label = Label.GAME_LOOP;
+                    label = Label.DRAW_PREVIEW_THEN_RETURN_TO_GAME;
                     break;
 
                 //endregion
@@ -1120,7 +1118,7 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
                     if (Devices.memory[MemoryMap.RETURN_SELECTOR] == 0) {
                         label = Label.TITLE_SCREEN_1;
                     } else {
-                        label = Label.START_GAME_3;
+                        label = Label.START_GAME_4;
                     }
                     break;
 
@@ -1158,16 +1156,10 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
                     Devices.memory[MemoryMap.CURRENT_Y] = -4;
 
                     if (Devices.memory[MemoryMap.RETURN_SELECTOR_NONLEAF_1] == 0) {
-                        label = Label.NEXT_PIECE_RETURN_0;
+                        label = Label.START_GAME_3;
                     } else {
-                        label = Label.NEXT_PIECE_RETURN_1;
+                        label = Label.DRAW_PREVIEW_THEN_RETURN_TO_GAME;
                     }
-                    break;
-
-                // note: NEXT_PIECE_RETURN_0 is located in game start code, not here
-                case NEXT_PIECE_RETURN_1:
-                    Engine.drawPreview();
-                    label = Label.GAME_LOOP;
                     break;
 
                 case NEXT_RANDOM_MOD_7:
@@ -1177,6 +1169,11 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
                     } else {
                         label = Label.NEXT_PIECE_2;
                     }
+                    break;
+
+                case DRAW_PREVIEW_THEN_RETURN_TO_GAME:
+                    Engine.drawPreview();
+                    label = Label.GAME_LOOP;
                     break;
 
                 default:
@@ -1196,6 +1193,7 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
         START_GAME_1,
         START_GAME_2,
         START_GAME_3,
+        START_GAME_4,
         GAME_LOOP,
 
         CLEAR_SCREEN,
@@ -1204,9 +1202,9 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
         NEXT_PIECE,
         NEXT_PIECE_1,
         NEXT_PIECE_2,
-        NEXT_PIECE_RETURN_0, // continue generating pieces to start the game
-        NEXT_PIECE_RETURN_1, // draw preview, then continue with the game
         NEXT_RANDOM_MOD_7,
+
+        DRAW_PREVIEW_THEN_RETURN_TO_GAME,
 
     }
 
