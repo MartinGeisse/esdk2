@@ -590,22 +590,6 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
     }
 
 //endregion
-//region game state
-
-    public void clearGameArea() {
-        lyi(199);
-        while (true) {
-            lxi(0);
-            sxn();
-            lxy();
-            operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.Y, 255);
-            if (!isCarry()) {
-                break;
-            }
-        }
-    }
-
-//endregion
 //region random number generator
 
     public void randomAutoSeederTick() {
@@ -916,7 +900,36 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
 
                 case START_GAME:
                     CpuProgramFragments.INSTANCE.autoSeedRandom();
-                    GameState.initializeGameState();
+
+                    // reset game stats
+                    lxi(0);
+                    sxa(MemoryMap.ROW_COUNTER);
+                    sxa(MemoryMap.LEVEL);
+
+                    // clear game area in memory (no need to clear it on screen since drawing the game background
+                    // will leave the on-screen game area blank anyway).
+                    lyi(199);
+                    while (true) {
+                        lxi(0);
+                        sxn();
+                        lxy();
+                        operation(Operation.ADD, AddressingMode.IMMEDIATE, Destination.Y, 255);
+                        if (!isCarry()) {
+                            break;
+                        }
+                    }
+
+                    // randomize the current and thee preview pieces
+                    {
+                        int i = 3;
+                        while (true) {
+                            GameState.nextPiece();
+                            i--;
+                            if (i < 0) {
+                                break;
+                            }
+                        }
+                    }
                     Devices.memory[MemoryMap.FLASH_ROWS_EFFECT] = -1;
                     Draw.drawBackground();
                     Engine.drawPreview();

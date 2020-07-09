@@ -10,24 +10,6 @@ public final class GameState {
     private GameState() {
     }
 
-    public static void initializeGameState() {
-        clearGameArea();
-        Devices.memory[MemoryMap.ROW_COUNTER] = 0;
-        Devices.memory[MemoryMap.LEVEL] = 0;
-        int i = 3;
-        while (true) {
-            nextPiece();
-            i--;
-            if (i < 0) {
-                break;
-            }
-        }
-    }
-
-    public static void clearGameArea() {
-        CpuProgramFragments.INSTANCE.clearGameArea();
-    }
-
     public static boolean addRows(int num) {
         Devices.memory[MemoryMap.ROW_COUNTER] += num;
         if (Devices.memory[MemoryMap.ROW_COUNTER] < 10) {
