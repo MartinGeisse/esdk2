@@ -1125,9 +1125,15 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
                 case NEXT_PIECE:
 
                     // undraw old piece, unless called from startup code
-                    if (Devices.memory[MemoryMap.RETURN_SELECTOR_NONLEAF_1] != 0) {
-                        Engine.clearPreview();
+                    if (Devices.memory[MemoryMap.RETURN_SELECTOR_NONLEAF_1] == 0) {
+                        label = Label.NEXT_PIECE_1;
+                        break;
                     }
+                    Engine.clearPreview();
+                    label = Label.NEXT_PIECE_1;
+                    break;
+
+                case NEXT_PIECE_1:
 
                     // shift color
                     Devices.memory[MemoryMap.CURRENT_COLOR] = Devices.memory[MemoryMap.PREVIEW_COLOR_0];
@@ -1137,7 +1143,7 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
                     label = Label.NEXT_RANDOM_MOD_7;
                     break;
 
-                case NEXT_PIECE_1:
+                case NEXT_PIECE_2:
                     Devices.memory[MemoryMap.PREVIEW_COLOR_2] = (byte)(Devices.memory[MemoryMap.TEMP_0] + 1);
 
                     // shift piece (note: CURRENT_SHAPE temporarily contains the piece, not the shape)
@@ -1148,7 +1154,7 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
                     label = Label.NEXT_RANDOM_MOD_7;
                     break;
 
-                case NEXT_PIECE_2:
+                case NEXT_PIECE_3:
                     Devices.memory[MemoryMap.PREVIEW_PIECE_2] = (byte) Devices.memory[MemoryMap.TEMP_0];
 
                     // now turn the piece into its normal shape
@@ -1168,9 +1174,9 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
                 case NEXT_RANDOM_MOD_7:
                     CpuProgramFragments.INSTANCE.nextRandomMod7();
                     if (Devices.memory[MemoryMap.RETURN_SELECTOR] == 0) {
-                        label = Label.NEXT_PIECE_1;
-                    } else {
                         label = Label.NEXT_PIECE_2;
+                    } else {
+                        label = Label.NEXT_PIECE_3;
                     }
                     break;
 
@@ -1205,6 +1211,7 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
         NEXT_PIECE,
         NEXT_PIECE_1,
         NEXT_PIECE_2,
+        NEXT_PIECE_3,
         NEXT_RANDOM_MOD_7,
 
         DRAW_PREVIEW_THEN_RETURN_TO_GAME,
