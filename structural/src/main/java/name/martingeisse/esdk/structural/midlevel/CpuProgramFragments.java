@@ -863,14 +863,6 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
 
     public void gameTick() {
 
-        // game delay depends on the current level
-        Devices.memory[MemoryMap.GAME_DELAY_COUNTER]++;
-        if (Devices.memory[MemoryMap.LEVEL] > Constants.delayLevels ||
-                Devices.memory[MemoryMap.GAME_DELAY_COUNTER] >= Constants.delayByLevel[Devices.memory[MemoryMap.LEVEL]]) {
-            Devices.memory[MemoryMap.GAME_DELAY_COUNTER] = 0;
-        }
-
-
         // undraw shape and remember position and shape
         Draw.drawShapeOnGameArea(Devices.memory[MemoryMap.CURRENT_X], Devices.memory[MemoryMap.CURRENT_Y],
                 Devices.memory[MemoryMap.CURRENT_SHAPE] & 0xff, 0);
@@ -1062,6 +1054,24 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
 
                 case GAME_LOOP_1:
                     sxa(MemoryMap.MOVEMENT_DELAY_COUNTER);
+
+                    // game delay depends on the current level
+                    lxa(MemoryMap.GAME_DELAY_COUNTER);
+                    operation(Operation.SUB, AddressingMode.IMMEDIATE, Destination.X, 1);
+                    if (isCarry()) {
+                        label = Label.GAME_LOOP_2;
+                        break;
+                    }
+
+                    // TODO
+                    if (Devices.memory[MemoryMap.LEVEL] > Constants.delayLevels) {
+                        lxi(0);
+                    } else {
+                        lxi(Constants.delayByLevel[Devices.memory[MemoryMap.LEVEL]] - 1);
+                    }
+
+                case GAME_LOOP_2:
+                    sxa(MemoryMap.GAME_DELAY_COUNTER);
 
                     // TODO
                     label = Label.GAME_LOOP;
@@ -1269,6 +1279,7 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
 
         GAME_LOOP,
         GAME_LOOP_1,
+        GAME_LOOP_2,
 
         CLEAR_SCREEN,
         FLASH_COMPLETED_ROWS,
