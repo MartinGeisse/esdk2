@@ -1057,20 +1057,81 @@ public final class CpuProgramFragments extends AbstractCpuProgramFragments {
 
                     // game delay depends on the current level
                     lxa(MemoryMap.GAME_DELAY_COUNTER);
-                    operation(Operation.SUB, AddressingMode.IMMEDIATE, Destination.X, 1);
+                    operation(Operation.SUB, AddressingMode.IMMEDIATE, Destination.Y, 1);
                     if (isCarry()) {
                         label = Label.GAME_LOOP_2;
                         break;
                     }
 
-                    // TODO
-                    if (Devices.memory[MemoryMap.LEVEL] > Constants.delayLevels) {
-                        lxi(0);
-                    } else {
-                        lxi(Constants.delayByLevel[Devices.memory[MemoryMap.LEVEL]] - 1);
+                    // screen frames per game frame by level: 30, 27, 24, 21, 18, 15, 12, 8, 5, 2, 1
+                    // (counter initialized to one less since it triggers on underflow)
+                    lxa(MemoryMap.LEVEL);
+                    lyi(29);
+                    operation(Operation.SUB, AddressingMode.IMMEDIATE, Destination.X, 1);
+                    if (!isCarry()) {
+                        label = Label.GAME_LOOP_2;
+                        break;
                     }
+                    lyi(26);
+                    operation(Operation.SUB, AddressingMode.IMMEDIATE, Destination.X, 1);
+                    if (!isCarry()) {
+                        label = Label.GAME_LOOP_2;
+                        break;
+                    }
+                    lyi(23);
+                    operation(Operation.SUB, AddressingMode.IMMEDIATE, Destination.X, 1);
+                    if (!isCarry()) {
+                        label = Label.GAME_LOOP_2;
+                        break;
+                    }
+                    lyi(20);
+                    operation(Operation.SUB, AddressingMode.IMMEDIATE, Destination.X, 1);
+                    if (!isCarry()) {
+                        label = Label.GAME_LOOP_2;
+                        break;
+                    }
+                    lyi(17);
+                    operation(Operation.SUB, AddressingMode.IMMEDIATE, Destination.X, 1);
+                    if (!isCarry()) {
+                        label = Label.GAME_LOOP_2;
+                        break;
+                    }
+                    lyi(14);
+                    operation(Operation.SUB, AddressingMode.IMMEDIATE, Destination.X, 1);
+                    if (!isCarry()) {
+                        label = Label.GAME_LOOP_2;
+                        break;
+                    }
+                    lyi(11);
+                    operation(Operation.SUB, AddressingMode.IMMEDIATE, Destination.X, 1);
+                    if (!isCarry()) {
+                        label = Label.GAME_LOOP_2;
+                        break;
+                    }
+                    lyi(8);
+                    operation(Operation.SUB, AddressingMode.IMMEDIATE, Destination.X, 1);
+                    if (!isCarry()) {
+                        label = Label.GAME_LOOP_2;
+                        break;
+                    }
+                    lyi(5);
+                    operation(Operation.SUB, AddressingMode.IMMEDIATE, Destination.X, 1);
+                    if (!isCarry()) {
+                        label = Label.GAME_LOOP_2;
+                        break;
+                    }
+                    lyi(2);
+                    operation(Operation.SUB, AddressingMode.IMMEDIATE, Destination.X, 1);
+                    if (!isCarry()) {
+                        label = Label.GAME_LOOP_2;
+                        break;
+                    }
+                    lyi(1);
+                    label = Label.GAME_LOOP_2;
+                    break;
 
                 case GAME_LOOP_2:
+                    lxy();
                     sxa(MemoryMap.GAME_DELAY_COUNTER);
 
                     // TODO
