@@ -2,11 +2,11 @@ module name.martingeisse.esdk.experiment.ColorTest;
 
 interface {
     in clock clk;
-    in clock ditherClk0, ditherClk180;
-    out bit r1, g1, b1, r2, g2, b2, hsync, vsync;
+    out vector[3] r, g, b;
+    out bit hsync, vsync;
 }
 
-// stage 1
+// stage 1 (timing)
 register vector[10] stage1x, stage1y;
 register vector[2] stage1p;
 register bit stage1hblank, stage1vblank, stage1hsync, stage1vsync;
@@ -42,7 +42,7 @@ do (clk) {
     }
 }
 
-// stage 2
+// stage 2 (apply blanking)
 signal bit blanked;
 do (*) {
     blanked = stage1hblank | stage1vblank;
@@ -50,74 +50,18 @@ do (*) {
 register vector[3] stage2r, stage2g, stage2b;
 register bit stage2hsync, stage2vsync;
 do (clk) {
-    stage2r = blanked ? 3d0 : stage1x[6:4];
-    stage2g = blanked ? 3d0 : stage1y[6:4];
-    stage2b = 3d0;
+    stage2r = (blanked | stage1y[6]) ? 3d0 : stage1x[6:4];
+    stage2g = (blanked | stage1y[7]) ? 3d0 : stage1x[6:4];
+    stage2b = (blanked | stage1y[8]) ? 3d0 : stage1x[6:4];
     stage2hsync = stage1hsync;
     stage2vsync = stage1vsync;
 }
 
-// dithering stage (from here, everything runs at higher speed)
-// dither patterns: 0000, 0101, 1011, 1111
-
-name.martingeisse.esdk.experiment.DitherTable ditherTableR, ditherTableG, ditherTableB;
-do (*) {
-    ditherTableR.value = stage2r;
-    ditherTableR.index = ditherCounter;
-    ditherTableG.value = stage2g;
-    ditherTableG.index = ditherCounter;
-    ditherTableB.value = stage2b;
-    ditherTableB.index = ditherCounter;
-}
-
-register vector[2] ditherR, ditherG, ditherB;
-register bit ditherHsync, ditherVsync;
-register vector[2] ditherCounter = 0;
-do (ditherClk0) {
-    ditherR = ditherTableR.dithered;
-    ditherG = ditherTableG.dithered;
-    ditherB = ditherTableB.dithered;
-    ditherHsync = stage2hsync;
-    ditherVsync = stage2vsync;
-    ditherCounter = ditherCounter + 2d1;
-}
-
-// another two register stages before the output stage to relax the effect of routing on the timing
-register vector[2] delayedDitherR, delayedDitherG, delayedDitherB;
-register bit delayedDitherHsync, delayedDitherVsync;
-do (ditherClk0) {
-    delayedDitherR = ditherR;
-    delayedDitherG = ditherG;
-    delayedDitherB = ditherB;
-    delayedDitherHsync = ditherHsync;
-    delayedDitherVsync = ditherVsync;
-}
-register bit delayedAgainDitherR1, delayedAgainDitherR2;
-register bit delayedAgainDitherG1, delayedAgainDitherG2;
-register bit delayedAgainDitherB1, delayedAgainDitherB2;
-register bit delayedAgainDitherHsync, delayedAgainDitherVsync;
-do (ditherClk180) {
-    delayedAgainDitherR1 = delayedDitherR[1];
-    delayedAgainDitherG1 = delayedDitherG[1];
-    delayedAgainDitherB1 = delayedDitherB[1];
-}
-do (ditherClk0) {
-    delayedAgainDitherR2 = delayedDitherR[0];
-    delayedAgainDitherG2 = delayedDitherG[0];
-    delayedAgainDitherB2 = delayedDitherB[0];
-
-    delayedAgainDitherHsync = delayedDitherHsync;
-    delayedAgainDitherVsync = delayedDitherVsync;
-}
-
 // output stage
 do (*) {
-    r1 = delayedAgainDitherR1;
-    g1 = delayedAgainDitherG1;
-    b1 = delayedAgainDitherB1;
-    r2 = delayedAgainDitherR2;
-    g2 = delayedAgainDitherG2;
-    b2 = delayedAgainDitherB2;
-    hsync = delayedAgainDitherHsync;
-    vsync = delayedAgainDitherVsync;
+    r = stage2r;
+    g = stage2g;
+    b = stage2b;
+    hsync = stage2hsync;
+    vsync = stage2vsync;
 }
