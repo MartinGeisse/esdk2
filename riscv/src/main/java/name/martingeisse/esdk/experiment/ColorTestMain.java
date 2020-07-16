@@ -45,6 +45,19 @@ public class ColorTestMain {
         vgaPin(realm, "F15", colorTest.getHsync());
         vgaPin(realm, "F14", colorTest.getVsync());
 
+        // "morecolor" VGA pins
+        vgaPin(realm, "F8",  colorTest.getR().select(2)); // IO11
+        vgaPin(realm, "C7",  colorTest.getR().select(1)); // IO10
+        vgaPin(realm, "D7",  colorTest.getR().select(0)); // IO9
+        vgaPin(realm, "E7",  colorTest.getG().select(2)); // IO7
+        vgaPin(realm, "B6",  colorTest.getG().select(1)); // IO6
+        vgaPin(realm, "A6",  colorTest.getG().select(0)); // IO5
+        vgaPin(realm, "D5",  colorTest.getB().select(2)); // IO3
+        vgaPin(realm, "A4",  colorTest.getB().select(1)); // IO2
+        vgaPin(realm, "B4",  colorTest.getB().select(0)); // IO1
+        vgaPin(realm, "C5", colorTest.getHsync()); // IO4
+        vgaPin(realm, "F7", colorTest.getVsync()); // IO8
+
         ProjectGenerator projectGenerator = new ProjectGenerator(realm, "ColorTest", new File("ise/color_test"), "XC3S500E-FG320-4");
         projectGenerator.addVerilogFile(new File("riscv/resource/hdl/clk_reset.v"));
         projectGenerator.addUcfLine("NET \"pinC9\" PERIOD = 20.0ns HIGH 40%;");
