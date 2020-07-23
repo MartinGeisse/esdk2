@@ -1,0 +1,22 @@
+
+It should be possible to have project L (library) with MaHDL files and supporting Java classes, and project A
+(application) which uses L. The hand-written classes in L want to use the generated classes in L, so L has to generate
+that code. Now A should not generate classes for the same MaHDL modules (from L) since then these classes would exist
+as duplicates. This implies that compiled classes are the correct way to distribute MaHDL artifacts, NOT MaHDL
+source code or any kind of "MaHDL binary".
+
+Additionally, to use these Java classes in other MaHDL code, meta-data is needed. So actually, MaHDL artifacts are
+compiled Java code + meta-data, for example as Java annotations or as accompanying descriptor files (e.g. JSON).
+For now I prefer the latter since it means that the MaHDL compiler can access the meta-data without hooking into
+the Java build system (or manually reading Java class files) to extract annotations.
+
+WRT Gradle, this means that a project dependency (A -> L) implies a task dependency
+(MaHDL codegen A -> MaHDL codegen L). Any attempt to sidestep that task dependency would just re-implement the
+latter step in an informal way -- keep in mind that at least MaHDL parsing, potentially half of MaHDL compilation is
+needed for that. We might try to cache the required information (the meta-data from the JSON files) to speed up
+the build, but I'd first check if reading some JSON files is still a performance bottleneck.
+
+Note that transitive project dependencies must be dealt with, even if the middle project is not a MaHDL project at all.
+How exactly this has to happen depends on what Gradle already does with them. A -> X -> L (with X not a MaHDL project)
+be imply a task dependency (MaHDL codegen A -> MaHDL codegen L). If X *is* a MaHDL project, this is not necessary
+since it will become a transitive task dependency, which will already be executed in the correct order.
