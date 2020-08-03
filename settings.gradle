@@ -1,5 +1,6 @@
 include 'core'
 include 'mahdl:mahdl-common'
+include 'mahdl:mahdl-compiler'
 include 'mahdl:mahdl-gradle'
 include 'mahdl:mahdl-intellij'
 include 'mahdl:mahdl-doc'
