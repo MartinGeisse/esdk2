@@ -64,6 +64,7 @@ repositories {
 dependencies {
 
 	compile project(':mahdl:mahdl-common')
+	compile project(':mahdl:mahdl-compiler')
 
 	implementation gradleApi()
 	implementation localGroovy()

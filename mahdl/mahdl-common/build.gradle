@@ -53,6 +53,7 @@ repositories {
 dependencies {
 
     compile 'org.apache.commons:commons-lang3:3.0'
+    compile 'org.apache.commons:commons-collections4:4.4'
     compile 'com.google.guava:guava:27.1-jre'
     compile 'org.jetbrains:annotations:16.0.2'
 
