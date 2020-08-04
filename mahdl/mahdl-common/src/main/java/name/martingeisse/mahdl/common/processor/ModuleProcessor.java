@@ -7,6 +7,7 @@ package name.martingeisse.mahdl.common.processor;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import name.martingeisse.mahdl.common.Environment;
+import name.martingeisse.mahdl.common.ModuleIdentifier;
 import name.martingeisse.mahdl.common.processor.definition.*;
 import name.martingeisse.mahdl.common.processor.expression.ExpressionProcessor;
 import name.martingeisse.mahdl.common.processor.expression.ExpressionProcessorImpl;
@@ -41,7 +42,7 @@ import java.util.Map;
 public final class ModuleProcessor {
 
 	private final Module module;
-	private final String canonicalModuleName;
+	private final ModuleIdentifier moduleIdentifier;
 	private final ProcessingSidekick sidekick;
 
 	private DataTypeProcessor dataTypeProcessor;
@@ -58,7 +59,7 @@ public final class ModuleProcessor {
 
 	public ModuleProcessor(@NotNull Module module, @NotNull ProcessingSidekick sidekick) {
 		this.module = module;
-		this.canonicalModuleName = CmUtil.canonicalizeQualifiedModuleName(module.getModuleName());
+		this.moduleIdentifier = new ModuleIdentifier(module.getModuleName());
 		this.sidekick = sidekick;
 	}
 
@@ -96,7 +97,7 @@ public final class ModuleProcessor {
 		// process module definitions
 		definitionProcessor.processPorts(module.getPortDefinitionGroups());
 		if (isNative) {
-			return new ModuleDefinition(isNative, canonicalModuleName, ImmutableMap.copyOf(getDefinitions()), ImmutableList.of());
+			return new ModuleDefinition(isNative, moduleIdentifier, ImmutableMap.copyOf(getDefinitions()), ImmutableList.of());
 		}
 		for (ImplementationItem implementationItem : module.getImplementationItems().getAll()) {
 			if (isConstant(implementationItem)) {
@@ -157,7 +158,7 @@ public final class ModuleProcessor {
 		// now check that all ports and signals without initializer have been assigned to
 		assignmentValidator.checkMissingAssignments(getDefinitions().values());
 
-		return new ModuleDefinition(isNative, canonicalModuleName, ImmutableMap.copyOf(getDefinitions()), ImmutableList.copyOf(processedDoBlocks));
+		return new ModuleDefinition(isNative, moduleIdentifier, ImmutableMap.copyOf(getDefinitions()), ImmutableList.copyOf(processedDoBlocks));
 	}
 
 	private boolean isConstant(ImplementationItem item) {

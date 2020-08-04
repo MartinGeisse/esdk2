@@ -6,6 +6,7 @@ package name.martingeisse.mahdl.common.processor.definition;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import name.martingeisse.mahdl.common.ModuleIdentifier;
 import name.martingeisse.mahdl.common.processor.statement.ProcessedDoBlock;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,7 +18,7 @@ public final class ModuleDefinition {
 	private final boolean isNative;
 
 	@NotNull
-	private final String name;
+	private final ModuleIdentifier identifier;
 
 	@NotNull
 	private final ImmutableMap<String, Named> definitions;
@@ -25,9 +26,9 @@ public final class ModuleDefinition {
 	@NotNull
 	private final ImmutableList<ProcessedDoBlock> doBlocks;
 
-	public ModuleDefinition(boolean isNative, @NotNull String name, @NotNull ImmutableMap<String, Named> definitions, @NotNull ImmutableList<ProcessedDoBlock> doBlocks) {
+	public ModuleDefinition(boolean isNative, @NotNull ModuleIdentifier identifier, @NotNull ImmutableMap<String, Named> definitions, @NotNull ImmutableList<ProcessedDoBlock> doBlocks) {
 		this.isNative = isNative;
-		this.name = name;
+		this.identifier = identifier;
 		this.definitions = definitions;
 		this.doBlocks = doBlocks;
 	}
@@ -37,8 +38,8 @@ public final class ModuleDefinition {
 	}
 
 	@NotNull
-	public String getName() {
-		return name;
+	public ModuleIdentifier getIdentifier() {
+		return identifier;
 	}
 
 	@NotNull
