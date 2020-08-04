@@ -11,6 +11,8 @@ import name.martingeisse.mahdl.common.processor.definition.Named;
  */
 public interface LocalDefinitionResolver {
 
+	LocalDefinitionResolver NULL = name -> null;
+
 	Named getDefinition(String name);
 
 }

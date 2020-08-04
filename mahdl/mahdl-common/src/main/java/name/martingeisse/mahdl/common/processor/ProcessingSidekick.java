@@ -12,6 +12,8 @@ import org.jetbrains.annotations.Nullable;
  */
 public final class ProcessingSidekick {
 
+	public static final ProcessingSidekick ISOLATED = new ProcessingSidekick(ErrorHandler.NOP);
+
 	private final ErrorHandler errorHandler;
 
 	public ProcessingSidekick(ErrorHandler errorHandler) {

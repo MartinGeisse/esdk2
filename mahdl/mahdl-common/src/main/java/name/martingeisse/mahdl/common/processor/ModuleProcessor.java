@@ -33,7 +33,7 @@ import java.util.Map;
  * compiling it, in that information about the code must be collected in multiple interdependent steps. Without a
  * central framework for these steps, a lot of code gets duplicated between them.
  * <p>
- * For example, it is not possible to check type correctness without evaluating constants, becuase constants are used to
+ * For example, it is not possible to check type correctness without evaluating constants, because constants are used to
  * specify array sizes. Type correctness is needed to evaluate constants though. Both of these steps can run into the
  * same errors in various sub-steps, so they would take an annotation holder to report these errors -- but there would
  * need to be an agreement which step reports which errors. And so on.

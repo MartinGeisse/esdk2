@@ -14,6 +14,18 @@ import org.jetbrains.annotations.Nullable;
  */
 public interface ErrorHandler {
 
+	ErrorHandler NOP = new ErrorHandler() {
+
+		@Override
+		public void onError(@NotNull CmLinked errorSource, @NotNull String message, @Nullable Throwable t) {
+		}
+
+		@Override
+		public void onDiagnostic(@NotNull CmLinked errorSource, @NotNull String message, @Nullable Throwable t) {
+		}
+
+	};
+
 	default void onError(@NotNull CmLinked errorSource, @NotNull String message) {
 		onError(errorSource, message, null);
 	}

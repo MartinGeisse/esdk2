@@ -14,6 +14,8 @@ import name.martingeisse.mahdl.input.cm.ExtendedExpression;
  */
 public interface ExpressionProcessor {
 
+	ExpressionProcessor ISOLATED = new ExpressionProcessorImpl(ProcessingSidekick.ISOLATED, LocalDefinitionResolver.NULL);
+
 	ProcessedExpression process(ExtendedExpression expression);
 
 	ProcessedExpression process(Expression expression);
