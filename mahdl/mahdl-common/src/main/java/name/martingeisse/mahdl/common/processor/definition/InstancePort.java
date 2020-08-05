@@ -4,6 +4,7 @@
  */
 package name.martingeisse.mahdl.common.processor.definition;
 
+import name.martingeisse.mahdl.common.ModuleApi;
 import name.martingeisse.mahdl.common.processor.type.ProcessedDataType;
 import org.jetbrains.annotations.NotNull;
 
@@ -11,6 +12,8 @@ import org.jetbrains.annotations.NotNull;
  * Sorting: This class can be sorted by port name. This may mix instance ports from different
  * module instances or even different modules, but we don't care since sorting is only used to
  * keep the generated code from changing randomly.
+ *
+ * TODO remove, we already have {@link ModuleApi.Port}
  */
 public final class InstancePort implements Comparable<InstancePort> {
 
