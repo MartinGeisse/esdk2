@@ -6,6 +6,7 @@ package name.martingeisse.mahdl.common.processor.definition;
 
 import com.google.common.collect.ImmutableMap;
 import name.martingeisse.mahdl.common.Environment;
+import name.martingeisse.mahdl.common.ModuleApi;
 import name.martingeisse.mahdl.common.ReferenceResolutionException;
 import name.martingeisse.mahdl.common.processor.ProcessingSidekick;
 import name.martingeisse.mahdl.common.processor.expression.ExpressionProcessor;
@@ -161,30 +162,12 @@ public final class DefinitionProcessor {
 				}
 				return;
 			}
+			ModuleApi moduleApi = new ModuleApi(resolvedModule);
 
-			// build a map of the port definitions from the module definition
+			// build a map of all ports
 			Map<String, InstancePort> ports = new HashMap<>();
-			for (PortDefinitionGroup untypedPortDefinitionGroup : resolvedModule.getPortDefinitionGroups().getAll()) {
-				if (untypedPortDefinitionGroup instanceof PortDefinitionGroup_Valid) {
-					PortDefinitionGroup_Valid portDefinitionGroup = (PortDefinitionGroup_Valid) untypedPortDefinitionGroup;
-					for (PortDefinition portDefinition : portDefinitionGroup.getDefinitions().getAll()) {
-						String portName = portDefinition.getIdentifier().getText();
-						if (portName != null) {
-							name.martingeisse.mahdl.common.processor.definition.PortDirection direction;
-							if (portDefinitionGroup.getDirection() instanceof PortDirection_In) {
-								direction = name.martingeisse.mahdl.common.processor.definition.PortDirection.IN;
-							} else if (portDefinitionGroup.getDirection() instanceof PortDirection_Out) {
-								direction = name.martingeisse.mahdl.common.processor.definition.PortDirection.OUT;
-							} else {
-								sidekick.onError(portDefinitionGroup.getDirection(), "unknown direction");
-								continue;
-							}
-							// do not report errors in foreign modules
-							ProcessedDataType processedDataType = dataTypeProcessor.processDataType(portDefinitionGroup.getDataType(), false);
-							ports.put(portName, new InstancePort(portName, direction, processedDataType));
-						}
-					}
-				}
+			for (ModuleApi.Port apiPort : moduleApi.getPorts()) {
+				ports.put(apiPort.getName(), new InstancePort(apiPort.getName(), apiPort.getDirection(), apiPort.getType()));
 			}
 
 			// add a module instance definition for each instance identifier
