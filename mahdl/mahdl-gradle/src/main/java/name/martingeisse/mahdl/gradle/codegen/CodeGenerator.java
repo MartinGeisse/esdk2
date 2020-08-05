@@ -156,9 +156,9 @@ public final class CodeGenerator {
 		// fields part: module instances
 		if (!connector) {
 			for (ModuleInstance moduleInstance : model.getModuleInstances()) {
-				String canonicalName = CmUtil.canonicalizeQualifiedModuleName(moduleInstance.getModuleElement().getModuleName());
 				builder.append("\n");
-				builder.append("		public final ").append(canonicalName).append(" _").append(moduleInstance.getName()).append(";\n");
+				builder.append("		public final ").append(moduleInstance.getModuleApi().getModuleIdentifier())
+						.append(" _").append(moduleInstance.getName()).append(";\n");
 			}
 		}
 
@@ -383,14 +383,14 @@ public final class CodeGenerator {
 					builder.append(", RtlClockNetwork ").append(clockToPass);
 				}
 				builder.append(") {\n");
-				if (info.getModuleInstance().getModuleElement().getNativeness().getIt() == null) {
+				if (info.getModuleInstance().getModuleApi().isNative()) {
+					builder.append("			throw new UnsupportedOperationException(\"submodule is native\");\n");
+				} else {
 					builder.append("			return new ").append(info.getCanonicalModuleName()).append(".Implementation(realm");
 					for (String clockToPass : info.getLocalClocksToPass()) {
 						builder.append(", ").append(clockToPass);
 					}
 					builder.append(");\n");
-				} else {
-					builder.append("			throw new UnsupportedOperationException(\"submodule is native\");\n");
 				}
 				builder.append("		}\n");
 				builder.append("\n");

@@ -125,7 +125,7 @@ public final class GenerationModel {
 		// derived: module instances and which clocks to use for them
 		moduleInstanceInfos = new ArrayList<>();
 		for (ModuleInstance moduleInstance : moduleInstances) {
-			String canonicalModuleName = CmUtil.canonicalizeQualifiedModuleName(moduleInstance.getModuleElement().getModuleName());
+			String canonicalModuleName = moduleInstance.getModuleApi().getModuleIdentifier().toString();
 
 			// collect clock ports, sorted by name
 			SortedSet<String> clockPortNames = new TreeSet<>();
