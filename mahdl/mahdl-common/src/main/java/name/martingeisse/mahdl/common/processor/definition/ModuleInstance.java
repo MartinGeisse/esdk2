@@ -15,41 +15,41 @@ import org.jetbrains.annotations.NotNull;
  */
 public final class ModuleInstance extends Named {
 
-	@NotNull
-	private final ModuleInstanceDefinition moduleInstanceDefinitionElement;
+    @NotNull
+    private final ModuleInstanceDefinition moduleInstanceDefinitionElement;
 
-	@NotNull
-	private final Module moduleElement;
+    @NotNull
+    private final Module moduleElement;
 
-	@NotNull
-	private final ImmutableMap<String, InstancePort> ports;
+    @NotNull
+    private final ImmutableMap<String, InstancePort> ports;
 
-	public ModuleInstance(@NotNull ModuleInstanceDefinition moduleInstanceDefinitionElement,
-						  @NotNull Module moduleElement,
-						  @NotNull ImmutableMap<String, InstancePort> ports) {
-		super(moduleInstanceDefinitionElement.getIdentifier());
-		this.moduleInstanceDefinitionElement = moduleInstanceDefinitionElement;
-		this.moduleElement = moduleElement;
-		this.ports = ports;
-	}
+    public ModuleInstance(@NotNull ModuleInstanceDefinition moduleInstanceDefinitionElement,
+                          @NotNull Module moduleElement,
+                          @NotNull ImmutableMap<String, InstancePort> ports) {
+        super(moduleInstanceDefinitionElement.getIdentifier());
+        this.moduleInstanceDefinitionElement = moduleInstanceDefinitionElement;
+        this.moduleElement = moduleElement;
+        this.ports = ports;
+    }
 
-	@NotNull
-	public ModuleInstanceDefinition getModuleInstanceDefinitionElement() {
-		return moduleInstanceDefinitionElement;
-	}
+    @NotNull
+    public ModuleInstanceDefinition getModuleInstanceDefinitionElement() {
+        return moduleInstanceDefinitionElement;
+    }
 
-	@NotNull
-	public Module getModuleElement() {
-		return moduleElement;
-	}
+    @NotNull
+    public Module getModuleElement() {
+        return moduleElement;
+    }
 
-	@NotNull
-	public ImmutableMap<String, InstancePort> getPorts() {
-		return ports;
-	}
+    @NotNull
+    public ImmutableMap<String, InstancePort> getPorts() {
+        return ports;
+    }
 
-	@Override
-	public void processExpressions(@NotNull ExpressionProcessor expressionProcessor) {
-	}
+    @Override
+    public void processExpressions(@NotNull ExpressionProcessor expressionProcessor) {
+    }
 
 }
