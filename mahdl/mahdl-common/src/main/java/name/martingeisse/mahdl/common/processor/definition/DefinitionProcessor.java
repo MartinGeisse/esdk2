@@ -172,7 +172,7 @@ public final class DefinitionProcessor {
 
 			// add a module instance definition for each instance identifier
 			for (ModuleInstanceDefinition definition : moduleInstanceDefinitionGroupElement.getDefinitions().getAll()) {
-				add(new ModuleInstance(definition, resolvedModule, ImmutableMap.copyOf(ports)));
+				add(new ModuleInstance(definition, resolvedModule, moduleApi, ImmutableMap.copyOf(ports)));
 			}
 
 		}
