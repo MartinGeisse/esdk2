@@ -238,7 +238,7 @@ public class ExpressionProcessorImpl implements ExpressionProcessor {
 		InstancePort port = moduleInstance.getPorts().get(portName);
 		if (port == null) {
 			return error(expression, "cannot resolve port '" + portName + "' of instance '" + moduleInstance.getName() +
-				"' of module '" + CmUtil.canonicalizeQualifiedModuleName(moduleInstance.getModuleElement().getModuleName()) + "'");
+				"' of module " + moduleInstance.getModuleApi().getModuleIdentifier());
 		}
 		return new InstancePortReference(expression, moduleInstance, port);
 

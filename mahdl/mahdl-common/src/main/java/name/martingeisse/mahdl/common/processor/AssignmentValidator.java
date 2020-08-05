@@ -4,6 +4,7 @@
  */
 package name.martingeisse.mahdl.common.processor;
 
+import name.martingeisse.mahdl.common.ModuleApi;
 import name.martingeisse.mahdl.common.processor.definition.PortDirection;
 import name.martingeisse.mahdl.common.processor.definition.*;
 import name.martingeisse.mahdl.common.processor.expression.*;
@@ -51,17 +52,12 @@ public final class AssignmentValidator {
 			} else if (definition instanceof ModuleInstance) {
 				ModuleInstance moduleInstance = (ModuleInstance) definition;
 				String instanceName = moduleInstance.getName();
-				for (PortDefinitionGroup untypedPortDefinitionGroup : moduleInstance.getModuleElement().getPortDefinitionGroups().getAll()) {
-					if (untypedPortDefinitionGroup instanceof PortDefinitionGroup_Valid) {
-						PortDefinitionGroup_Valid portDefinitionGroup = (PortDefinitionGroup_Valid) untypedPortDefinitionGroup;
-						if (portDefinitionGroup.getDirection() instanceof PortDirection_In) {
-							for (PortDefinition portDefinition : portDefinitionGroup.getDefinitions().getAll()) {
-								String prefixedPortName = instanceName + '.' + portDefinition.getIdentifier().getText();
-								if (!previouslyAssignedSignals.contains(prefixedPortName)) {
-									sidekick.onError(moduleInstance.getModuleInstanceDefinitionElement(),
-										"missing assignment for port '" + portDefinition.getIdentifier().getText() + "' in instance '" + instanceName + "'");
-								}
-							}
+				for (ModuleApi.Port portApi : moduleInstance.getModuleApi().getPorts()) {
+					if (portApi.getDirection() == PortDirection.IN) {
+						String prefixedPortName = instanceName + '.' + portApi.getName();
+						if (!previouslyAssignedSignals.contains(prefixedPortName)) {
+							sidekick.onError(moduleInstance.getModuleInstanceDefinitionElement(),
+									"missing assignment for port '" + portApi.getName() + "' in instance '" + instanceName + "'");
 						}
 					}
 				}
