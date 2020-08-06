@@ -1,7 +1,6 @@
 package name.martingeisse.mahdl.gradle
 
 import org.gradle.api.DefaultTask
-import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 
 /**

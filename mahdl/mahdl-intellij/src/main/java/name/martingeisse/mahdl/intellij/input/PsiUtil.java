@@ -24,7 +24,6 @@ import name.martingeisse.mahdl.intellij.MahdlSourceFile;
 import name.martingeisse.mahdl.intellij.input.reference.LocalReference;
 import name.martingeisse.mahdl.intellij.input.reference.ModuleInstancePortReference;
 import name.martingeisse.mahdl.intellij.input.reference.ModuleReference;
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

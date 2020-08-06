@@ -12,7 +12,6 @@ import name.martingeisse.mahdl.gradle.model.ClockedDoBlockInfo;
 import name.martingeisse.mahdl.gradle.model.ContinuousDoBlockInfo;
 import name.martingeisse.mahdl.gradle.model.GenerationModel;
 import name.martingeisse.mahdl.gradle.model.ModuleInstanceInfo;
-import name.martingeisse.mahdl.input.cm.CmUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.function.Predicate;

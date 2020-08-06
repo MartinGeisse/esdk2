@@ -16,7 +16,6 @@ import name.martingeisse.mahdl.common.processor.statement.StatementProcessor;
 import name.martingeisse.mahdl.common.processor.type.DataTypeProcessor;
 import name.martingeisse.mahdl.common.processor.type.DataTypeProcessorImpl;
 import name.martingeisse.mahdl.input.cm.*;
-import name.martingeisse.mahdl.input.cm.Module;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 

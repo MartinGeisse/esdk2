@@ -7,7 +7,6 @@ import name.martingeisse.mahdl.input.MapagGeneratedMahdlParser;
 import name.martingeisse.mahdl.input.Symbols;
 import name.martingeisse.mahdl.input.cm.CmNode;
 import name.martingeisse.mahdl.input.cm.Module;
-import name.martingeisse.mahdl.input.cm.impl.CmNodeImpl;
 import name.martingeisse.mahdl.input.cm.impl.CmTokenImpl;
 import name.martingeisse.mahdl.input.cm.impl.IElementType;
 import name.martingeisse.mahdl.input.cm.impl.ModuleWrapper;

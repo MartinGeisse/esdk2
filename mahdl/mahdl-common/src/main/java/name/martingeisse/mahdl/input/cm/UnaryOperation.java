@@ -4,8 +4,6 @@
  */
 package name.martingeisse.mahdl.input.cm;
 
-import name.martingeisse.mahdl.input.cm.CmNode;
-import name.martingeisse.mahdl.input.cm.Expression;
 import org.jetbrains.annotations.Nullable;
 
 /**

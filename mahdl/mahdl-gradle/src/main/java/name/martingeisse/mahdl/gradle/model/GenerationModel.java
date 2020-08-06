@@ -5,7 +5,6 @@ import name.martingeisse.mahdl.common.processor.expression.InstancePortReference
 import name.martingeisse.mahdl.common.processor.statement.ProcessedDoBlock;
 import name.martingeisse.mahdl.common.processor.type.ProcessedDataType;
 import name.martingeisse.mahdl.gradle.CompilationErrors;
-import name.martingeisse.mahdl.input.cm.CmUtil;
 
 import java.util.*;
 
