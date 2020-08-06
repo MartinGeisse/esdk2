@@ -7,7 +7,6 @@ package name.martingeisse.mahdl.common.processor.definition;
 import com.google.common.collect.ImmutableMap;
 import name.martingeisse.mahdl.common.ModuleApi;
 import name.martingeisse.mahdl.common.processor.expression.ExpressionProcessor;
-import name.martingeisse.mahdl.input.cm.Module;
 import name.martingeisse.mahdl.input.cm.ModuleInstanceDefinition;
 import org.jetbrains.annotations.NotNull;
 
@@ -20,21 +19,16 @@ public final class ModuleInstance extends Named {
     private final ModuleInstanceDefinition moduleInstanceDefinitionElement;
 
     @NotNull
-    private final Module moduleElement;
-
-    @NotNull
     private final ModuleApi moduleApi;
 
     @NotNull
     private final ImmutableMap<String, InstancePort> ports;
 
     public ModuleInstance(@NotNull ModuleInstanceDefinition moduleInstanceDefinitionElement,
-                          @NotNull Module moduleElement,
                           @NotNull ModuleApi moduleApi,
                           @NotNull ImmutableMap<String, InstancePort> ports) {
         super(moduleInstanceDefinitionElement.getIdentifier());
         this.moduleInstanceDefinitionElement = moduleInstanceDefinitionElement;
-        this.moduleElement = moduleElement;
         this.moduleApi = moduleApi;
         this.ports = ports;
     }
@@ -42,11 +36,6 @@ public final class ModuleInstance extends Named {
     @NotNull
     public ModuleInstanceDefinition getModuleInstanceDefinitionElement() {
         return moduleInstanceDefinitionElement;
-    }
-
-    @NotNull
-    public Module getModuleElement() {
-        return moduleElement;
     }
 
     @NotNull
