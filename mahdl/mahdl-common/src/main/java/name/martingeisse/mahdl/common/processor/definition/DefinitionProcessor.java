@@ -152,9 +152,9 @@ public final class DefinitionProcessor {
 			ImplementationItem_ModuleInstanceDefinitionGroup moduleInstanceDefinitionGroupElement = (ImplementationItem_ModuleInstanceDefinitionGroup) implementationItem;
 
 			// resolve the module definition
-			Module resolvedModule;
+			ModuleApi moduleApi;
 			try {
-				resolvedModule = Environment.Holder.INSTANCE.resolveModuleReference(moduleInstanceDefinitionGroupElement.getModuleName());
+				moduleApi = Environment.Holder.INSTANCE.getModuleApi(moduleInstanceDefinitionGroupElement.getModuleName());
 			} catch (ReferenceResolutionException e) {
 				sidekick.onError(moduleInstanceDefinitionGroupElement.getModuleName(), e.getMessage());
 				for (ModuleInstanceDefinition definition : moduleInstanceDefinitionGroupElement.getDefinitions().getAll()) {
@@ -162,7 +162,6 @@ public final class DefinitionProcessor {
 				}
 				return;
 			}
-			ModuleApi moduleApi = new ModuleApi(resolvedModule);
 
 			// build a map of all ports
 			Map<String, InstancePort> ports = new HashMap<>();

@@ -18,6 +18,10 @@ public interface Environment {
 
 	Module resolveModuleReference(QualifiedModuleName name) throws ReferenceResolutionException;
 
+	default ModuleApi getModuleApi(QualifiedModuleName name) throws ReferenceResolutionException {
+		return new ModuleApi(resolveModuleReference(name));
+	}
+
 	class Holder {
 		public static Environment INSTANCE = null;
 	}
