@@ -151,7 +151,7 @@ public final class DefinitionProcessor {
 		} else if (implementationItem instanceof ImplementationItem_ModuleInstanceDefinitionGroup) {
 			ImplementationItem_ModuleInstanceDefinitionGroup moduleInstanceDefinitionGroupElement = (ImplementationItem_ModuleInstanceDefinitionGroup) implementationItem;
 
-			// resolve the module definition
+			// resolve the module API
 			ModuleApi moduleApi;
 			try {
 				moduleApi = Environment.Holder.INSTANCE.getModuleApi(moduleInstanceDefinitionGroupElement.getModuleName());
