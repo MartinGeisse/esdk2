@@ -1,6 +1,7 @@
 package name.martingeisse.mahdl.gradle;
 
 import name.martingeisse.mahdl.common.Environment;
+import name.martingeisse.mahdl.common.ModuleApi;
 import name.martingeisse.mahdl.common.ReferenceResolutionException;
 import name.martingeisse.mahdl.input.cm.CmNode;
 import name.martingeisse.mahdl.input.cm.Module;
@@ -40,12 +41,13 @@ public class GradleEnvironment implements Environment {
 	}
 
 	@Override
-	public Module resolveModuleReference(QualifiedModuleName name) throws ReferenceResolutionException {
+	public ModuleApi getModuleApi(QualifiedModuleName name) throws ReferenceResolutionException {
 		ModuleWrapper moduleWrapper = ModuleWrapper.get(name);
 		if (moduleWrapper == null) {
 			throw new ReferenceResolutionException("could not resolve module reference due to previous errors");
 		}
-		return moduleWrapper.getProcessingRun().resolveModuleReference(moduleWrapper, name);
+		Module module = moduleWrapper.getProcessingRun().resolveModuleReference(moduleWrapper, name);
+		return new ModuleApi(module);
 	}
 
 }

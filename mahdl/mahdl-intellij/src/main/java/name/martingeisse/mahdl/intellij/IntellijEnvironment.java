@@ -6,6 +6,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import name.martingeisse.mahdl.common.Environment;
+import name.martingeisse.mahdl.common.ModuleApi;
 import name.martingeisse.mahdl.common.ReferenceResolutionException;
 import name.martingeisse.mahdl.input.cm.CmNode;
 import name.martingeisse.mahdl.input.cm.CmUtil;
@@ -103,11 +104,11 @@ public class IntellijEnvironment implements Environment {
 	}
 
 	@Override
-	public Module resolveModuleReference(QualifiedModuleName name) throws ReferenceResolutionException {
+	public ModuleApi getModuleApi(QualifiedModuleName name) throws ReferenceResolutionException {
 		QualifiedModuleNameImpl namePsi = (QualifiedModuleNameImpl) InternalPsiUtil.getPsiFromCm(name);
 		PsiElement untypedResolvedModule = namePsi.getReference().resolve();
 		if (untypedResolvedModule instanceof Module) {
-			return (Module) untypedResolvedModule;
+			return new ModuleApi((Module) untypedResolvedModule);
 		} else {
 			throw new ReferenceResolutionException("unknown module: '" + namePsi.getReference().getCanonicalText() + "'");
 		}
