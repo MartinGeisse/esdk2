@@ -1,4 +1,4 @@
-package name.martingeisse.mahdl.gradle.model;
+package name.martingeisse.mahdl.compiler.model;
 
 import name.martingeisse.mahdl.common.processor.definition.SignalLike;
 import name.martingeisse.mahdl.common.processor.expression.InstancePortReference;

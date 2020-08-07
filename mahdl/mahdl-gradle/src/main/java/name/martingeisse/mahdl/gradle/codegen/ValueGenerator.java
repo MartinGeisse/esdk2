@@ -2,7 +2,7 @@ package name.martingeisse.mahdl.gradle.codegen;
 
 import name.martingeisse.mahdl.common.processor.expression.ConstantValue;
 import name.martingeisse.mahdl.compiler.CompilerContext;
-import name.martingeisse.mahdl.gradle.model.GenerationModel;
+import name.martingeisse.mahdl.compiler.model.GenerationModel;
 
 /**
  *

@@ -8,10 +8,10 @@ import name.martingeisse.mahdl.common.processor.expression.ProcessedExpression;
 import name.martingeisse.mahdl.common.processor.expression.SignalLikeReference;
 import name.martingeisse.mahdl.common.processor.type.ProcessedDataType;
 import name.martingeisse.mahdl.compiler.CompilerContext;
-import name.martingeisse.mahdl.gradle.model.ClockedDoBlockInfo;
-import name.martingeisse.mahdl.gradle.model.ContinuousDoBlockInfo;
-import name.martingeisse.mahdl.gradle.model.GenerationModel;
-import name.martingeisse.mahdl.gradle.model.ModuleInstanceInfo;
+import name.martingeisse.mahdl.compiler.model.ClockedDoBlockInfo;
+import name.martingeisse.mahdl.compiler.model.ContinuousDoBlockInfo;
+import name.martingeisse.mahdl.compiler.model.GenerationModel;
+import name.martingeisse.mahdl.compiler.model.ModuleInstanceInfo;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.function.Predicate;

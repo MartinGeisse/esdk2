@@ -6,7 +6,7 @@ import name.martingeisse.mahdl.common.processor.ProcessingSidekick;
 import name.martingeisse.mahdl.common.processor.expression.*;
 import name.martingeisse.mahdl.common.processor.type.ProcessedDataType;
 import name.martingeisse.mahdl.compiler.CompilerContext;
-import name.martingeisse.mahdl.gradle.model.GenerationModel;
+import name.martingeisse.mahdl.compiler.model.GenerationModel;
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigInteger;
