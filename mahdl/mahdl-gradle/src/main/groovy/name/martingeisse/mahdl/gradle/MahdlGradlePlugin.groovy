@@ -19,9 +19,9 @@ class MahdlGradlePlugin implements Plugin<Project> {
     void apply(Project project) {
 
         // create the mahdlCodegen task
-        MahdlCodegenTask task = project.tasks.create("mahdlCodegen", MahdlCodegenTask.class);
-        task.group = "build";
-        task.description = "Generates Java code from MaHDL sources.";
+        MahdlCodegenTask task = project.tasks.create('mahdlCodegen', MahdlCodegenTask.class);
+        task.group = 'build';
+        task.description = 'Generates Java code from MaHDL sources.';
         task.sourceDirectory = new File(project.projectDir, "src/mahdl");
         task.outputDirectory = new File(project.buildDir, "mahdl-java");
 

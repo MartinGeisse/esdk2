@@ -16,7 +16,7 @@ public interface CompilerContext {
 
     //region access to input files
 
-    // ImmutableCollection<InputModuleEntry> getInputModuleEntries();
+    ImmutableCollection<InputModuleEntry> getInputModuleEntries();
 
     //endregion
     //region dependency resolution
@@ -25,18 +25,18 @@ public interface CompilerContext {
      * Returns null if not found. This is not an error case since multiple loaders may be combined, and only one of
      * them should find the metadata for a specific module.
      */
-    // ModuleApi readDependencyModuleApi(ModuleIdentifier identifier) throws IOException;
+    ModuleApi readDependencyModuleApi(ModuleIdentifier identifier) throws IOException;
 
-    // InputStream openDataInputFile(ModuleIdentifier anchorIdentifier, String filename) throws IOException;
+    InputStream openDataInputFile(ModuleIdentifier anchorIdentifier, String filename) throws IOException;
 
     //endregion
     //region output generation
 
-    // void writeOutputModuleApi(ModuleIdentifier identifier, ModuleApi moduleApi) throws IOException;
+    void writeOutputModuleApi(ModuleIdentifier identifier, ModuleApi moduleApi) throws IOException;
 
-    // OutputStream openCodeOutputFile(ModuleIdentifier identifier) throws IOException;
+    OutputStream openCodeOutputFile(ModuleIdentifier identifier) throws IOException;
 
-    // OutputStream openDataOutputFile(ModuleIdentifier anchorIdentifier, String filename) throws IOException;
+    OutputStream openDataOutputFile(ModuleIdentifier anchorIdentifier, String filename) throws IOException;
 
     //endregion
     //region error reporting
