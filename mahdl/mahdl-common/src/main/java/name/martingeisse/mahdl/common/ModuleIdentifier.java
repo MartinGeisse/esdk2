@@ -120,8 +120,16 @@ public final class ModuleIdentifier implements Iterable<String> {
         return StringUtils.join(segments, separator);
     }
 
+    public String packageToString() {
+        return packageToString('.');
+    }
+
     public String packageToString(char separator) {
         return StringUtils.join(segments, separator, 0, segments.length - 1);
+    }
+
+    public String localNameToString() {
+        return segments[segments.length - 1];
     }
 
 }

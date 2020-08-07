@@ -140,18 +140,10 @@ public final class ModuleCompiler {
     private void compile(ModuleWrapper moduleWrapper) throws IOException {
 
         // these names are used in the generated Java code
-        String qualifiedName = moduleWrapper.getIdentifier().toString();
-        String packageName, localName;
-        {
-            int index = qualifiedName.indexOf('.');
-            if (index == -1) {
-                packageName = null;
-                localName = qualifiedName;
-            } else {
-                packageName = qualifiedName.substring(0, index);
-                localName = qualifiedName.substring(index + 1);
-            }
-        }
+        ModuleIdentifier moduleIdentifier = moduleWrapper.getIdentifier();
+        String qualifiedName = moduleIdentifier.toString();
+        String packageName = moduleIdentifier.packageToString();
+        String localName = moduleIdentifier.localNameToString();
 
         // used by the code generator to generate output data files -- we have to map this to our CompilerContext
         CodeGenerator.DataFileFactory dataFileFactory = new CodeGenerator.DataFileFactory() {
@@ -163,7 +155,7 @@ public final class ModuleCompiler {
 
             @Override
             public void createDataFile(String filename, byte[] data) throws IOException {
-                try (OutputStream out = context.openDataOutputFile(moduleWrapper.getIdentifier(), filename)) {
+                try (OutputStream out = context.openDataOutputFile(moduleIdentifier, filename)) {
                     IOUtils.write(data, out);
                 }
             }
@@ -175,10 +167,10 @@ public final class ModuleCompiler {
         GenerationModel model = new GenerationModel(moduleDefinition, packageName, localName);
         CodeGenerator codeGenerator = new CodeGenerator(model, dataFileFactory, moduleProcessorErrorHandler);
         codeGenerator.run();
-        try (OutputStream out = context.openCodeOutputFile(moduleWrapper.getIdentifier())) {
+        try (OutputStream out = context.openCodeOutputFile(moduleIdentifier)) {
             IOUtils.write(codeGenerator.getCode(), out, StandardCharsets.UTF_8);
         }
-        context.writeOutputModuleApi(moduleWrapper.getIdentifier(), new ModuleApi(moduleDefinition));
+        context.writeOutputModuleApi(moduleIdentifier, new ModuleApi(moduleDefinition));
 
     }
 
