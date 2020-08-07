@@ -23,6 +23,9 @@ class MahdlGradlePlugin implements Plugin<Project> {
         task.group = 'build';
         task.description = 'Generates Java code from MaHDL sources.';
         task.sourceDirectory = new File(project.projectDir, "src/mahdl");
+        if (!task.sourceDirectory.isDirectory()) {
+            task.sourceDirectory = null;
+        }
         task.outputDirectory = new File(project.buildDir, "mahdl-java");
 
         // mahdlCodegen must run before compiling Java code
@@ -34,7 +37,8 @@ class MahdlGradlePlugin implements Plugin<Project> {
         project.sourceSets.test.java.srcDirs += task.outputDirectory;
         project.sourceSets.test.resources.srcDirs += task.outputDirectory;
 
-        // Turn project dependencies into task dependencies. We have to delay this until the end of the configuration
+        // Turn project dependencies into task dependencies, and add their JAR files as well as external JAR
+        // dependencies as inputs to our task. We have to delay this until the end of the configuration
         // phase because project dependencies are not fully known until then.
         project.gradle.addBuildListener(new BuildAdapter() {
             @Override
