@@ -121,7 +121,7 @@ public final class ModuleIdentifier implements Iterable<String> {
     }
 
     public String packageToString(char separator) {
-        return StringUtils.join(segments, 0, segments.length - 1, separator);
+        return StringUtils.join(segments, separator, 0, segments.length - 1);
     }
 
 }
