@@ -43,9 +43,15 @@ class MahdlGradlePlugin implements Plugin<Project> {
         project.gradle.addBuildListener(new BuildAdapter() {
             @Override
             void projectsEvaluated(Gradle gradle) {
+
+                // add dependency JAR files as inputs
+                project.configurations.compileClasspath.each {
+                    task.dependencyOutputs += it
+                }
+
+                // turn project dependencies into task dependencies
                 project.configurations.each { configuration ->
                     configuration.dependencies.each { dependency ->
-                        task.dependencyOutputs += dependency
                         if (dependency instanceof ProjectDependency) {
                             def producerProject = ((ProjectDependency) dependency).dependencyProject
                             if (producerProject.tasks.hasProperty("jar")) {
@@ -54,6 +60,7 @@ class MahdlGradlePlugin implements Plugin<Project> {
                         }
                     }
                 }
+
             }
         });
 
