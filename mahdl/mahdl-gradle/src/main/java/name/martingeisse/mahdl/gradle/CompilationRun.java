@@ -2,6 +2,7 @@ package name.martingeisse.mahdl.gradle;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import name.martingeisse.mahdl.compiler.CompilerContextHolder;
 import name.martingeisse.mahdl.input.cm.impl.ModuleWrapper;
 import org.apache.commons.io.FileUtils;
 
@@ -26,6 +27,17 @@ public class CompilationRun {
 	}
 
 	public void run() throws IOException {
+		try {
+			CompilerContextHolder.set(new TempCompilerContext());
+			runInternal();
+			CompilationErrors.failOnErrors();
+		} finally {
+			CompilationErrors.clearErrors();
+			CompilerContextHolder.remove();
+		}
+	}
+
+	private void runInternal() throws IOException {
 		GradleEnvironment.initialize();
 
 		// clear old build results
