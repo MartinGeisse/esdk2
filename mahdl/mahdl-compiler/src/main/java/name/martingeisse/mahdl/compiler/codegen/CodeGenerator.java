@@ -14,6 +14,7 @@ import name.martingeisse.mahdl.compiler.model.GenerationModel;
 import name.martingeisse.mahdl.compiler.model.ModuleInstanceInfo;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.IOException;
 import java.util.function.Predicate;
 
 import static name.martingeisse.mahdl.compiler.codegen.Util.signalTypeToString;
@@ -413,7 +414,7 @@ public final class CodeGenerator {
 
 	public interface DataFileFactory {
 		String getAnchorClassName();
-		void createDataFile(String filename, byte[] data);
+		void createDataFile(String filename, byte[] data) throws IOException;
 	}
 
 }

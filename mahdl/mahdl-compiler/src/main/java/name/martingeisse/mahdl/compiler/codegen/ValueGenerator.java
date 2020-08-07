@@ -4,6 +4,8 @@ import name.martingeisse.mahdl.common.processor.expression.ConstantValue;
 import name.martingeisse.mahdl.compiler.CompilerContext;
 import name.martingeisse.mahdl.compiler.model.GenerationModel;
 
+import java.io.IOException;
+
 /**
  *
  */
@@ -67,7 +69,11 @@ public class ValueGenerator {
 					}
 				}
 			} else {
-				dataFileFactory.createDataFile(name, Util.generateMatrixFileContents(matrix));
+				try {
+					dataFileFactory.createDataFile(name, Util.generateMatrixFileContents(matrix));
+				} catch (IOException e) {
+					CompilerContext.get().reportError(null, "could not generate output data file", e);
+				}
 				builder.append("		Matrix ").append(name).append(" = Matrix.load(")
 					.append(dataFileFactory.getAnchorClassName()).append(".class, \"").append(name)
 					.append("\", ").append(matrix.getFirstSize()).append(", ").append(matrix.getSecondSize())
