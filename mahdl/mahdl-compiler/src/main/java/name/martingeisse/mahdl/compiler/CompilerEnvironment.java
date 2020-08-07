@@ -46,7 +46,7 @@ public class CompilerEnvironment implements Environment {
     }
 
     @Override
-    public ModuleApi getModuleApi(QualifiedModuleName name) throws ReferenceResolutionException {
+    public ModuleApi getModuleApi(QualifiedModuleName name) throws ReferenceResolutionException, IOException {
         ModuleWrapper moduleWrapper = ModuleWrapper.get(name);
         return moduleWrapper.getCompiler().getModuleApi(name);
     }

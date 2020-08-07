@@ -77,7 +77,9 @@ public final class ModuleCompiler {
             try (InputStream inputStream = inputModuleEntry.getLoader().load()) {
                 moduleWrapper = readSource(inputModuleEntry.getIdentifier(), inputStream);
             }
-            result.put(moduleWrapper.getIdentifier(), moduleWrapper);
+            if (result.put(moduleWrapper.getIdentifier(), moduleWrapper) != null) {
+                context.reportError(null, "module exists more than once in the source trees: " + moduleWrapper.getIdentifier());
+            }
         }
         return ImmutableMap.copyOf(result);
     }
@@ -174,13 +176,23 @@ public final class ModuleCompiler {
 
     }
 
-    public ModuleApi getModuleApi(QualifiedModuleName name) throws ReferenceResolutionException {
+    public ModuleApi getModuleApi(QualifiedModuleName name) throws ReferenceResolutionException, IOException {
         ModuleIdentifier moduleIdentifier = new ModuleIdentifier(name);
-        ModuleApi api = sourceModuleApis.get(moduleIdentifier);
-        if (api == null) {
-            throw new ReferenceResolutionException("cannot resolve module " + moduleIdentifier);
+        ModuleApi apiFromSources = sourceModuleApis.get(moduleIdentifier);
+        ModuleApi apiFromDependencies = context.readDependencyModuleApi(moduleIdentifier);
+        if (apiFromSources == null) {
+            if (apiFromDependencies == null) {
+                throw new ReferenceResolutionException("cannot resolve module " + moduleIdentifier);
+            } else {
+                return apiFromDependencies;
+            }
+        } else {
+            if (apiFromDependencies == null) {
+                return apiFromSources;
+            } else {
+                throw new ReferenceResolutionException("module in sources collides with module from dependencies: " + moduleIdentifier);
+            }
         }
-        return api;
     }
 
 }

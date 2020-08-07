@@ -16,6 +16,7 @@ import name.martingeisse.mahdl.common.processor.type.ProcessedDataType;
 import name.martingeisse.mahdl.input.cm.*;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -155,7 +156,7 @@ public final class DefinitionProcessor {
 			ModuleApi moduleApi;
 			try {
 				moduleApi = Environment.Holder.INSTANCE.getModuleApi(moduleInstanceDefinitionGroupElement.getModuleName());
-			} catch (ReferenceResolutionException e) {
+			} catch (ReferenceResolutionException|IOException e) {
 				sidekick.onError(moduleInstanceDefinitionGroupElement.getModuleName(), e.getMessage());
 				for (ModuleInstanceDefinition definition : moduleInstanceDefinitionGroupElement.getDefinitions().getAll()) {
 					add(new ModuleInstanceWithMissingDefinition(moduleInstanceDefinitionGroupElement.getModuleName(), definition));

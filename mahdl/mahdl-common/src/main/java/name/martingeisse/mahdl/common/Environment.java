@@ -28,7 +28,7 @@ public interface Environment {
 
 	void validateModuleNameAgainstFilePath(Module module, QualifiedModuleName name) throws IOException;
 
-	ModuleApi getModuleApi(QualifiedModuleName name) throws ReferenceResolutionException;
+	ModuleApi getModuleApi(QualifiedModuleName name) throws ReferenceResolutionException, IOException;
 
 	class Holder {
 		public static Environment INSTANCE = null;

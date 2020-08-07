@@ -12,13 +12,26 @@ import java.util.regex.Pattern;
 
 public final class ModuleIdentifier implements Iterable<String> {
 
-    private static final Pattern SEGMENT_PATTERN = Pattern.compile("[A-Za-z][A-Za-z0-9_]*");
+    private static final String SEGMENT_PATTERN_TEXT = "[A-Za-z][A-Za-z0-9_]*";
+    private static final Pattern SEGMENT_PATTERN = Pattern.compile(SEGMENT_PATTERN_TEXT);
+    private static final Pattern FULL_PATTERN = Pattern.compile(SEGMENT_PATTERN_TEXT + "(\\." + SEGMENT_PATTERN_TEXT + ")*");
 
     public static boolean isValidSegment(String s) {
         return SEGMENT_PATTERN.matcher(s).matches();
     }
 
     private final String[] segments;
+
+    public ModuleIdentifier(String text) {
+        this(parseFullText(text));
+    }
+
+    private static String[] parseFullText(String text) {
+        if (!FULL_PATTERN.matcher(text).matches()) {
+            throw new IllegalArgumentException("invalid module identifier: " + text);
+        }
+        return StringUtils.split(text, '.');
+    }
 
     public ModuleIdentifier(String[] segments) {
         if (segments == null) {

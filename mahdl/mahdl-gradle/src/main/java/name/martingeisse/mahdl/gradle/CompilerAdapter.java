@@ -6,10 +6,13 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import name.martingeisse.mahdl.common.ModuleApi;
 import name.martingeisse.mahdl.common.ModuleIdentifier;
+import name.martingeisse.mahdl.common.ReferenceResolutionException;
+import name.martingeisse.mahdl.compiler.CompilerConstants;
 import name.martingeisse.mahdl.compiler.CompilerContext;
 import name.martingeisse.mahdl.compiler.InputModuleEntry;
 import name.martingeisse.mahdl.compiler.ModuleCompiler;
 import name.martingeisse.mahdl.compiler.util.FileInputCollector;
+import name.martingeisse.mahdl.gradle.json.ModuleApiGson;
 import name.martingeisse.mahdl.input.cm.CmLinked;
 import name.martingeisse.mahdl.input.cm.impl.CmNodeImpl;
 import name.martingeisse.mahdl.input.cm.impl.ModuleWrapper;
@@ -26,11 +29,10 @@ public final class CompilerAdapter implements CompilerContext {
 
     private static final boolean ENABLE_DIAGNOSTICS = false;
 
-    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-
     private final ImmutableList<File> sourceDirectories;
     private final ImmutableList<File> dependencyOutputs;
     private final File outputDirectory;
+    private final DependencyCache dependencyCache = new DependencyCache();
     private ImmutableList<InputModuleEntry> inputModuleEntries;
     private boolean hasErrors = false;
 
@@ -115,20 +117,28 @@ public final class CompilerAdapter implements CompilerContext {
     }
 
     @Override
-    public ModuleApi readDependencyModuleApi(ModuleIdentifier identifier) throws IOException {
+    public ModuleApi readDependencyModuleApi(ModuleIdentifier identifier) throws ReferenceResolutionException, IOException {
         ModuleApi result = null;
+        File previousDependencyOutput = null;
         for (File dependencyOutput : dependencyOutputs) {
             if (dependencyOutput.isFile()) {
                 if (!dependencyOutput.getName().endsWith(".jar")) {
                     throw new IOException("don't know how to read dependency: " + dependencyOutput);
                 }
-                // TODO JAR file
+                ModuleApi thisResult = dependencyCache.get(dependencyOutput, identifier);
+                if (thisResult != null) {
+                    if (result != null) {
+                        throw new ReferenceResolutionException("module " + identifier + " from dependency " +
+                                previousDependencyOutput + " collides with a module with the same name from dependency " +
+                                dependencyOutput);
+                    }
+                    result = thisResult;
+                    previousDependencyOutput = dependencyOutput;
+                }
             } else if (dependencyOutput.isDirectory()) {
-                // TODO class file folder
-                /*
-                File file = new File(baseFolder, identifier.toString().replace('.', '/') + ".json");
-                return (file.exists() ? new FileInputStream(file) : null);
-                 */
+                // this does not currently happen since even project dependencies are forced to produce their JAR
+                // before this task runs by the MahdlGradlePlugin
+                throw new IOException("dependency is a folder -- this is currently not supported");
             } else if (dependencyOutput.exists()) {
                 throw new IOException("dependency is neither a directory nor a file: " + dependencyOutput);
             } else {
@@ -161,11 +171,11 @@ public final class CompilerAdapter implements CompilerContext {
 
     @Override
     public void writeOutputModuleApi(ModuleIdentifier identifier, ModuleApi moduleApi) throws IOException {
-        File file = new File(outputDirectory, identifier.toString('/') + ".json");
+        File file = new File(outputDirectory, identifier.toString('/') + CompilerConstants.JSON_FILENAME_SUFFIX);
         FileUtils.forceMkdir(file.getParentFile());
         try (FileOutputStream fileOutputStream = new FileOutputStream(file)) {
             try (OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8)) {
-                gson.toJson(moduleApi, outputStreamWriter);
+                ModuleApiGson.gson.toJson(moduleApi, outputStreamWriter);
             }
         }
     }

@@ -3,6 +3,7 @@ package name.martingeisse.mahdl.compiler;
 import com.google.common.collect.ImmutableCollection;
 import name.martingeisse.mahdl.common.ModuleApi;
 import name.martingeisse.mahdl.common.ModuleIdentifier;
+import name.martingeisse.mahdl.common.ReferenceResolutionException;
 import name.martingeisse.mahdl.input.cm.CmLinked;
 
 import java.io.IOException;
@@ -23,9 +24,11 @@ public interface CompilerContext {
 
     /**
      * Returns null if not found. This is not an error case since multiple loaders may be combined, and only one of
-     * them should find the metadata for a specific module.
+     * them should find the metadata for a specific module. Throws a {@link ReferenceResolutionException} if a
+     * logical error exists in the dependencies (e.g. duplicate definitions for the same module) or {@link IOException}
+     * for low-level I/O errors.
      */
-    ModuleApi readDependencyModuleApi(ModuleIdentifier identifier) throws IOException;
+    ModuleApi readDependencyModuleApi(ModuleIdentifier identifier) throws ReferenceResolutionException, IOException;
 
     InputStream openDataInputFile(ModuleIdentifier anchorIdentifier, String filename) throws IOException;
 
