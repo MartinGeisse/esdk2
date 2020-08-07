@@ -4,7 +4,7 @@ import name.martingeisse.mahdl.common.processor.definition.*;
 import name.martingeisse.mahdl.common.processor.expression.InstancePortReference;
 import name.martingeisse.mahdl.common.processor.statement.ProcessedDoBlock;
 import name.martingeisse.mahdl.common.processor.type.ProcessedDataType;
-import name.martingeisse.mahdl.gradle.CompilationErrors;
+import name.martingeisse.mahdl.compiler.CompilerContext;
 
 import java.util.*;
 
@@ -71,7 +71,7 @@ public final class GenerationModel {
 				if (port.getDirection() == PortDirection.IN) {
 					clocks.add(port);
 				} else {
-					CompilationErrors.reportError(port.getDataTypeElement(), "clock output ports are not yet supported");
+					CompilerContext.get().reportError(port.getDataTypeElement(), "clock output ports are not yet supported");
 				}
 			} else {
 				dataPorts.add(port);
@@ -82,7 +82,7 @@ public final class GenerationModel {
 				SignalLike signalLike = (SignalLike) named;
 				if (signalLike.getProcessedDataType().getFamily() == ProcessedDataType.Family.CLOCK) {
 					if (!(signalLike instanceof ModulePort)) {
-						CompilationErrors.reportError(signalLike.getDataTypeElement(), "clocks must be input ports");
+						CompilerContext.get().reportError(signalLike.getDataTypeElement(), "clocks must be input ports");
 					}
 				}
 			}
@@ -96,7 +96,7 @@ public final class GenerationModel {
 			ProcessedDataType type = signalLike.getProcessedDataType();
 			ProcessedDataType.Family family = type.getFamily();
 			if (family != ProcessedDataType.Family.BIT && family != ProcessedDataType.Family.VECTOR) {
-				CompilationErrors.reportError(signalLike.getDataTypeElement(), "data type not supported here");
+				CompilerContext.get().reportError(signalLike.getDataTypeElement(), "data type not supported here");
 				return true;
 			}
 			return false;
@@ -118,7 +118,7 @@ public final class GenerationModel {
 			}
 		}
 		for (Register unassignedRegister : remainingRegisters) {
-			CompilationErrors.reportError(unassignedRegister.getNameElement(), "registers that are never assigned to are not yet supported");
+			CompilerContext.get().reportError(unassignedRegister.getNameElement(), "registers that are never assigned to are not yet supported");
 		}
 
 		// derived: module instances and which clocks to use for them

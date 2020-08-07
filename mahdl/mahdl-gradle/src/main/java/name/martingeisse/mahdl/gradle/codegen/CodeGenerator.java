@@ -7,7 +7,7 @@ import name.martingeisse.mahdl.common.processor.expression.InstancePortReference
 import name.martingeisse.mahdl.common.processor.expression.ProcessedExpression;
 import name.martingeisse.mahdl.common.processor.expression.SignalLikeReference;
 import name.martingeisse.mahdl.common.processor.type.ProcessedDataType;
-import name.martingeisse.mahdl.gradle.CompilationErrors;
+import name.martingeisse.mahdl.compiler.CompilerContext;
 import name.martingeisse.mahdl.gradle.model.ClockedDoBlockInfo;
 import name.martingeisse.mahdl.gradle.model.ContinuousDoBlockInfo;
 import name.martingeisse.mahdl.gradle.model.GenerationModel;
@@ -212,7 +212,7 @@ public final class CodeGenerator {
 			for (ClockedDoBlockInfo doBlockInfo : model.getClockedDoBlockInfos()) {
 				ProcessedExpression clock = doBlockInfo.getDoBlock().getClock();
 				if (!(clock instanceof SignalLikeReference)) {
-					CompilationErrors.reportError(clock, "this compiler currently only supports clocks that are input ports");
+					CompilerContext.get().reportError(clock, "this compiler currently only supports clocks that are input ports");
 					continue;
 				}
 				String clockName = ((SignalLikeReference) clock).getDefinition().getName();
@@ -280,7 +280,7 @@ public final class CodeGenerator {
 							return false;
 						}
 						if (!(expression instanceof SignalLikeReference)) {
-							CompilationErrors.reportError(expression,
+							CompilerContext.get().reportError(expression,
 									"only assignment to whole registers are currently supported");
 							return false;
 						}

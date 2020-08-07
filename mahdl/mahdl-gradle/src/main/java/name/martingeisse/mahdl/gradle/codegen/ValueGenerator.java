@@ -1,7 +1,7 @@
 package name.martingeisse.mahdl.gradle.codegen;
 
 import name.martingeisse.mahdl.common.processor.expression.ConstantValue;
-import name.martingeisse.mahdl.gradle.CompilationErrors;
+import name.martingeisse.mahdl.compiler.CompilerContext;
 import name.martingeisse.mahdl.gradle.model.GenerationModel;
 
 /**
@@ -79,7 +79,7 @@ public class ValueGenerator {
 		} else if (value instanceof ConstantValue.Text) {
 			return Util.buildJavaStringLiteral(((ConstantValue.Text) value).getValue());
 		} else {
-			CompilationErrors.reportError(null, "unsupported run-time value: " + value);
+			CompilerContext.get().reportError(null, "unsupported run-time value: " + value);
 			return "null";
 		}
 	}

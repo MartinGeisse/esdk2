@@ -5,7 +5,7 @@ import name.martingeisse.mahdl.common.processor.expression.InstancePortReference
 import name.martingeisse.mahdl.common.processor.expression.ProcessedExpression;
 import name.martingeisse.mahdl.common.processor.expression.SignalLikeReference;
 import name.martingeisse.mahdl.common.processor.statement.*;
-import name.martingeisse.mahdl.gradle.CompilationErrors;
+import name.martingeisse.mahdl.compiler.CompilerContext;
 
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -105,7 +105,7 @@ public final class ContinuousDoBlockInfo extends DoBlockInfo {
 			if (leftHandSide instanceof InstancePortReference) {
 				InstancePortReference portReference = (InstancePortReference) leftHandSide;
 				if (portReference.isSameAs(target)) {
-					CompilationErrors.reportError(statement, "unsupported clock source");
+					CompilerContext.get().reportError(statement, "unsupported clock source");
 				}
 			}
 

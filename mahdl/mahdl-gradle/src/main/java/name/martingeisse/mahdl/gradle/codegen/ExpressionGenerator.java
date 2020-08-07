@@ -5,7 +5,7 @@ import name.martingeisse.mahdl.common.functions.RepeatFunction;
 import name.martingeisse.mahdl.common.processor.ProcessingSidekick;
 import name.martingeisse.mahdl.common.processor.expression.*;
 import name.martingeisse.mahdl.common.processor.type.ProcessedDataType;
-import name.martingeisse.mahdl.gradle.CompilationErrors;
+import name.martingeisse.mahdl.compiler.CompilerContext;
 import name.martingeisse.mahdl.gradle.model.GenerationModel;
 import org.apache.commons.lang3.StringUtils;
 
@@ -54,7 +54,7 @@ public class ExpressionGenerator {
 					return "new RtlVectorConstant(realm, " + value + ")";
 
 				default:
-					CompilationErrors.reportError(expression, "unsupported run-time value: " + expression.getDataType());
+					CompilerContext.get().reportError(expression, "unsupported run-time value: " + expression.getDataType());
 					return "null";
 
 			}
@@ -84,7 +84,7 @@ public class ExpressionGenerator {
 					return operand + ".not()";
 
 				default:
-					CompilationErrors.reportError(expression, "unsupported unary operator: " + operation.getOperator());
+					CompilerContext.get().reportError(expression, "unsupported unary operator: " + operation.getOperator());
 					return "null";
 
 			}
@@ -117,7 +117,7 @@ public class ExpressionGenerator {
 				// these are only allowed in constant sub-expressions and so should have been folded
 				case DIVIDED_BY:
 				case REMAINDER:
-					CompilationErrors.reportError(expression, "run-time division / remainder are not supported");
+					CompilerContext.get().reportError(expression, "run-time division / remainder are not supported");
 					return "null";
 
 				case VECTOR_CONCAT:
@@ -148,7 +148,7 @@ public class ExpressionGenerator {
 					return left + ".compareUnsignedGreaterThanOrEqual(" + right + ")";
 
 				default:
-					CompilationErrors.reportError(expression, "unsupported binary operator: " + operation.getOperator());
+					CompilerContext.get().reportError(expression, "unsupported binary operator: " + operation.getOperator());
 					return "null";
 
 			}
@@ -213,7 +213,7 @@ public class ExpressionGenerator {
 					.append(" = new RtlVectorSwitchSignal(realm, ").append(buildExpression(switchExpression.getSelector()))
 					.append(", ").append(width).append(");\n");
 			} else {
-				CompilationErrors.reportError(expression, "unsupported data type for switch expression");
+				CompilerContext.get().reportError(expression, "unsupported data type for switch expression");
 				return "null";
 			}
 			for (ProcessedSwitchExpression.Case aCase : switchExpression.getCases()) {
@@ -234,7 +234,7 @@ public class ExpressionGenerator {
 			if (function instanceof RepeatFunction) {
 				return buildRepeatCall(call);
 			} else {
-				CompilationErrors.reportError(expression, "unsupported run-time function call: " + ((ProcessedFunctionCall) expression).getFunction());
+				CompilerContext.get().reportError(expression, "unsupported run-time function call: " + ((ProcessedFunctionCall) expression).getFunction());
 				return "null";
 			}
 
