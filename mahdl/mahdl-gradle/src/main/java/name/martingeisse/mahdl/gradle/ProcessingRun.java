@@ -6,7 +6,7 @@ import name.martingeisse.mahdl.common.ReferenceResolutionException;
 import name.martingeisse.mahdl.common.processor.ErrorHandler;
 import name.martingeisse.mahdl.common.processor.ModuleProcessor;
 import name.martingeisse.mahdl.common.processor.definition.ModuleDefinition;
-import name.martingeisse.mahdl.gradle.codegen.CodeGenerator;
+import name.martingeisse.mahdl.compiler.codegen.CodeGenerator;
 import name.martingeisse.mahdl.compiler.model.GenerationModel;
 import name.martingeisse.mahdl.input.cm.CmLinked;
 import name.martingeisse.mahdl.input.cm.CmToken;

@@ -1,4 +1,4 @@
-package name.martingeisse.mahdl.gradle.codegen;
+package name.martingeisse.mahdl.compiler.codegen;
 
 import name.martingeisse.mahdl.common.functions.BuiltinFunction;
 import name.martingeisse.mahdl.common.functions.RepeatFunction;

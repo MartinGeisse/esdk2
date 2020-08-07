@@ -1,4 +1,4 @@
-package name.martingeisse.mahdl.gradle.codegen;
+package name.martingeisse.mahdl.compiler.codegen;
 
 import name.martingeisse.mahdl.common.processor.ErrorHandler;
 import name.martingeisse.mahdl.common.processor.ProcessingSidekick;
@@ -16,8 +16,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.function.Predicate;
 
-import static name.martingeisse.mahdl.gradle.codegen.Util.signalTypeToString;
-import static name.martingeisse.mahdl.gradle.codegen.Util.valueTypeToString;
+import static name.martingeisse.mahdl.compiler.codegen.Util.signalTypeToString;
+import static name.martingeisse.mahdl.compiler.codegen.Util.valueTypeToString;
 
 /**
  *

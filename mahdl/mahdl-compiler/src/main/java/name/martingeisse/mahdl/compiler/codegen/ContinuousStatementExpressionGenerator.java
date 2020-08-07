@@ -1,4 +1,4 @@
-package name.martingeisse.mahdl.gradle.codegen;
+package name.martingeisse.mahdl.compiler.codegen;
 
 import com.google.common.collect.ImmutableList;
 import name.martingeisse.mahdl.common.processor.expression.*;
