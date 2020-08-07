@@ -16,7 +16,6 @@ import name.martingeisse.mahdl.input.cm.CmUtil;
 import name.martingeisse.mahdl.input.cm.impl.ModuleImpl;
 import name.martingeisse.mahdl.input.cm.impl.QualifiedModuleNameImpl;
 import name.martingeisse.mahdl.intellij.input.PsiUtil;
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -60,8 +59,7 @@ public class ModuleReference implements PsiReference {
 	@Override
 	public String getCanonicalText() {
 		// this removes whitespace and comments from the module name
-		String[] segments = CmUtil.parseQualifiedModuleName(moduleName);
-		return StringUtils.join(segments, '.');
+		return CmUtil.canonicalizeQualifiedModuleName(moduleName);
 	}
 
 	@Override
