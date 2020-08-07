@@ -29,13 +29,10 @@ sourceSets {
 	main {
 		java {
 			srcDir 'src/main/java'
-			srcDir 'src/generated/java'
 		}
 		resources {
 			srcDir 'src/main/java'
 			srcDir 'src/main/resources'
-			srcDir 'src/generated/java'
-			srcDir 'src/generated/resources'
 		}
 	}
 	test {
