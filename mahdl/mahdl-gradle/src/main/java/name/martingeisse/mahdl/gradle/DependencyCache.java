@@ -62,7 +62,7 @@ final class DependencyCache {
         }
 
         ModuleApi get(ModuleIdentifier identifier) {
-            throw new UnsupportedOperationException();
+            return moduleApis.get(identifier);
         }
 
     }
