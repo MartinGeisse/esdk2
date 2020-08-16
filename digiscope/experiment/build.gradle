@@ -1,3 +1,17 @@
+import name.martingeisse.digiscope.gradle.DigiscopeCodegenTask
+
+buildscript {
+
+	repositories {
+		mavenLocal()
+		mavenCentral()
+	}
+
+	dependencies {
+		classpath 'name.martingeisse.digiscope:digiscope-gradle:1.0'
+	}
+
+}
 
 group = 'name.martingeisse'
 version = '0.1'
@@ -12,9 +26,8 @@ tasks.withType(JavaCompile) {
 
 sourceSets.main.resources.srcDir 'src/main/java'
 
-//task digiscopeCodegen(type: Class.forName('name.martingeisse.digiscope.DigiscopeCodegenTask')) {
-//}
-//compileJava.dependsOn digiscopeCodegen
+task digiscopeCodegen(type: name.martingeisse.digiscope.gradle.DigiscopeCodegenTask.class) {
+}
 
 repositories {
 	mavenCentral()
