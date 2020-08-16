@@ -10,3 +10,5 @@ include 'riscv'
 include 'ui'
 include 'mypld'
 include 'structural'
+
+include 'digiscope'
