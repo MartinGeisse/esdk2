@@ -53,7 +53,7 @@ repositories {
 
 dependencies {
 
-    compile project(':mahdl:mahdl-common')
-    compile project(':mahdl:mahdl-compiler')
+    compile project(':mahdl-common')
+    compile project(':mahdl-compiler')
 
 }
