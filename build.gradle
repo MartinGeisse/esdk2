@@ -1,0 +1,2 @@
+// dummy file -- this project only contains sub-projects
+apply plugin:'base'
