@@ -1,0 +1,8 @@
+includeBuild '../mahdl'
+
+include 'core'
+include 'mahdl-test'
+include 'riscv'
+include 'ui'
+include 'mypld'
+include 'structural'

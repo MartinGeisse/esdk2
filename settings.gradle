@@ -1,15 +1,3 @@
-include 'core'
-include 'mahdl:mahdl-common'
-include 'mahdl:mahdl-compiler'
-include 'mahdl:mahdl-gradle'
-include 'mahdl:mahdl-intellij'
-include 'mahdl:mahdl-doc'
-
-include 'mahdl-test'
-include 'riscv'
-include 'ui'
-include 'mypld'
-include 'structural'
-
-include 'digiscope:digiscope-gradle'
-include 'digiscope:experiment'
+includeBuild 'mahdl'
+includeBuild 'digicope'
+includeBuild 'simsyn'
