@@ -27,6 +27,9 @@ tasks.withType(JavaCompile) {
 sourceSets.main.resources.srcDir 'src/main/java'
 
 task digiscopeCodegen(type: name.martingeisse.digiscope.gradle.DigiscopeCodegenTask.class) {
+
+	className 'foo.bar.MyScope'
+
 }
 
 repositories {
