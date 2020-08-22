@@ -1,3 +1,0 @@
-includeBuild 'mahdl'
-includeBuild 'digiscope'
-includeBuild 'simsyn'
