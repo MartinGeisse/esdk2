@@ -145,9 +145,6 @@ public final class CompilerAdapter implements CompilerContext {
                 throw new IOException("dependency does not exist: " + dependencyOutput);
             }
         }
-        if (result == null) {
-            throw new IOException("metadata JSON file not found for " + identifier);
-        }
         return result;
     }
 
