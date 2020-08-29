@@ -1,5 +1,3 @@
-includeBuild '../mahdl'
-
 include 'core'
 include 'mahdl-test'
 include 'riscv'

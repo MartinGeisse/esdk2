@@ -1,6 +1,0 @@
-
-// currently renamed to settings.gradle.txt because IntelliJ can't handle included builds correctly. See https://youtrack.jetbrains.com/issue/IDEA-207003
-
-includeBuild 'mahdl'
-includeBuild 'digiscope'
-includeBuild 'simsyn'
