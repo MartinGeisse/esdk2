@@ -104,7 +104,7 @@ public class ScopeExperimentSynthesisMain {
 		// pixel display
 		PixelDisplayController.Implementation displayController = (PixelDisplayController.Implementation) mainModule._display;
 		VgaConnector.Connector vgaConnector = (VgaConnector.Connector) displayController._vgaConnector;
-		vgaPin(realm, "H14", vgaConnector.getRSocket());
+		vgaPin(realm, "H14", vgaConnector.getRSocket()); // TODO works, i.e. DOES disable red channel
 		vgaPin(realm, "H15", vgaConnector.getGSocket());
 		vgaPin(realm, "G15", vgaConnector.getBSocket());
 		vgaPin(realm, "F15", vgaConnector.getHsyncSocket());
@@ -145,9 +145,20 @@ public class ScopeExperimentSynthesisMain {
 		mainModule.setSerialPortSignal(serialPortSignal);
 		RtlBitSignal serialPortActive = RegisterBuilder.build(false,
 				design.getClock(), new RtlBitConstant(realm, true), serialPortSignal.not());
-		RtlVectorSignal serialPortDivider = RegisterBuilder.build(5, VectorValue.of(5, 0),
+		RtlVectorSignal serialPortDivider = RegisterBuilder.build(20, VectorValue.of(20, 0),
 				design.getClock(), r -> r.add(1));
 
+		// shared by signal logger
+		RtlVectorSignal buttonsAndSwitches = new RtlConcatenation(realm,
+				slideSwitchPin(realm, "N17"), // switch 3
+				slideSwitchPin(realm, "H18"), // switch 2
+				slideSwitchPin(realm, "L14"), // switch 1
+				slideSwitchPin(realm, "L13"), // switch 0
+				buttonPin(realm, "V4"), // north
+				buttonPin(realm, "H13"), // east
+				buttonPin(realm, "K17"), // south
+				buttonPin(realm, "D18") // west
+		);
 
         //
 		// signal logger
@@ -155,10 +166,7 @@ public class ScopeExperimentSynthesisMain {
 		SignalLoggerBusInterface.Connector loggerInterface = (SignalLoggerBusInterface.Connector) mainModule._signalLogger;
 		SignalLogger signalLogger = new SignalLogger.Implementation(realm, design.getClock(), design.getClock());
 		signalLogger.setLogEnable(serialPortActive.and(serialPortDivider.compareEqual(0)));
-		signalLogger.setLogData(RtlVectorConstant.of(realm, 27, 0)
-			.concat(serialPortSignal)
-			.concat(((SerialPort.Implementation) mainModule._serialPort)._state)
-		);
+		signalLogger.setLogData(RtlVectorConstant.of(realm, 28, 0).concat(buttonsAndSwitches.select(7, 4)));
 		signalLogger.setBusEnable(loggerInterface.getBusEnableSocket());
 		signalLogger.setBusWrite(loggerInterface.getBusWriteSocket());
 		signalLogger.setBusWriteData(loggerInterface.getBusWriteDataSocket());
@@ -168,16 +176,7 @@ public class ScopeExperimentSynthesisMain {
 		//
 		// GPIO (buttons and switches; LEDs not yet implemented)
 		//
-		mainModule.setButtonsAndSwitches(new RtlConcatenation(realm,
-			slideSwitchPin(realm, "N17"), // switch 3
-			slideSwitchPin(realm, "H18"), // switch 2
-			slideSwitchPin(realm, "L14"), // switch 1
-			slideSwitchPin(realm, "L13"), // switch 0
-			buttonPin(realm, "V4"), // north
-			buttonPin(realm, "H13"), // east
-			buttonPin(realm, "K17"), // south
-			buttonPin(realm, "D18") // west
-		));
+		mainModule.setButtonsAndSwitches(buttonsAndSwitches);
 
 		// SPI
 		{
