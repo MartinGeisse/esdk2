@@ -46,7 +46,6 @@ final class DependencyCache {
         }
 
         private void handleZipEntry(ZipFile zipFile, ZipEntry zipEntry) throws IOException {
-            System.out.println(zipEntry.getName());
             if (zipEntry.getName().endsWith(CompilerConstants.JSON_FILENAME_SUFFIX)) {
                 String baseFilename = zipEntry.getName().substring(0, zipEntry.getName().length() -
                         CompilerConstants.JSON_FILENAME_SUFFIX.length());

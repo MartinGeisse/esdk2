@@ -1,6 +1,6 @@
 package name.martingeisse.digiscope.test;
 
-import foo.bar.MyScope;
+// import foo.bar.MyScope;
 
 public class TestMain {
 
