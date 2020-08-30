@@ -1,0 +1,162 @@
+module name.martingeisse.esdk.riscv.rtl.ComputerModule;
+
+interface {
+    in clock clk;
+    in bit reset;
+
+    in clock ddrClock0, ddrClock90, ddrClock180, ddrClock270;
+
+    in vector[8] buttonsAndSwitches;
+    in bit serialPortSignal;
+}
+
+// CPU
+name.martingeisse.esdk.riscv.rtl.Multicycle cpu;
+
+// peripherals
+name.martingeisse.esdk.riscv.rtl.ram.RamController bigRam;
+name.martingeisse.esdk.riscv.rtl.ram.RamAgent ramAgent;
+name.martingeisse.esdk.riscv.rtl.simulation.SimulationDevice simulationDevice;
+name.martingeisse.esdk.riscv.rtl.terminal.PixelDisplayController display;
+name.martingeisse.esdk.riscv.rtl.terminal.KeyboardController keyboard;
+name.martingeisse.esdk.library.SignalLoggerBusInterface signalLogger;
+name.martingeisse.esdk.riscv.rtl.spi.SpiInterface spiInterface;
+name.martingeisse.esdk.riscv.rtl.serial.SerialPort serialPort;
+
+// bus decoder: big devices
+signal bit ramAgentSelected = cpu.memoryWordAddress[29];
+signal bit simulationDeviceSelected = ~cpu.memoryWordAddress[29] & cpu.memoryWordAddress[28];
+signal bit smallDeviceRegionSelected = ~cpu.memoryWordAddress[29] & ~cpu.memoryWordAddress[28];
+
+// bus decoder: small devices
+signal bit terminalSelected = smallDeviceRegionSelected & cpu.memoryWordAddress[12];
+signal bit signalLoggerSelected = smallDeviceRegionSelected & cpu.memoryWordAddress[13];
+signal bit gpioSelected = smallDeviceRegionSelected & cpu.memoryWordAddress[14];
+signal bit spiSelected = smallDeviceRegionSelected & cpu.memoryWordAddress[15];
+signal bit displayControllerSelected = smallDeviceRegionSelected & cpu.memoryWordAddress[16];
+signal bit serialPortSelected = smallDeviceRegionSelected & cpu.memoryWordAddress[17];
+signal bit internalMemorySelected = smallDeviceRegionSelected & ~terminalSelected & ~signalLoggerSelected
+    & ~gpioSelected & ~spiSelected & ~displayControllerSelected & ~serialPortSelected;
+
+// Memory: the number indicates the significance inside a word, NOT the position of a byte in a byte buffer (these
+// are different since RISC-V is little-endian).
+register matrix[4096][8] memory0, memory1, memory2, memory3;
+signal vector[32] memoryReadData;
+register bit internalMemorySecondReadCycle = 0;
+
+
+do (*) {
+
+    // control interface
+    cpu.clk = clk;
+    cpu.reset = reset;
+
+    // data interface
+    cpu.memoryReadData = ramAgentSelected ? ramAgent.cpuReadData :
+        simulationDeviceSelected ? simulationDevice.busReadData :
+            terminalSelected ? (24d0 _ keyboard.inputData) :
+                signalLoggerSelected ? signalLogger.busReadData :
+                    gpioSelected ? (24d0 _ buttonsAndSwitches) :
+                        spiSelected ? 32d0 :
+                            displayControllerSelected ? 32d0 :
+                                serialPortSelected ? serialPort.busReadData :
+                                    memoryReadData;
+    cpu.memoryAcknowledge = ramAgentSelected ? ramAgent.cpuAcknowledge :
+        simulationDeviceSelected ? simulationDevice.busAcknowledge :
+            terminalSelected ? bit(1) :
+                signalLoggerSelected ? signalLogger.busAcknowledge :
+                    gpioSelected ? bit(1) :
+                        spiSelected ? spiInterface.busAcknowledge :
+                            displayControllerSelected ? bit(1) :
+                                serialPortSelected ? serialPort.busAcknowledge :
+                                    (cpu.memoryWrite | internalMemorySecondReadCycle);
+
+    display.clk = clk;
+    display.registerWriteEnable = cpu.memoryEnable & cpu.memoryWrite & displayControllerSelected;
+    display.registerWriteData = cpu.memoryWriteData[0];
+
+    keyboard.clk = clk;
+    keyboard.inputAcknowledge = cpu.memoryEnable & ~cpu.memoryWrite & terminalSelected;
+
+    ramAgent.clk = clk;
+    ramAgent.reset = reset;
+    ramAgent.cpuSelectCommandEngine = cpu.memoryWordAddress[28];
+    ramAgent.cpuCommandCode = cpu.memoryWordAddress[27:24];
+    ramAgent.cpuWordAddress = cpu.memoryWordAddress[23:0];
+    ramAgent.cpuEnable = cpu.memoryEnable & ramAgentSelected;
+    ramAgent.cpuWrite = cpu.memoryWrite;
+    ramAgent.cpuWriteData = cpu.memoryWriteData;
+    ramAgent.cpuWriteMask = cpu.memoryWriteMask;
+    ramAgent.ramRequestAcknowledge = bigRam.busRequestAcknowledge;
+    ramAgent.ramResponseReadData = bigRam.busResponseReadData;
+    ramAgent.ramResponseEnable = bigRam.busResponseEnable;
+
+    bigRam.clk0 = ddrClock0;
+    bigRam.clk90 = ddrClock90;
+    bigRam.clk180 = ddrClock180;
+    bigRam.clk270 = ddrClock270;
+    bigRam.reset = reset;
+    bigRam.busRequestEnable = ramAgent.ramRequestEnable;
+    bigRam.busRequestWrite = ramAgent.ramRequestWrite;
+    bigRam.busRequestWordAddress = ramAgent.ramRequestWordAddress;
+    bigRam.busRequestWriteData = ramAgent.ramRequestWriteData;
+    bigRam.busRequestWriteMask = ramAgent.ramRequestWriteMask;
+
+    signalLogger.busEnable = cpu.memoryEnable & signalLoggerSelected;
+    signalLogger.busWrite = cpu.memoryWrite;
+    signalLogger.busWriteData = cpu.memoryWriteData;
+
+    // RAMDAC connections
+    bigRam.ramdacRequestEnable = display.ramdacRequestEnable;
+    bigRam.ramdacRequestWordAddress = display.ramdacRequestWordAddress;
+    display.ramdacRequestAcknowledge = bigRam.ramdacRequestAcknowledge;
+    display.ramdacResponseEnable = bigRam.ramdacResponseEnable;
+    display.ramdacResponseWordAddress = bigRam.ramdacResponseWordAddress;
+    display.ramdacResponseData = bigRam.ramdacResponseData;
+
+    spiInterface.clk = clk;
+    spiInterface.busEnable = cpu.memoryEnable & spiSelected;
+    spiInterface.busWrite = cpu.memoryWrite;
+    spiInterface.busWriteData = cpu.memoryWriteData;
+
+    simulationDevice.clk = clk;
+    simulationDevice.busEnable = cpu.memoryEnable & simulationDeviceSelected;
+    simulationDevice.busWrite = cpu.memoryWrite;
+    simulationDevice.busWordAddress = cpu.memoryWordAddress[23:0];
+    simulationDevice.busWriteData = cpu.memoryWriteData;
+    simulationDevice.busWriteMask = cpu.memoryWriteMask;
+
+    serialPort.clk = clk;
+    serialPort.busEnable = cpu.memoryEnable & serialPortSelected;
+    serialPort.serialSignal = serialPortSignal;
+
+}
+
+signal vector[12] memoryDataWordAddress = cpu.memoryWordAddress[11:0];
+register vector[8] memoryReadData0, memoryReadData1, memoryReadData2, memoryReadData3;
+do (*) memoryReadData = memoryReadData3 _ memoryReadData2 _ memoryReadData1 _ memoryReadData0;
+do (clk) {
+    memoryReadData0 = memory0[memoryDataWordAddress];
+    memoryReadData1 = memory1[memoryDataWordAddress];
+    memoryReadData2 = memory2[memoryDataWordAddress];
+    memoryReadData3 = memory3[memoryDataWordAddress];
+    if (cpu.memoryEnable & cpu.memoryWrite & internalMemorySelected) {
+        if (cpu.memoryWriteMask[0]) {
+            memory0[memoryDataWordAddress] = cpu.memoryWriteData[7:0];
+        }
+        if (cpu.memoryWriteMask[1]) {
+            memory1[memoryDataWordAddress] = cpu.memoryWriteData[15:8];
+        }
+        if (cpu.memoryWriteMask[2]) {
+            memory2[memoryDataWordAddress] = cpu.memoryWriteData[23:16];
+        }
+        if (cpu.memoryWriteMask[3]) {
+            memory3[memoryDataWordAddress] = cpu.memoryWriteData[31:24];
+        }
+    }
+    if (cpu.memoryEnable & ~cpu.memoryWrite) {
+        internalMemorySecondReadCycle = ~internalMemorySecondReadCycle;
+    } else {
+        internalMemorySecondReadCycle = 0;
+    }
+}
