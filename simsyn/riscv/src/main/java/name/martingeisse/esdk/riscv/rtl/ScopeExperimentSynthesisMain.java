@@ -33,10 +33,10 @@ public class ScopeExperimentSynthesisMain {
 
 	public static void main(String[] args) throws Exception {
 		CeeCompilerInvoker.invoke();
-		ComputerDesign design = new ComputerDesign() {
+		ScopeExperimentDesign design = new ScopeExperimentDesign() {
 			@Override
-			protected ComputerModule.Implementation createComputerModule() {
-				return new ComputerModule.Implementation(getRealm(), getClock(), getDdrClock0(), getDdrClock180(), getDdrClock270(), getDdrClock90()) {
+			protected ScopeExample.Implementation createMainModule() {
+				return new ScopeExample.Implementation(getRealm(), getClock(), getDdrClock0(), getDdrClock180(), getDdrClock270(), getDdrClock90()) {
 
 					@Override
 					protected RamController createBigRam(RtlRealm realm, RtlClockNetwork ddrClock0, RtlClockNetwork ddrClock180, RtlClockNetwork ddrClock270, RtlClockNetwork ddrClock90) {
@@ -86,7 +86,7 @@ public class ScopeExperimentSynthesisMain {
 				};
 			}
 		};
-		ComputerModule.Implementation computerModule = design.getComputerModule();
+		ScopeExample.Implementation mainModule = design.getMainModule();
 		RtlRealm realm = design.getRealm();
 
 		// clk / reset
@@ -94,7 +94,7 @@ public class ScopeExperimentSynthesisMain {
 		RtlBitSignal reset = clkReset.createBitOutputPort("reset");
 		clkReset.createBitInputPort("clk_in", clockPin(realm));
 		clkReset.createBitInputPort("reset_in", buttonPin(realm, "V16"));
-		computerModule.setReset(reset);
+		mainModule.setReset(reset);
 		design.getDdrClock0SignalConnector().setConnected(withName(clkReset.createBitOutputPort("ddr_clk_0"), "ddr_clk_0"));
 		design.getDdrClock90SignalConnector().setConnected(withName(clkReset.createBitOutputPort("ddr_clk_90"), "ddr_clk_90"));
 		design.getDdrClock180SignalConnector().setConnected(withName(clkReset.createBitOutputPort("ddr_clk_180"), "ddr_clk_180"));
@@ -102,7 +102,7 @@ public class ScopeExperimentSynthesisMain {
 		design.getClockSignalConnector().setConnected(design.getDdrClock0SignalConnector().getConnected());
 
 		// pixel display
-		PixelDisplayController.Implementation displayController = (PixelDisplayController.Implementation)computerModule._display;
+		PixelDisplayController.Implementation displayController = (PixelDisplayController.Implementation) mainModule._display;
 		VgaConnector.Connector vgaConnector = (VgaConnector.Connector) displayController._vgaConnector;
 		vgaPin(realm, "H14", vgaConnector.getRSocket());
 		vgaPin(realm, "H15", vgaConnector.getGSocket());
@@ -111,7 +111,7 @@ public class ScopeExperimentSynthesisMain {
 		vgaPin(realm, "F14", vgaConnector.getVsyncSocket());
 
 		// keyboard
-		KeyboardController.Implementation keyboardController = (KeyboardController.Implementation)computerModule._keyboard;
+		KeyboardController.Implementation keyboardController = (KeyboardController.Implementation) mainModule._keyboard;
 		Ps2Connector.Connector ps2Connector = (Ps2Connector.Connector)keyboardController._ps2;
 		ps2Connector.setClkSocket(ps2Pin(realm, "G14"));
 		ps2Connector.setDataSocket(ps2Pin(realm, "G13"));
@@ -142,7 +142,7 @@ public class ScopeExperimentSynthesisMain {
 			serialPortPin.setConfiguration(configuration);
 			serialPortSignal = serialPortPin;
 		}
-		computerModule.setSerialPortSignal(serialPortSignal);
+		mainModule.setSerialPortSignal(serialPortSignal);
 		RtlBitSignal serialPortActive = RegisterBuilder.build(false,
 				design.getClock(), new RtlBitConstant(realm, true), serialPortSignal.not());
 		RtlVectorSignal serialPortDivider = RegisterBuilder.build(5, VectorValue.of(5, 0),
@@ -152,12 +152,12 @@ public class ScopeExperimentSynthesisMain {
         //
 		// signal logger
 		//
-		SignalLoggerBusInterface.Connector loggerInterface = (SignalLoggerBusInterface.Connector)computerModule._signalLogger;
+		SignalLoggerBusInterface.Connector loggerInterface = (SignalLoggerBusInterface.Connector) mainModule._signalLogger;
 		SignalLogger signalLogger = new SignalLogger.Implementation(realm, design.getClock(), design.getClock());
 		signalLogger.setLogEnable(serialPortActive.and(serialPortDivider.compareEqual(0)));
 		signalLogger.setLogData(RtlVectorConstant.of(realm, 27, 0)
 			.concat(serialPortSignal)
-			.concat(((SerialPort.Implementation)computerModule._serialPort)._state)
+			.concat(((SerialPort.Implementation) mainModule._serialPort)._state)
 		);
 		signalLogger.setBusEnable(loggerInterface.getBusEnableSocket());
 		signalLogger.setBusWrite(loggerInterface.getBusWriteSocket());
@@ -168,7 +168,7 @@ public class ScopeExperimentSynthesisMain {
 		//
 		// GPIO (buttons and switches; LEDs not yet implemented)
 		//
-		computerModule.setButtonsAndSwitches(new RtlConcatenation(realm,
+		mainModule.setButtonsAndSwitches(new RtlConcatenation(realm,
 			slideSwitchPin(realm, "N17"), // switch 3
 			slideSwitchPin(realm, "H18"), // switch 2
 			slideSwitchPin(realm, "L14"), // switch 1
@@ -181,7 +181,7 @@ public class ScopeExperimentSynthesisMain {
 
 		// SPI
 		{
-			SpiInterface.Implementation spiInterface = (SpiInterface.Implementation)design.getComputerModule()._spiInterface;
+			SpiInterface.Implementation spiInterface = (SpiInterface.Implementation)design.getMainModule()._spiInterface;
 			SpiConnector.Connector connector = (SpiConnector.Connector)spiInterface._spiConnector;
 
 			// general

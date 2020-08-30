@@ -26,7 +26,7 @@ public class ScopeExperimentDesign extends Design {
     private final RtlClockNetwork ddrClock180;
     private final RtlBitSignalConnector ddrClock270SignalConnector;
     private final RtlClockNetwork ddrClock270;
-    private final ComputerModule.Implementation computerModule;
+    private final ScopeExample.Implementation mainModule;
 
     public ScopeExperimentDesign() throws IOException {
         this.realm = new RtlRealm(this);
@@ -40,7 +40,7 @@ public class ScopeExperimentDesign extends Design {
         this.ddrClock180 = realm.createClockNetwork(ddrClock180SignalConnector);
         this.ddrClock270SignalConnector = new RtlBitSignalConnector(realm);
         this.ddrClock270 = realm.createClockNetwork(ddrClock270SignalConnector);
-        this.computerModule = createComputerModule();
+        this.mainModule = createMainModule();
         try (FileInputStream in = new FileInputStream("riscv/resource/scope-program/build/program.bin")) {
             int index = 0;
             while (true) {
@@ -48,10 +48,10 @@ public class ScopeExperimentDesign extends Design {
                 if (first < 0) {
                     break;
                 }
-                computerModule._memory0.getMatrix().setRow(index, VectorValue.of(8, first));
-                computerModule._memory1.getMatrix().setRow(index, VectorValue.of(8, readByteEofSafe(in)));
-                computerModule._memory2.getMatrix().setRow(index, VectorValue.of(8, readByteEofSafe(in)));
-                computerModule._memory3.getMatrix().setRow(index, VectorValue.of(8, readByteEofSafe(in)));
+                mainModule._memory0.getMatrix().setRow(index, VectorValue.of(8, first));
+                mainModule._memory1.getMatrix().setRow(index, VectorValue.of(8, readByteEofSafe(in)));
+                mainModule._memory2.getMatrix().setRow(index, VectorValue.of(8, readByteEofSafe(in)));
+                mainModule._memory3.getMatrix().setRow(index, VectorValue.of(8, readByteEofSafe(in)));
                 index++;
             }
         }
@@ -62,8 +62,8 @@ public class ScopeExperimentDesign extends Design {
         return (x < 0 ? 0 : x);
     }
 
-    protected ComputerModule.Implementation createComputerModule() {
-        return new ComputerModule.Implementation(realm, clock, ddrClock0, ddrClock180, ddrClock270, ddrClock90);
+    protected ScopeExample.Implementation createMainModule() {
+        return new ScopeExample.Implementation(realm, clock, ddrClock0, ddrClock180, ddrClock270, ddrClock90);
     }
 
     public RtlRealm getRealm() {
@@ -110,8 +110,8 @@ public class ScopeExperimentDesign extends Design {
         return ddrClock270;
     }
 
-    public ComputerModule.Implementation getComputerModule() {
-        return computerModule;
+    public ScopeExample.Implementation getMainModule() {
+        return mainModule;
     }
 
 }
