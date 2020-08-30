@@ -1,4 +1,4 @@
-module name.martingeisse.esdk.riscv.rtl.ComputerModule;
+module name.martingeisse.esdk.riscv.rtl.ScopeExample;
 
 interface {
     in clock clk;
@@ -50,6 +50,7 @@ do (*) {
     // control interface
     cpu.clk = clk;
     cpu.reset = reset;
+    cpu.interrupt = 0;
 
     // data interface
     cpu.memoryReadData = ramAgentSelected ? ramAgent.cpuReadData :
@@ -72,6 +73,7 @@ do (*) {
                                     (cpu.memoryWrite | internalMemorySecondReadCycle);
 
     display.clk = clk;
+    display.reset = reset;
     display.registerWriteEnable = cpu.memoryEnable & cpu.memoryWrite & displayControllerSelected;
     display.registerWriteData = cpu.memoryWriteData[0];
 
@@ -127,6 +129,7 @@ do (*) {
     simulationDevice.busWriteMask = cpu.memoryWriteMask;
 
     serialPort.clk = clk;
+    serialPort.reset = reset;
     serialPort.busEnable = cpu.memoryEnable & serialPortSelected;
     serialPort.serialSignal = serialPortSignal;
 
