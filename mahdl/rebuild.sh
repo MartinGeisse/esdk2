@@ -1,1 +1,1 @@
-../gradlew clean build buildPlugin publishToMavenLocal
+./gradlew clean build buildPlugin publishToMavenLocal
