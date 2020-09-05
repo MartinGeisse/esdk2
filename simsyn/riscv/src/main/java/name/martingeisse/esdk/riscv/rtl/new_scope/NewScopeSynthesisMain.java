@@ -17,8 +17,6 @@ import name.martingeisse.esdk.riscv.rtl.CeeCompilerInvoker;
 import name.martingeisse.esdk.riscv.rtl.ram.RamController;
 import name.martingeisse.esdk.riscv.rtl.ram.SdramConnector;
 import name.martingeisse.esdk.riscv.rtl.ram.SdramConnectorImpl;
-import name.martingeisse.esdk.riscv.rtl.spi.SpiConnector;
-import name.martingeisse.esdk.riscv.rtl.spi.SpiInterface;
 import name.martingeisse.esdk.riscv.rtl.terminal.KeyboardController;
 import name.martingeisse.esdk.riscv.rtl.terminal.PixelDisplayController;
 import name.martingeisse.esdk.riscv.rtl.terminal.Ps2Connector;
@@ -71,16 +69,6 @@ public class NewScopeSynthesisMain {
                     @Override
                     protected SignalLoggerBusInterface createSignalLogger(RtlRealm realm) {
                         return new SignalLoggerBusInterface.Connector(realm);
-                    }
-
-                    @Override
-                    protected SpiInterface createSpiInterface(RtlRealm realm, RtlClockNetwork clk) {
-                        return new SpiInterface.Implementation(getRealm(), clk) {
-                            @Override
-                            protected SpiConnector createSpiConnector(RtlRealm realm) {
-                                return new SpiConnector.Connector(realm);
-                            }
-                        };
                     }
 
                 };
@@ -147,32 +135,6 @@ public class NewScopeSynthesisMain {
         // GPIO (buttons and switches; LEDs not yet implemented)
         //
         newScope.setButtonsAndSwitches(buttonsAndSwitches);
-
-        // SPI
-        {
-            SpiInterface.Implementation spiInterface = (SpiInterface.Implementation) design.getNewScope()._spiInterface;
-            SpiConnector.Connector connector = (SpiConnector.Connector) spiInterface._spiConnector;
-
-            // general
-            outputPin(realm, "U16", "LVCMOS33", 6, XilinxPinConfiguration.Slew.SLOW, connector.getSckSocket()); // SCK
-            outputPin(realm, "T4", "LVCMOS33", 6, XilinxPinConfiguration.Slew.SLOW, connector.getMosiSocket()); // MOSI
-
-            // DAC
-            outputPin(realm, "N8", "LVCMOS33", 8, XilinxPinConfiguration.Slew.SLOW, connector.getDacCsSocket()); // DAC_CS
-            outputPin(realm, "P8", "LVCMOS33", 8, XilinxPinConfiguration.Slew.SLOW, true); // DAC_CLR
-
-        }
-
-        // unused SPI devices
-        {
-            outputPin(realm, "P11", "LVCMOS33", 6, XilinxPinConfiguration.Slew.SLOW, false); // AD_CONV
-            outputPin(realm, "N7", "LVCMOS33", 6, XilinxPinConfiguration.Slew.SLOW, true); // AMP_CS
-            outputPin(realm, "T3", "LVCMOS33", 4, XilinxPinConfiguration.Slew.SLOW, false); // FPGA_INIT_B
-            outputPin(realm, "M18", "LVCMOS33", 4, XilinxPinConfiguration.Slew.SLOW, false); // LCD_E
-            outputPin(realm, "L17", "LVCMOS33", 4, XilinxPinConfiguration.Slew.SLOW, false); // LCD_RW
-            outputPin(realm, "D16", "LVCMOS33", 4, XilinxPinConfiguration.Slew.SLOW, true); // SF_CE0
-            outputPin(realm, "U3", "LVCMOS33", 6, XilinxPinConfiguration.Slew.SLOW, true); // SPI_SS_B
-        }
 
         ProjectGenerator projectGenerator = new ProjectGenerator(design.getRealm(), "NewScope", new File("ise/new-scope"), "XC3S500E-FG320-4");
         projectGenerator.addVerilogFile(new File("riscv/resource/hdl/clk_reset.v"));

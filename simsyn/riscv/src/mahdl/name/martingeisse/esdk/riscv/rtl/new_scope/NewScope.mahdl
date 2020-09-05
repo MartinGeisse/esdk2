@@ -20,7 +20,6 @@ name.martingeisse.esdk.riscv.rtl.simulation.SimulationDevice simulationDevice;
 name.martingeisse.esdk.riscv.rtl.terminal.PixelDisplayController display;
 name.martingeisse.esdk.riscv.rtl.terminal.KeyboardController keyboard;
 name.martingeisse.esdk.library.SignalLoggerBusInterface signalLogger;
-name.martingeisse.esdk.riscv.rtl.spi.SpiInterface spiInterface;
 
 // bus decoder
 signal bit ramAgentSelected = cpu.memoryWordAddress[29];
@@ -28,7 +27,6 @@ signal bit internalMemorySelected = cpu.memoryWordAddress[29:22] == 8d0;
 signal bit terminalSelected = cpu.memoryWordAddress[29:22] == 8d1;
 signal bit signalLoggerSelected = cpu.memoryWordAddress[29:22] == 8d2;
 signal bit gpioSelected = cpu.memoryWordAddress[29:22] == 8d3;
-signal bit spiSelected = cpu.memoryWordAddress[29:22] == 8d4;
 signal bit displayControllerSelected = cpu.memoryWordAddress[29:22] == 8d5;
 signal bit hardwareClockSelected = cpu.memoryWordAddress[29:22] == 8d7;
 // ...
@@ -61,7 +59,6 @@ do (*) {
             case 7d1: bit(1)
             case 7d2: signalLogger.busAcknowledge
             case 7d3: bit(1)
-            case 7d4: spiInterface.busAcknowledge
             case 7d5: bit(1)
             case 7d7: bit(1)
             case 7d127: simulationDevice.busAcknowledge
@@ -117,11 +114,6 @@ do (*) {
     display.ramdacResponseEnable = bigRam.ramdacResponseEnable;
     display.ramdacResponseWordAddress = bigRam.ramdacResponseWordAddress;
     display.ramdacResponseData = bigRam.ramdacResponseData;
-
-    spiInterface.clk = clk;
-    spiInterface.busEnable = cpu.memoryEnable & spiSelected;
-    spiInterface.busWrite = cpu.memoryWrite;
-    spiInterface.busWriteData = cpu.memoryWriteData;
 
     simulationDevice.clk = clk;
     simulationDevice.busEnable = cpu.memoryEnable & simulationDeviceSelected;
