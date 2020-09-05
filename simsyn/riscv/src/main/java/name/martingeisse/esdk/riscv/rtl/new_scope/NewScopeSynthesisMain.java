@@ -119,7 +119,7 @@ public class NewScopeSynthesisMain {
         //
         // signal logger
         //
-        RtlVectorSignal logClockDivider = RegisterBuilder.build(8, VectorValue.of(8, 0),
+        RtlVectorSignal logClockDivider = RegisterBuilder.build(20, VectorValue.of(20, 0),
                 design.getClock(), r -> r.add(1));
         SignalLoggerBusInterface.Connector loggerInterface = (SignalLoggerBusInterface.Connector) newScope._signalLogger;
         SignalLogger signalLogger = new SignalLogger.Implementation(realm, design.getClock(), design.getClock());
