@@ -4,7 +4,6 @@ import name.martingeisse.esdk.core.model.Item;
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.module.RtlModuleInstance;
-import name.martingeisse.esdk.core.rtl.pin.RtlBidirectionalPin;
 import name.martingeisse.esdk.core.rtl.pin.RtlInputPin;
 import name.martingeisse.esdk.core.rtl.pin.RtlOutputPin;
 import name.martingeisse.esdk.core.rtl.signal.*;
@@ -15,9 +14,6 @@ import name.martingeisse.esdk.library.SignalLogger;
 import name.martingeisse.esdk.library.SignalLoggerBusInterface;
 import name.martingeisse.esdk.library.util.RegisterBuilder;
 import name.martingeisse.esdk.riscv.rtl.CeeCompilerInvoker;
-import name.martingeisse.esdk.riscv.rtl.lan.LanController;
-import name.martingeisse.esdk.riscv.rtl.lan.ReceiveBuffer;
-import name.martingeisse.esdk.riscv.rtl.lan.SendBuffer;
 import name.martingeisse.esdk.riscv.rtl.ram.RamController;
 import name.martingeisse.esdk.riscv.rtl.ram.SdramConnector;
 import name.martingeisse.esdk.riscv.rtl.ram.SdramConnectorImpl;
@@ -87,64 +83,6 @@ public class NewScopeSynthesisMain {
                         };
                     }
 
-                    @Override
-                    protected LanController createLanController(RtlRealm realm, RtlClockNetwork clk) {
-                        return new LanController.Implementation(realm, clk) {
-
-                            @Override
-                            protected ReceiveBuffer createReceiveBuffer(RtlRealm realm, RtlClockNetwork clk) {
-                                ReceiveBuffer.Connector connector = new ReceiveBuffer.Connector(realm, clk);
-                                RtlModuleInstance instance = new RtlModuleInstance(realm, "RAMB16_S4_S36");
-
-                                // port A (4k x 4)
-                                instance.createBitInputPort("WEA", connector.getWriteEnableSocket());
-                                instance.createBitInputPort("ENA", true);
-                                instance.createBitInputPort("SSRA", false);
-                                instance.createBitInputPort("CLKA", clk.getClockSignal());
-                                instance.createVectorInputPort("ADDRA", 12, connector.getWriteAddressSocket());
-                                instance.createVectorInputPort("DIA", 4, connector.getWriteDataSocket());
-
-                                // port B (512 x 32, internally 512 x 36)
-                                instance.createBitInputPort("WEB", false);
-                                instance.createBitInputPort("ENB", true);
-                                instance.createBitInputPort("SSRB", false);
-                                instance.createBitInputPort("CLKB", clk.getClockSignal());
-                                instance.createVectorInputPort("ADDRB", 9, connector.getReadAddressSocket());
-                                instance.createVectorInputPort("DIB", 32, RtlVectorConstant.of(realm, 32, 0));
-                                instance.createVectorInputPort("DIPB", 4, RtlVectorConstant.of(realm, 4, 0));
-                                connector.setReadDataSocket(instance.createVectorOutputPort("DOB", 32));
-
-                                return connector;
-                            }
-
-                            @Override
-                            protected SendBuffer createSendBuffer(RtlRealm realm, RtlClockNetwork clk) {
-                                SendBuffer.Connector connector = new SendBuffer.Connector(realm, clk);
-                                RtlModuleInstance instance = new RtlModuleInstance(realm, "RAMB16_S4_S36");
-
-                                // port A (4k x 4)
-                                instance.createBitInputPort("WEA", false);
-                                instance.createBitInputPort("ENA", true);
-                                instance.createBitInputPort("SSRA", false);
-                                instance.createBitInputPort("CLKA", clk.getClockSignal());
-                                instance.createVectorInputPort("ADDRA", 12, connector.getReadAddressSocket());
-                                instance.createVectorInputPort("DIA", 4, RtlVectorConstant.of(realm, 4, 0));
-                                connector.setReadDataSocket(instance.createVectorOutputPort("DOA", 4));
-
-                                // port B (512 x 32, internally 512 x 36)
-                                instance.createBitInputPort("WEB", connector.getWriteEnableSocket());
-                                instance.createBitInputPort("ENB", true);
-                                instance.createBitInputPort("SSRB", false);
-                                instance.createBitInputPort("CLKB", clk.getClockSignal());
-                                instance.createVectorInputPort("ADDRB", 9, connector.getWriteAddressSocket());
-                                instance.createVectorInputPort("DIB", 32, connector.getWriteDataSocket());
-                                instance.createVectorInputPort("DIPB", 4, RtlVectorConstant.of(realm, 4, 0));
-
-                                return connector;
-                            }
-
-                        };
-                    }
                 };
             }
         };
@@ -178,76 +116,6 @@ public class NewScopeSynthesisMain {
         ps2Connector.setClkSocket(ps2Pin(realm, "G14"));
         ps2Connector.setDataSocket(ps2Pin(realm, "G13"));
 
-        // serial port test
-        // I built my own software serial implementation because the built-in library for Arduino is buggy as hell.
-        // Parameters: idle = HIGH, 1 start bit (LOW), 1 stop bit (HIGH, equivalent to at least one idle bit),
-        // data is sent active-HIGH. Lowest bit is sent first. All bits including start/stop have the same length.
-        // The catch is that this length is not well-defined and has to be measured:
-        // - each pixel is two clock cycles
-        // total logging length: 12.9cm, 512 pixels --> 4096 clocks
-        // start bit length: 5.7cm (226 pixels, 452 clocks)
-        // data bit length: 6.1 cm (242 pixels, 484 clocks)
-        // residue after that: 1.2cm
-        RtlBitSignal serialPortSignal;
-        {
-            // NET "FX2_IO<5>"  LOC = "A6"  | IOSTANDARD = LVCMOS33  | SLEW = FAST  | DRIVE = 8 ;
-            XilinxPinConfiguration configuration = new XilinxPinConfiguration();
-            configuration.setIostandard("LVCMOS33");
-            configuration.setSlew(XilinxPinConfiguration.Slew.FAST);
-            configuration.setDrive(8);
-            RtlInputPin serialPortPin = new RtlInputPin(realm);
-            serialPortPin.setId("A6");
-            serialPortPin.setConfiguration(configuration);
-            serialPortSignal = serialPortPin;
-        }
-        newScope.setSerialPortSignal(serialPortSignal);
-        RtlBitSignal serialPortActive = RegisterBuilder.build(false,
-                design.getClock(), new RtlBitConstant(realm, true), serialPortSignal.not());
-        RtlVectorSignal serialPortDivider = RegisterBuilder.build(8, VectorValue.of(8, 0),
-                design.getClock(), r -> r.add(1));
-
-        //
-        // LAN PHY interface
-        //
-        {
-            XilinxPinConfiguration configuration = new XilinxPinConfiguration();
-            configuration.setIostandard("LVCMOS33");
-            configuration.setSlew(XilinxPinConfiguration.Slew.SLOW);
-            configuration.setDrive(8);
-            RtlOutputPin mdcPin = new RtlOutputPin(realm);
-            mdcPin.setId("P9");
-            mdcPin.setConfiguration(configuration);
-            mdcPin.setOutputSignal(newScope.getLanMdc());
-        }
-        {
-            XilinxPinConfiguration configuration = new XilinxPinConfiguration();
-            configuration.setIostandard("LVCMOS33");
-            configuration.setSlew(XilinxPinConfiguration.Slew.SLOW);
-            configuration.setDrive(8);
-            configuration.setAdditionalInfo("PULLUP");
-            RtlBidirectionalPin mdioPin = new RtlBidirectionalPin(realm);
-            mdioPin.setId("U5");
-            mdioPin.setConfiguration(configuration);
-            mdioPin.setOutputSignal(new RtlBitConstant(realm, false));
-            mdioPin.setOutputEnableSignal(newScope.getLanMdioOutWeak().not());
-            newScope.setLanMdioIn(mdioPin);
-        }
-        newScope.setLanRxClk(inputPin(realm, "V3", "LVCMOS33"));
-        newScope.setLanRxDv(inputPin(realm, "V2", "LVCMOS33"));
-        newScope.setLanRxd(inputPin(realm, "V14", "LVCMOS33")
-                .concat(inputPin(realm, "U11", "LVCMOS33"))
-                .concat(inputPin(realm, "T11", "LVCMOS33"))
-                .concat(inputPin(realm, "V8", "LVCMOS33"))
-        );
-        newScope.setLanRxEr(inputPin(realm, "U14", "LVCMOS33"));
-        newScope.setLanTxClk(inputPin(realm, "T7", "LVCMOS33"));
-        outputPin(realm, "P15", "LVCMOS33", 8, XilinxPinConfiguration.Slew.SLOW, newScope.getLanTxEn());
-        outputPin(realm, "R11", "LVCMOS33", 8, XilinxPinConfiguration.Slew.SLOW, newScope.getLanTxd().select(0));
-        outputPin(realm, "T15", "LVCMOS33", 8, XilinxPinConfiguration.Slew.SLOW, newScope.getLanTxd().select(1));
-        outputPin(realm, "R5", "LVCMOS33", 8, XilinxPinConfiguration.Slew.SLOW, newScope.getLanTxd().select(2));
-        outputPin(realm, "T5", "LVCMOS33", 8, XilinxPinConfiguration.Slew.SLOW, newScope.getLanTxd().select(3));
-        outputPin(realm, "R6", "LVCMOS33", 8, XilinxPinConfiguration.Slew.SLOW, newScope.getLanTxEr());
-
         // shared by signal logger
         RtlVectorSignal buttonsAndSwitches = new RtlConcatenation(realm,
                 slideSwitchPin(realm, "N17"), // switch 3
@@ -263,9 +131,11 @@ public class NewScopeSynthesisMain {
         //
         // signal logger
         //
+        RtlVectorSignal logClockDivider = RegisterBuilder.build(8, VectorValue.of(8, 0),
+                design.getClock(), r -> r.add(1));
         SignalLoggerBusInterface.Connector loggerInterface = (SignalLoggerBusInterface.Connector) newScope._signalLogger;
         SignalLogger signalLogger = new SignalLogger.Implementation(realm, design.getClock(), design.getClock());
-        signalLogger.setLogEnable(serialPortActive.and(serialPortDivider.compareEqual(0)));
+        signalLogger.setLogEnable(logClockDivider.compareEqual(0));
         signalLogger.setLogData(RtlVectorConstant.of(realm, 28, 0).concat(buttonsAndSwitches.select(7, 4)));
         signalLogger.setBusEnable(loggerInterface.getBusEnableSocket());
         signalLogger.setBusWrite(loggerInterface.getBusWriteSocket());

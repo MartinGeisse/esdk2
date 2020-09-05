@@ -8,5 +8,5 @@ void scopeMain(void) {
     setDrawColor(1);
     clearScreen(0);
     termInitialize();
-    termPrintlnString("--- new scope 2 ---");
+    termPrintlnString("--- new scope 3 ---");
 }

@@ -7,15 +7,6 @@ interface {
     in clock ddrClock0, ddrClock90, ddrClock180, ddrClock270;
 
     in vector[8] buttonsAndSwitches;
-    in bit serialPortSignal;
-
-    out bit lanMdc, lanMdioOutWeak;
-    in bit lanMdioIn;
-    in bit lanRxDv, lanRxClk, lanRxEr;
-    in vector[4] lanRxd;
-    in bit lanTxClk;
-    out bit lanTxEn, lanTxEr;
-    out vector[4] lanTxd;
 
 }
 
@@ -30,8 +21,6 @@ name.martingeisse.esdk.riscv.rtl.terminal.PixelDisplayController display;
 name.martingeisse.esdk.riscv.rtl.terminal.KeyboardController keyboard;
 name.martingeisse.esdk.library.SignalLoggerBusInterface signalLogger;
 name.martingeisse.esdk.riscv.rtl.spi.SpiInterface spiInterface;
-name.martingeisse.esdk.riscv.rtl.serial.SerialPort serialPort;
-name.martingeisse.esdk.riscv.rtl.lan.LanController lanController;
 
 // bus decoder
 signal bit ramAgentSelected = cpu.memoryWordAddress[29];
@@ -41,9 +30,7 @@ signal bit signalLoggerSelected = cpu.memoryWordAddress[29:22] == 8d2;
 signal bit gpioSelected = cpu.memoryWordAddress[29:22] == 8d3;
 signal bit spiSelected = cpu.memoryWordAddress[29:22] == 8d4;
 signal bit displayControllerSelected = cpu.memoryWordAddress[29:22] == 8d5;
-signal bit serialPortSelected = cpu.memoryWordAddress[29:22] == 8d6;
 signal bit hardwareClockSelected = cpu.memoryWordAddress[29:22] == 8d7;
-signal bit lanControllerSelected = cpu.memoryWordAddress[29:22] == 8d8;
 // ...
 signal bit simulationDeviceSelected = cpu.memoryWordAddress[29:22] == 8d127;
 
@@ -65,9 +52,7 @@ do (*) {
             case 7d3: 24d0 _ buttonsAndSwitches
             case 7d4: 32d0
             case 7d5: 32d0
-            case 7d6: serialPort.busReadData
             case 7d7: hardwareClock
-            case 7d8: lanController.busReadData
             case 7d127: simulationDevice.busReadData
             default: 32d0
         };
@@ -78,9 +63,7 @@ do (*) {
             case 7d3: bit(1)
             case 7d4: spiInterface.busAcknowledge
             case 7d5: bit(1)
-            case 7d6: serialPort.busAcknowledge
             case 7d7: bit(1)
-            case 7d8: lanController.busAcknowledge
             case 7d127: simulationDevice.busAcknowledge
             default: bit(1)
         };
@@ -146,29 +129,6 @@ do (*) {
     simulationDevice.busWordAddress = cpu.memoryWordAddress[23:0];
     simulationDevice.busWriteData = cpu.memoryWriteData;
     simulationDevice.busWriteMask = cpu.memoryWriteMask;
-
-    serialPort.clk = clk;
-    serialPort.reset = reset;
-    serialPort.busEnable = cpu.memoryEnable & serialPortSelected;
-    serialPort.serialSignal = serialPortSignal;
-
-    lanController.clk = clk;
-    lanController.reset = reset;
-    lanController.busEnable = cpu.memoryEnable & lanControllerSelected;
-    lanController.busWrite = cpu.memoryWrite;
-    lanController.busWordAddress = cpu.memoryWordAddress[21:0];
-    lanController.busWriteData = cpu.memoryWriteData;
-    lanController.mdioIn = lanMdioIn;
-    lanMdc = lanController.mdc;
-    lanMdioOutWeak = lanController.mdioOutWeak;
-    lanController.rxDv = lanRxDv;
-    lanController.rxClk = lanRxClk;
-    lanController.rxEr = lanRxEr;
-    lanController.rxd = lanRxd;
-    lanController.txClk = lanTxClk;
-    lanTxEn = lanController.txEn;
-    lanTxEr = lanController.txEr;
-    lanTxd = lanController.txd;
 
 }
 
