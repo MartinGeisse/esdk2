@@ -50,8 +50,7 @@ $paths = array(
     'src/divrem.c' => 'build/divrem.o',
     'src/draw.c' => 'build/draw.o',
     'src/term.c' => 'build/term.o',
-    'src/profiling.c' => 'build/profiling.o',
-    'src/netboot.c' => 'build/netboot.o',
+    'src/scope.c' => 'build/scope.o',
     'src/chargen.c' => 'build/chargen.o',
 );
 foreach ($paths as $inputPath => $outputPath) {

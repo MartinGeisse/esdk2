@@ -10,8 +10,6 @@ textSection:
 // external locations
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-.globl payloadStartAddress
-.set payloadStartAddress, 0x80200000
 .set keyStateTable, (0x00004000 - 32)
 .set scanCodeBuffer, (0x00004000 - 64)
 .set keyboardController, 0x01000000
@@ -61,9 +59,6 @@ functionTable:
     .word termPrintlnUnsignedInt
     .word termPrintlnHexInt
     .word termPrintlnUnsignedHexInt
-    .word profReset
-    .word profLog
-    .word profDisplay
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // startup
@@ -101,8 +96,9 @@ start:
     call delay
 
     // invoke bootloader
-    call netboot
-    tail payloadStartAddress
+    call scopeMain
+hang:
+    j hang
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // interrupts
