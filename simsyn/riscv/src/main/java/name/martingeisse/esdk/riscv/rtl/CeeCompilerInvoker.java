@@ -9,6 +9,7 @@ public class CeeCompilerInvoker {
     public static void invoke() throws Exception {
         invoke("riscv/resource/bootloader");
         invoke("riscv/resource/gfx-program");
+        invoke("riscv/resource/new-scope-program");
     }
 
     public static void invoke(String path) throws Exception {
