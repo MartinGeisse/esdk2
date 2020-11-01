@@ -193,6 +193,8 @@ public class SimulationMain {
         main.design.simulate();
     }
 
+    //region simulation device and helpers
+
     public int readFromSimulationDevice(int wordAddress) {
         switch (wordAddress) {
 
@@ -311,5 +313,7 @@ public class SimulationMain {
         }
         return new String(stream.toByteArray(), StandardCharsets.ISO_8859_1);
     }
+
+    //endregion
 
 }
