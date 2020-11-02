@@ -289,19 +289,6 @@ public class SynthesisMain {
 				buttonPin(realm, "K17"), // south
 				buttonPin(realm, "D18") // west
 		);
-
-		// connect signal logger
-		SignalLoggerBusInterface.Connector loggerInterface = (SignalLoggerBusInterface.Connector)computerModule._signalLogger;
-		SignalLogger signalLogger = new SignalLogger.Implementation(realm, clock, clock);
-		signalLogger.setLogEnable(serialPortActive.and(serialPortDivider.compareEqual(0)));
-		signalLogger.setLogData(RtlVectorConstant.of(realm, 28, 0).concat(buttonsAndSwitches.select(7, 4)));
-		signalLogger.setBusEnable(loggerInterface.getBusEnableSocket());
-		signalLogger.setBusWrite(loggerInterface.getBusWriteSocket());
-		signalLogger.setBusWriteData(loggerInterface.getBusWriteDataSocket());
-		loggerInterface.setBusReadDataSocket(signalLogger.getBusReadData());
-		loggerInterface.setBusAcknowledgeSocket(signalLogger.getBusAcknowledge());
-
-		// connect GPIO (buttons and switches; LEDs not yet implemented)
 		computerModule.setButtonsAndSwitches(buttonsAndSwitches);
 
 		// connect SPI
@@ -329,6 +316,17 @@ public class SynthesisMain {
 			outputPin(realm, "D16", "LVCMOS33", 4, XilinxPinConfiguration.Slew.SLOW, true); // SF_CE0
 			outputPin(realm, "U3", "LVCMOS33", 6, XilinxPinConfiguration.Slew.SLOW, true); // SPI_SS_B
 		}
+
+		// connect signal logger
+		SignalLoggerBusInterface.Connector loggerInterface = (SignalLoggerBusInterface.Connector)computerModule._signalLogger;
+		SignalLogger signalLogger = new SignalLogger.Implementation(realm, clock, clock);
+		signalLogger.setLogEnable(serialPortActive.and(serialPortDivider.compareEqual(0)));
+		signalLogger.setLogData(RtlVectorConstant.of(realm, 28, 0).concat(buttonsAndSwitches.select(7, 4)));
+		signalLogger.setBusEnable(loggerInterface.getBusEnableSocket());
+		signalLogger.setBusWrite(loggerInterface.getBusWriteSocket());
+		signalLogger.setBusWriteData(loggerInterface.getBusWriteDataSocket());
+		loggerInterface.setBusReadDataSocket(signalLogger.getBusReadData());
+		loggerInterface.setBusAcknowledgeSocket(signalLogger.getBusAcknowledge());
 
 		// generate Verilog and ISE project files
 		ProjectGenerator projectGenerator = new ProjectGenerator(realm, "TerminalTest", new File("ise/terminal_test"), "XC3S500E-FG320-4");
