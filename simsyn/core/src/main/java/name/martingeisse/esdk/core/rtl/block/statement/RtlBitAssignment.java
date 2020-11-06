@@ -7,6 +7,8 @@ package name.martingeisse.esdk.core.rtl.block.statement;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.block.statement.target.RtlBitAssignmentTarget;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
+import name.martingeisse.esdk.core.rtl.signal.getter.DefaultSignalGetterFactory;
+import name.martingeisse.esdk.core.rtl.signal.getter.RtlBitSignalGetter;
 
 /**
  *
@@ -15,6 +17,7 @@ public final class RtlBitAssignment extends RtlAssignment {
 
 	private final RtlBitAssignmentTarget destination;
 	private final RtlBitSignal source;
+	private RtlBitSignalGetter sourceGetter;
 
 	public RtlBitAssignment(RtlRealm realm, RtlBitAssignmentTarget destination, RtlBitSignal source) {
 		super(realm);
@@ -42,8 +45,14 @@ public final class RtlBitAssignment extends RtlAssignment {
 	// ----------------------------------------------------------------------------------------------------------------
 
 	@Override
+	protected void initializeSimulation() {
+		super.initializeSimulation();
+		this.sourceGetter = DefaultSignalGetterFactory.getGetter(source);
+	}
+
+	@Override
 	public void execute() {
-		destination.setNextValue(source.getValue());
+		destination.setNextValue(sourceGetter.getValue());
 	}
 
 }

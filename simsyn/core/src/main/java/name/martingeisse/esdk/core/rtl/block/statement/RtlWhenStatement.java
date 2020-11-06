@@ -6,6 +6,8 @@ package name.martingeisse.esdk.core.rtl.block.statement;
 
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
+import name.martingeisse.esdk.core.rtl.signal.getter.DefaultSignalGetterFactory;
+import name.martingeisse.esdk.core.rtl.signal.getter.RtlBitSignalGetter;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.SignalUsageConsumer;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.expression.VerilogExpressionNesting;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogWriter;
@@ -18,6 +20,7 @@ public final class RtlWhenStatement extends RtlStatement {
 	private final RtlBitSignal condition;
 	private final RtlStatementSequence thenBranch;
 	private final RtlStatementSequence otherwiseBranch;
+	private RtlBitSignalGetter conditionGetter;
 
 	public RtlWhenStatement(RtlRealm realm, RtlBitSignal condition) {
 		super(realm);
@@ -47,9 +50,16 @@ public final class RtlWhenStatement extends RtlStatement {
 	// simulation
 	// ----------------------------------------------------------------------------------------------------------------
 
+
+	@Override
+	protected void initializeSimulation() {
+		super.initializeSimulation();
+		conditionGetter = DefaultSignalGetterFactory.getGetter(condition);
+	}
+
 	@Override
 	public void execute() {
-		if (condition.getValue()) {
+		if (conditionGetter.getValue()) {
 			thenBranch.execute();
 		} else {
 			otherwiseBranch.execute();
