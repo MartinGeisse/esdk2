@@ -2,6 +2,7 @@ package name.martingeisse.esdk.riscv.rtl;
 
 import name.martingeisse.esdk.core.model.Design;
 import name.martingeisse.esdk.core.model.Item;
+import name.martingeisse.esdk.core.model.items.IntervalItem;
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.block.RtlProceduralMemory;
@@ -40,11 +41,15 @@ import java.nio.charset.StandardCharsets;
  */
 public class SimulationMain {
 
-	private static Design design;
-	private static RtlRealm realm;
-	private static ComputerModule.Implementation computerModule;
-	private static SimulatedRamAdapterWithoutRamdacSupport ramAdapter;
-	private static SimulatedPixelDisplayPanel displayPanel;
+	private static final int PHYSICAL_PAYLOAD_START_ADDRESS = 0x00200000 >> 2; // word address
+	private static final int VIRTUAL_PAYLOAD_START_ADDRESS = 0x80200000; // byte address
+
+	public static Design design;
+	public static RtlRealm realm;
+	public static ComputerModule.Implementation computerModule;
+	public static Multicycle.Implementation cpu;
+	public static SimulatedRamAdapterWithoutRamdacSupport ramAdapter;
+	public static SimulatedPixelDisplayPanel displayPanel;
 
 	public static void main(String[] args) throws Exception {
 
@@ -135,22 +140,7 @@ public class SimulationMain {
 			}
 
 		};
-
-		// load the bootloader into small memory
-		try (FileInputStream in = new FileInputStream("riscv/resource/bootloader/build/program.bin")) {
-			int index = 0;
-			while (true) {
-				int first = in.read();
-				if (first < 0) {
-					break;
-				}
-				computerModule._memory0.getMatrix().setRow(index, VectorValue.of(8, first));
-				computerModule._memory1.getMatrix().setRow(index, VectorValue.of(8, readByteEofSafe(in)));
-				computerModule._memory2.getMatrix().setRow(index, VectorValue.of(8, readByteEofSafe(in)));
-				computerModule._memory3.getMatrix().setRow(index, VectorValue.of(8, readByteEofSafe(in)));
-				index++;
-			}
-		}
+		cpu = (Multicycle.Implementation)computerModule._cpu;
 
 		// connect reset
 		computerModule.setReset(new RtlBitConstant(realm, false));
@@ -207,6 +197,42 @@ public class SimulationMain {
 		signalLogger.setBusWriteData(loggerInterface.getBusWriteDataSocket());
 		loggerInterface.setBusReadDataSocket(signalLogger.getBusReadData());
 		loggerInterface.setBusAcknowledgeSocket(signalLogger.getBusAcknowledge());
+
+		// Load the bootloader into small RAM. We don't use it as a bootloader, but it contains helper routines.
+		try (FileInputStream in = new FileInputStream("riscv/resource/bootloader/build/program.bin")) {
+			int index = 0;
+			while (true) {
+				int first = in.read();
+				if (first < 0) {
+					break;
+				}
+				computerModule._memory0.getMatrix().setRow(index, VectorValue.of(8, first));
+				computerModule._memory1.getMatrix().setRow(index, VectorValue.of(8, readByteEofSafe(in)));
+				computerModule._memory2.getMatrix().setRow(index, VectorValue.of(8, readByteEofSafe(in)));
+				computerModule._memory3.getMatrix().setRow(index, VectorValue.of(8, readByteEofSafe(in)));
+				index++;
+			}
+		}
+
+		// load the actual program into RAM
+		try (FileInputStream in = new FileInputStream("riscv/resource/gfx-program/build/program.bin")) {
+			SimulatedRam.Implementation ram = ramAdapter.getRam();
+			int index = 0;
+			while (true) {
+				int first = in.read();
+				if (first < 0) {
+					break;
+				}
+				ram._memory0.getMatrix().setRow(PHYSICAL_PAYLOAD_START_ADDRESS + index, VectorValue.of(8, first));
+				ram._memory1.getMatrix().setRow(PHYSICAL_PAYLOAD_START_ADDRESS + index, VectorValue.of(8, readByteEofSafe(in)));
+				ram._memory2.getMatrix().setRow(PHYSICAL_PAYLOAD_START_ADDRESS + index, VectorValue.of(8, readByteEofSafe(in)));
+				ram._memory3.getMatrix().setRow(PHYSICAL_PAYLOAD_START_ADDRESS + index, VectorValue.of(8, readByteEofSafe(in)));
+				index++;
+			}
+		}
+
+		// jump to the program
+		cpu._pc.overrideCurrentValue(VectorValue.of(32, VIRTUAL_PAYLOAD_START_ADDRESS & 0xffffffffL));
 
 		// set debugger breakpoints here to allow clock stepping
 		new RtlClockedSimulationItem(clock) {
