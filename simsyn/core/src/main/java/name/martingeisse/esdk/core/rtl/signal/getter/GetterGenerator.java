@@ -1,5 +1,6 @@
 package name.martingeisse.esdk.core.rtl.signal.getter;
 
+import name.martingeisse.esdk.core.rtl.block.RtlProceduralBitRegister;
 import name.martingeisse.esdk.core.rtl.signal.*;
 import name.martingeisse.esdk.core.rtl.signal.connector.RtlSignalConnector;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
@@ -19,27 +20,31 @@ import java.util.List;
 class GetterGenerator {
 
     private static final String GET_BIT_SIGNATURE = "()Z";
-    private static final String GET_VECTOR_SIGNATURE = "()L" + VectorValue.class.getName().replace('.', '/') + ";";
+    private static final String GET_VECTOR_SIGNATURE = "()L" + internal(VectorValue.class) + ";";
 
     private static int CLASS_COUNTER = 0;
 
     static RtlBitSignalGetter generate(RtlBitSignal signal) {
-        return (RtlBitSignalGetter)generateInternal(RtlBitSignalGetter.class.getName().replace('.', '/'),
+        return (RtlBitSignalGetter)generateInternal(RtlBitSignalGetter.class,
                 GET_BIT_SIGNATURE, signal, Opcodes.IRETURN);
     }
 
     static RtlVectorSignalGetter generate(RtlVectorSignal signal) {
-        return (RtlVectorSignalGetter)generateInternal(RtlVectorSignalGetter.class.getName().replace('.', '/'),
+        return (RtlVectorSignalGetter)generateInternal(RtlVectorSignalGetter.class,
                 GET_VECTOR_SIGNATURE, signal, Opcodes.ARETURN);
     }
 
-    private static Object generateInternal(String superName, String descriptor, RtlSignal signal, int returnOpcode) {
+    private static final String internal(Class<?> c) {
+        return c.getName().replace('.', '/');
+    }
+
+    private static Object generateInternal(Class<?> superClass, String descriptor, RtlSignal signal, int returnOpcode) {
         try {
 
             ClassNode classNode = new ClassNode();
             classNode.version = 52;
             classNode.name = "GeneratedSignalGetter_" + CLASS_COUNTER;
-            classNode.superName = superName;
+            classNode.superName = internal(superClass);
             classNode.access = Opcodes.ACC_PUBLIC;
 
             MethodNode constructorNode = new MethodNode();
@@ -48,8 +53,7 @@ class GetterGenerator {
             constructorNode.access = Opcodes.ACC_PUBLIC;
             constructorNode.visitCode();
             constructorNode.visitVarInsn(Opcodes.ALOAD, 0);
-            constructorNode.visitMethodInsn(Opcodes.INVOKESPECIAL, superName.replace('.', '/'),
-                    "<init>", "()V", false);
+            constructorNode.visitMethodInsn(Opcodes.INVOKESPECIAL, internal(superClass), "<init>", "()V", false);
             constructorNode.visitInsn(Opcodes.RETURN);
             classNode.methods.add(constructorNode);
 
@@ -84,11 +88,18 @@ class GetterGenerator {
     }
 
     void renderSignal(RtlSignal signal) {
-        renderReference(signal);
 
         // handle connectors
         if (signal instanceof RtlSignalConnector) {
             renderSignal(((RtlSignalConnector) signal).getConnected());
+            return;
+        }
+
+        // handle procedural registers (avoiding the interface method call)
+        if (signal instanceof RtlProceduralBitRegister) {
+            renderReference(signal);
+            methodNode.visitMethodInsn(Opcodes.INVOKEVIRTUAL, internal(RtlProceduralBitRegister.class),
+                    "getValue", "()Z", false);
             return;
         }
 
@@ -107,18 +118,20 @@ class GetterGenerator {
         }
 
         // fallback: call .getValue()
+        renderReference(signal);
         if (signal instanceof RtlBitSignal) {
-            methodNode.visitMethodInsn(Opcodes.INVOKEINTERFACE, RtlBitSignal.class.getName().replace('.', '/'),
+            methodNode.visitMethodInsn(Opcodes.INVOKEINTERFACE, internal(RtlBitSignal.class),
                     "getValue", GET_BIT_SIGNATURE, true);
         } else {
-            methodNode.visitMethodInsn(Opcodes.INVOKEINTERFACE, RtlVectorSignal.class.getName().replace('.', '/'),
+            methodNode.visitMethodInsn(Opcodes.INVOKEINTERFACE, internal(RtlVectorSignal.class),
                     "getValue", GET_VECTOR_SIGNATURE, true);
         }
+
     }
 
     void renderReference(Object reference) {
         String name = "reference" + references.size();
-        String descriptor = "Ljava/lang/Object;";
+        String descriptor = "L" + internal(reference.getClass()) + ";";
         classNode.visitField(Opcodes.ACC_PUBLIC, name, descriptor, null, null);
         methodNode.visitVarInsn(Opcodes.ALOAD, 0);
         methodNode.visitFieldInsn(Opcodes.GETFIELD, classNode.name, name, descriptor);
