@@ -1,9 +1,9 @@
 package name.martingeisse.esdk.core.rtl.signal.getter;
 
-import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
-import name.martingeisse.esdk.core.rtl.signal.RtlSignal;
-import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
+import name.martingeisse.esdk.core.rtl.signal.*;
+import name.martingeisse.esdk.core.rtl.signal.connector.RtlSignalConnector;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
+import org.objectweb.asm.Label;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
@@ -85,6 +85,28 @@ class GetterGenerator {
 
     void renderSignal(RtlSignal signal) {
         renderReference(signal);
+
+        // handle connectors
+        if (signal instanceof RtlSignalConnector) {
+            renderSignal(((RtlSignalConnector) signal).getConnected());
+            return;
+        }
+
+        // handle bit operations
+        if (signal instanceof RtlBitNotOperation) {
+            renderSignal(((RtlBitNotOperation) signal).getOperand());
+            Label label1 = new Label();
+            Label label2 = new Label();
+            methodNode.visitJumpInsn(Opcodes.IFNE, label1);
+            methodNode.visitInsn(Opcodes.ICONST_1);
+            methodNode.visitJumpInsn(Opcodes.GOTO, label2);
+            methodNode.visitLabel(label1);
+            methodNode.visitInsn(Opcodes.ICONST_0);
+            methodNode.visitLabel(label2);
+            return;
+        }
+
+        // fallback: call .getValue()
         if (signal instanceof RtlBitSignal) {
             methodNode.visitMethodInsn(Opcodes.INVOKEINTERFACE, RtlBitSignal.class.getName().replace('.', '/'),
                     "getValue", GET_BIT_SIGNATURE, true);
