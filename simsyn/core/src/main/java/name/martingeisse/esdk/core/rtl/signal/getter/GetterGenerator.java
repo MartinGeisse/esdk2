@@ -1,9 +1,11 @@
 package name.martingeisse.esdk.core.rtl.signal.getter;
 
 import name.martingeisse.esdk.core.rtl.block.RtlProceduralBitRegister;
+import name.martingeisse.esdk.core.rtl.block.RtlProceduralMemoryIndexSelection;
 import name.martingeisse.esdk.core.rtl.block.RtlProceduralVectorRegister;
 import name.martingeisse.esdk.core.rtl.signal.*;
 import name.martingeisse.esdk.core.rtl.signal.connector.RtlSignalConnector;
+import name.martingeisse.esdk.core.util.Matrix;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.Opcodes;
@@ -300,6 +302,18 @@ class GetterGenerator {
                 }
             }
             methodNode.visitLabel(finishLabel);
+            return;
+        }
+
+        // memory
+        if (signal instanceof RtlProceduralMemoryIndexSelection) {
+            RtlProceduralMemoryIndexSelection selection = (RtlProceduralMemoryIndexSelection)signal;
+            renderReference(selection.getMemory().getMatrix());
+            renderSignal(selection.getIndexSignal());
+            methodNode.visitMethodInsn(Opcodes.INVOKEVIRTUAL, internal(VectorValue.class), "getAsUnsignedInt",
+                    "()I", false);
+            methodNode.visitMethodInsn(Opcodes.INVOKEVIRTUAL, internal(Matrix.class), "getRow",
+                    "(I)L" + internal(VectorValue.class) + ";", false);
             return;
         }
 
