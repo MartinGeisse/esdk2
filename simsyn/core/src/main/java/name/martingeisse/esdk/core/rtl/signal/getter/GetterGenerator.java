@@ -190,6 +190,27 @@ class GetterGenerator {
                     "(L" + internal(VectorValue.class) + ";)L" + internal(VectorValue.class) + ";", false);
             return;
         }
+        if (signal instanceof RtlShiftOperation) {
+            RtlShiftOperation shift = (RtlShiftOperation)signal;
+            renderSignal(shift.getLeftOperand());
+            renderSignal(shift.getRightOperand());
+            String methodName;
+            switch (shift.getDirection()) {
+                case LEFT:
+                    methodName = "shiftLeft";
+                    break;
+                case RIGHT:
+                    methodName = "shiftRight";
+                    break;
+                default:
+                    throw new RuntimeException("unknown RtlShiftOperation.Direction: " + shift.getDirection());
+            }
+            methodNode.visitMethodInsn(Opcodes.INVOKEVIRTUAL, internal(VectorValue.class), "getAsUnsignedInt",
+                    "()I", false);
+            methodNode.visitMethodInsn(Opcodes.INVOKEVIRTUAL, internal(VectorValue.class), methodName,
+                    "(I)L" + internal(VectorValue.class) + ";", false);
+            return;
+        }
 
         // handle vector comparison
         if (signal instanceof RtlVectorComparison) {
