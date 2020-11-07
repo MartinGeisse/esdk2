@@ -313,6 +313,15 @@ class GetterGenerator {
             methodNode.visitMethodInsn(Opcodes.INVOKEVIRTUAL, internal(VectorValue.class), "select", "(I)Z", false);
             return;
         }
+        if (signal instanceof RtlIndexSelection) {
+            RtlIndexSelection selection = (RtlIndexSelection)signal;
+            renderSignal(selection.getContainerSignal());
+            renderSignal(selection.getIndexSignal());
+            methodNode.visitMethodInsn(Opcodes.INVOKEVIRTUAL, internal(VectorValue.class), "getAsUnsignedInt",
+                    "()I", false);
+            methodNode.visitMethodInsn(Opcodes.INVOKEVIRTUAL, internal(VectorValue.class), "select", "(I)Z", false);
+            return;
+        }
         if (signal instanceof RtlRangeSelection) {
             RtlRangeSelection selection = (RtlRangeSelection)signal;
             renderSignal(selection.getContainerSignal());
