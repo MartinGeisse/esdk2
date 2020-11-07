@@ -1,6 +1,7 @@
 package name.martingeisse.esdk.core.rtl.signal.getter;
 
 import name.martingeisse.esdk.core.rtl.block.RtlProceduralBitRegister;
+import name.martingeisse.esdk.core.rtl.block.RtlProceduralVectorRegister;
 import name.martingeisse.esdk.core.rtl.signal.*;
 import name.martingeisse.esdk.core.rtl.signal.connector.RtlSignalConnector;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
@@ -99,21 +100,59 @@ class GetterGenerator {
         if (signal instanceof RtlProceduralBitRegister) {
             renderReference(signal);
             methodNode.visitMethodInsn(Opcodes.INVOKEVIRTUAL, internal(RtlProceduralBitRegister.class),
-                    "getValue", "()Z", false);
+                    "getValue", GET_BIT_SIGNATURE, false);
+            return;
+        }
+        if (signal instanceof RtlProceduralVectorRegister) {
+            renderReference(signal);
+            methodNode.visitMethodInsn(Opcodes.INVOKEVIRTUAL, internal(RtlProceduralVectorRegister.class),
+                    "getValue", GET_VECTOR_SIGNATURE, false);
             return;
         }
 
         // handle bit operations
         if (signal instanceof RtlBitNotOperation) {
             renderSignal(((RtlBitNotOperation) signal).getOperand());
-            Label label1 = new Label();
-            Label label2 = new Label();
-            methodNode.visitJumpInsn(Opcodes.IFNE, label1);
-            methodNode.visitInsn(Opcodes.ICONST_1);
-            methodNode.visitJumpInsn(Opcodes.GOTO, label2);
-            methodNode.visitLabel(label1);
-            methodNode.visitInsn(Opcodes.ICONST_0);
-            methodNode.visitLabel(label2);
+            renderBitSwitch(() -> methodNode.visitInsn(Opcodes.ICONST_1), () -> methodNode.visitInsn(Opcodes.ICONST_0));
+            return;
+        }
+        if (signal instanceof RtlBitOperation) {
+            RtlBitOperation operation = (RtlBitOperation)signal;
+            renderSignal(operation.getLeftOperand());
+            switch (operation.getOperator()) {
+
+                case AND:
+                    renderBitSwitch(() -> methodNode.visitInsn(Opcodes.ICONST_0),
+                            () -> renderSignal(operation.getRightOperand()));
+                    break;
+
+                case OR:
+                    renderBitSwitch(() -> renderSignal(operation.getRightOperand()),
+                            () -> methodNode.visitInsn(Opcodes.ICONST_1));
+                    break;
+
+                case XOR:
+                    renderSignal(operation.getRightOperand());
+                    renderIfTrue(this::renderNot);
+                    break;
+
+                case XNOR:
+                    renderSignal(operation.getRightOperand());
+                    renderIfFalse(this::renderNot);
+                    break;
+
+                default:
+                    throw new RuntimeException("unknown RtlBitOperation.Operator: " + operation.getOperator());
+
+            }
+            return;
+        }
+
+        // handle conditional operations
+        if (signal instanceof RtlConditionalOperation) {
+            RtlConditionalOperation conditional = (RtlConditionalOperation)signal;
+            renderSignal(conditional.getCondition());
+            renderBitSwitch(() -> renderSignal(conditional.getOnFalse()), () -> renderSignal(conditional.getOnTrue()));
             return;
         }
 
@@ -136,6 +175,38 @@ class GetterGenerator {
         methodNode.visitVarInsn(Opcodes.ALOAD, 0);
         methodNode.visitFieldInsn(Opcodes.GETFIELD, classNode.name, name, descriptor);
         references.add(reference);
+    }
+
+    // computes the logical NOT of the top-of-stack
+    void renderNot() {
+        renderBitSwitch(() -> methodNode.visitInsn(Opcodes.ICONST_1), () -> methodNode.visitInsn(Opcodes.ICONST_0));
+    }
+
+    void renderBitSwitch(Runnable falseCase, Runnable trueCase) {
+        Label label1 = new Label();
+        Label label2 = new Label();
+        methodNode.visitJumpInsn(Opcodes.IFNE, label1);
+        falseCase.run();
+        methodNode.visitJumpInsn(Opcodes.GOTO, label2);
+        methodNode.visitLabel(label1);
+        trueCase.run();
+        methodNode.visitLabel(label2);
+    }
+
+    // pops the top-of-stack and executes a piece of code if it is true
+    void renderIfTrue(Runnable trueCase) {
+        Label label = new Label();
+        methodNode.visitJumpInsn(Opcodes.IFEQ, label);
+        trueCase.run();
+        methodNode.visitLabel(label);
+    }
+
+    // pops the top-of-stack and executes a piece of code if it is false
+    void renderIfFalse(Runnable falseCase) {
+        Label label = new Label();
+        methodNode.visitJumpInsn(Opcodes.IFNE, label);
+        falseCase.run();
+        methodNode.visitLabel(label);
     }
 
     void initializeFields(Object instance) throws Exception {
