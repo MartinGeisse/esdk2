@@ -305,7 +305,23 @@ class GetterGenerator {
             return;
         }
 
-        // memory
+        // selections (bit from vector, vector from vector, vector from matrix)
+        if (signal instanceof RtlConstantIndexSelection) {
+            RtlConstantIndexSelection selection = (RtlConstantIndexSelection)signal;
+            renderSignal(selection.getContainerSignal());
+            push(selection.getIndex());
+            methodNode.visitMethodInsn(Opcodes.INVOKEVIRTUAL, internal(VectorValue.class), "select", "(I)Z", false);
+            return;
+        }
+        if (signal instanceof RtlRangeSelection) {
+            RtlRangeSelection selection = (RtlRangeSelection)signal;
+            renderSignal(selection.getContainerSignal());
+            push(selection.getFrom());
+            push(selection.getTo());
+            methodNode.visitMethodInsn(Opcodes.INVOKEVIRTUAL, internal(VectorValue.class), "select",
+                    "(II)L" + internal(VectorValue.class) + ";", false);
+            return;
+        }
         if (signal instanceof RtlProceduralMemoryIndexSelection) {
             RtlProceduralMemoryIndexSelection selection = (RtlProceduralMemoryIndexSelection)signal;
             renderReference(selection.getMemory().getMatrix());
@@ -377,6 +393,49 @@ class GetterGenerator {
         methodNode.visitJumpInsn(Opcodes.IFNE, label);
         falseCase.run();
         methodNode.visitLabel(label);
+    }
+
+    void push(int value) {
+        switch (value) {
+
+            case -1:
+                methodNode.visitInsn(Opcodes.ICONST_M1);
+                return;
+
+            case 0:
+                methodNode.visitInsn(Opcodes.ICONST_0);
+                return;
+
+            case 1:
+                methodNode.visitInsn(Opcodes.ICONST_1);
+                return;
+
+            case 2:
+                methodNode.visitInsn(Opcodes.ICONST_2);
+                return;
+
+            case 3:
+                methodNode.visitInsn(Opcodes.ICONST_3);
+                return;
+
+            case 4:
+                methodNode.visitInsn(Opcodes.ICONST_4);
+                return;
+
+            case 5:
+                methodNode.visitInsn(Opcodes.ICONST_5);
+                return;
+
+        }
+        if (value == (byte)value) {
+            methodNode.visitIntInsn(Opcodes.BIPUSH, value);
+            return;
+        }
+        if (value == (short)value) {
+            methodNode.visitIntInsn(Opcodes.SIPUSH, value);
+            return;
+        }
+        methodNode.visitLdcInsn(value);
     }
 
     void initializeFields(Object instance) throws Exception {
