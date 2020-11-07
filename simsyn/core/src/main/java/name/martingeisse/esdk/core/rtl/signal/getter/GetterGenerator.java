@@ -250,6 +250,59 @@ class GetterGenerator {
             return;
         }
 
+        // handle switch/case signals
+        if (signal instanceof RtlSwitchSignal<?>) {
+            RtlSwitchSignal<?> switchSignal = (RtlSwitchSignal<?>)signal;
+
+            // labels
+            Label[] caseMatchedLabels = new Label[switchSignal.getCases().size()];
+            for (int i = 0; i < caseMatchedLabels.length; i++) {
+                caseMatchedLabels[i] = new Label();
+            }
+            Label finishLabel = new Label();
+
+            // branching
+            {
+                renderSignal(switchSignal.getSelector());
+                int caseIndex = 0;
+                for (RtlSwitchSignal.Case<?> aCase : switchSignal.getCases()) {
+                    for (VectorValue selectorValue : aCase.getSelectorValues()) {
+                        methodNode.visitInsn(Opcodes.DUP);
+                        renderReference(selectorValue);
+                        methodNode.visitMethodInsn(Opcodes.INVOKEVIRTUAL, internal(VectorValue.class), "equals",
+                                "(Ljava/lang/Object;)Z", false);
+                        methodNode.visitJumpInsn(Opcodes.IFNE, caseMatchedLabels[caseIndex]);
+                    }
+                    caseIndex++;
+                }
+                methodNode.visitInsn(Opcodes.POP);
+                if (switchSignal.getDefaultSignal() == null) {
+                    methodNode.visitTypeInsn(Opcodes.NEW, internal(RuntimeException.class));
+                    methodNode.visitInsn(Opcodes.DUP);
+                    methodNode.visitMethodInsn(Opcodes.INVOKESPECIAL, internal(RuntimeException.class), "<init>",
+                            "()V", false);
+                    methodNode.visitInsn(Opcodes.ATHROW);
+                } else {
+                    renderSignal(switchSignal.getDefaultSignal());
+                    methodNode.visitJumpInsn(Opcodes.GOTO, finishLabel);
+                }
+            }
+
+            // results
+            {
+                int caseIndex = 0;
+                for (RtlSwitchSignal.Case<?> aCase : switchSignal.getCases()) {
+                    methodNode.visitLabel(caseMatchedLabels[caseIndex]);
+                    methodNode.visitInsn(Opcodes.POP);
+                    renderSignal(aCase.getBranch());
+                    methodNode.visitJumpInsn(Opcodes.GOTO, finishLabel);
+                    caseIndex++;
+                }
+            }
+            methodNode.visitLabel(finishLabel);
+            return;
+        }
+
         // fallback: call .getValue()
         renderReference(signal);
         if (signal instanceof RtlBitSignal) {
