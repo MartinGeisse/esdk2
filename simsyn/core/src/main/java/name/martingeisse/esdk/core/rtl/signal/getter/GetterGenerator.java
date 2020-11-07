@@ -148,11 +148,105 @@ class GetterGenerator {
             return;
         }
 
+        // handle vector operations
+        if (signal instanceof RtlVectorOperation) {
+            RtlVectorOperation operation = (RtlVectorOperation)signal;
+            renderSignal(operation.getLeftOperand());
+            renderSignal(operation.getRightOperand());
+            String operationMethodName;
+            switch (operation.getOperator()) {
+
+                case ADD:
+                    operationMethodName = "add";
+                    break;
+
+                case SUBTRACT:
+                    operationMethodName = "subtract";
+                    break;
+
+                case MULTIPLY:
+                    operationMethodName = "multiply";
+                    break;
+
+                case AND:
+                    operationMethodName = "and";
+                    break;
+
+                case OR:
+                    operationMethodName = "or";
+                    break;
+
+                case XOR:
+                    operationMethodName = "xor";
+                    break;
+
+                default:
+                    throw new RuntimeException("unknown RtlVectorOperation.Operator: " + operation.getOperator());
+
+            }
+            methodNode.visitMethodInsn(Opcodes.INVOKEVIRTUAL, internal(VectorValue.class), operationMethodName,
+                    "(L" + internal(VectorValue.class) + ";)L" + internal(VectorValue.class) + ";", false);
+            return;
+        }
+
+        // handle vector comparison
+        if (signal instanceof RtlVectorComparison) {
+            RtlVectorComparison comparison = (RtlVectorComparison)signal;
+            renderSignal(comparison.getLeftOperand());
+            renderSignal(comparison.getRightOperand());
+            RtlVectorComparison.Operator operator = comparison.getOperator();
+            if (operator == RtlVectorComparison.Operator.EQUAL || operator == RtlVectorComparison.Operator.NOT_EQUAL) {
+                methodNode.visitMethodInsn(Opcodes.INVOKEVIRTUAL, internal(VectorValue.class), "equals",
+                        "(Ljava/lang/Object;)Z", false);
+                if (operator == RtlVectorComparison.Operator.NOT_EQUAL) {
+                    renderNot();
+                }
+            } else {
+                methodNode.visitMethodInsn(Opcodes.INVOKEVIRTUAL, internal(VectorValue.class), "compareUnsigned",
+                        "(L" + internal(VectorValue.class) + ";)I", false);
+                switch (operator) {
+                    case UNSIGNED_LESS_THAN:
+                        renderBitSwitchToBoolean(Opcodes.IFLT);
+                        break;
+                    case UNSIGNED_LESS_THAN_OR_EQUAL:
+                        renderBitSwitchToBoolean(Opcodes.IFLE);
+                        break;
+                    case UNSIGNED_GREATER_THAN:
+                        renderBitSwitchToBoolean(Opcodes.IFGT);
+                        break;
+                    case UNSIGNED_GREATER_THAN_OR_EQUAL:
+                        renderBitSwitchToBoolean(Opcodes.IFGE);
+                        break;
+                    default:
+                        throw new RuntimeException("unknown RtlVectorComparison.Operator: " + comparison.getOperator());
+                }
+            }
+            return;
+        }
+
         // handle conditional operations
         if (signal instanceof RtlConditionalOperation) {
             RtlConditionalOperation conditional = (RtlConditionalOperation)signal;
             renderSignal(conditional.getCondition());
             renderBitSwitch(() -> renderSignal(conditional.getOnFalse()), () -> renderSignal(conditional.getOnTrue()));
+            return;
+        }
+
+        // handle concatenation
+        if (signal instanceof RtlConcatenation) {
+            renderReference(VectorValue.of(0, 0));
+            for (RtlSignal elementSignal : ((RtlConcatenation) signal).getSignals()) {
+                renderSignal(elementSignal);
+                if (elementSignal instanceof RtlBitSignal) {
+                    methodNode.visitMethodInsn(Opcodes.INVOKEVIRTUAL, internal(VectorValue.class), "concat",
+                            "(Z)L" + internal(VectorValue.class) + ";", false);
+                } else if (elementSignal instanceof RtlVectorSignal) {
+                    methodNode.visitMethodInsn(Opcodes.INVOKEVIRTUAL, internal(VectorValue.class), "concat",
+                            "(L" + internal(VectorValue.class) + ";)L" + internal(VectorValue.class) + ";", false);
+                } else {
+                    throw new RuntimeException("invalid signal: " + elementSignal);
+                }
+            }
             return;
         }
 
@@ -182,15 +276,24 @@ class GetterGenerator {
         renderBitSwitch(() -> methodNode.visitInsn(Opcodes.ICONST_1), () -> methodNode.visitInsn(Opcodes.ICONST_0));
     }
 
-    void renderBitSwitch(Runnable falseCase, Runnable trueCase) {
+    void renderBitSwitch(int branchingOpcode, Runnable falseCase, Runnable trueCase) {
         Label label1 = new Label();
         Label label2 = new Label();
-        methodNode.visitJumpInsn(Opcodes.IFNE, label1);
+        methodNode.visitJumpInsn(branchingOpcode, label1);
         falseCase.run();
         methodNode.visitJumpInsn(Opcodes.GOTO, label2);
         methodNode.visitLabel(label1);
         trueCase.run();
         methodNode.visitLabel(label2);
+    }
+
+    void renderBitSwitch(Runnable falseCase, Runnable trueCase) {
+        renderBitSwitch(Opcodes.IFNE, falseCase, trueCase);
+    }
+
+    void renderBitSwitchToBoolean(int branchingOpcode) {
+        renderBitSwitch(branchingOpcode, () -> methodNode.visitInsn(Opcodes.ICONST_0),
+                () -> methodNode.visitInsn(Opcodes.ICONST_1));
     }
 
     // pops the top-of-stack and executes a piece of code if it is true
