@@ -53,6 +53,7 @@ $paths = array(
     'src/profiling.c' => 'build/profiling.o',
     'src/netboot.c' => 'build/netboot.o',
     'src/chargen.c' => 'build/chargen.o',
+    'src/simdev.c' => 'build/simdev.o',
 );
 foreach ($paths as $inputPath => $outputPath) {
     buildFile($inputPath, $outputPath);
