@@ -1,7 +1,7 @@
 
 #include "simdev.h"
 
-static volatile int *simulationDevice = (volatile int *)0xff000000;
+static volatile int *simulationDevice = (volatile int *)0xfe000000;
 
 int simdevIsSimulation() {
     return *simulationDevice;
