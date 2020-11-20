@@ -39,7 +39,7 @@ public final class GameSystem implements IoUnit {
                 int wordAddress = address >>> 2;
                 int byteOffset = address & 3;
                 int bitOffset = byteOffset * 8;
-                write(wordAddress, dataByte << bitOffset, 0xff << bitOffset);
+                write(wordAddress, dataByte << bitOffset, 1 << byteOffset);
                 address++;
             }
         }
