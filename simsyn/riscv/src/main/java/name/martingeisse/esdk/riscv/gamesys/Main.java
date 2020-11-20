@@ -10,6 +10,7 @@ public class Main {
 
         GameSystem gameSystem = new GameSystem();
         gameSystem.loadImage(new File("riscv/resource/gamesys/build/program.bin"), 0);
+        gameSystem.memoryMapFile = new File("riscv/resource/gamesys/build/program.map");
 
         DisplayPanel displayPanel = new DisplayPanel(gameSystem.ram);
         JFrame frame = new JFrame("Graphics Display");
