@@ -30,9 +30,9 @@ public class DisplayPanel extends JPanel {
 
     @Override
     protected void paintComponent(Graphics g) {
-        int planeBaseAddress = (displayPlane == 0 ? Constants.FRAMEBUFFER_0_ADDRESS : Constants.FRAMEBUFFER_1_ADDRESS) >> 2;
+        int planeBaseWordAddress = (displayPlane == 0 ? Constants.FRAMEBUFFER_0_WORD_ADDRESS : Constants.FRAMEBUFFER_1_WORD_ADDRESS);
         for (int y = 0; y < 480; y++) {
-            int baseWordAddress = planeBaseAddress + y * 256;
+            int baseWordAddress = planeBaseWordAddress + y * 256;
             int basePixelIndex = y * 640;
             for (int x = 0; x < 640; x += 4) {
                 int wordAddress = baseWordAddress + (x >> 2);

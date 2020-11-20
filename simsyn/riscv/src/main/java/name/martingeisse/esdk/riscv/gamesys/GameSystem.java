@@ -18,9 +18,9 @@ public final class GameSystem implements IoUnit {
         cpu = new Cpu();
         cpu.setMultiplyDivideUnit(new HardwareMultiplyDivideUnit(cpu));
         cpu.setIoUnit(this);
-        ram = new int[Constants.RAM_SIZE >> 2];
-        fastRam = new int[512]; // single BlockRAM: 2kB == 512k words
-        fastRom = new int[512]; // single BlockRAM: 2kB == 512k words
+        ram = new int[Constants.RAM_SIZE_WORDS];
+        fastRam = new int[Constants.FAST_RAM_SIZE_WORDS];
+        fastRom = new int[Constants.FAST_ROM_SIZE_WORDS];
     }
 
     public void run() {
@@ -53,16 +53,49 @@ public final class GameSystem implements IoUnit {
 
     @Override
     public int read(int wordAddress) {
-        return (wordAddress < ram.length ? ram[wordAddress] : 0);
+
+        // normal RAM, including framebuffer
+        if (wordAddress >= 0 && wordAddress < ram.length) {
+            return ram[wordAddress];
+        }
+
+        // fast RAM and ROM
+        if (wordAddress >= Constants.FAST_ROM_WORD_ADDRESS) {
+            return fastRom[wordAddress - Constants.FAST_ROM_WORD_ADDRESS];
+        }
+        if (wordAddress >= Constants.FAST_RAM_WORD_ADDRESS) {
+            return fastRam[wordAddress - Constants.FAST_RAM_WORD_ADDRESS];
+        }
+
+        // detect errors early
+        throw new RuntimeException("unexpected read access to word address " + Integer.toHexString(wordAddress) +
+                ", byte address " + Integer.toHexString(4 * wordAddress));
+
     }
 
     @Override
     public void write(int wordAddress, int data, int byteMask) {
-        if (wordAddress >= ram.length) {
+
+        // normal RAM, including framebuffer
+        if (wordAddress >= 0 && wordAddress < ram.length) {
+            write(ram, wordAddress, data, byteMask);
             return;
         }
-        if (byteMask == 15) {
-            // optimization
+
+        // fast RAM
+        if (wordAddress >= Constants.FAST_RAM_WORD_ADDRESS && wordAddress < Constants.FAST_ROM_WORD_ADDRESS) {
+            write(fastRam, wordAddress - Constants.FAST_RAM_WORD_ADDRESS, data, byteMask);
+            return;
+        }
+
+        // detect errors early
+        throw new RuntimeException("unexpected write access to word address " + Integer.toHexString(wordAddress) +
+                ", byte address " + Integer.toHexString(4 * wordAddress));
+
+    }
+
+    private static void write(int[] ram, int wordAddress, int data, int byteMask) {
+        if (byteMask == 15) { // optimization
             ram[wordAddress] = data;
             return;
         }
