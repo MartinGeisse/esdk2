@@ -1,15 +1,16 @@
 
 #include "divrem.h"
+#include "simdev.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // low-level helpers
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#define DISPLAY_CONTROL_BASE_ADDRESS 0x05000000
+#define DISPLAY_CONTROL_BASE_ADDRESS 0x85000000
 #define PLANE0_BASE_ADDRESS 0x00f00000
 
 #define RAM_AGENT_COMMAND_ENGINE_ADDRESS_BIT 0x40000000
-#define RAM_AGENT_COMMAND_ENGINE_BASE_ADDRESS 0xc0000000
+#define RAM_AGENT_COMMAND_ENGINE_BASE_ADDRESS 0x40000000
 #define RAM_AGENT_COMMAND_ENGINE_SPAN_LENGTH_REGISTER_ADDRESS RAM_AGENT_COMMAND_ENGINE_BASE_ADDRESS
 #define RAM_AGENT_COMMAND_ENGINE_COMMAND_CODE_WRITE_SPAN 0x04000000
 #define RAM_AGENT_COMMAND_ENGINE_WRITE_SPAN_BASE_ADDRESS RAM_AGENT_COMMAND_ENGINE_BASE_ADDRESS
@@ -40,10 +41,17 @@ void clearScreen(unsigned char color) {
     int fourPixels = color | (color << 8) | (color << 16) | (color << 24);
     int *rowPointer = (int*)drawPlane;
     int *screenEnd = rowPointer + 256 * 480;
-    *(int *)RAM_AGENT_COMMAND_ENGINE_SPAN_LENGTH_REGISTER_ADDRESS = 160;
-    while (rowPointer < screenEnd) {
-        *(int*)(((int)rowPointer) | RAM_AGENT_COMMAND_ENGINE_ADDRESS_BIT | RAM_AGENT_COMMAND_ENGINE_COMMAND_CODE_WRITE_SPAN) = fourPixels;
-        rowPointer += 256;
+    if (simdevIsSimulation()) {
+        while (rowPointer < screenEnd) {
+            simdevFillWordsShowInt(rowPointer, fourPixels, 160);
+            rowPointer += 256;
+        }
+    } else {
+        *(int *)RAM_AGENT_COMMAND_ENGINE_SPAN_LENGTH_REGISTER_ADDRESS = 160;
+        while (rowPointer < screenEnd) {
+            *(int*)(((int)rowPointer) | RAM_AGENT_COMMAND_ENGINE_ADDRESS_BIT | RAM_AGENT_COMMAND_ENGINE_COMMAND_CODE_WRITE_SPAN) = fourPixels;
+            rowPointer += 256;
+        }
     }
 }
 
