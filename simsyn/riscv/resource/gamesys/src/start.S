@@ -11,10 +11,10 @@ textSection:
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 .globl payloadStartAddress
-.set payloadStartAddress, 0x80200000
-.set keyStateTable, (0x00004000 - 32)
-.set scanCodeBuffer, (0x00004000 - 64)
-.set keyboardController, 0x01000000
+.set payloadStartAddress, 0x04000000 // dummy for now
+.set keyStateTable, 0xfffff000
+.set scanCodeBuffer, 0xfffff020
+.set keyboardController, 0x81000000
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // entry points
@@ -76,8 +76,8 @@ start:
     la gp, __global_pointer$
     .option pop
 
-    // initialize the SP register to start below the scan code buffer
-    li sp, scanCodeBuffer
+    // initialize the SP register to start below the frame buffer
+    li sp, 15 * 1024 * 1024
 
     // clear keyboard states, receive logic, scan code buffer
     li t1, keyStateTable
