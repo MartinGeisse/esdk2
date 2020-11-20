@@ -15,7 +15,7 @@ import name.martingeisse.esdk.riscv.instruction.io.IoUnit;
  * This implementation is little-endian only, which in a word-based addressing scheme means: For an aligned 4-byte block
  * (i.e. one addressing word), accessing the lowest byte accesses the 8 bits with lowest significance in the 32-bit value.
  */
-public abstract class InstructionLevelRiscv {
+public class InstructionLevelRiscv {
 
 	private static final int WORD_ADDRESS_MASK = 0x3fff_ffff;
 
@@ -34,49 +34,50 @@ public abstract class InstructionLevelRiscv {
 		setFloatingPointUnit(null);
 		setExtendedInstructionUnit(null);
 		setSupportsMisalignedIo(false);
+		reset();
 	}
 
 	// ----------------------------------------------------------------------------------------------------------------
 	// configuration
 	// ----------------------------------------------------------------------------------------------------------------
 
-	public IoUnit getIoUnit() {
+	public final IoUnit getIoUnit() {
 		return ioUnit;
 	}
 
-	public void setIoUnit(IoUnit ioUnit) {
+	public final void setIoUnit(IoUnit ioUnit) {
 		this.ioUnit = (ioUnit == null ? BrokenIoUnit.INSTANCE : ioUnit);
 	}
 
-	public MultiplyDivideUnit getMultiplyDivideUnit() {
+	public final MultiplyDivideUnit getMultiplyDivideUnit() {
 		return multiplyDivideUnit;
 	}
 
-	public void setMultiplyDivideUnit(MultiplyDivideUnit multiplyDivideUnit) {
+	public final void setMultiplyDivideUnit(MultiplyDivideUnit multiplyDivideUnit) {
 		this.multiplyDivideUnit = (multiplyDivideUnit == null ? new ExceptionMultiplyDivideUnit(this) : multiplyDivideUnit);
 	}
 
-	public FloatingPointUnit getFloatingPointUnit() {
+	public final FloatingPointUnit getFloatingPointUnit() {
 		return floatingPointUnit;
 	}
 
-	public void setFloatingPointUnit(FloatingPointUnit floatingPointUnit) {
+	public final void setFloatingPointUnit(FloatingPointUnit floatingPointUnit) {
 		this.floatingPointUnit = (floatingPointUnit == null ? new ExceptionFloatingPointUnit(this) : floatingPointUnit);
 	}
 
-	public ExtendedInstructionUnit getExtendedInstructionUnit() {
+	public final ExtendedInstructionUnit getExtendedInstructionUnit() {
 		return extendedInstructionUnit;
 	}
 
-	public void setExtendedInstructionUnit(ExtendedInstructionUnit extendedInstructionUnit) {
+	public final void setExtendedInstructionUnit(ExtendedInstructionUnit extendedInstructionUnit) {
 		this.extendedInstructionUnit = (extendedInstructionUnit == null ? new ExceptionExtendedInstructionUnit(this) : extendedInstructionUnit);
 	}
 
-	public boolean isSupportsMisalignedIo() {
+	public final boolean isSupportsMisalignedIo() {
 		return supportsMisalignedIo;
 	}
 
-	public void setSupportsMisalignedIo(boolean supportsMisalignedIo) {
+	public final void setSupportsMisalignedIo(boolean supportsMisalignedIo) {
 		this.supportsMisalignedIo = supportsMisalignedIo;
 	}
 
