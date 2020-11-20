@@ -1,10 +1,15 @@
 package name.martingeisse.esdk.riscv.gamesys;
 
+import name.martingeisse.esdk.core.rtl.block.RtlProceduralMemory;
+import name.martingeisse.esdk.core.util.vector.VectorValue;
 import name.martingeisse.esdk.riscv.instruction.io.IoUnit;
 import name.martingeisse.esdk.riscv.instruction.muldiv.HardwareMultiplyDivideUnit;
+import name.martingeisse.esdk.riscv.rtl.Multicycle;
+import name.martingeisse.esdk.riscv.rtl.ram.SimulatedRam;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 public final class GameSystem implements IoUnit {
 
@@ -13,6 +18,7 @@ public final class GameSystem implements IoUnit {
     public final int[] fastRam;
     public final int[] fastRom;
     public File memoryMapFile;
+    private boolean simulationStopped;
 
     public GameSystem() {
         cpu = new Cpu();
@@ -25,7 +31,7 @@ public final class GameSystem implements IoUnit {
 
     public void run() {
         try {
-            while (true) {
+            while (!simulationStopped) {
                 cpu.step();
             }
         } catch (Exception e) {
@@ -122,12 +128,26 @@ public final class GameSystem implements IoUnit {
             return ram[wordAddress];
         }
 
-        // fast RAM and ROM
-        if (wordAddress >= Constants.FAST_ROM_WORD_ADDRESS) {
-            return fastRom[wordAddress - Constants.FAST_ROM_WORD_ADDRESS];
-        }
-        if (wordAddress >= Constants.FAST_RAM_WORD_ADDRESS) {
-            return fastRam[wordAddress - Constants.FAST_RAM_WORD_ADDRESS];
+        // switch by device
+        int deviceId = (wordAddress >> 22) & 127;
+        int localWordAddress = wordAddress & 0x3f_ffff;
+        switch (deviceId) {
+
+            case 126:
+                if (localWordAddress == 0) {
+                    return 1;
+                }
+                break;
+
+            case 127:
+                if (wordAddress >= Constants.FAST_ROM_WORD_ADDRESS) {
+                    return fastRom[wordAddress - Constants.FAST_ROM_WORD_ADDRESS];
+                }
+                if (wordAddress >= Constants.FAST_RAM_WORD_ADDRESS) {
+                    return fastRam[wordAddress - Constants.FAST_RAM_WORD_ADDRESS];
+                }
+                break;
+
         }
 
         // detect errors early
@@ -145,10 +165,41 @@ public final class GameSystem implements IoUnit {
             return;
         }
 
-        // fast RAM
-        if (wordAddress >= Constants.FAST_RAM_WORD_ADDRESS && wordAddress < Constants.FAST_ROM_WORD_ADDRESS) {
-            write(fastRam, wordAddress - Constants.FAST_RAM_WORD_ADDRESS, data, byteMask);
-            return;
+        // switch by device
+        int deviceId = (wordAddress >> 22) & 127;
+        int localWordAddress = wordAddress & 0x3f_ffff;
+        switch (deviceId) {
+
+            case 126:
+                switch (localWordAddress) {
+
+                    case 0:
+                        simulationStopped = true;
+                        return;
+
+                    case 1:
+                        debugPrint(data);
+                        return;
+
+                    case 2:
+                        memoryHelper(data);
+                        return;
+
+                    case 3:
+                        System.out.println("displayPanel.setDisplayPlane(data & 1);");
+                        return;
+
+                }
+                break;
+
+            case 127:
+                // fast RAM
+                if (wordAddress >= Constants.FAST_RAM_WORD_ADDRESS && wordAddress < Constants.FAST_ROM_WORD_ADDRESS) {
+                    write(fastRam, wordAddress - Constants.FAST_RAM_WORD_ADDRESS, data, byteMask);
+                    return;
+                }
+                break;
+
         }
 
         // detect errors early
@@ -157,7 +208,7 @@ public final class GameSystem implements IoUnit {
 
     }
 
-    private static void write(int[] ram, int wordAddress, int data, int byteMask) {
+    private void write(int[] ram, int wordAddress, int data, int byteMask) {
         if (byteMask == 15) { // optimization
             ram[wordAddress] = data;
             return;
@@ -174,6 +225,77 @@ public final class GameSystem implements IoUnit {
         if ((byteMask & 8) != 0) {
             ram[wordAddress] = (ram[wordAddress] & 0x00ffffff) | (data & 0xff000000);
         }
+    }
+
+    private void debugPrint(int subcode) {
+        System.out.print("OUT:        ");
+        int a0 = cpu.getRegister(10);
+        int a1 = cpu.getRegister(11);
+        switch (subcode) {
+
+            case 0:
+                System.out.println(readZeroTerminatedMemoryString(a0));
+                break;
+
+            case 1: {
+                System.out.println(readZeroTerminatedMemoryString(a0) + ": " + a1 + " (0x" + Integer.toHexString(a1) + ")");
+                break;
+            }
+
+            default:
+                throw new RuntimeException("invalid debugPrint subcode");
+        }
+    }
+
+    private void memoryHelper(int subcode) {
+        int a0 = cpu.getRegister(10);
+        int a1 = cpu.getRegister(11);
+        int a2 = cpu.getRegister(12);
+        switch (subcode) {
+
+            // fill words
+            case 0: {
+                int wordAddress = (a0 >> 2);
+                if (wordAddress < 0 || a2 < 0 || wordAddress + a2 >= ram.length) {
+                    throw new RuntimeException("invalid parameters for memory helper (fill words): address = " +
+                            Integer.toHexString(a0) + ", word value = " + Integer.toHexString(a1) + ", count = " + a2);
+                }
+                Arrays.fill(ram, wordAddress, wordAddress + a2, a1);
+                break;
+            }
+
+            default:
+                throw new RuntimeException("invalid memoryHelper subcode: " + subcode);
+        }
+    }
+
+    public byte readByte(int address) {
+        return (byte)(read(address >> 2) >> ((address & 3) * 8));
+    }
+
+    public byte[] readMemoryBytes(int startAddress, int count) {
+        byte[] result = new byte[count];
+        for (int i = 0; i < count; i++) {
+            result[i] = readByte(startAddress + i);
+        }
+        return result;
+    }
+
+    public String readMemoryString(int startAddress, int count) {
+        return new String(readMemoryBytes(startAddress, count), StandardCharsets.ISO_8859_1);
+    }
+
+    public String readZeroTerminatedMemoryString(int startAddress) {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        while (true) {
+            byte b = readByte(startAddress);
+            if (b == 0) {
+                break;
+            }
+            stream.write(b);
+            startAddress++;
+        }
+        return new String(stream.toByteArray(), StandardCharsets.ISO_8859_1);
     }
 
 }
