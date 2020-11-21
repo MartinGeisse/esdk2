@@ -12,7 +12,7 @@ public class Main {
         gameSystem.loadImage(new File("riscv/resource/gamesys/build/program.bin"), 0);
         gameSystem.memoryMapFile = new File("riscv/resource/gamesys/build/program.map");
 
-        DisplayPanel displayPanel = new DisplayPanel(gameSystem.ram);
+        DisplayPanel displayPanel = new DisplayPanel(gameSystem.peripherals.ram);
         JFrame frame = new JFrame("Graphics Display");
         frame.add(displayPanel);
         frame.pack();
