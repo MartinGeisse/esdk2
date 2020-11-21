@@ -30,6 +30,9 @@ public final class Peripherals {
         int localWordAddress = wordAddress & 0x3f_ffff;
         switch (deviceId) {
 
+            case 7:
+                return (int)(System.nanoTime() >> 10);
+
             case 126:
                 return simdevHelper.read(localWordAddress);
 

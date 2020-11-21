@@ -100,9 +100,10 @@ start:
     // li a0, 500
     // call delay
 
-    // invoke bootloader
-    call netboot
-    tail payloadStartAddress
+    // invoke the main method
+    call main
+hang:
+    j hang
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // interrupts
