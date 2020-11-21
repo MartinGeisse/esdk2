@@ -54,6 +54,9 @@ $paths = array(
     'src/main.c' => 'build/main.o',
     'src/chargen.c' => 'build/chargen.o',
     'src/simdev.c' => 'build/simdev.o',
+    'src/random.c' => 'build/random.o',
+
+    'src/sierpinsky/sierpinsky.c' => 'build/sierpinsky.o',
 );
 foreach ($paths as $inputPath => $outputPath) {
     buildFile($inputPath, $outputPath);
