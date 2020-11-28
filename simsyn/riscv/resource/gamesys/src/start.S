@@ -20,6 +20,7 @@ textSection:
 // entry points
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+.globl entryPoint // not actually used (the entry point is fixed by the hardware), but LD complains without this
 entryPoint:
     j start
     j interruptEntry
@@ -101,7 +102,7 @@ start:
     // call delay
 
     // invoke the main method
-    call main
+    call kernelMain
 hang:
     j hang
 

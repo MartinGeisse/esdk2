@@ -1,7 +1,8 @@
 #!/usr/bin/env php
 <?php
 
-define('TOOL', '~/riscv-toolchain/bin/riscv32-unknown-linux-gnu-');
+define('TOOL', '~/riscv-toolchain/bin/riscv32-unknown-elf-');
+define('LIBC_FOLDER', '~/git-repos/riscv-gnu-toolchain/build-newlib/riscv32-unknown-elf/newlib');
 
 $objectFiles = array();
 
@@ -31,7 +32,9 @@ function buildFile($inputPath, $outputPath) {
 function linkFiles() {
     global $objectFiles;
     $objectFilesList = implode(' ', $objectFiles);
-    system(TOOL . 'ld -T src/linkerscript -Map=build/program.map -A rv32im -o build/program.elf ' . $objectFilesList);
+    // note: the -lc must come *after* the source files that call functions from it because LD is a "smart" linker...
+    // See https://stackoverflow.com/questions/45135/why-does-the-order-in-which-libraries-are-linked-sometimes-cause-errors-in-gcc
+    system(TOOL . 'ld -L ' . LIBC_FOLDER . ' -T src/linkerscript -Map=build/program.map -A rv32im -o build/program.elf ' . $objectFilesList . ' -lc');
 }
 
 function convertExecutable() {
@@ -55,8 +58,11 @@ $paths = array(
     'src/chargen.c' => 'build/chargen.o',
     'src/simdev.c' => 'build/simdev.o',
     'src/random.c' => 'build/random.o',
+    'src/libc-compat/memory.c' => 'build/libc-compat_memory.o',
 
     'src/sierpinsky/sierpinsky.c' => 'build/sierpinsky.o',
+
+    'src/rocksndiamonds/libgame/hash.c' => 'build/rocksndiamonds_libgame_hash.o',
 );
 foreach ($paths as $inputPath => $outputPath) {
     buildFile($inputPath, $outputPath);
