@@ -10,6 +10,9 @@ import name.martingeisse.esdk.core.rtl.pin.RtlPinConfiguration;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.AuxiliaryFileFactory;
 import name.martingeisse.esdk.core.rtl.synthesis.verilog.VerilogGenerator;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -21,6 +24,8 @@ import java.util.function.Consumer;
  *
  */
 public class ProjectGenerator {
+
+	private static final File toolFolder = new File("/home/martin.geisse/tools/fpga-toolchain/bin");
 
 	private final RtlRealm realm;
 	private final String name;
@@ -44,6 +49,10 @@ public class ProjectGenerator {
 		additionalVerilogFiles.add(path);
 	}
 
+	public void clean() throws IOException {
+		FileUtils.deleteDirectory(outputFolder);
+	}
+
 	public void generate() throws IOException {
 		outputFolder.mkdirs();
 
@@ -59,7 +68,7 @@ public class ProjectGenerator {
 			verilogGenerator.generate();
 		});
 
-		generateFile("build.pcf", out -> {
+		generateFile("design.pcf", out -> {
 			for (RtlPin pin : realm.getPins()) {
 				RtlPinConfiguration pinConfiguration = pin.getConfiguration();
 				if (!(pinConfiguration instanceof LatticePinConfiguration)) {
@@ -84,6 +93,49 @@ public class ProjectGenerator {
 				}
 			}
 		}
+	}
+
+	public void build() throws IOException, InterruptedException {
+		execTool("design.json", "synthesis", "yosys", "-p", "synth_ecp5 -json design.json", name + ".v");
+		execTool("design.config", "pnr", "nextpnr-ecp5", "--json", "design.json", "--textcfg", "design.config",
+				"--25k", "--package", fpgaPartId, "--lpf", "design.pcf");
+		execTool("design.bit", "ecppack", "ecppack", "--compress", "--freq", "38.8", "--input", "design.config",
+				"--bit", "design.bit");
+		FileUtils.copyFile(new File(outputFolder, "design.bit"), new File(outputFolder, "design.dfu"));
+		execTool("design.dfu", "dfu-suffix", "dfu-suffix", "-v", "1209", "-p", "5af0", "-a", "design.dfu");
+	}
+
+	public void program() throws IOException, InterruptedException {
+		execTool("design.dfu", "program", "dfu-util", "-D", "design.dfu");
+	}
+
+	private void execTool(String expectedOutputFilename, String logName, String... command) throws IOException, InterruptedException {
+		command[0] = new File(toolFolder, command[0]).getAbsolutePath();
+		File expectedOutput = new File(outputFolder, expectedOutputFilename);
+		ProcessBuilder builder = new ProcessBuilder(command);
+		builder.directory(outputFolder);
+		Process process = builder.start();
+		int status = process.waitFor();
+		if (status != 0 || !expectedOutput.exists()) {
+			System.err.println();
+			System.err.println("***********************************************");
+			System.err.println("*** ERROR WHILE BUILDING FPGA CONFIGURATION ***");
+			System.err.println("***********************************************");
+			System.err.println();
+			System.err.println("path: " + outputFolder);
+			System.err.println("command: " + StringUtils.join(command, ' '));
+			System.err.println("status code: " + status);
+			System.err.println();
+			IOUtils.copy(process.getInputStream(), System.err);
+			IOUtils.copy(process.getErrorStream(), System.err);
+			System.err.flush();
+			System.exit(1);
+		}
+		FileUtils.copyInputStreamToFile(process.getInputStream(), new File(outputFolder, "log_out_" + logName + ".txt"));
+		FileUtils.copyInputStreamToFile(process.getErrorStream(), new File(outputFolder, "log_err_" + logName + ".txt"));
+		process.getInputStream().close();
+		process.getOutputStream().close();
+		process.getErrorStream().close();
 	}
 
 }

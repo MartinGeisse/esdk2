@@ -29,8 +29,11 @@ public class SynthesisMain {
 		outputPin(realm, "J3", "LVCMOS33", null, blink.getLedBn());
 
 		// generate Verilog and ISE project files
-		ProjectGenerator projectGenerator = new ProjectGenerator(realm, "Blink", new File("synthesize/blink"), "TODO");
+		ProjectGenerator projectGenerator = new ProjectGenerator(realm, "Blink", new File("synthesize/blink"), "CSFBGA285");
+		projectGenerator.clean();
 		projectGenerator.generate();
+		projectGenerator.build();
+		projectGenerator.program();
 
 	}
 
