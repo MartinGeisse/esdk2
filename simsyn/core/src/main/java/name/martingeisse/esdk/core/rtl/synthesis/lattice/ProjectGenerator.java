@@ -25,6 +25,8 @@ import java.util.function.Consumer;
  */
 public class ProjectGenerator {
 
+	public static final boolean SHOW_OUTPUT = true;
+
 	private static final File toolFolder = new File("/home/martin.geisse/tools/fpga-toolchain/bin");
 
 	private final RtlRealm realm;
@@ -114,6 +116,9 @@ public class ProjectGenerator {
 		File expectedOutput = new File(outputFolder, expectedOutputFilename);
 		ProcessBuilder builder = new ProcessBuilder(command);
 		builder.directory(outputFolder);
+		if (SHOW_OUTPUT) {
+			builder.inheritIO();
+		}
 		Process process = builder.start();
 		int status = process.waitFor();
 		if (status != 0 || !expectedOutput.exists()) {
@@ -126,16 +131,20 @@ public class ProjectGenerator {
 			System.err.println("command: " + StringUtils.join(command, ' '));
 			System.err.println("status code: " + status);
 			System.err.println();
-			IOUtils.copy(process.getInputStream(), System.err);
-			IOUtils.copy(process.getErrorStream(), System.err);
+			if (!SHOW_OUTPUT) {
+				IOUtils.copy(process.getInputStream(), System.err);
+				IOUtils.copy(process.getErrorStream(), System.err);
+			}
 			System.err.flush();
 			System.exit(1);
 		}
-		FileUtils.copyInputStreamToFile(process.getInputStream(), new File(outputFolder, "log_out_" + logName + ".txt"));
-		FileUtils.copyInputStreamToFile(process.getErrorStream(), new File(outputFolder, "log_err_" + logName + ".txt"));
-		process.getInputStream().close();
-		process.getOutputStream().close();
-		process.getErrorStream().close();
+		if (!SHOW_OUTPUT) {
+			FileUtils.copyInputStreamToFile(process.getInputStream(), new File(outputFolder, "log_out_" + logName + ".txt"));
+			FileUtils.copyInputStreamToFile(process.getErrorStream(), new File(outputFolder, "log_err_" + logName + ".txt"));
+			process.getInputStream().close();
+			process.getOutputStream().close();
+			process.getErrorStream().close();
+		}
 	}
 
 }
