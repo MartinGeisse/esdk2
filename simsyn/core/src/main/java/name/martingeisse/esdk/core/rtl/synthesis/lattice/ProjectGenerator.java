@@ -25,7 +25,7 @@ import java.util.function.Consumer;
  */
 public class ProjectGenerator {
 
-	public static final boolean SHOW_OUTPUT = true;
+	public static final boolean SHOW_OUTPUT = false;
 
 	private static final File toolFolder = new File("/home/martin.geisse/tools/fpga-toolchain/bin");
 
@@ -118,6 +118,9 @@ public class ProjectGenerator {
 		builder.directory(outputFolder);
 		if (SHOW_OUTPUT) {
 			builder.inheritIO();
+		} else {
+			builder.redirectOutput(new File(outputFolder, "log_out_" + logName + ".txt"));
+			builder.redirectError(new File(outputFolder, "log_err_" + logName + ".txt"));
 		}
 		Process process = builder.start();
 		int status = process.waitFor();
@@ -131,16 +134,10 @@ public class ProjectGenerator {
 			System.err.println("command: " + StringUtils.join(command, ' '));
 			System.err.println("status code: " + status);
 			System.err.println();
-			if (!SHOW_OUTPUT) {
-				IOUtils.copy(process.getInputStream(), System.err);
-				IOUtils.copy(process.getErrorStream(), System.err);
-			}
 			System.err.flush();
 			System.exit(1);
 		}
 		if (!SHOW_OUTPUT) {
-			FileUtils.copyInputStreamToFile(process.getInputStream(), new File(outputFolder, "log_out_" + logName + ".txt"));
-			FileUtils.copyInputStreamToFile(process.getErrorStream(), new File(outputFolder, "log_err_" + logName + ".txt"));
 			process.getInputStream().close();
 			process.getOutputStream().close();
 			process.getErrorStream().close();
