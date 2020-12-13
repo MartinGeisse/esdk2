@@ -9,32 +9,60 @@ import name.martingeisse.esdk.core.rtl.pin.RtlOutputPin;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.lattice.LatticePinConfiguration;
 import name.martingeisse.esdk.core.rtl.synthesis.lattice.ProjectGenerator;
+import name.martingeisse.esdk.core.util.vector.VectorValue;
+import name.martingeisse.esdk.riscv.rtl.CeeCompilerInvoker;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  *
  */
-public class SynthesisMain {
+public class RiscvBlinkSynthesisMain {
 
 	public static void main(String[] args) throws Exception {
+
+		CeeCompilerInvoker.invoke("riscv/resource/lattice-riscv-blink");
 
 		// create design, realm, clock networks
 		Design design = new Design();
 		RtlRealm realm = new RtlRealm(design);
 		RtlClockNetwork clock = realm.createClockNetwork(clockPin(realm));
-		Blink blink = new Blink.Implementation(realm, clock);
-		outputPin(realm, "K4", "LVCMOS33", null, blink.getLedRn());
-		outputPin(realm, "M3", "LVCMOS33", null, blink.getLedGn());
-		outputPin(realm, "J3", "LVCMOS33", null, blink.getLedBn());
+		RiscvBlink.Implementation riscvBlink = new RiscvBlink.Implementation(realm, clock);
+		outputPin(realm, "K4", "LVCMOS33", null, riscvBlink.getLedRn());
+		outputPin(realm, "M3", "LVCMOS33", null, riscvBlink.getLedGn());
+		outputPin(realm, "J3", "LVCMOS33", null, riscvBlink.getLedBn());
+
+		// load the program into small memory
+		try (FileInputStream in = new FileInputStream("riscv/resource/lattice-riscv-blink/build/program.bin")) {
+			int index = 0;
+			while (true) {
+				int first = in.read();
+				if (first < 0) {
+					break;
+				}
+				riscvBlink._memory0.getMatrix().setRow(index, VectorValue.of(8, first));
+				riscvBlink._memory1.getMatrix().setRow(index, VectorValue.of(8, readByteEofSafe(in)));
+				riscvBlink._memory2.getMatrix().setRow(index, VectorValue.of(8, readByteEofSafe(in)));
+				riscvBlink._memory3.getMatrix().setRow(index, VectorValue.of(8, readByteEofSafe(in)));
+				index++;
+			}
+		}
 
 		// generate Verilog and ISE project files
-		ProjectGenerator projectGenerator = new ProjectGenerator(realm, "Blink", new File("synthesize/blink"), "CSFBGA285");
+		ProjectGenerator projectGenerator = new ProjectGenerator(realm, "Blink", new File("synthesize/riscv-blink"), "CSFBGA285");
 		projectGenerator.clean();
 		projectGenerator.generate();
 		projectGenerator.build();
 		projectGenerator.program();
 
+	}
+
+	private static int readByteEofSafe(InputStream in) throws IOException {
+		int x = in.read();
+		return (x < 0 ? 0 : x);
 	}
 
 	private static <T extends Item> T withName(T item, String name) {
