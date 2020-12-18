@@ -26,30 +26,30 @@ start:
     .option pop
 
     // test code
-    li t0, 0x03000000
+    li s0, 0x03000000
 mainLoop:
 
     // blue
-    li t1, 1
-    sw t1, 0(t0)
+    li s1, 1
+    sw s1, 0(s0)
     li a0, 500
     call delay
 
     // black
-    li t1, 0
-    sw t1, 0(t0)
+    li s1, 0
+    sw s1, 0(s0)
     li a0, 500
     call delay
 
     // purple
-    li t1, 5
-    sw t1, 0(t0)
+    li s1, 5
+    sw s1, 0(s0)
     li a0, 500
     call delay
 
     // black
-    li t1, 0
-    sw t1, 0(t0)
+    li s1, 0
+    sw s1, 0(s0)
     li a0, 500
     call delay
 
