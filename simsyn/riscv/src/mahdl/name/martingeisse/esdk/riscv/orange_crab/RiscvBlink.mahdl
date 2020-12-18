@@ -37,9 +37,9 @@ do (*) {
 // GPIO
 register vector[3] ledState = 0;
 do (*) {
-    ledRn = ledState[2];
-    ledGn = ledState[1];
-    ledBn = ledState[0];
+    ledRn = ~ledState[2];
+    ledGn = ~ledState[1];
+    ledBn = ~ledState[0];
 }
 do (clk) {
     if (cpu.memoryEnable & cpu.memoryWrite & gpioSelected) {
