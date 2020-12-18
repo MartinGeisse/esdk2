@@ -7,6 +7,9 @@ import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.pin.RtlInputPin;
 import name.martingeisse.esdk.core.rtl.pin.RtlOutputPin;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
+import name.martingeisse.esdk.core.rtl.simulation.RtlClockGenerator;
+import name.martingeisse.esdk.core.rtl.simulation.RtlClockedSimulationItem;
+import name.martingeisse.esdk.core.rtl.simulation.RtlIntervalSimulationItem;
 import name.martingeisse.esdk.core.rtl.synthesis.lattice.LatticePinConfiguration;
 import name.martingeisse.esdk.core.rtl.synthesis.lattice.ProjectGenerator;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
@@ -20,7 +23,7 @@ import java.io.InputStream;
 /**
  *
  */
-public class RiscvBlinkSynthesisMain {
+public class RiscvBlinkSimulationMain {
 
 	public static void main(String[] args) throws Exception {
 
@@ -51,12 +54,24 @@ public class RiscvBlinkSynthesisMain {
 			}
 		}
 
-		// generate Verilog and ISE project files
-		ProjectGenerator projectGenerator = new ProjectGenerator(realm, "RiscvBlink", new File("synthesize/riscv-blink"), "CSFBGA285");
-		projectGenerator.clean();
-		projectGenerator.generate();
-		projectGenerator.build();
-		projectGenerator.program();
+		// set debugger breakpoints here to allow clock stepping
+		new RtlClockedSimulationItem(clock) {
+
+			@Override
+			public void computeNextState() {
+			}
+
+			@Override
+			public void updateState() {
+			}
+
+		};
+
+		// simulate
+		new RtlClockGenerator(clock, 21); // ca. 48 MHz expressed in nanoseconds
+		new RtlIntervalSimulationItem(realm, 100_000_000, () -> System.out.println(riscvBlink._ledState.getValue().getBitsAsInt()));
+		design.simulate();
+
 
 	}
 
