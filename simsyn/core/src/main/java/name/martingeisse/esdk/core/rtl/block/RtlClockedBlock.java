@@ -153,19 +153,21 @@ public final class RtlClockedBlock extends RtlClockedItem {
 				out.println("initial begin");
 				out.startIndentation();
 				for (RtlProceduralRegister register : proceduralRegisters) {
-					out.indent();
-					register.printVerilogAssignmentTarget(out);
-					out.print(" <= ");
-					if (register instanceof RtlProceduralBitRegister) {
-						boolean value = ((RtlProceduralBitRegister) register).getValue();
-						out.print(RtlBitConstant.getVerilogConstant(value));
-					} else if (register instanceof RtlProceduralVectorRegister) {
-						VectorValue value = ((RtlProceduralVectorRegister) register).getValue();
-						value.printVerilogExpression(out);
-					} else {
-						throw new RuntimeException("unknown register type: " + register);
+					if (register.isInitialized()) {
+						out.indent();
+						register.printVerilogAssignmentTarget(out);
+						out.print(" <= ");
+						if (register instanceof RtlProceduralBitRegister) {
+							boolean value = ((RtlProceduralBitRegister) register).getValue();
+							out.print(RtlBitConstant.getVerilogConstant(value));
+						} else if (register instanceof RtlProceduralVectorRegister) {
+							VectorValue value = ((RtlProceduralVectorRegister) register).getValue();
+							value.printVerilogExpression(out);
+						} else {
+							throw new RuntimeException("unknown register type: " + register);
+						}
+						out.println(";");
 					}
-					out.println(";");
 				}
 				for (RtlProceduralMemory memory : proceduralMemories) {
 					String memoryName = memoryNames.get(memory);

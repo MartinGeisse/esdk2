@@ -24,6 +24,7 @@ public final class RtlProceduralBitRegister extends RtlProceduralRegister implem
 		super(realm, block);
 		this.value = initialValue;
 		this.nextValue = initialValue;
+		setInitialized(true);
 	}
 
 	// ----------------------------------------------------------------------------------------------------------------

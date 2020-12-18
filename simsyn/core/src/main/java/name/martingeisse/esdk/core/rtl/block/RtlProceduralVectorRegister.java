@@ -36,6 +36,7 @@ public final class RtlProceduralVectorRegister extends RtlProceduralRegister imp
 		this.width = width;
 		this.value = initialValue;
 		this.nextValue = value;
+		setInitialized(true);
 	}
 
 	@Override
