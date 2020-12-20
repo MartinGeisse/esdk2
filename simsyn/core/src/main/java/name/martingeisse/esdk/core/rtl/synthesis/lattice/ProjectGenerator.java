@@ -35,6 +35,7 @@ public class ProjectGenerator {
 	private final String fpgaPartId;
 	private final List<String> additionalPcfLines = new ArrayList<>();
 	private final List<File> additionalVerilogFiles = new ArrayList<>();
+	private Integer nextBootAddress;
 
 	public ProjectGenerator(RtlRealm realm, String name, File outputFolder, String fpgaPartId) {
 		this.realm = realm;
@@ -49,6 +50,14 @@ public class ProjectGenerator {
 
 	public void addVerilogFile(File path) {
 		additionalVerilogFiles.add(path);
+	}
+
+	public Integer getNextBootAddress() {
+		return nextBootAddress;
+	}
+
+	public void setNextBootAddress(Integer nextBootAddress) {
+		this.nextBootAddress = nextBootAddress;
 	}
 
 	public void clean() throws IOException {
@@ -102,7 +111,9 @@ public class ProjectGenerator {
 		execTool("design.config", "pnr", "nextpnr-ecp5", "--json", "design.json", "--textcfg", "design.config",
 				"--25k", "--package", fpgaPartId, "--lpf", "design.pcf");
 		execTool("design.bit", "ecppack", "ecppack", "--compress", "--freq", "38.8", "--input", "design.config",
-				"--bit", "design.bit");
+				"--bit", "design.bit",
+				nextBootAddress != null ? "--bootaddr" : null,
+				nextBootAddress != null ? ("0x" + Integer.toHexString(nextBootAddress)) : null);
 		FileUtils.copyFile(new File(outputFolder, "design.bit"), new File(outputFolder, "design.dfu"));
 		execTool("design.dfu", "dfu-suffix", "dfu-suffix", "-v", "1209", "-p", "5af0", "-a", "design.dfu");
 	}
@@ -112,6 +123,7 @@ public class ProjectGenerator {
 	}
 
 	private void execTool(String expectedOutputFilename, String logName, String... command) throws IOException, InterruptedException {
+		command = removeNullElements(command);
 		command[0] = new File(toolFolder, command[0]).getAbsolutePath();
 		File expectedOutput = new File(outputFolder, expectedOutputFilename);
 		ProcessBuilder builder = new ProcessBuilder(command);
@@ -142,6 +154,27 @@ public class ProjectGenerator {
 			process.getOutputStream().close();
 			process.getErrorStream().close();
 		}
+	}
+
+	private static String[] removeNullElements(String[] array) {
+		int resultCount = 0;
+		for (String s : array) {
+			if (s != null) {
+				resultCount++;
+			}
+		}
+		if (resultCount == array.length) {
+			return array;
+		}
+		String[] result = new String[resultCount];
+		int writePointer = 0;
+		for (String s : array) {
+			if (s != null) {
+				result[writePointer] = s;
+				writePointer++;
+			}
+		}
+		return result;
 	}
 
 }

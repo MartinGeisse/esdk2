@@ -4,8 +4,10 @@ import name.martingeisse.esdk.core.model.Design;
 import name.martingeisse.esdk.core.model.Item;
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
+import name.martingeisse.esdk.core.rtl.pin.RtlBidirectionalPin;
 import name.martingeisse.esdk.core.rtl.pin.RtlInputPin;
 import name.martingeisse.esdk.core.rtl.pin.RtlOutputPin;
+import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.lattice.LatticePinConfiguration;
 import name.martingeisse.esdk.core.rtl.synthesis.lattice.ProjectGenerator;
@@ -34,6 +36,10 @@ public class RiscvBlinkSynthesisMain {
 		outputPin(realm, "K4", "LVCMOS33", null, riscvBlink.getLedRn());
 		outputPin(realm, "M3", "LVCMOS33", null, riscvBlink.getLedGn());
 		outputPin(realm, "J3", "LVCMOS33", null, riscvBlink.getLedBn());
+
+		// use the pushbutton to reconfigure the FPGA
+		RtlBitSignal button = inputPin(realm, "J17", "SSTL135_I");
+		inOutPin(realm, "V17", "LVCMOS33", null, new RtlBitConstant(realm, false), button.not());
 
 		// load the program into small memory
 		try (FileInputStream in = new FileInputStream("riscv/resource/lattice-riscv-blink/build/program.bin")) {
@@ -95,6 +101,20 @@ public class RiscvBlinkSynthesisMain {
 		pin.setId(id);
 		pin.setConfiguration(configuration);
 		pin.setOutputSignal(outputSignal);
+		return pin;
+	}
+
+	private static RtlBidirectionalPin inOutPin(RtlRealm realm, String id, String ioType, String slewRate, RtlBitSignal outputSignal, RtlBitSignal enableSignal) {
+		LatticePinConfiguration configuration = new LatticePinConfiguration();
+		configuration.set("IO_TYPE", ioType);
+		if (slewRate != null) {
+			configuration.set("SLEWRATE", slewRate);
+		}
+		RtlBidirectionalPin pin = new RtlBidirectionalPin(realm);
+		pin.setId(id);
+		pin.setConfiguration(configuration);
+		pin.setOutputSignal(outputSignal);
+		pin.setOutputEnableSignal(enableSignal);
 		return pin;
 	}
 
