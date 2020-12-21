@@ -19,6 +19,7 @@ import name.martingeisse.esdk.core.rtl.synthesis.verilog.expression.VerilogExpre
 public abstract class RtlProceduralRegister extends RtlItem implements RtlSignal, RtlAssignmentTarget {
 
 	private final RtlClockedBlock block;
+	private boolean initialized;
 
 	public RtlProceduralRegister(RtlRealm realm, RtlClockedBlock block) {
 		super(realm);
@@ -42,6 +43,15 @@ public abstract class RtlProceduralRegister extends RtlItem implements RtlSignal
 	// ----------------------------------------------------------------------------------------------------------------
 	// Verilog generation
 	// ----------------------------------------------------------------------------------------------------------------
+
+
+	public boolean isInitialized() {
+		return initialized;
+	}
+
+	public void setInitialized(boolean initialized) {
+		this.initialized = initialized;
+	}
 
 	@Override
 	public VerilogContribution getVerilogContribution() {

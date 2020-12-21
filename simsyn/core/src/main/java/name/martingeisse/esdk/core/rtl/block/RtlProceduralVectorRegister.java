@@ -36,6 +36,7 @@ public final class RtlProceduralVectorRegister extends RtlProceduralRegister imp
 		this.width = width;
 		this.value = initialValue;
 		this.nextValue = value;
+		setInitialized(true);
 	}
 
 	@Override
@@ -86,6 +87,28 @@ public final class RtlProceduralVectorRegister extends RtlProceduralRegister imp
 	@Override
 	void updateValue() {
 		value = nextValue;
+	}
+
+	/**
+	 * This method directly sets the current value. This is useful, for example, to override the initial value of
+	 * a register for simulation.
+	 *
+	 * DO NOT CALL THIS from within any clock handler! Doing so makes the behavior dependent on the order in which
+	 * clock handlers are executed, which is undefined by design.
+	 */
+	public void overrideCurrentValue(VectorValue value) {
+		if (value == null) {
+			throw new IllegalArgumentException("value cannot be null");
+		}
+		if (value.getWidth() != width) {
+			throw new IllegalArgumentException("trying to set next value of wrong width " + value.getWidth() + ", should be " + width);
+		}
+		this.value = value;
+		// We also have to override the next value because for a procedural register that gets assigned inside an
+		// if-statement (i.e. has a clock enable), that statement conditionally sets the next value, but the next
+		// value always gets written to the current value in updateValue(), restoring the old value from before this
+		// method got called.
+		this.nextValue = value;
 	}
 
 }

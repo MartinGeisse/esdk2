@@ -28,6 +28,10 @@ dependencies {
 	compile 'commons-beanutils:commons-beanutils:1.9.2'
 	compile 'commons-codec:commons-codec:1.9'
 
+	// bytecode manipulation for fast simulation
+	compile group: 'org.ow2.asm', name: 'asm', version: '9.0'
+	compile group: 'org.ow2.asm', name: 'asm-tree', version: '9.0'
+
 	// testing
 	testCompile 'junit:junit:4.12'
 
