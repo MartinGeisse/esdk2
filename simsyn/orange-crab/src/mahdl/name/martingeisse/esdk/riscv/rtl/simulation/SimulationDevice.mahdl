@@ -1,0 +1,19 @@
+module name.martingeisse.esdk.riscv.rtl.simulation.SimulationDevice;
+
+interface {
+    in clock clk;
+    in vector[24] busWordAddress;
+    in bit busEnable, busWrite;
+    in vector[32] busWriteData;
+    in vector[4] busWriteMask;
+    out vector[32] busReadData;
+    out bit busAcknowledge;
+}
+
+// This module is intentionally not "native", so we don't have to remove it for real hardware (and change the software).
+// It just does nothing.
+
+do (*) {
+    busReadData = 0;
+    busAcknowledge = 1;
+}

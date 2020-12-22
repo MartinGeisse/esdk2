@@ -1,0 +1,53 @@
+module name.martingeisse.esdk.riscv.rtl.ram.SimulatedRam;
+
+/**
+ * The RAM size is specified as "8M x 16 x 4 Banks", i.e. (32M x 16) = (16M x 32) = 16M words, resulting in a
+ * 24 bit wide word address. This memory is always word-addressed, so endianness is not relevant. All numbers
+ * referring to the bytes of a word specify significance, i.e. 0 is the LSB and 3 is the MSB.
+ */
+interface {
+    in clock clk;
+    in bit enable, write;
+    in vector[24] wordAddress;
+    in vector[32] writeData;
+    in vector[4] writeMask;
+    out vector[32] readData;
+    out bit acknowledge;
+}
+
+constant integer WORD_COUNT = 16 * 1024 * 1024;
+
+register matrix[WORD_COUNT][8] memory3, memory2, memory1, memory0;
+register vector[8] readData3, readData2, readData1, readData0;
+register bit secondReadCycle = 0;
+
+do (*) {
+    readData = readData3 _ readData2 _ readData1 _ readData0;
+    acknowledge = write | secondReadCycle;
+}
+
+do (clk) {
+    readData3 = memory3[wordAddress];
+    readData2 = memory2[wordAddress];
+    readData1 = memory1[wordAddress];
+    readData0 = memory0[wordAddress];
+    if (enable & write) {
+        if (writeMask[3]) {
+            memory3[wordAddress] = writeData[31:24];
+        }
+        if (writeMask[2]) {
+            memory2[wordAddress] = writeData[23:16];
+        }
+        if (writeMask[1]) {
+            memory1[wordAddress] = writeData[15:8];
+        }
+        if (writeMask[0]) {
+            memory0[wordAddress] = writeData[7:0];
+        }
+    }
+    if (enable & ~write) {
+        secondReadCycle = ~secondReadCycle;
+    } else {
+        secondReadCycle = 0;
+    }
+}

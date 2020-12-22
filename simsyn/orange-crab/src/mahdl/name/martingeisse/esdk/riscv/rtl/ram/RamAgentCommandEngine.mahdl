@@ -1,0 +1,117 @@
+module name.martingeisse.esdk.riscv.rtl.ram.RamAgentCommandEngine;
+
+interface {
+
+    in clock clk;
+    in bit reset;
+
+    // as long as this flag is true, regular requests to the RAM controller must be blocked
+    out bit lockRamInterface;
+
+    // CPU interface
+    in vector[4] cpuCommandCode;
+    in vector[24] cpuWordAddress;
+    in bit cpuEnable, cpuWrite;
+    in vector[32] cpuWriteData;
+    in vector[4] cpuWriteMask;
+    out vector[32] cpuReadData;
+    out bit cpuAcknowledge;
+
+    // RAM controller interface
+    out bit ramRequestEnable;
+    out vector[24] ramRequestWordAddress;
+    out bit ramRequestWrite;
+    out vector[32] ramRequestWriteData;
+    out vector[4] ramRequestWriteMask;
+    in bit ramRequestAcknowledge;
+    in vector[32] ramResponseReadData;
+    in bit ramResponseEnable;
+
+}
+
+// these command codes can be sent by the CPU
+constant vector[4] COMMAND_CODE_ACCESS_CONTROL_REGISTERS = 4d0;
+constant vector[4] COMMAND_CODE_WRITE_SPAN = 4d1;
+
+// Bus interface: in STATE_IDLE, immediate read or write control registers. In other states, wait for STATE_IDLE.
+// This module does not support complex bus operations; they must be broken down to simple operations. We block off
+// operations while not idle because they would read or write inconsistent data.
+do (*) {
+    cpuAcknowledge = cpuEnable & (state == STATE_IDLE);
+    cpuReadData = 0;
+}
+do (clk) {
+    if (cpuEnable & cpuWrite & cpuCommandCode == COMMAND_CODE_ACCESS_CONTROL_REGISTERS) {
+        spanLengthRegister = cpuWriteData[9:0];
+    }
+}
+
+// RAM interface: We lock the RAM as long as we're not idle, and generate all RAM-related signals through secondary
+// registers in the state machine
+do (*) {
+    lockRamInterface = (state != STATE_IDLE);
+    ramRequestEnable = ramRequestEnableRegister;
+    ramRequestWordAddress = ramRequestWordAddressRegister;
+    ramRequestWrite = ramRequestWriteRegister;
+    ramRequestWriteData = ramRequestWriteDataRegister;
+    ramRequestWriteMask = ramRequestWriteMaskRegister;
+}
+
+// control registers (writable by the CPU)
+register vector[10] spanLengthRegister; // 10d0 means 2^10, not 0
+
+// main state register
+constant vector[4] STATE_IDLE = 4d0;
+constant vector[4] STATE_WRITE_SPAN = 4d1;
+register vector[4] state;
+
+// secondary processing registers: RAM control
+register bit ramRequestEnableRegister;
+register vector[24] ramRequestWordAddressRegister;
+register bit ramRequestWriteRegister;
+register vector[32] ramRequestWriteDataRegister;
+register vector[4] ramRequestWriteMaskRegister;
+
+// secondary processing registers: other
+register vector[10] remainingSpanLengthRegister;
+
+// main state machine
+do (clk) {
+    if (reset) {
+        ramRequestEnableRegister = 0;
+        state = STATE_IDLE;
+    } else {
+        switch (state) {
+
+            case STATE_IDLE:
+                ramRequestWordAddressRegister = cpuWordAddress;
+                ramRequestWriteRegister = cpuWrite;
+                ramRequestWriteDataRegister = cpuWriteData;
+                ramRequestWriteMaskRegister = cpuWriteMask;
+                if (cpuEnable) {
+                    if (cpuWrite) {
+                        switch (cpuCommandCode) {
+                            case COMMAND_CODE_WRITE_SPAN:
+                                state = STATE_WRITE_SPAN;
+                                remainingSpanLengthRegister = spanLengthRegister;
+                                ramRequestEnableRegister = 1;
+                        }
+                    }
+                }
+
+            case STATE_WRITE_SPAN:
+                if (ramRequestAcknowledge) {
+                    ramRequestWordAddressRegister = ramRequestWordAddressRegister + 24d1;
+                    if (remainingSpanLengthRegister == 10d1) {
+                        ramRequestEnableRegister = 0;
+                        state = STATE_IDLE;
+                    }
+                    remainingSpanLengthRegister = remainingSpanLengthRegister - 10d1;
+                }
+
+            default:
+                state = STATE_IDLE;
+
+        }
+    }
+}

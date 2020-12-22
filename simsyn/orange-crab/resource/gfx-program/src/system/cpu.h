@@ -1,0 +1,2 @@
+
+int cpuGetExceptionCode(void);

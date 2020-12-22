@@ -1,0 +1,9 @@
+
+native module name.martingeisse.esdk.library.SignalLoggerBusInterface;
+
+interface {
+    in bit busEnable, busWrite;
+    in vector[32] busWriteData;
+    out vector[32] busReadData;
+    out bit busAcknowledge;
+}

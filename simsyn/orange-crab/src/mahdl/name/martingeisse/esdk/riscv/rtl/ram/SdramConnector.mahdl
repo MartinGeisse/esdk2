@@ -1,0 +1,28 @@
+native module name.martingeisse.esdk.riscv.rtl.ram.SdramConnector;
+
+interface {
+
+    // system signals
+    in clock clk0;
+    in clock clk90;
+    in clock clk180;
+    in clock clk270;
+
+    // SDRAM control interface
+    in bit sdramCKE;
+    in bit sdramCS;
+    in vector[2] sdramBA;
+    in vector[13] sdramA;
+    in bit sdramRAS;
+    in bit sdramCAS;
+    in bit sdramWE;
+
+    // SDRAM DDR data interface
+    in bit ddrInterfaceDataStrobeEnable;
+    in bit ddrInterfaceDataStrobe;
+    in bit ddrInterfaceDataOutEnable;
+    in vector[32] ddrInterfaceDataOut;
+    in vector[4] ddrInterfaceDataOutMask;
+    out vector[32] ddrInterfaceDataIn;
+
+}
