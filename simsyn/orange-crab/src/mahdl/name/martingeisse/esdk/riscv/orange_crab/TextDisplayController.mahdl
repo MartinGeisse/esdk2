@@ -1,20 +1,22 @@
-module name.martingeisse.esdk.riscv.rtl.terminal.TextDisplayController;
+module name.martingeisse.esdk.riscv.orange_crab.TextDisplayController;
 
 interface {
     in clock clk;
-    in bit clockEnable;
-    in bit writeEnable;
-    in vector[12] address;
-    in vector[8] writeData;
+    in bit busEnable;
+    in bit busWrite;
+    in vector[12] busWordAddress;
+    in vector[8] busWriteData;
+    out vector[2] r, g, b;
+    out bit hsync, vsync;
 }
 
 // stage 1: VGA timing
 register vector[10] stage1x, stage1y;
-register vector[2] stage1p;
+register vector[1] stage1p;
 register bit stage1hblank, stage1vblank, stage1hsync, stage1vsync;
 do (clk) {
-    stage1p = stage1p + 2d1;
-    if (stage1p == 2d0) {
+    stage1p = stage1p + 1d1;
+    if (stage1p == 1d0) {
         if (stage1x == 10d799) {
             stage1hblank = 0;
             stage1x = 0;
@@ -74,18 +76,17 @@ do (clk) {
 
 // stage 4 (non-registered): generate VGA signals
 signal bit outputPixel = stage3pixels[stage3pixelSelector ? 1b1 : 1b0] & ~stage3blank;
-name.martingeisse.esdk.riscv.rtl.terminal.VgaConnector vgaConnector;
 do (*) {
-    vgaConnector.r = outputPixel;
-    vgaConnector.g = outputPixel;
-    vgaConnector.b = outputPixel;
-    vgaConnector.hsync = stage3hsync;
-    vgaConnector.vsync = stage3vsync;
+    r = outputPixel _ bit(0);
+    g = outputPixel _ bit(0);
+    b = outputPixel _ ~stage3blank;
+    hsync = stage3hsync;
+    vsync = stage3vsync;
 }
 
 // bus interface (write character matrix)
 do (clk) {
-    if (clockEnable & writeEnable) {
-        characterMatrix[address] = writeData;
+    if (busEnable & busWrite) {
+        characterMatrix[busWordAddress] = busWriteData;
     }
 }
