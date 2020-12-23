@@ -114,6 +114,10 @@ public class ProjectGenerator {
 				"--bit", "design.bit",
 				nextBootAddress != null ? "--bootaddr" : null,
 				nextBootAddress != null ? ("0x" + Integer.toHexString(nextBootAddress)) : null);
+		if (new File(outputFolder, "design.bit").length() > 512 * 1024) {
+			System.err.println("design.bit is too large (max size: 4Mb == 512kB");
+			System.exit(1);
+		}
 		FileUtils.copyFile(new File(outputFolder, "design.bit"), new File(outputFolder, "design.dfu"));
 		execTool("design.dfu", "dfu-suffix", "dfu-suffix", "-v", "1209", "-p", "5af0", "-a", "design.dfu");
 	}
