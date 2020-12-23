@@ -6,7 +6,7 @@ interface {
     in bit busWrite;
     in vector[12] busWordAddress;
     in vector[8] busWriteData;
-    out vector[2] r, g, b;
+    out vector[3] r, g, b;
     out bit hsync, vsync;
 }
 
@@ -77,9 +77,9 @@ do (clk) {
 // stage 4 (non-registered): generate VGA signals
 signal bit outputPixel = stage3pixels[stage3pixelSelector ? 1b1 : 1b0] & ~stage3blank;
 do (*) {
-    r = outputPixel _ bit(0);
-    g = outputPixel _ bit(0);
-    b = outputPixel _ ~stage3blank;
+    r = outputPixel _ 2d0;
+    g = outputPixel _ 2d0;
+    b = outputPixel _ bit(0) _ ~stage3blank;
     hsync = stage3hsync;
     vsync = stage3vsync;
 }

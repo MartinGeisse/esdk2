@@ -3,7 +3,7 @@ module name.martingeisse.esdk.riscv.orange_crab.RiscvTextModeHelloWorld;
 interface {
     in clock clk;
     out bit ledRn, ledGn, ledBn;
-    out vector[2] r, g, b;
+    out vector[3] r, g, b;
     out bit hsync, vsync;
 }
 

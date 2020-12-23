@@ -3,7 +3,7 @@ module name.martingeisse.esdk.riscv.orange_crab.Testbild;
 interface {
     in clock clk;
     out bit ledRn, ledGn, ledBn;
-    out vector[2] r, g, b;
+    out vector[3] r, g, b;
     out bit hsync, vsync;
 }
 
@@ -63,9 +63,9 @@ do (clk) {
 //
 
 do (*) {
-    r = (~stage1hblank & ~stage1vblank) ? stage1x[6:5] : 2b0;
-    g = (~stage1hblank & ~stage1vblank) ? stage1y[6:5] : 2b0;
-    b = (~stage1hblank & ~stage1vblank) ? (stage1x + stage1y)[8:7] : 2b0;
+    r = (~stage1hblank & ~stage1vblank) ? stage1x[5:3] : 3b0;
+    g = (~stage1hblank & ~stage1vblank) ? stage1y[5:3] : 3b0;
+    b = (~stage1hblank & ~stage1vblank) ? (stage1x + stage1y)[8:6] : 3b0;
     hsync = stage1hsync;
     vsync = stage1vsync;
 }

@@ -2,9 +2,13 @@ module name.martingeisse.esdk.riscv.orange_crab.Heos;
 
 interface {
     in clock clk;
+
     out bit ledRn, ledGn, ledBn;
-    out vector[2] r, g, b;
+
+    out vector[3] r, g, b;
     out bit hsync, vsync;
+
+    in bit ps2clk, ps2data;
 }
 
 // heartbeat LED
@@ -23,10 +27,12 @@ name.martingeisse.esdk.riscv.rtl.Multicycle cpu;
 
 // peripherals
 name.martingeisse.esdk.riscv.orange_crab.TextDisplayController displayController;
+name.martingeisse.esdk.riscv.orange_crab.KeyboardController keyboardController;
 
 // bus decoder
 signal bit internalMemorySelected = cpu.memoryWordAddress[29:22] == 8d0;
 signal bit displaySelected = cpu.memoryWordAddress[29:22] == 8d1;
+signal bit keyboardSelected = cpu.memoryWordAddress[29:22] == 8d2;
 signal bit gpioSelected = cpu.memoryWordAddress[29:22] == 8d3;
 
 // bus / peripherals wiring
@@ -40,11 +46,13 @@ do (*) {
     cpu.memoryReadData = switch (cpu.memoryWordAddress[28:22]) {
         case 7d0: memoryReadData
         case 7d1: 32d0 // display
+        case 7d2: 24d0 _ keyboardController.busReadData
         default: 32d0
     };
     cpu.memoryAcknowledge = switch (cpu.memoryWordAddress[28:22]) {
         case 7d0: cpu.memoryWrite | internalMemorySecondReadCycle
         case 7d1: bit(1) // display
+        case 7d2: bit(1) // keyboard
         default: bit(1)
     };
 
@@ -62,6 +70,12 @@ do (*) {
     b = displayController.b;
     hsync = displayController.hsync;
     vsync = displayController.vsync;
+
+    // keyboard
+    keyboardController.clk = clk;
+    keyboardController.ps2clk = ps2clk;
+    keyboardController.ps2data = ps2data;
+    keyboardController.busEnable = cpu.memoryEnable & keyboardSelected;
 
 }
 

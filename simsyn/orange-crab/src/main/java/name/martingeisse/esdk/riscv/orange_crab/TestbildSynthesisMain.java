@@ -76,14 +76,17 @@ public class TestbildSynthesisMain {
 		outputPin(realm, "J3", "LVCMOS33", null, testbild.getLedBn());
 
 		// VGA pins
-		outputPin(realm, "C8", "LVCMOS33", null, testbild.getR().select(1)); // IO 9
-		outputPin(realm, "B8", "LVCMOS33", null, testbild.getG().select(1)); // IO 10
-		outputPin(realm, "A8", "LVCMOS33", null, testbild.getB().select(1)); // IO 11
-		outputPin(realm, "H2", "LVCMOS33", null, testbild.getHsync()); // IO 12
-		outputPin(realm, "J2", "LVCMOS33", null, testbild.getVsync()); // IO 13
-		outputPin(realm, "N17", "LVCMOS33", null, testbild.getR().select(0)); // IO 0
-		outputPin(realm, "M18", "LVCMOS33", null, testbild.getG().select(0)); // IO 1
-		outputPin(realm, "B9", "LVCMOS33", null, testbild.getB().select(0)); // IO 6
+		outputPin(realm, "J2", "LVCMOS33", null, testbild.getR().select(2)); // IO 13
+		outputPin(realm, "H2", "LVCMOS33", null, testbild.getR().select(1)); // IO 12
+		outputPin(realm, "A8", "LVCMOS33", null, testbild.getR().select(0)); // IO 11
+		outputPin(realm, "B8", "LVCMOS33", null, testbild.getG().select(2)); // IO 10
+		outputPin(realm, "C8", "LVCMOS33", null, testbild.getG().select(1)); // IO 9
+		outputPin(realm, "B9", "LVCMOS33", null, testbild.getG().select(0)); // IO 6
+		outputPin(realm, "B10", "LVCMOS33", null, testbild.getB().select(2)); // IO 5
+		outputPin(realm, "C9", "LVCMOS33", null, testbild.getB().select(1)); // SCL
+		outputPin(realm, "C10", "LVCMOS33", null, testbild.getB().select(0)); // SDA
+		outputPin(realm, "N16", "LVCMOS33", null, testbild.getHsync()); // MOSI
+		outputPin(realm, "N15", "LVCMOS33", null, testbild.getVsync()); // MISO
 
 		// use the pushbutton to reconfigure the FPGA
 		RtlBitSignal button = inputPin(realm, "J17", "SSTL135_I");
