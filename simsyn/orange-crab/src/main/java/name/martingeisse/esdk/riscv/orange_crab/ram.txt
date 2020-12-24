@@ -1,0 +1,9 @@
+MT41K64M16TW-107_J-TR
+
+MT41K       base part
+64M16       size: 64M x 16
+TW          96-ball 8mm x 14mm FBGA, rev. J
+-107        speed: tCK = 1.07ns, CL = 13
+            commercial (not industrial)
+_J          revision (eigentlich :J)
+-TR         ???

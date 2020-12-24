@@ -1,0 +1,535 @@
+module name.martingeisse.esdk.riscv.orange_crab.ddr3.old.RamController;
+
+interface {
+
+    // system signals
+    in clock clk0;
+    in clock clk90;
+    in clock clk180;
+    in clock clk270;
+    in bit reset;
+
+    // Wishbone interface
+    in bit busRequestEnable;
+    in vector[24] busRequestWordAddress;
+    in bit busRequestWrite;
+    in vector[32] busRequestWriteData;
+    in vector[4] busRequestWriteMask;
+    out bit busRequestAcknowledge;
+    out bit busResponseEnable;
+    out vector[32] busResponseReadData;
+
+}
+
+// interface to SDRAM
+name.martingeisse.esdk.riscv.rtl.ram.SdramConnector sdram;
+do (*) {
+    sdram.clk0 = clk0;
+    sdram.clk90 = clk90;
+    sdram.clk180 = clk180;
+    sdram.clk270 = clk270;
+}
+
+// timing
+constant vector[15] INIT_WAIT = 15h3000;
+constant vector[15] INIT_CLK_EN_WAIT = 15h10;
+constant vector[6] WAIT_CMD_MAX = 6b100000;
+constant vector[6] REFRESH_WAIT = WAIT_CMD_MAX - 6d7;
+constant vector[6] ACCESS_WAIT = WAIT_CMD_MAX - 6d1;
+constant vector[6] CAS_WAIT = WAIT_CMD_MAX - 6d2;
+constant vector[10] AVG_REFRESH_DUR = 10d700;
+
+// main state machine
+constant vector[6] SD_IDLE = 0;
+constant vector[6] SD_INIT = 1;
+constant vector[6] SD_INIT_WAIT = 2;
+constant vector[6] SD_PRECHG_ALL = 3;
+constant vector[6] SD_PRECHG_ALL1 = 4;
+constant vector[6] SD_AUTO_REF = 5;
+constant vector[6] SD_AUTO_REF1 = 6;
+constant vector[6] SD_AUTO_REF_ACK = 7;
+constant vector[6] SD_LD_MODE = 8;
+constant vector[6] SD_LD_MODE1 = 9;
+constant vector[6] SD_RD_START = 10;
+constant vector[6] SD_RD_WAIT_FOR_RAS = 11;
+constant vector[6] SD_RD_SEND_CAS_OR_PRECHARGE = 12;
+constant vector[6] SD_RD_WAIT_FOR_PRECHARGE = 13;
+constant vector[6] SD_RD_DONE = 14;
+constant vector[6] SD_WR_START = 15;
+constant vector[6] SD_WR_WAIT_FOR_RAS = 16;
+constant vector[6] SD_WR_SEND_FIRST_CAS = 17;
+constant vector[6] SD_WR_TRY_SEND_ANOTHER_CAS = 18;
+constant vector[6] SD_WR_WAIT_WRITE_RECOVERY_1 = 19;
+constant vector[6] SD_WR_WAIT_WRITE_RECOVERY_2 = 20;
+constant vector[6] SD_WR_SEND_PRECHARGE = 21;
+
+// initialization state machine
+constant vector[4] SI_START = 0;
+constant vector[4] SI_PRECHG = 1;
+constant vector[4] SI_LOAD_EX_MODE = 2;
+constant vector[4] SI_LOAD_MODE = 3;
+constant vector[4] SI_LOAD_MODE2 = 4;
+constant vector[4] SI_PRECHG2 = 5;
+constant vector[4] SI_AUTO_REF = 6;
+constant vector[4] SI_AUTO_REF2 = 7;
+constant vector[4] SI_DONE = 8;
+
+// SDRAM output registers for the main and init state machine
+register bit sdramRegisterCKE;
+register bit sdramRegisterCS;
+register vector[2] sdramRegisterBA;
+register vector[13] sdramRegisterA;
+register bit sdramRegisterRAS;
+register bit sdramRegisterCAS;
+register bit sdramRegisterWE;
+do (*) {
+    sdram.sdramCKE = sdramRegisterCKE;
+    sdram.sdramCS = sdramRegisterCS;
+    sdram.sdramBA = sdramRegisterBA;
+    sdram.sdramA = sdramRegisterA;
+    sdram.sdramRAS = sdramRegisterRAS;
+    sdram.sdramCAS = sdramRegisterCAS;
+    sdram.sdramWE = sdramRegisterWE;
+}
+
+// Wishbone output registers for the main and init state machine
+do (*) {
+    busRequestAcknowledge =
+        (sd_state == SD_RD_SEND_CAS_OR_PRECHARGE | sd_state == SD_WR_SEND_FIRST_CAS | sd_state == SD_WR_TRY_SEND_ANOTHER_CAS)
+        & busRequestEnable & isRequestingCurrentRow;
+    busResponseEnable = (inflightReadQueueStage4Type == INFLIGHT_READ_QUEUE_TYPE_BUS);
+    busResponseReadData = ddrRegisterDataIn;
+}
+
+// output registers for DDR signals
+register bit ddrRegisterDataStrobeEnable;
+register bit ddrRegisterDataStrobe;
+register bit ddrRegisterDataOutEnable;
+register vector[32] ddrRegisterDataOut;
+register vector[4] ddrRegisterDataOutMask;
+do (*) {
+    sdram.ddrInterfaceDataStrobeEnable = ddrRegisterDataStrobeEnable;
+    sdram.ddrInterfaceDataStrobe = ddrRegisterDataStrobe;
+    sdram.ddrInterfaceDataOutEnable = ddrRegisterDataOutEnable;
+    sdram.ddrInterfaceDataOut = ddrRegisterDataOut;
+    sdram.ddrInterfaceDataOutMask = ddrRegisterDataOutMask;
+}
+
+/* DDR data sampling whose output can be used synchronous to the main clock (though with only half a cycle of logic).
+ *
+ * The DDR interface samples the lower and upper 16 data-in bits in alternation, so full 32 bits per main clock cycle.
+ * Up till here, there is no additional register so far beyond sampling itself, so we see a half-word changing at a
+ * time.
+ *
+ * The right time to sample this changing data is at a negative edge of the main clock, i.e. a positive edge of the
+ * clk180. This makes a consistent 32-bit word available at the next positive edge of the main clock. In other words,
+ * the value from ddrRegisterDataIn can be used synchronously to the main clock, but only half a cycle is available
+ * for logic in between.
+ *
+ * Right now, this is possible. The logic that has only half a cycle is the bus read data mux, which is quite large,
+ * but barely fits into that half-cycle. If this is no longer the case, either an additional register must be introduced
+ * for the data read here, or the bus mux must be re-arranged. The latter is preferred since memory access is already
+ * a bottleneck for everything.
+ */
+register vector[32] ddrRegisterDataIn;
+do (clk180) {
+    ddrRegisterDataIn = sdram.ddrInterfaceDataIn;
+}
+
+/* The in-flight read queue mirrors read requests that have been sent to the SDRAM but have not been responded to yet.
+ * Stage 0 of the queue is special in that the (column) address is stored in the low bits of sdramRegisterA and so is
+ * the same as is being sent to the SDRAM. The final stage is fed asynchronously to the bus interfaces. It
+ * implicitly includes the returned data that is stored in the ddrRegisterDataIn.
+ *
+ * The address in stage 0 is set by the main state machine. To make the code more expressive, the same is true for
+ * all stage 0 registers. All other stages are simply shifted here.
+ */
+constant vector[2] INFLIGHT_READ_QUEUE_TYPE_NOP = 2b00;
+constant vector[2] INFLIGHT_READ_QUEUE_TYPE_BUS = 2b01;
+
+register vector[2] inflightReadQueueStage0Type, inflightReadQueueStage1Type, inflightReadQueueStage2Type,
+        inflightReadQueueStage3Type, inflightReadQueueStage4Type;
+register vector[9] inflightReadQueueStage1Address, inflightReadQueueStage2Address, inflightReadQueueStage3Address,
+        inflightReadQueueStage4Address;
+do (clk0) {
+    inflightReadQueueStage1Type = inflightReadQueueStage0Type;
+    inflightReadQueueStage1Address = sdramRegisterA[9:1];
+    inflightReadQueueStage2Type = inflightReadQueueStage1Type;
+    inflightReadQueueStage2Address = inflightReadQueueStage1Address;
+    inflightReadQueueStage3Type = inflightReadQueueStage2Type;
+    inflightReadQueueStage3Address = inflightReadQueueStage2Address;
+    inflightReadQueueStage4Type = inflightReadQueueStage3Type;
+    inflightReadQueueStage4Address = inflightReadQueueStage3Address;
+}
+
+/* The write delay registers are used to acknowledge a write cycle when its CAS is sent to the SDRAM -- the actual
+ * data and the byte mask have to be sent one cycle later according to the timing specifications. This poses a problem
+ * without delay registers because then we cannot acknowledge at the same time as the CAS (because the data would be
+ * gone when needed), but we cannot acknowledge when sending the data either because at that time we already want to
+ * know if another request is pending so we can send the CAS for that, and we don't know that if we have not ack'ed
+ * the first request. So without delay registers, we would have to introduce a wait state instead and slow consecutive
+ * write cycles down to half the speed.
+ */
+register vector[32] delayedWriteData;
+register vector[4] delayedWriteMask;
+do (clk0) {
+    // only the bus can write, so we can take these assignments out of the state machine and therefore simplify the
+    // enable logic.
+    delayedWriteData = busRequestWriteData;
+    delayedWriteMask = busRequestWriteMask;
+}
+
+// This row address is sent to the SDRAM and also sent back in the response. It is copied from the request so it
+// remains the same even after the request has been acknowledged and the requested address may be invalid or may
+// indicate a different row.
+//
+// Note that until the first request of a "combo" has been acknowledged, the "current" and "followup" row addresses
+// are the same. This is exploited in the logic that generates the request acknowledge.
+register vector[15] currentRowAddressRegister;
+signal vector[15] requestingRowAddress = busRequestWordAddress[23:9];
+signal bit isRequestingCurrentRow = (requestingRowAddress == currentRowAddressRegister);
+
+// main and init state machines
+register bit refreshAcknowledge;
+register vector[6] sd_state;
+register vector[4] init_state;
+register vector[6] wait_count;
+register vector[15] init_wait_count;
+register vector[13] mode_reg;
+
+do (clk0) {
+    if (reset) {
+        sd_state = SD_INIT;
+        init_state = SI_START;
+    } else {
+        wait_count = wait_count + 6d1;
+        switch (sd_state) {
+
+            // --------------------------------------------------------------------------------------------------------
+            // initialization
+            // --------------------------------------------------------------------------------------------------------
+
+            // choose next initialization step
+            case SD_INIT:
+                switch (init_state) {
+                    case SI_START:
+                        sd_state = SD_INIT_WAIT;
+                        init_state = SI_PRECHG;
+                        sdramRegisterRAS = 1;
+                        sdramRegisterCAS = 1;
+                        sdramRegisterWE = 1;
+                        sdramRegisterCS = 1;
+                        sdramRegisterCKE = 0;
+                        init_wait_count = 0;
+
+                    case SI_PRECHG:
+                        sd_state = SD_PRECHG_ALL;
+                        init_state = SI_LOAD_EX_MODE;
+
+                    case SI_LOAD_EX_MODE:
+                        // Normal operation
+                        mode_reg = 13b0000000000000;
+                        sdramRegisterBA = 2b01;
+                        sd_state = SD_LD_MODE;
+                        init_state = SI_LOAD_MODE;
+
+                    case SI_LOAD_MODE:
+                        // CAS = 2, Reset DLL, Burst = 2, sequential
+                        mode_reg = 6b000010 _ 3b010 _ 1b0 _ 3b001;
+                        sdramRegisterBA = 2b00;
+                        sd_state = SD_LD_MODE;
+                        init_state = SI_LOAD_MODE2;
+
+                    case SI_LOAD_MODE2:
+                        // CAS = 2, NO Reset DLL, Burst = 2, sequential
+                        mode_reg = 6b000000 _ 3b010 _ 1b0 _ 3b001;
+                        sdramRegisterBA = 2b00;
+                        sd_state = SD_LD_MODE;
+                        init_state = SI_PRECHG2;
+
+                    case SI_PRECHG2:
+                        sd_state = SD_PRECHG_ALL;
+                        init_state = SI_AUTO_REF;
+
+                    case SI_AUTO_REF:
+                        sd_state = SD_AUTO_REF;
+                        init_state = SI_AUTO_REF2;
+
+                    case SI_AUTO_REF2:
+                        sd_state = SD_AUTO_REF;
+                        init_state = SI_DONE;
+
+                    case SI_DONE:
+                        init_state = SI_DONE;
+                        sd_state = SD_IDLE;
+
+                    default:
+                        init_state = SI_START;
+
+                }
+
+
+            // waiting for SDRAM waking up
+            case SD_INIT_WAIT:
+                init_wait_count = init_wait_count + 15d1;
+                if (init_wait_count == INIT_WAIT) {
+                    sd_state = SD_INIT;
+                }
+                if (init_wait_count == INIT_CLK_EN_WAIT) {
+                    sdramRegisterCKE = 1;
+                }
+
+            // precharge command
+            case SD_PRECHG_ALL:
+                sd_state = SD_PRECHG_ALL1;
+                sdramRegisterRAS = 0;
+                sdramRegisterCAS = 1;
+                sdramRegisterWE = 0;
+                sdramRegisterCS = 0;
+                sdramRegisterA[10] = 1;				// Command for precharge all
+
+            case SD_PRECHG_ALL1:
+                sdramRegisterCS = 1;
+                sdramRegisterRAS = 1;
+                sdramRegisterCAS = 1;
+                sdramRegisterWE = 1;
+                sd_state = SD_IDLE;			// Precharge takes 15nS before next command
+
+            // load mode register
+            case SD_LD_MODE:
+                sd_state = SD_LD_MODE1;
+                sdramRegisterRAS = 0;
+                sdramRegisterCAS = 0;
+                sdramRegisterWE = 0;
+                sdramRegisterCS = 0;
+                sdramRegisterA[12:0] = mode_reg;
+
+            case SD_LD_MODE1:
+                sdramRegisterCS = 1;
+                sdramRegisterRAS = 1;
+                sdramRegisterCAS = 1;
+                sdramRegisterWE = 1;					// Load Mode takes 12nS
+                sd_state = SD_IDLE;			// Add wait if needed
+
+            // --------------------------------------------------------------------------------------------------------
+            // refresh
+            // --------------------------------------------------------------------------------------------------------
+
+            case SD_AUTO_REF:
+                sd_state = SD_AUTO_REF1;
+                sdramRegisterRAS = 0;
+                sdramRegisterCAS = 0;
+                sdramRegisterWE = 1;
+                sdramRegisterCS = 0;
+                wait_count = REFRESH_WAIT;
+
+            case SD_AUTO_REF1:
+                sdramRegisterCS = 1;					// Issue NOP during wait
+                sdramRegisterRAS = 1;
+                sdramRegisterCAS = 1;
+                sdramRegisterWE = 1;
+                if (wait_count[5]) {
+                    // Time up, return to idle
+                    sd_state = SD_AUTO_REF_ACK;
+                    refreshAcknowledge = 1;
+                }
+
+            case SD_AUTO_REF_ACK:
+                // Interlocking state
+                sd_state = SD_IDLE;
+                refreshAcknowledge = 0;
+
+            // --------------------------------------------------------------------------------------------------------
+            // reading
+            // --------------------------------------------------------------------------------------------------------
+
+            case SD_RD_START:
+                // RAS
+                sdramRegisterRAS = 0;
+                sdramRegisterCAS = 1;
+                sdramRegisterWE = 1;
+                sdramRegisterCS = 0;
+                sdramRegisterBA[1:0] = currentRowAddressRegister[14:13];
+                sdramRegisterA[12:0] = currentRowAddressRegister[12:0];
+                ddrRegisterDataOutEnable = 0; // Not driving the bus
+                ddrRegisterDataStrobe = 0;
+                sd_state = SD_RD_WAIT_FOR_RAS;
+
+            case SD_RD_WAIT_FOR_RAS:
+                // NOP
+                sdramRegisterCS = 1;
+                sdramRegisterRAS = 1;
+                sdramRegisterCAS = 1;
+                sdramRegisterWE = 1;
+                sd_state = SD_RD_SEND_CAS_OR_PRECHARGE;
+
+            case SD_RD_SEND_CAS_OR_PRECHARGE:
+                if (busRequestAcknowledge) {
+                    // CAS
+                    sdramRegisterCS = 0;
+                    sdramRegisterRAS = 1;
+                    sdramRegisterCAS = 0;
+                    sdramRegisterWE = 1;
+                    inflightReadQueueStage0Type = INFLIGHT_READ_QUEUE_TYPE_BUS;
+                    sdramRegisterA[10] = 0; // don't use auto-precharge
+                    sdramRegisterA[9:1] = busRequestWordAddress[8:0];
+                    sdramRegisterA[0] = 0;
+                    ddrRegisterDataStrobeEnable = 0; // Set DQS for input
+                } else {
+                    // PRECHARGE and change to inserting NOPs into the queue
+                    sdramRegisterCS = 0;
+                    sdramRegisterRAS = 0;
+                    sdramRegisterCAS = 1;
+                    sdramRegisterWE = 0;
+                    inflightReadQueueStage0Type = INFLIGHT_READ_QUEUE_TYPE_NOP;
+                    wait_count = CAS_WAIT;
+                    sd_state = SD_RD_WAIT_FOR_PRECHARGE;
+                }
+
+            case SD_RD_WAIT_FOR_PRECHARGE:
+                if (~wait_count[5]) {
+                    // NOP
+                    sdramRegisterCS = 1;
+                    sdramRegisterRAS = 1;
+                    sdramRegisterCAS = 1;
+                    sdramRegisterWE = 1;
+                } else {
+                    sd_state = SD_RD_DONE;
+                }
+
+            case SD_RD_DONE:
+                ddrRegisterDataStrobe = 0;
+                ddrRegisterDataStrobeEnable = 1;	// Set DQS back to output
+                sd_state = SD_IDLE;
+
+            // --------------------------------------------------------------------------------------------------------
+            // writing
+            // --------------------------------------------------------------------------------------------------------
+
+            case SD_WR_START:
+                // RAS
+                sdramRegisterCS = 0;
+                sdramRegisterRAS = 0;
+                sdramRegisterCAS = 1;
+                sdramRegisterWE = 1;
+                sdramRegisterBA[1:0] = currentRowAddressRegister[14:13];
+                sdramRegisterA[12:0] = currentRowAddressRegister[12:0];
+                sd_state = SD_WR_WAIT_FOR_RAS;
+
+            case SD_WR_WAIT_FOR_RAS:
+                // NOP
+                sdramRegisterCS = 1;
+                sdramRegisterRAS = 1;
+                sdramRegisterCAS = 1;
+                sdramRegisterWE = 1;
+                sd_state = SD_WR_SEND_FIRST_CAS;
+
+            // Note to understand the timing: Our internal clock edge occurs when we assert the output signals. From
+            // the POV of the SDRAM, "the clock edge" occurs when the output signals are stable, which is half a cycle
+            // later (see generation of the output clock through a DDR module in SdramConnectorImpl). Therefore
+            // generation of DQS at clk180 is aligned with the output clock.
+
+            case SD_WR_SEND_FIRST_CAS:
+                // CAS
+                sdramRegisterCS = 0;
+                sdramRegisterRAS = 1;
+                sdramRegisterCAS = 0;
+                sdramRegisterWE = 0;
+                sdramRegisterA[10] = 0; // don't use auto-precharge
+                sdramRegisterA[9:1] = busRequestWordAddress[8:0];
+                sdramRegisterA[0] = 0;
+                // set DQS to LOW (will start when the data starts)
+                ddrRegisterDataStrobeEnable = 1;
+                ddrRegisterDataStrobe = 0;
+                sd_state = SD_WR_TRY_SEND_ANOTHER_CAS;
+
+            case SD_WR_TRY_SEND_ANOTHER_CAS:
+                // send the data word we just acknowledged
+                ddrRegisterDataStrobe = 1;
+                ddrRegisterDataOutEnable = 1;
+                ddrRegisterDataOut = delayedWriteData;
+                ddrRegisterDataOutMask = ~delayedWriteMask;
+                // check if we can accept another request immediately
+                if (busRequestAcknowledge) {
+                    // keep CAS and just change the address
+                    sdramRegisterA[9:1] = busRequestWordAddress[8:0];
+                } else {
+                    // NOP
+                    sdramRegisterCS = 1;
+                    sdramRegisterRAS = 1;
+                    sdramRegisterCAS = 1;
+                    sdramRegisterWE = 1;
+                    //
+                    sd_state = SD_WR_WAIT_WRITE_RECOVERY_1;
+                }
+
+            case SD_WR_WAIT_WRITE_RECOVERY_1:
+                ddrRegisterDataStrobe = 0;
+                ddrRegisterDataOutEnable = 0;
+                sd_state = SD_WR_WAIT_WRITE_RECOVERY_2;
+
+            case SD_WR_WAIT_WRITE_RECOVERY_2:
+                sd_state = SD_WR_SEND_PRECHARGE;
+
+            case SD_WR_SEND_PRECHARGE:
+                // PRECHARGE
+                sdramRegisterCS = 0;
+                sdramRegisterRAS = 0;
+                sdramRegisterCAS = 1;
+                sdramRegisterWE = 0;
+                // the IDLE state will send the NOP necessary between PRECHARGE and RAS (ACTIVE) to obey timing (tPR)
+                sd_state = SD_IDLE;
+
+            // --------------------------------------------------------------------------------------------------------
+            // idle
+            // --------------------------------------------------------------------------------------------------------
+
+            case SD_IDLE: 						// Idle/sleep process
+                sdramRegisterRAS = 1;				// Set for NOP by default
+                sdramRegisterCAS = 1;
+                sdramRegisterWE = 1;
+                sdramRegisterCS = 1;
+                if (init_state != SI_DONE) {
+                    sd_state = SD_INIT;
+                } else if (busRequestEnable & ~busRequestWrite) {
+                    sd_state = SD_RD_START;
+                    currentRowAddressRegister = busRequestWordAddress[23:9];
+                } else if (busRequestEnable & busRequestWrite) {
+                    sd_state = SD_WR_START;
+                    currentRowAddressRegister = busRequestWordAddress[23:9];
+                } else if (refreshRequest) {
+                    sd_state = SD_AUTO_REF;
+                }
+
+            default:
+                sd_state = SD_IDLE;
+
+        }
+    }
+}
+
+// refresh control logic
+register bit refreshRequest;
+register vector[10] refreshCounter;
+register vector[4] refreshQueue;
+
+do (clk0) {
+    if (refreshAcknowledge) {
+        refreshRequest = 0;
+        refreshQueue = refreshQueue + 4d1;
+    } else if (reset) {
+        refreshCounter = 0;
+        refreshQueue = 0;
+    } else {
+        refreshCounter = refreshCounter + 10d1;
+        if (refreshCounter == AVG_REFRESH_DUR) {
+            refreshCounter = 0;
+            if (refreshQueue != 4d0) {
+                refreshQueue = refreshQueue - 4d1;
+            }
+        }
+        if (refreshQueue != 4d7) {
+            refreshRequest = 1;
+        }
+    }
+}
