@@ -50,6 +50,7 @@ $paths = array(
     'src/main.c' => 'build/main.o',
     'src/term.c' => 'build/term.o',
     'src/divrem.c' => 'build/divrem.o',
+    'src/display_signal_logger.c' => 'build/display_signal_logger.o',
 );
 foreach ($paths as $inputPath => $outputPath) {
     buildFile($inputPath, $outputPath);

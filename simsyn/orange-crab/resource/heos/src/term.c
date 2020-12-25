@@ -2,7 +2,7 @@
 #include "divrem.h"
 #include "term.h"
 
-unsigned int * const SCREEN = (const unsigned int *)0x01000000;
+static unsigned int * const SCREEN = (unsigned int *)0x01000000;
 static int x, y;
 
 void termInitialize() {
