@@ -3,6 +3,7 @@ void delay(int n);
 
 static unsigned int * const SCREEN = (unsigned int *)0x01000000;
 static volatile unsigned int * const KEYBOARD = (unsigned int * const)0x02000000;
+static volatile unsigned int * const SIGNAL_LOGGER = (unsigned int * const)0x04000000;
 
 static int keyStates[256];
 
@@ -24,8 +25,7 @@ static void pollKeyboard(void) {
 }
 
 static int sample(int signalIndex, int sampleIndex) {
-    // emulate a simple counter
-    return (sampleIndex >> signalIndex) & 1;
+    return (SIGNAL_LOGGER[sampleIndex] >> signalIndex) & 1;
 }
 
 void displaySignalLoggerMain(void) {

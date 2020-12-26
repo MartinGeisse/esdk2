@@ -123,9 +123,11 @@ public class HeosSynthesisMain {
 		}
 
 		// signal logging
-		RtlVectorSignal dummyCounter = RegisterBuilder.build(16, VectorValue.of(16, 0), clock, r -> r.add(1));
+		// RtlVectorSignal dummyCounter = RegisterBuilder.build(16, VectorValue.of(16, 0), clock, r -> r.add(1));
+		RtlVectorSignal dummyShifter = RegisterBuilder.build(8, VectorValue.of(8, 1), clock, r -> r.select(0).concat(r.select(7, 1)));
 		implementation.setSignalLogEnable(new RtlBitConstant(realm, true));
-		implementation.setSignalLogData(new RtlVectorConstant(realm, VectorValue.of(16, 0)).concat(dummyCounter));
+		// implementation.setSignalLogData(new RtlVectorConstant(realm, VectorValue.of(24, 0)).concat(dummyCounter.select(9, 2)));
+		implementation.setSignalLogData(new RtlVectorConstant(realm, VectorValue.of(24, 0)).concat(dummyShifter));
 
 		// generate Verilog and ISE project files
 		ProjectGenerator projectGenerator = new ProjectGenerator(realm, "Testbild", new File("synthesize/testbild"), "CSFBGA285");
