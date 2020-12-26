@@ -10,9 +10,12 @@ import name.martingeisse.esdk.core.rtl.pin.RtlInputPin;
 import name.martingeisse.esdk.core.rtl.pin.RtlOutputPin;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
+import name.martingeisse.esdk.core.rtl.signal.RtlVectorConstant;
+import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
 import name.martingeisse.esdk.core.rtl.synthesis.lattice.LatticePinConfiguration;
 import name.martingeisse.esdk.core.rtl.synthesis.lattice.ProjectGenerator;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
+import name.martingeisse.esdk.library.util.RegisterBuilder;
 import name.martingeisse.esdk.riscv.rtl.CeeCompilerInvoker;
 
 import java.io.File;
@@ -75,7 +78,7 @@ public class HeosSynthesisMain {
 		pll.getParameters().put("CLKFB_DIV", 25);
 
 		// create main RTL
-		Heos.Implementation implementation = new Heos.Implementation(realm, clock);
+		Heos.Implementation implementation = new Heos.Implementation(realm, clock, clock);
 
 		// LED pins
 		outputPin(realm, "K4", "LVCMOS33", null, implementation.getLedRn());
@@ -118,6 +121,11 @@ public class HeosSynthesisMain {
 				index++;
 			}
 		}
+
+		// signal logging
+		RtlVectorSignal dummyCounter = RegisterBuilder.build(16, VectorValue.of(16, 0), clock, r -> r.add(1));
+		implementation.setSignalLogEnable(new RtlBitConstant(realm, true));
+		implementation.setSignalLogData(new RtlVectorConstant(realm, VectorValue.of(16, 0)).concat(dummyCounter));
 
 		// generate Verilog and ISE project files
 		ProjectGenerator projectGenerator = new ProjectGenerator(realm, "Testbild", new File("synthesize/testbild"), "CSFBGA285");

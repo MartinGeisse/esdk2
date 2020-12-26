@@ -9,6 +9,11 @@ interface {
     out bit hsync, vsync;
 
     in bit ps2clk, ps2data;
+
+    in clock signalLogClock;
+    in bit signalLogEnable;
+    in vector[32] signalLogData;
+
 }
 
 // heartbeat LED
@@ -28,12 +33,14 @@ name.martingeisse.esdk.riscv.rtl.Multicycle cpu;
 // peripherals
 name.martingeisse.esdk.riscv.orange_crab.TextDisplayController displayController;
 name.martingeisse.esdk.riscv.orange_crab.KeyboardController keyboardController;
+name.martingeisse.esdk.riscv.orange_crab.SignalLogger signalLogger;
 
 // bus decoder
 signal bit internalMemorySelected = cpu.memoryWordAddress[29:22] == 8d0;
 signal bit displaySelected = cpu.memoryWordAddress[29:22] == 8d1;
 signal bit keyboardSelected = cpu.memoryWordAddress[29:22] == 8d2;
 signal bit gpioSelected = cpu.memoryWordAddress[29:22] == 8d3;
+signal bit signalLoggerSelected = cpu.memoryWordAddress[29:22] == 8d4;
 
 // bus / peripherals wiring
 do (*) {
@@ -47,12 +54,16 @@ do (*) {
         case 7d0: memoryReadData
         case 7d1: 32d0 // display
         case 7d2: 24d0 _ keyboardController.busReadData
+        case 7d3: 32d0 // GPIO
+        case 7d4: signalLogger.busReadData
         default: 32d0
     };
     cpu.memoryAcknowledge = switch (cpu.memoryWordAddress[28:22]) {
         case 7d0: cpu.memoryWrite | internalMemorySecondReadCycle
         case 7d1: bit(1) // display
         case 7d2: bit(1) // keyboard
+        case 7d3: bit(1) // GPIO
+        case 7d4: signalLogger.busAcknowledge
         default: bit(1)
     };
 
@@ -76,6 +87,16 @@ do (*) {
     keyboardController.ps2clk = ps2clk;
     keyboardController.ps2data = ps2data;
     keyboardController.busEnable = cpu.memoryEnable & keyboardSelected;
+
+    // signal logger
+    signalLogger.logClock = signalLogClock;
+    signalLogger.logEnable = signalLogEnable;
+    signalLogger.logData = signalLogData;
+    signalLogger.busClock = clk;
+    signalLogger.busEnable = cpu.memoryEnable & signalLoggerSelected;
+    signalLogger.busWrite = cpu.memoryWrite;
+    signalLogger.busWordAddress = cpu.memoryWordAddress[21:0];
+    signalLogger.busWriteData = cpu.memoryWriteData;
 
 }
 
