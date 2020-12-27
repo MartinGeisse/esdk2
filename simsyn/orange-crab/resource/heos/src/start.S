@@ -25,6 +25,8 @@ start:
     la gp, __global_pointer$
     .option pop
 
+    li sp, 16384
+
     call main
     j hang
 
