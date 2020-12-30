@@ -43,7 +43,7 @@ do (busClock) {
 }
 
 // bus write interface
-register bit resetLogPointer = 0, clearMode = 0, loggingActive = 0;
+register bit resetLogPointer = 0, clearMode = 0, loggingActive = 1;
 do (busClock) {
     if (busEnable & busWrite) {
         resetLogPointer = busWriteData[0];

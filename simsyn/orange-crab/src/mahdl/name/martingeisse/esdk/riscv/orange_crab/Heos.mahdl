@@ -34,6 +34,7 @@ name.martingeisse.esdk.riscv.rtl.Multicycle cpu;
 name.martingeisse.esdk.riscv.orange_crab.TextDisplayController displayController;
 name.martingeisse.esdk.riscv.orange_crab.KeyboardController keyboardController;
 name.martingeisse.esdk.riscv.orange_crab.SignalLogger signalLogger;
+name.martingeisse.esdk.riscv.orange_crab.ddr3.RamController ramController;
 
 // bus decoder
 signal bit internalMemorySelected = cpu.memoryWordAddress[29:22] == 8d0;
@@ -50,22 +51,27 @@ do (*) {
     cpu.reset = 0;
 
     // data interface
-    cpu.memoryReadData = switch (cpu.memoryWordAddress[28:22]) {
-        case 7d0: memoryReadData
-        case 7d1: 32d0 // display
-        case 7d2: 24d0 _ keyboardController.busReadData
-        case 7d3: 32d0 // GPIO
-        case 7d4: signalLogger.busReadData
-        default: 32d0
-    };
-    cpu.memoryAcknowledge = switch (cpu.memoryWordAddress[28:22]) {
-        case 7d0: cpu.memoryWrite | internalMemorySecondReadCycle
-        case 7d1: bit(1) // display
-        case 7d2: bit(1) // keyboard
-        case 7d3: bit(1) // GPIO
-        case 7d4: signalLogger.busAcknowledge
-        default: bit(1)
-    };
+    if (cpu.memoryWordAddress[29]) {
+        cpu.memoryReadData = ramController.busResponseReadData;
+        cpu.memoryAcknowledge = ramController.busRequestAcknowledge;
+    } else {
+        cpu.memoryReadData = switch (cpu.memoryWordAddress[28:22]) {
+            case 7d0: memoryReadData
+            case 7d1: 32d0 // display
+            case 7d2: 24d0 _ keyboardController.busReadData
+            case 7d3: 32d0 // GPIO
+            case 7d4: signalLogger.busReadData
+            default: 32d0
+        };
+        cpu.memoryAcknowledge = switch (cpu.memoryWordAddress[28:22]) {
+            case 7d0: cpu.memoryWrite | internalMemorySecondReadCycle
+            case 7d1: bit(1) // display
+            case 7d2: bit(1) // keyboard
+            case 7d3: bit(1) // GPIO
+            case 7d4: signalLogger.busAcknowledge
+            default: bit(1)
+        };
+    }
 
     // interrupts
     cpu.interrupt = 0;
@@ -97,6 +103,15 @@ do (*) {
     signalLogger.busWrite = cpu.memoryWrite;
     signalLogger.busWordAddress = cpu.memoryWordAddress[21:0];
     signalLogger.busWriteData = cpu.memoryWriteData;
+
+    // RAM controller
+    ramController.clk = clk;
+    ramController.reset = 0;
+    ramController.busRequestEnable = cpu.memoryEnable & cpu.memoryWordAddress[29];
+    ramController.busRequestWordAddress = cpu.memoryWordAddress[24:0];
+    ramController.busRequestWrite = cpu.memoryWrite;
+    ramController.busRequestWriteData = cpu.memoryWriteData;
+    ramController.busRequestWriteMask = cpu.memoryWriteMask;
 
 }
 

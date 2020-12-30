@@ -2,6 +2,7 @@ package name.martingeisse.esdk.riscv.orange_crab;
 
 import name.martingeisse.esdk.core.model.Design;
 import name.martingeisse.esdk.core.model.Item;
+import name.martingeisse.esdk.core.rtl.RtlBuilder;
 import name.martingeisse.esdk.core.rtl.RtlClockNetwork;
 import name.martingeisse.esdk.core.rtl.RtlRealm;
 import name.martingeisse.esdk.core.rtl.module.RtlModuleInstance;
@@ -16,6 +17,8 @@ import name.martingeisse.esdk.core.rtl.synthesis.lattice.LatticePinConfiguration
 import name.martingeisse.esdk.core.rtl.synthesis.lattice.ProjectGenerator;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
 import name.martingeisse.esdk.library.util.RegisterBuilder;
+import name.martingeisse.esdk.riscv.orange_crab.ddr3.RamController;
+import name.martingeisse.esdk.riscv.orange_crab.ddr3.SdramConnector;
 import name.martingeisse.esdk.riscv.rtl.CeeCompilerInvoker;
 
 import java.io.File;
@@ -78,7 +81,18 @@ public class HeosSynthesisMain {
 		pll.getParameters().put("CLKFB_DIV", 25);
 
 		// create main RTL
-		Heos.Implementation implementation = new Heos.Implementation(realm, clock, clock);
+		SdramConnector.Connector sdramConnector = new SdramConnector.Connector(realm);
+		Heos.Implementation implementation = new Heos.Implementation(realm, clock, clock) {
+			@Override
+			protected RamController createRamController(RtlRealm realm, RtlClockNetwork clk) {
+				return new RamController.Implementation(realm, clk) {
+					@Override
+					protected SdramConnector createSdram(RtlRealm realm) {
+						return sdramConnector;
+					}
+				};
+			}
+		};
 
 		// LED pins
 		outputPin(realm, "K4", "LVCMOS33", null, implementation.getLedRn());
@@ -106,6 +120,81 @@ public class HeosSynthesisMain {
 		RtlBitSignal button = inputPin(realm, "J17", "SSTL135_I");
 		inOutPin(realm, "V17", "LVCMOS33", null, new RtlBitConstant(realm, false), button.not());
 
+		// SDRAM pins
+		//
+		// It seems that the implementation process recognizes the differential pin-pairs as such and only expects the
+		// positive pin to be declared in the constraints file. This is probably triggered by the extra "D" in the
+		// IO type.
+		//
+		// The "_I" and "_II" suffixes seem to be different kinds of termination.
+		//
+		// Unfortunately, documentation on this is hard to find, and lattice documentation in particular gets
+		// mis-indexed by google on a regular basis.
+		//
+		// Also, I skipped the VCCIO and GND pins for now. These are listed in the original constraints file but not
+		// actually used anywhere in the design. Externally they are hardwired to the supply voltage and GND, so I
+		// don't get at all what to use them for, or why they are even connected to the FPGA. Possibly they can be
+		// used to check if the supply voltage is stable already.
+		//
+		{
+			// control
+			outputPin(realm, "J18", "SSTL135D_I", "FAST", sdramConnector.getCKSocket());
+
+			outputPin(realm, "D18", "SSTL135_I", "FAST", sdramConnector.getCKESocket());
+			outputPin(realm, "C13", "SSTL135_I", "FAST", sdramConnector.getODTSocket());
+			outputPin(realm, "L18", "SSTL135_I", "FAST", sdramConnector.getRESETnSocket());
+
+			outputPin(realm, "C12", "SSTL135_I", "FAST", sdramConnector.getRASnSocket());
+			outputPin(realm, "D13", "SSTL135_I", "FAST", sdramConnector.getCASnSocket());
+			outputPin(realm, "B12", "SSTL135_I", "FAST", sdramConnector.getWEnSocket());
+			outputPin(realm, "A12", "SSTL135_I", "FAST", sdramConnector.getCSnSocket());
+			outputPin(realm, "D16", "SSTL135_I", "FAST", sdramConnector.getDataOutMaskSocket().select(0));
+			outputPin(realm, "G16", "SSTL135_I", "FAST", sdramConnector.getDataOutMaskSocket().select(1));
+		}
+		{
+			// address
+			String[] addressPinIds = {"C4", "D2", "D3", "A3", "A4", "D4", "C3", "B2",
+				"B1", "D1", "A7", "C2", "B6", "C1", "A2", "C7"};
+			for (int i = 0; i < 16; i++) {
+				outputPin(realm, addressPinIds[i], "SSTL135_I", "FAST", sdramConnector.getASocket().select(i));
+			}
+		}
+		{
+			// bank address
+			String[] bankAddressPinIds = {"D6", "B7", "A6"};
+			for (int i = 0; i < 3; i++) {
+				outputPin(realm, bankAddressPinIds[i], "SSTL135_I", "FAST", sdramConnector.getBASocket().select(i));
+			}
+		}
+		{
+			// data
+			RtlVectorSignal dataIn = new RtlVectorConstant(realm, VectorValue.of(0, 0));
+			String[] dataPinIds = {"C17", "D15", "B17", "C16", "A15", "B13", "A17", "A13",
+				"F17", "F16", "G15", "F15", "J16", "C18", "H16", "F18"};
+			for (int i = 0; i < 16; i++) {
+				RtlBidirectionalPin pin = inOutPin(realm, dataPinIds[i], "SSTL135_I", "FAST",
+						sdramConnector.getDataOutSocket().select(i), sdramConnector.getDriveDataSocket());
+				((LatticePinConfiguration)pin.getConfiguration()).set("TERMINATION", "OFF");
+				dataIn = pin.concat(dataIn);
+			}
+			sdramConnector.setDataInSocket(dataIn);
+		}
+		{
+			// data strobe
+			RtlBidirectionalPin udqs = inOutPin(realm, "B15", "SSTL135D_I", "FAST",
+					sdramConnector.getDataStrobeOutSocket(),
+					sdramConnector.getDriveDataStrobeSocket());
+			((LatticePinConfiguration) udqs.getConfiguration()).set("TERMINATION", "OFF");
+			((LatticePinConfiguration) udqs.getConfiguration()).set("DIFFRESISTOR", "100");
+
+			RtlBidirectionalPin ldqs = inOutPin(realm, "G18", "SSTL135D_I", "FAST",
+					sdramConnector.getDataStrobeOutSocket(),
+					sdramConnector.getDriveDataStrobeSocket());
+			((LatticePinConfiguration) ldqs.getConfiguration()).set("TERMINATION", "OFF");
+			((LatticePinConfiguration) ldqs.getConfiguration()).set("DIFFRESISTOR", "100");
+		}
+
+
 		// load the program into small memory
 		try (FileInputStream in = new FileInputStream("orange-crab/resource/heos/build/program.bin")) {
 			int index = 0;
@@ -123,14 +212,23 @@ public class HeosSynthesisMain {
 		}
 
 		// signal logging
-		RtlVectorSignal dummyCounter = RegisterBuilder.build(32, VectorValue.of(32, 0), clock, r -> r.add(1));
-		// RtlVectorSignal dummyShifter = RegisterBuilder.build(8, VectorValue.of(8, 1), clock, r -> r.select(0).concat(r.select(7, 1)));
-		implementation.setSignalLogEnable(new RtlBitConstant(realm, true));
-		implementation.setSignalLogData(dummyCounter);
-		// implementation.setSignalLogData(new RtlVectorConstant(realm, VectorValue.of(24, 0)).concat(dummyShifter));
+//		RtlVectorSignal dummyCounter = RegisterBuilder.build(32, VectorValue.of(32, 0), clock, r -> r.add(1));
+//		// RtlVectorSignal dummyShifter = RegisterBuilder.build(8, VectorValue.of(8, 1), clock, r -> r.select(0).concat(r.select(7, 1)));
+//		implementation.setSignalLogEnable(new RtlBitConstant(realm, true));
+//		implementation.setSignalLogData(dummyCounter);
+//		// implementation.setSignalLogData(new RtlVectorConstant(realm, VectorValue.of(24, 0)).concat(dummyShifter));
+
+		{
+			RamController.Implementation ramController = ((RamController.Implementation) implementation._ramController);
+			RtlBitSignal logStart = ramController._mainState.compareEqual(new RamController.Implementation._STATE_INIT_LMR_0);
+			RtlBitSignal logEnable = RtlBuilder.bitRegister(clock, new RtlBitConstant(realm, true),
+					)
+			implementation.setSignalLogEnable(new RtlBitConstant(realm, true));
+			implementation.setSignalLogData(dummyCounter);
+		}
 
 		// generate Verilog and ISE project files
-		ProjectGenerator projectGenerator = new ProjectGenerator(realm, "Testbild", new File("synthesize/testbild"), "CSFBGA285");
+		ProjectGenerator projectGenerator = new ProjectGenerator(realm, "Heos", new File("synthesize/testbild"), "CSFBGA285");
 		projectGenerator.clean();
 		projectGenerator.generate();
 		projectGenerator.build();

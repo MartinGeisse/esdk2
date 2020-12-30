@@ -62,8 +62,8 @@ int main(void) {
                 continue;
 
             case 0x06:
-                *SIGNAL_LOGGER = 1; // reset
-                *SIGNAL_LOGGER = 8; // activate
+                // *SIGNAL_LOGGER = 1; // reset
+                // *SIGNAL_LOGGER = 8; // activate
                 delay(100);
                 displaySignalLoggerMain();
                 continue;
