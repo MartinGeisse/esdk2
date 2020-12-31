@@ -224,7 +224,7 @@ public class HeosSynthesisMain {
 
 		{
 			RamController.Implementation ramController = ((RamController.Implementation) implementation._ramController);
-			RtlBitSignal logStart = ramController._mainState.compareEqual(RamController.Implementation._STATE_READ_RAS);
+			RtlBitSignal logStart = ramController._mainState.compareEqual(RamController.Implementation._STATE_WRITE_RAS);
 			RtlBitSignal logEnable = RtlBuilder.bitRegister(clock, new RtlBitConstant(realm, true), logStart, false);
 			// RtlBitSignal logEnable = new RtlBitConstant(realm, true);
 			implementation.setSignalLogEnable(logEnable);

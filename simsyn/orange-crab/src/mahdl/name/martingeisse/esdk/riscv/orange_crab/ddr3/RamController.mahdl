@@ -51,13 +51,13 @@ do (*) {
 register vector[16] sdramRegisterDataOut;
 register vector[2] sdramRegisterDataOutMask;
 register bit sdramRegisterDriveData = 0;
-register bit sdramRegisterDataStrobeOut;
 register bit sdramRegisterDriveDataStrobe = 0;
 do (*) {
     sdram.dataOut = sdramRegisterDataOut;
     sdram.dataOutMask = sdramRegisterDataOutMask;
     sdram.driveData = sdramRegisterDriveData;
-    sdram.dataStrobeOut = sdramRegisterDataStrobeOut;
+    sdram.dataStrobeOut = sdramRegisterCK; // nominal DQS-out is identical to the main clock (later we might
+        // time-shift this within the allowed range of +/- one quarter clock cycle)
     sdram.driveDataStrobe = sdramRegisterDriveDataStrobe;
 }
 
@@ -97,8 +97,9 @@ register vector[16] offBeatDataInRegister;
 
 // bus interface
 do (*) {
-    busRequestAcknowledge = (clockDivider == 3d0 & mainState == STATE_READ_DATA & waitCount == 16d0);
-    busResponseReadData = offBeatDataInRegister _ sdram.dataIn;
+    busRequestAcknowledge = clockDivider == 3d0 & ((mainState == STATE_READ_DATA & waitCount == 16d0)
+            | (mainState == STATE_WRITE_POSTAMBLE & waitCount == 16d1));
+    busResponseReadData = sdram.dataIn _ offBeatDataInRegister;
 }
 
 /**
@@ -283,41 +284,27 @@ do (clk) {
                             sdramRegisterCASn = 0;
                             sdramRegisterWEn = 0;
                             sdramRegisterA[10] = 1; // use auto-precharge
-                            sdramRegisterA[9:1] = busRequestWordAddress[8:0];
-                            sdramRegisterA[0] = 0;
-                            // TODO DQS and data
+                            sdramRegisterA[9:3] = busRequestWordAddress[8:2];
+                            sdramRegisterA[2:0] = 0;
                             sdramRegisterDriveData = 1;
                             sdramRegisterDriveDataStrobe = 1;
-                            sdramRegisterDataStrobeOut = 0;
-                            waitCount = 6; // TODO exact timing
+                            waitCount = 4; // CWL=6, but -1 due to DLL disabled is 5, means wait 4 cycles then act 1 cycle
                             mainState = STATE_WRITE_DATA;
 
                         case STATE_WRITE_DATA:
-                            // send the data word we just acknowledged
-//                            ddrRegisterDataStrobe = 1;
-//                            ddrRegisterDataOutEnable = 1;
-//                            ddrRegisterDataOut = delayedWriteData;
-//                            ddrRegisterDataOutMask = ~delayedWriteMask;
-                            sdramRegisterDataOut = 0;
-                            sdramRegisterDataOutMask = 0;
-                            // check if we can accept another request immediately
-                            if (busRequestAcknowledge) {
-                                // keep CAS and just change the address
-                                sdramRegisterA[9:1] = busRequestWordAddress[8:0];
-                            } else {
-                                // NOP
-                                sdramRegisterCSn = 1;
-                                sdramRegisterRASn = 1;
-                                sdramRegisterCASn = 1;
-                                sdramRegisterWEn = 1;
-                                //
+                            if (sdramRegisterA[2:1] == 2d3) {
+                                waitCount = 1;
                                 mainState = STATE_WRITE_POSTAMBLE;
                             }
+                            sdramRegisterDataOut = busRequestWriteData[15:0];
+                            // TODO halfword / byte mask
+                            sdramRegisterDataOutMask = (sdramRegisterA[2:1] == busRequestWordAddress[1:0]) ? 2b11 : 2b00;
+                            sdramRegisterA = sdramRegisterA + 13d1;
 
                         case STATE_WRITE_POSTAMBLE:
                             sdramRegisterDriveDataStrobe = 0;
                             sdramRegisterDriveData = 0;
-                            waitCount = 12;
+                            waitCount = 10; // write recovery + precharging
                             mainState = STATE_IDLE;
 
                         // --------------------------------------------------------------------------------------------------------
@@ -326,9 +313,9 @@ do (clk) {
 
                         case STATE_IDLE:
                             if (busRequestEnable & ~busRequestWrite) {
-                                waitCount = 3; // TODO remove
                                 mainState = STATE_READ_RAS;
                             } else if (busRequestEnable & busRequestWrite) {
+                                waitCount = 3; // TODO remove
                                 mainState = STATE_WRITE_RAS;
                             } else if (refreshRequest) {
                                 // TODO no refreshing for now since that makes it easier to debug
@@ -346,7 +333,6 @@ do (clk) {
 
             case 3d4:
                 sdramRegisterDataOut = busRequestWriteData[31:16];
-                sdramRegisterDataStrobeOut = 0; // TODO exact sequence? Also, must be time-shifted!
                 offBeatDataInRegister = sdram.dataIn;
 
             case 3d6:
