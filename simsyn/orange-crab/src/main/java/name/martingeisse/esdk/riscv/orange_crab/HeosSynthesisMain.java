@@ -229,7 +229,8 @@ public class HeosSynthesisMain {
 			// RtlBitSignal logEnable = new RtlBitConstant(realm, true);
 			implementation.setSignalLogEnable(logEnable);
 			implementation.setSignalLogData(new RtlConcatenation(realm,
-					new RtlVectorConstant(realm, VectorValue.of(7, 0)),
+					new RtlVectorConstant(realm, VectorValue.of(5, 0)),
+					sdramConnector.getDataOutMaskSocket(),
 					sdramConnector.getDataIn().select(7, 0),
 					udqs,
 					ldqs,

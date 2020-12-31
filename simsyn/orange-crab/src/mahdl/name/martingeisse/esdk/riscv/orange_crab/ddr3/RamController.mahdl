@@ -200,6 +200,7 @@ do (clk) {
                             // according to the manual, but I configured it by accident and it seems to work. The
                             // manual says something about DQSCK "starting earlier" with the DLL off and this seems
                             // to mean that we actually have CL=4 when CL=5 is configured.
+                            // TODO data on the wire looks like in "interleave" mode but I don't know why
                             sdramRegisterA = 13h0310;
                             waitCount = 12; // tMOD = 12 clock cycles
                             mainState = STATE_INIT_ZQCL;
@@ -288,7 +289,8 @@ do (clk) {
                             sdramRegisterA[2:0] = 0;
                             sdramRegisterDriveData = 1;
                             sdramRegisterDriveDataStrobe = 1;
-                            waitCount = 4; // CWL=6, but -1 due to DLL disabled is 5, means wait 4 cycles then act 1 cycle
+                            waitCount = 5; // CWL = 6, means wait 5 cycles then act 1 cycle. The -1 from DLL disable
+                                // does not seem to apply to WRITEs
                             mainState = STATE_WRITE_DATA;
 
                         case STATE_WRITE_DATA:
@@ -298,8 +300,8 @@ do (clk) {
                             }
                             sdramRegisterDataOut = busRequestWriteData[15:0];
                             // TODO halfword / byte mask
-                            sdramRegisterDataOutMask = (sdramRegisterA[2:1] == busRequestWordAddress[1:0]) ? 2b11 : 2b00;
-                            sdramRegisterA = sdramRegisterA + 13d1;
+                            sdramRegisterDataOutMask = (sdramRegisterA[2:1] == busRequestWordAddress[1:0]) ? 2b00 : 2b11;
+                            sdramRegisterA = sdramRegisterA + 13d2;
 
                         case STATE_WRITE_POSTAMBLE:
                             sdramRegisterDriveDataStrobe = 0;
@@ -315,11 +317,9 @@ do (clk) {
                             if (busRequestEnable & ~busRequestWrite) {
                                 mainState = STATE_READ_RAS;
                             } else if (busRequestEnable & busRequestWrite) {
-                                waitCount = 3; // TODO remove
                                 mainState = STATE_WRITE_RAS;
-                            } else if (refreshRequest) {
-                                // TODO no refreshing for now since that makes it easier to debug
-                                // mainState = SD_AUTO_REF;
+//                            } else if (refreshRequest) {
+//                                mainState = STATE_REFRESH;
                             }
 
                         default:
@@ -346,7 +346,9 @@ do (clk) {
 // refresh timer state machine
 // --------------------------------------------------------------------------------------------------------------------
 
-// TODO adjust to new RAM chip
+// Each row needs to be refreshed every 64ms. This means a refresh command is needed every 7.8125µs.
+// With a (RAM) clock cycle being 8 main clock cycles which are 50MHz, the RAM is clocked at 6.25 MHz (0.16 µs).
+// This means we need a refresh command every 48 clock cycles.
 
 register bit refreshRequest;
 register vector[10] refreshCounter;
@@ -361,7 +363,7 @@ do (clk) {
         refreshQueue = 0;
     } else {
         refreshCounter = refreshCounter + 10d1;
-        if (refreshCounter == 10d700) { // TODO adjust
+        if (refreshCounter == 10d48) {
             refreshCounter = 0;
             if (refreshQueue != 3d0) {
                 refreshQueue = refreshQueue - 3d1;

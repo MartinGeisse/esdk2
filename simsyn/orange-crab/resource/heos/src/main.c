@@ -35,15 +35,17 @@ static void keycodeLoop() {
 int main(void) {
 
     delay(1000);
-    *(unsigned int *)0x80000000 = 0x12345678;
-    *(unsigned int *)0x80000004 = 0x1bc8390c;
-    *(unsigned int *)0x80000008 = 0x00000000;
-    *(unsigned int *)0x8000000c = 0xffffffff;
-    // *(unsigned int *)0x80000008 = 0x01010202;
-    unsigned int readValue1 = *(unsigned int *)0x80000000;
-    unsigned int readValue2 = *(unsigned int *)0x80000004;
-    unsigned int readValue3 = *(unsigned int *)0x80000008;
-    unsigned int readValue4 = *(unsigned int *)0x8000000c;
+    *(volatile unsigned int *)0x80000000 = 0x12345678;
+    *(volatile unsigned int *)0x80000004 = 0x1bc8390c;
+    *(volatile unsigned int *)0x80000008 = 0x00000000;
+    *(volatile unsigned int *)0x8000000c = 0xffffffff;
+    *(volatile unsigned int *)0x80000010 = 0xabcdabcd;
+    *(unsigned int *)0x80000008 = 0x01010202;
+    unsigned int readValue1 = *(volatile unsigned int *)0x80000000;
+    unsigned int readValue2 = *(volatile unsigned int *)0x80000004;
+    unsigned int readValue3 = *(volatile unsigned int *)0x80000008;
+    unsigned int readValue4 = *(volatile unsigned int *)0x8000000c;
+    unsigned int readValue5 = *(volatile unsigned int *)0x80000010;
 
     while (1) {
 
@@ -57,17 +59,20 @@ int main(void) {
 
         // show menu
         termPrintString("readValue1: ");
-        // termPrintlnUnsignedHexInt(readValue1);
-        termPrintlnUnsignedHexInt(*(unsigned int *)0x80000000);
+        termPrintlnUnsignedHexInt(readValue1);
+        // termPrintlnUnsignedHexInt(*(unsigned int *)0x80000000);
         termPrintString("readValue2: ");
-        // termPrintlnUnsignedHexInt(readValue2);
-        termPrintlnUnsignedHexInt(*(unsigned int *)0x80000004);
+        termPrintlnUnsignedHexInt(readValue2);
+        // termPrintlnUnsignedHexInt(*(unsigned int *)0x80000004);
         termPrintString("readValue3: ");
-        // termPrintlnUnsignedHexInt(readValue3);
-        termPrintlnUnsignedHexInt(*(unsigned int *)0x80000008);
+        termPrintlnUnsignedHexInt(readValue3);
+        // termPrintlnUnsignedHexInt(*(unsigned int *)0x80000008);
         termPrintString("readValue4: ");
-        // termPrintlnUnsignedHexInt(readValue4);
-        termPrintlnUnsignedHexInt(*(unsigned int *)0x8000000c);
+        termPrintlnUnsignedHexInt(readValue4);
+        // termPrintlnUnsignedHexInt(*(unsigned int *)0x8000000c);
+        termPrintString("readValue5: ");
+        termPrintlnUnsignedHexInt(readValue5);
+        // termPrintlnUnsignedHexInt(*(unsigned int *)0x80000010);
 
         termPrintlnString("F1 - keycodes");
         termPrintlnString("F2 - signal logger");
