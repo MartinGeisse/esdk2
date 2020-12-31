@@ -157,7 +157,7 @@ do (clk) {
                         case STATE_INIT_CLOCK_ENABLE:
                             sdramRegisterCKE = 1;
                             waitCount = 12; // min. 10ns+tRFC = 120ns, min. 5 clocks
-                            mainState = STATE_INIT_CLOCK_ENABLE;
+                            mainState = STATE_INIT_LMR_2;
 
                         case STATE_INIT_LMR_2:
                             sdramRegisterCSn = 0;
@@ -213,7 +213,9 @@ do (clk) {
                             sdramRegisterWEn = 0;
                             sdramRegisterA[10] = 1;
                             waitCount = 512; // time needed for ZQ calibration
-                            mainState = STATE_IDLE;
+                            // TODO
+                            // mainState = STATE_IDLE;
+                            mainState = STATE_INIT_HANG;
 
                         case STATE_INIT_READ:
                             sdramRegisterCSn = 0;

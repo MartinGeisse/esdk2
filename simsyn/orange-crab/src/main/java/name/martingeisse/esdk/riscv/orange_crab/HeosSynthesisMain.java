@@ -9,10 +9,7 @@ import name.martingeisse.esdk.core.rtl.module.RtlModuleInstance;
 import name.martingeisse.esdk.core.rtl.pin.RtlBidirectionalPin;
 import name.martingeisse.esdk.core.rtl.pin.RtlInputPin;
 import name.martingeisse.esdk.core.rtl.pin.RtlOutputPin;
-import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
-import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
-import name.martingeisse.esdk.core.rtl.signal.RtlVectorConstant;
-import name.martingeisse.esdk.core.rtl.signal.RtlVectorSignal;
+import name.martingeisse.esdk.core.rtl.signal.*;
 import name.martingeisse.esdk.core.rtl.synthesis.lattice.LatticePinConfiguration;
 import name.martingeisse.esdk.core.rtl.synthesis.lattice.ProjectGenerator;
 import name.martingeisse.esdk.core.util.vector.VectorValue;
@@ -135,6 +132,12 @@ public class HeosSynthesisMain {
 		// actually used anywhere in the design. Externally they are hardwired to the supply voltage and GND, so I
 		// don't get at all what to use them for, or why they are even connected to the FPGA. Possibly they can be
 		// used to check if the supply voltage is stable already.
+		// Comment by Greg about these pins:
+		// 		Lattice refers to these as "Virtual" power pins.
+		//		I believe the logic is to attach un-used I/O pins to VCCIO/GND, and then drive them in gateware to
+		//			offer more return paths for signals to aid in reducing switching noise.
+		// 		By default these pins are tri-stated. So if you're not using the DRAM in your design it's okay to leave
+		// 			them out of the pin constraints.
 		//
 		{
 			// control
@@ -220,11 +223,24 @@ public class HeosSynthesisMain {
 
 		{
 			RamController.Implementation ramController = ((RamController.Implementation) implementation._ramController);
-			RtlBitSignal logStart = ramController._mainState.compareEqual(new RamController.Implementation._STATE_INIT_LMR_0);
-			RtlBitSignal logEnable = RtlBuilder.bitRegister(clock, new RtlBitConstant(realm, true),
-					)
-			implementation.setSignalLogEnable(new RtlBitConstant(realm, true));
-			implementation.setSignalLogData(dummyCounter);
+			RtlBitSignal logStart = ramController._mainState.compareEqual(RamController.Implementation._STATE_INIT_LMR_3);
+			RtlBitSignal logEnable = RtlBuilder.bitRegister(clock, new RtlBitConstant(realm, true), logStart, false);
+			// RtlBitSignal logEnable = new RtlBitConstant(realm, true);
+			implementation.setSignalLogEnable(logEnable);
+			implementation.setSignalLogData(new RtlConcatenation(realm,
+					new RtlVectorConstant(realm, VectorValue.of(17, 0)),
+					sdramConnector.getRESETnSocket(),
+					sdramConnector.getODTSocket(),
+					sdramConnector.getDriveDataStrobeSocket(),
+					sdramConnector.getDriveDataSocket(),
+					sdramConnector.getWEnSocket(),
+					sdramConnector.getCASnSocket(),
+					sdramConnector.getRASnSocket(),
+					sdramConnector.getCSnSocket(),
+					sdramConnector.getCKESocket(),
+					sdramConnector.getCKSocket(),
+					ramController._mainState
+			));
 		}
 
 		// generate Verilog and ISE project files

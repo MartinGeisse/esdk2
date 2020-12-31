@@ -1,5 +1,6 @@
 
 #include "keyboard.h"
+#include "term.h"
 
 void delay(int n);
 
@@ -9,6 +10,41 @@ static volatile unsigned int * const SIGNAL_LOGGER = (unsigned int * const)0x040
 static int sample(int signalIndex, int sampleIndex) {
     return (SIGNAL_LOGGER[sampleIndex] >> signalIndex) & 1;
 }
+
+static const char * const labels[32] = {
+    "mainState4",
+    "mainState3",
+    "mainState2",
+    "mainState1",
+    "mainState0",
+    "CK",
+    "CKE",
+    "CS'",
+    "RAS'",
+    "CAS'",
+    "WE'",
+    "*data",
+    "*strobe",
+    "ODT",
+    "RESET'"
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+};
 
 void displaySignalLoggerMain(void) {
     int startSampleIndex = 0;
@@ -25,11 +61,21 @@ void displaySignalLoggerMain(void) {
         }
 
         // drawing
+
         const int sampleCount = 512;
-        for (int signalIndexDelta = 0; signalIndexDelta < 7; signalIndexDelta++) {
+        for (int signalIndexDelta = 0; signalIndexDelta < 10; signalIndexDelta++) {
             int signalIndex = startSignalIndex + signalIndexDelta;
-            int y = signalIndexDelta << 2;
-            for (int x = 0, sampleIndex = startSampleIndex; x < 80 && sampleIndex + groupSize <= sampleCount; x++, sampleIndex += groupSize) {
+            int y = signalIndexDelta + signalIndexDelta + signalIndexDelta;
+            const char *label = labels[signalIndex];
+            for (int i = 0; i < 10; i++) {
+                char c = label[i];
+                if (c == 0) {
+                    break;
+                } else {
+                    SCREEN[((y + 1) << 7) + i] = c;
+                }
+            }
+            for (int x = 0, sampleIndex = startSampleIndex; x < 70 && sampleIndex + groupSize <= sampleCount; x++, sampleIndex += groupSize) {
                 int firstSampleValue = sample(signalIndex, sampleIndex);
                 int sampleValue = firstSampleValue;
                 for (int i = 0; i < groupSize; i++) {
@@ -39,11 +85,13 @@ void displaySignalLoggerMain(void) {
                     }
                 }
                 if (sampleValue < 0) {
-                    SCREEN[((y + 1) << 7) + x] = '#';
+                    SCREEN[((y + 1) << 7) + x + 10] = '#';
                 } else if (sampleValue) {
-                    SCREEN[(y << 7) + x] = '_';
+                    SCREEN[(y << 7) + x + 10] = '_';
+                    SCREEN[((y + 1) << 7) + x + 10] = '.';
                 } else {
-                    SCREEN[((y + 1) << 7) + x] = '_';
+                    SCREEN[(y << 7) + x + 10] = '.';
+                    SCREEN[((y + 1) << 7) + x + 10] = '_';
                 }
             }
             pollKeyboard();
@@ -82,14 +130,14 @@ void displaySignalLoggerMain(void) {
                 }
             }
             if (keyStates[0x6b]) {
-                startSampleIndex -= groupSize;
+                startSampleIndex -= groupSize << 1;
                 if (startSampleIndex < 0) {
                     startSampleIndex = 0;
                 }
                 cooldown = 50;
             }
             if (keyStates[0x74]) {
-                startSampleIndex += groupSize;
+                startSampleIndex += groupSize << 1;
                 cooldown = 50;
             }
             if (keyStates[0x76]) {
