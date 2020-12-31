@@ -33,6 +33,11 @@ static void keycodeLoop() {
 }
 
 int main(void) {
+
+    delay(1000);
+    unsigned int readValue = *(unsigned int *)0x80000000;
+
+
     while (1) {
 
         // clear screen
@@ -44,6 +49,8 @@ int main(void) {
         }
 
         // show menu
+        termPrintString("readValue: ");
+        termPrintlnUnsignedHexInt(readValue);
         termPrintlnString("F1 - keycodes");
         termPrintlnString("F2 - signal logger");
         termPrintlnString("ESC - return to this menu");

@@ -75,19 +75,16 @@ constant vector[5] STATE_INIT_LMR_3 = 4;
 constant vector[5] STATE_INIT_LMR_1 = 5;
 constant vector[5] STATE_INIT_LMR_0 = 6;
 constant vector[5] STATE_INIT_ZQCL = 7;
-// TODO
-constant vector[5] STATE_INIT_READ = 8;
-constant vector[5] STATE_INIT_HANG = 9;
-// TODO
 constant vector[5] STATE_IDLE = 10;
 constant vector[5] STATE_REFRESH = 11;
 constant vector[5] STATE_REFRESH_ACK = 12;
 constant vector[5] STATE_READ_RAS = 13;
 constant vector[5] STATE_READ_CAS = 14;
-constant vector[5] STATE_WRITE_RAS = 15;
-constant vector[5] STATE_WRITE_CAS = 16;
-constant vector[5] STATE_WRITE_DATA = 17;
-constant vector[5] STATE_WRITE_POSTAMBLE = 18;
+constant vector[5] STATE_READ_DATA = 15;
+constant vector[5] STATE_WRITE_RAS = 16;
+constant vector[5] STATE_WRITE_CAS = 17;
+constant vector[5] STATE_WRITE_DATA = 18;
+constant vector[5] STATE_WRITE_POSTAMBLE = 19;
 
 // main and init state machines
 register bit refreshAcknowledge;
@@ -95,17 +92,13 @@ register vector[3] clockDivider = 0;
 register vector[5] mainState = STATE_START;
 register vector[16] waitCount = 0;
 
-// TODO move to main state machine
-//do (*) {
-//    busRequestAcknowledge =
-//            (mainState == STATE_READ_CAS | mainState == STATE_WRITE_CAS | mainState == STATE_WRITE_DATA)
-//                    & busRequestEnable & isRequestingCurrentRow;
-//    busResponseEnable = (inflightReadQueueStage4Type == INFLIGHT_READ_QUEUE_TYPE_BUS);
-//    busResponseReadData = ddrRegisterDataIn;
-//}
+// data input
+register vector[16] offBeatDataInRegister;
+
+// bus interface
 do (*) {
-    busRequestAcknowledge = 0;
-    busResponseReadData = 0;
+    busRequestAcknowledge = (clockDivider == 3d0 & mainState == STATE_READ_DATA & waitCount == 16d0);
+    busResponseReadData = offBeatDataInRegister _ sdram.dataIn;
 }
 
 /**
@@ -177,9 +170,8 @@ do (clk) {
                             sdramRegisterCASn = 0;
                             sdramRegisterWEn = 0;
                             sdramRegisterBA = 3d3;
-                            // TODO: temporarily enable the MPR
-                            // with MPR enabled: 0x0004; with MPR disabled: 0x0000
-                            sdramRegisterA = 13h0004;
+                            // MPR disabled
+                            sdramRegisterA = 13h0000;
                             waitCount = 4; // tMRD = 4 clock cycles
                             mainState = STATE_INIT_LMR_1;
 
@@ -218,18 +210,7 @@ do (clk) {
                             sdramRegisterWEn = 0;
                             sdramRegisterA[10] = 1;
                             waitCount = 512; // time needed for ZQ calibration
-                            mainState = STATE_INIT_READ;
-
-                        case STATE_INIT_READ:
-                            sdramRegisterCSn = 0;
-                            sdramRegisterRASn = 1;
-                            sdramRegisterCASn = 0;
-                            sdramRegisterWEn = 1;
-                            sdramRegisterA = 0;
-                            mainState = STATE_INIT_HANG;
-
-                        case STATE_INIT_HANG:
-                            {}
+                            mainState = STATE_IDLE;
 
                         // --------------------------------------------------------------------------------------------------------
                         // refresh
@@ -272,9 +253,12 @@ do (clk) {
                             sdramRegisterA[10] = 1; // use auto-precharge
                             sdramRegisterA[9:1] = busRequestWordAddress[8:0];
                             sdramRegisterA[0] = 0;
-                            // TODO actually sample the input data!
-                            // 10 CK + 15ns, aber mindestens 37,5ns
-                            waitCount = 12;
+                            waitCount = 4;
+                            mainState = STATE_READ_DATA;
+
+                        case STATE_READ_DATA:
+                            waitCount = 8; // wait for data, after that wait a time that seems to be 0 according to
+                                            // the manual, but for now we want to be on the safe side
                             mainState = STATE_IDLE;
 
                         // --------------------------------------------------------------------------------------------------------
@@ -342,6 +326,7 @@ do (clk) {
 
                         case STATE_IDLE:
                             if (busRequestEnable & ~busRequestWrite) {
+                                waitCount = 3; // TODO remove
                                 mainState = STATE_READ_RAS;
                             } else if (busRequestEnable & busRequestWrite) {
                                 mainState = STATE_WRITE_RAS;
@@ -362,6 +347,7 @@ do (clk) {
             case 3d4:
                 sdramRegisterDataOut = busRequestWriteData[31:16];
                 sdramRegisterDataStrobeOut = 0; // TODO exact sequence? Also, must be time-shifted!
+                offBeatDataInRegister = sdram.dataIn;
 
             case 3d6:
                 sdramRegisterCK = 0;
