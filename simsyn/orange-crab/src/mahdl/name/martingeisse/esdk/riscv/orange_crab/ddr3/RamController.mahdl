@@ -166,6 +166,7 @@ do (clk) {
                             sdramRegisterWEn = 0;
                             sdramRegisterBA = 3d2;
                             // CWL=6; ASR disabled; SRT=normal; dynamic ODT disabled
+                            // TODO try CWL=5
                             sdramRegisterA = 13h0008;
                             waitCount = 4; // tMRD = 4 clock cycles
                             mainState = STATE_INIT_LMR_3;
@@ -200,8 +201,12 @@ do (clk) {
                             sdramRegisterCASn = 0;
                             sdramRegisterWEn = 0;
                             sdramRegisterBA = 3d0;
-                            // fixed burst length 8; sequential burst; CL=6; DLL reset yes (TODO ???)
+                            // fixed burst length 8; sequential burst; CL=5; DLL reset yes
                             // write recovery=5; precharge PD: DLL off
+                            // The DLL reset probably does not matter. CL=5 is not supported with the DLL disabled
+                            // according to the manual, but I configured it by accident and it seems to work. The
+                            // manual says something about DQSCK "starting earlier" with the DLL off and this seems
+                            // to mean that we actually have CL=4 when CL=5 is configured.
                             sdramRegisterA = 13h0310;
                             waitCount = 12; // tMOD = 12 clock cycles
                             mainState = STATE_INIT_ZQCL;
