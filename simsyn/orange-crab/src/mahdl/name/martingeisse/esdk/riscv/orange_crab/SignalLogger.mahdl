@@ -16,10 +16,10 @@ interface {
 
 }
 
-register matrix[512][32] memory;
+register matrix[8192][32] memory;
 
 // logging interface
-register vector[9] logPointer;
+register vector[13] logPointer;
 do (logClock) {
     if (clearMode | (loggingActive & logEnable)) {
         memory[logPointer] = clearMode ? 32d0 : logData;
@@ -28,8 +28,8 @@ do (logClock) {
 do (logClock) {
     if (resetLogPointer) {
         logPointer = 0;
-    } else if (loggingActive & logEnable & logPointer != 9b111111111) {
-        logPointer = logPointer + 9d1;
+    } else if (loggingActive & logEnable & logPointer != 13b1111111111111) {
+        logPointer = logPointer + 13d1;
     }
 }
 
@@ -38,7 +38,7 @@ register vector[32] busReadDataRegister;
 do (*) busReadData = busReadDataRegister;
 do (busClock) {
     if (busEnable & ~busWrite) {
-        busReadDataRegister = memory[busWordAddress[8:0]];
+        busReadDataRegister = memory[busWordAddress[12:0]];
     }
 }
 

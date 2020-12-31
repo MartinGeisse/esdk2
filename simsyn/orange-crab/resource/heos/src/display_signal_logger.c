@@ -12,11 +12,11 @@ static int sample(int signalIndex, int sampleIndex) {
 }
 
 static const char * const labels[32] = {
-    "mainState4",
-    "mainState3",
-    "mainState2",
-    "mainState1",
     "mainState0",
+    "mainState1",
+    "mainState2",
+    "mainState3",
+    "mainState4",
     "CK",
     "CKE",
     "CS'",
@@ -26,17 +26,17 @@ static const char * const labels[32] = {
     "*data",
     "*strobe",
     "ODT",
-    "RESET'"
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
+    "RESET'",
+    "LDQS",
+    "UDQS",
+    "d0",
+    "d1",
+    "d2",
+    "d3",
+    "d4",
+    "d5",
+    "d6",
+    "d7",
     "",
     "",
     "",
@@ -62,7 +62,7 @@ void displaySignalLoggerMain(void) {
 
         // drawing
 
-        const int sampleCount = 512;
+        const int sampleCount = 8192;
         for (int signalIndexDelta = 0; signalIndexDelta < 10; signalIndexDelta++) {
             int signalIndex = startSignalIndex + signalIndexDelta;
             int y = signalIndexDelta + signalIndexDelta + signalIndexDelta;

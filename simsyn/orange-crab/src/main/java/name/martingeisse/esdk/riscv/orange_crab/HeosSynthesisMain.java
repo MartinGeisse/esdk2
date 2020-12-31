@@ -182,15 +182,16 @@ public class HeosSynthesisMain {
 			}
 			sdramConnector.setDataInSocket(dataIn);
 		}
+		RtlBidirectionalPin udqs, ldqs;
 		{
 			// data strobe
-			RtlBidirectionalPin udqs = inOutPin(realm, "B15", "SSTL135D_I", "FAST",
+			udqs = inOutPin(realm, "B15", "SSTL135D_I", "FAST",
 					sdramConnector.getDataStrobeOutSocket(),
 					sdramConnector.getDriveDataStrobeSocket());
 			((LatticePinConfiguration) udqs.getConfiguration()).set("TERMINATION", "OFF");
 			((LatticePinConfiguration) udqs.getConfiguration()).set("DIFFRESISTOR", "100");
 
-			RtlBidirectionalPin ldqs = inOutPin(realm, "G18", "SSTL135D_I", "FAST",
+			ldqs = inOutPin(realm, "G18", "SSTL135D_I", "FAST",
 					sdramConnector.getDataStrobeOutSocket(),
 					sdramConnector.getDriveDataStrobeSocket());
 			((LatticePinConfiguration) ldqs.getConfiguration()).set("TERMINATION", "OFF");
@@ -228,7 +229,10 @@ public class HeosSynthesisMain {
 			// RtlBitSignal logEnable = new RtlBitConstant(realm, true);
 			implementation.setSignalLogEnable(logEnable);
 			implementation.setSignalLogData(new RtlConcatenation(realm,
-					new RtlVectorConstant(realm, VectorValue.of(17, 0)),
+					new RtlVectorConstant(realm, VectorValue.of(7, 0)),
+					sdramConnector.getDataIn().select(7, 0),
+					udqs,
+					ldqs,
 					sdramConnector.getRESETnSocket(),
 					sdramConnector.getODTSocket(),
 					sdramConnector.getDriveDataStrobeSocket(),

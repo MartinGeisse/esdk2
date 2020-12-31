@@ -213,9 +213,7 @@ do (clk) {
                             sdramRegisterWEn = 0;
                             sdramRegisterA[10] = 1;
                             waitCount = 512; // time needed for ZQ calibration
-                            // TODO
-                            // mainState = STATE_IDLE;
-                            mainState = STATE_INIT_HANG;
+                            mainState = STATE_INIT_READ;
 
                         case STATE_INIT_READ:
                             sdramRegisterCSn = 0;
