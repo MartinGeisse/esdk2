@@ -23,6 +23,12 @@ void memoryTest(void) {
     termPrintlnUnsignedInt(memory[2]);
     termPrintlnUnsignedInt(memory[3]);
 
+//    for (int i = 0; i < 80; i++) {
+//        delay(1000);
+//        termPrintChar('.');
+//    }
+//    termPrintln();
+
     termPrintString("read phase... ");
     x = 1;
     for (int i = 0; i < 0x02000000; i++) {
@@ -36,8 +42,6 @@ void memoryTest(void) {
             termPrintUnsignedHexInt(memory[i]);
             return;
         }
-        termPrintUnsignedHexInt(x);
-        termPrintString("  ");
         x = (x << 2) + x + 1;
     }
     termPrintlnString("success!");
