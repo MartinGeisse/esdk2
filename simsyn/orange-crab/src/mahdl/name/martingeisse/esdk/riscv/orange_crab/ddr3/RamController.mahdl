@@ -92,8 +92,9 @@ register vector[3] clockDivider = 0;
 register vector[5] mainState = STATE_START;
 register vector[16] waitCount = 0;
 
-// data input
+// off-beat (falling RAM CK edge) data input/output
 register vector[16] offBeatDataInRegister;
+register vector[2] sdramRegisterOffBeatDataOutMask;
 
 // bus interface
 do (*) {
@@ -300,7 +301,13 @@ do (clk) {
                             }
                             sdramRegisterDataOut = busRequestWriteData[15:0];
                             // TODO halfword / byte mask
-                            sdramRegisterDataOutMask = (sdramRegisterA[2:1] == busRequestWordAddress[1:0]) ? 2b00 : 2b11;
+                            if (sdramRegisterA[2:1] == busRequestWordAddress[1:0]) {
+                                sdramRegisterDataOutMask = ~busRequestWriteMask[1:0];
+                                sdramRegisterOffBeatDataOutMask = ~busRequestWriteMask[3:2];
+                            } else {
+                                sdramRegisterDataOutMask = 2b11;
+                                sdramRegisterOffBeatDataOutMask = 2b11;
+                            }
                             sdramRegisterA = sdramRegisterA + 13d2;
 
                         case STATE_WRITE_POSTAMBLE:
@@ -334,6 +341,7 @@ do (clk) {
             case 3d4:
                 sdramRegisterDataOut = busRequestWriteData[31:16];
                 offBeatDataInRegister = sdram.dataIn;
+                sdramRegisterDataOutMask = sdramRegisterOffBeatDataOutMask;
 
             case 3d6:
                 sdramRegisterCK = 0;

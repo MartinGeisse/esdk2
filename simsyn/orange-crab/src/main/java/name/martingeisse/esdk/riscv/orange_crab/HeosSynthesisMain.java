@@ -151,8 +151,8 @@ public class HeosSynthesisMain {
 			outputPin(realm, "D13", "SSTL135_I", "FAST", sdramConnector.getCASnSocket());
 			outputPin(realm, "B12", "SSTL135_I", "FAST", sdramConnector.getWEnSocket());
 			outputPin(realm, "A12", "SSTL135_I", "FAST", sdramConnector.getCSnSocket());
-			outputPin(realm, "D16", "SSTL135_I", "FAST", sdramConnector.getDataOutMaskSocket().select(0));
-			outputPin(realm, "G16", "SSTL135_I", "FAST", sdramConnector.getDataOutMaskSocket().select(1));
+			outputPin(realm, "G16", "SSTL135_I", "FAST", sdramConnector.getDataOutMaskSocket().select(0));
+			outputPin(realm, "D16", "SSTL135_I", "FAST", sdramConnector.getDataOutMaskSocket().select(1));
 		}
 		{
 			// address

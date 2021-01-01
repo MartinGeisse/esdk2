@@ -3,6 +3,7 @@
 #include "keyboard.h"
 
 void delay(int n);
+static volatile unsigned int * const SCREEN = (unsigned int *)0x01000000;
 
 void memoryTest(void) {
     termPrintlnString("performing memory test");
@@ -23,6 +24,12 @@ void memoryTest(void) {
 }
 
 void memoryMaskTest(void) {
+    for (int y = 0; y < 30; y++) {
+        for (int x = 0; x < 80; x++) {
+            SCREEN[(y << 7) + x] = ' ';
+        }
+    }
+    termInitialize();
     termPrintlnString("performing memory mask test");
     volatile unsigned int *words = (volatile unsigned int *)0x80000000;
     volatile unsigned short *halfwords = (volatile unsigned short *)0x80000000;
@@ -40,4 +47,11 @@ void memoryMaskTest(void) {
     bytes[16 + 1] = 0xbb;
     bytes[20 + 2] = 0xcc;
     bytes[24 + 3] = 0xdd;
+    termPrintlnUnsignedHexInt(words[0]);
+    termPrintlnUnsignedHexInt(words[1]);
+    termPrintlnUnsignedHexInt(words[2]);
+    termPrintlnUnsignedHexInt(words[3]);
+    termPrintlnUnsignedHexInt(words[4]);
+    termPrintlnUnsignedHexInt(words[5]);
+    termPrintlnUnsignedHexInt(words[6]);
 }
