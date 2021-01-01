@@ -160,9 +160,8 @@ do (clk) {
                             sdramRegisterCASn = 0;
                             sdramRegisterWEn = 0;
                             sdramRegisterBA = 3d2;
-                            // CWL=6; ASR disabled; SRT=normal; dynamic ODT disabled
-                            // TODO try CWL=5
-                            sdramRegisterA = 13h0008;
+                            // CWL=5; ASR disabled; SRT=normal; dynamic ODT disabled
+                            sdramRegisterA = 13h0000;
                             waitCount = 4; // tMRD = 4 clock cycles
                             mainState = STATE_INIT_LMR_3;
 
@@ -201,7 +200,7 @@ do (clk) {
                             // according to the manual, but I configured it by accident and it seems to work. The
                             // manual says something about DQSCK "starting earlier" with the DLL off and this seems
                             // to mean that we actually have CL=4 when CL=5 is configured.
-                            // TODO data on the wire looks like in "interleave" mode but I don't know why
+                            // Note: data on the wire looks like in "interleave" mode but I don't know why
                             sdramRegisterA = 13h0310;
                             waitCount = 12; // tMOD = 12 clock cycles
                             mainState = STATE_INIT_ZQCL;
@@ -287,7 +286,7 @@ do (clk) {
                             sdramRegisterA[2:0] = 0;
                             sdramRegisterDriveData = 1;
                             sdramRegisterDriveDataStrobe = 1;
-                            waitCount = 5; // CWL = 6, means wait 5 cycles then act 1 cycle. The -1 from DLL disable
+                            waitCount = 4; // CWL = 5, means wait 4 cycles then act 1 cycle. The -1 from DLL disable
                                 // does not seem to apply to WRITEs
                             mainState = STATE_WRITE_DATA;
 
@@ -297,7 +296,6 @@ do (clk) {
                                 mainState = STATE_WRITE_POSTAMBLE;
                             }
                             sdramRegisterDataOut = busRequestWriteData[15:0];
-                            // TODO halfword / byte mask
                             if (sdramRegisterA[2:1] == busRequestWordAddress[1:0]) {
                                 sdramRegisterDataOutMask = ~busRequestWriteMask[1:0];
                                 sdramRegisterOffBeatDataOutMask = ~busRequestWriteMask[3:2];
