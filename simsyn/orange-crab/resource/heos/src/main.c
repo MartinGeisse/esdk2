@@ -3,6 +3,7 @@
 #include "display_signal_logger.h"
 
 void delay(int n);
+void memoryTest(void);
 
 static volatile unsigned int * const SCREEN = (unsigned int *)0x01000000;
 static volatile unsigned int * const KEYBOARD = (unsigned int * const)0x02000000;
@@ -51,39 +52,40 @@ int main(void) {
 
         // clear screen
         termInitialize();
-//        for (int y = 0; y < 30; y++) {
-//            for (int x = 0; x < 80; x++) {
-//                SCREEN[(y << 7) + x] = ' ';
-//            }
-//        }
+        for (int y = 0; y < 30; y++) {
+            for (int x = 0; x < 80; x++) {
+                SCREEN[(y << 7) + x] = ' ';
+            }
+        }
 
         // show menu
         termPrintString("readValue1: ");
-        termPrintlnUnsignedHexInt(readValue1);
-        // termPrintlnUnsignedHexInt(*(unsigned int *)0x80000000);
+        // termPrintlnUnsignedHexInt(readValue1);
+        termPrintlnUnsignedHexInt(*(volatile unsigned int *)0x80000000);
         termPrintString("readValue2: ");
-        termPrintlnUnsignedHexInt(readValue2);
-        // termPrintlnUnsignedHexInt(*(unsigned int *)0x80000004);
+        // termPrintlnUnsignedHexInt(readValue2);
+        termPrintlnUnsignedHexInt(*(volatile unsigned int *)0x80000004);
         termPrintString("readValue3: ");
-        termPrintlnUnsignedHexInt(readValue3);
-        // termPrintlnUnsignedHexInt(*(unsigned int *)0x80000008);
+        // termPrintlnUnsignedHexInt(readValue3);
+        termPrintlnUnsignedHexInt(*(volatile unsigned int *)0x80000008);
         termPrintString("readValue4: ");
-        termPrintlnUnsignedHexInt(readValue4);
-        // termPrintlnUnsignedHexInt(*(unsigned int *)0x8000000c);
+        // termPrintlnUnsignedHexInt(readValue4);
+        termPrintlnUnsignedHexInt(*(volatile unsigned int *)0x8000000c);
         termPrintString("readValue5: ");
-        termPrintlnUnsignedHexInt(readValue5);
-        // termPrintlnUnsignedHexInt(*(unsigned int *)0x80000010);
+        // termPrintlnUnsignedHexInt(readValue5);
+        termPrintlnUnsignedHexInt(*(volatile unsigned int *)0x80000010);
 
         termPrintlnString("F1 - keycodes");
         termPrintlnString("F2 - signal logger");
+        termPrintlnString("F3 - memory test");
         termPrintlnString("ESC - return to this menu");
         termPrintln();
 
         // wait for kepress
         unsigned int code;
-        //do {
+        do {
             code = *KEYBOARD;
-        //} while (code == 0);
+        } while (code == 0);
         resetKeyStates();
         switch (code) {
 
@@ -97,6 +99,16 @@ int main(void) {
                 delay(100);
                 displaySignalLoggerMain();
                 continue;
+
+            case 0x04:
+                memoryTest();
+                do {
+                    code = *KEYBOARD;
+                } while (code != 0);
+                do {
+                    code = *KEYBOARD;
+                } while (code == 0);
+                break;
 
         }
 

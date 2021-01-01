@@ -318,8 +318,8 @@ do (clk) {
                                 mainState = STATE_READ_RAS;
                             } else if (busRequestEnable & busRequestWrite) {
                                 mainState = STATE_WRITE_RAS;
-//                            } else if (refreshRequest) {
-//                                mainState = STATE_REFRESH;
+                            } else if (refreshRequest) {
+                                mainState = STATE_REFRESH;
                             }
 
                         default:

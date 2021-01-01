@@ -52,6 +52,7 @@ $paths = array(
     'src/divrem.c' => 'build/divrem.o',
     'src/display_signal_logger.c' => 'build/display_signal_logger.o',
     'src/keyboard.c' => 'build/keyboard.o',
+    'src/memtest.c' => 'build/memtest.o',
 );
 foreach ($paths as $inputPath => $outputPath) {
     buildFile($inputPath, $outputPath);
