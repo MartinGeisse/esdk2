@@ -10,17 +10,37 @@ void memoryTest(void) {
 
     termPrintString("write phase... ");
     volatile unsigned int *memory = (volatile unsigned int *)0x80000000;
-    int x = 1;
+    unsigned int x = 1;
     for (int i = 0; i < 0x02000000; i++) { // this is exactly the declared size of the memory, and exactly the size when the test succeeds
         memory[i] = x;
         x = (x << 2) + x + 1;
     }
     termPrintlnString("done.");
 
+    termPrintString("test values: ");
     termPrintlnUnsignedInt(memory[0]);
     termPrintlnUnsignedInt(memory[1]);
     termPrintlnUnsignedInt(memory[2]);
     termPrintlnUnsignedInt(memory[3]);
+
+    termPrintString("read phase... ");
+    x = 1;
+    for (int i = 0; i < 0x02000000; i++) {
+        if (memory[i] != x) {
+            termPrintln();
+            termPrintString("ERROR at i = ");
+            termPrintUnsignedHexInt(i);
+            termPrintString(", expected: ");
+            termPrintUnsignedHexInt(x);
+            termPrintString(", actual: ");
+            termPrintUnsignedHexInt(memory[i]);
+            return;
+        }
+        termPrintUnsignedHexInt(x);
+        termPrintString("  ");
+        x = (x << 2) + x + 1;
+    }
+    termPrintlnString("success!");
 }
 
 void memoryMaskTest(void) {
