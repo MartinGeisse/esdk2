@@ -4,6 +4,7 @@
 
 void delay(int n);
 void memoryTest(void);
+void memoryMaskTest(void);
 
 static volatile unsigned int * const SCREEN = (unsigned int *)0x01000000;
 static volatile unsigned int * const KEYBOARD = (unsigned int * const)0x02000000;
@@ -78,6 +79,7 @@ int main(void) {
         termPrintlnString("F1 - keycodes");
         termPrintlnString("F2 - signal logger");
         termPrintlnString("F3 - memory test");
+        termPrintlnString("F4 - memory mask test");
         termPrintlnString("ESC - return to this menu");
         termPrintln();
 
@@ -108,6 +110,40 @@ int main(void) {
                 do {
                     code = *KEYBOARD;
                 } while (code == 0);
+                break;
+
+            case 0x0c:
+                memoryMaskTest();
+                do {
+                    code = *KEYBOARD;
+                } while (code != 0);
+                do {
+                    code = *KEYBOARD;
+                } while (code == 0);
+                break;
+
+            case 0x03:
+                break;
+
+            case 0x0b:
+                break;
+
+            case 0x83:
+                break;
+
+            case 0x0a:
+                break;
+
+            case 0x01:
+                break;
+
+            case 0x09:
+                break;
+
+            case 0x78:
+                break;
+
+            case 0x07:
                 break;
 
         }
