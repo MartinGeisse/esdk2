@@ -23,7 +23,6 @@ public class InstructionSmokeTests {
 	private final RtlRealm realm;
 	private final RtlClockNetwork clock;
 	private final Multicycle.Implementation cpu;
-	private final RtlSimulatedSettableVectorSignal instruction;
 	private final ClockStepper clockStepper;
 	private final InstructionStepper stepper;
 
@@ -33,11 +32,9 @@ public class InstructionSmokeTests {
 		clock = new RtlClockNetwork(realm);
 		cpu = new Multicycle.Implementation(realm, clock);
 		cpu.setReset(new RtlBitConstant(realm, false));
-		instruction = new RtlSimulatedSettableVectorSignal(realm, 32);
+		cpu.setInterrupt(new RtlBitConstant(realm, false));
 		clockStepper = new ClockStepper(clock, 10);
 		stepper = new InstructionStepper(clockStepper, cpu);
-		cpu.setMemoryAcknowledge(new RtlBitConstant(realm, true));
-		cpu.setMemoryReadData(instruction);
 		design.prepareSimulation();
 	}
 
@@ -58,8 +55,7 @@ public class InstructionSmokeTests {
 
 	private void testOpImm(int funct3, int registerValue, int immediateValue, int expectedResult) {
 		setRegisters(registerValue);
-		instruction.setValue(VectorValue.of(32, ((immediateValue << 20) | (1 << 15) | (funct3 << 12) | (2 << 7) | 19) & 0xffff_ffffL));
-		stepper.step();
+		stepper.step((immediateValue << 20) | (1 << 15) | (funct3 << 12) | (2 << 7) | 19);
 		assertRegisters(registerValue, expectedResult);
 	}
 
@@ -122,8 +118,7 @@ public class InstructionSmokeTests {
 		// rs2 = x2 = data
 		StoreRecorder storeRecorder = new StoreRecorder(clock);
 		setRegisters(addressRegister, data);
-		instruction.setValue(VectorValue.of(32, instructionImmediateBits | 0x002_0a_023));
-		stepper.step();
+		stepper.step(instructionImmediateBits | 0x002_0a_023);
 		assertRegisters(addressRegister, data);
 		Assert.assertEquals(1, storeRecorder.entries.size());
 		storeRecorder.entries.get(0).assertEquals(expectedWordAddress & 0x3fff_ffff, data, 15);
@@ -142,8 +137,7 @@ public class InstructionSmokeTests {
 	@Test
 	public void tetestBeqTaken() {
 		setRegisters(5, 5);
-		instruction.setValue(VectorValue.of(32, 0x102_08_063));
-		stepper.step();
+		stepper.step(0x102_08_063);
 		assertRegisters(5, 5);
 		Assert.assertNotEquals(4, cpu._pc.getValue().getBitsAsInt());
 	}
@@ -151,8 +145,7 @@ public class InstructionSmokeTests {
 	@Test
 	public void testBeqNotTaken() {
 		setRegisters(5, 7);
-		instruction.setValue(VectorValue.of(32, 0x102_08_063));
-		stepper.step();
+		stepper.step(0x102_08_063);
 		assertRegisters(5, 7);
 		Assert.assertEquals(4, cpu._pc.getValue().getBitsAsInt());
 	}

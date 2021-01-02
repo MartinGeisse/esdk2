@@ -116,7 +116,7 @@ public class RiscvTextModeHelloWorldSynthesisMain {
 		}
 
 		// generate Verilog and ISE project files
-		ProjectGenerator projectGenerator = new ProjectGenerator(realm, "Testbild", new File("synthesize/testbild"), "CSFBGA285");
+		ProjectGenerator projectGenerator = new ProjectGenerator(realm, "RiscvHello", new File("synthesize/riscv-hello"), "CSFBGA285");
 		projectGenerator.clean();
 		projectGenerator.generate();
 		projectGenerator.build();

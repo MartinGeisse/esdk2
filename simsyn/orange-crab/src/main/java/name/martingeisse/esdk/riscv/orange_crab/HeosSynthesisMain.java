@@ -249,7 +249,7 @@ public class HeosSynthesisMain {
 		}
 
 		// generate Verilog and ISE project files
-		ProjectGenerator projectGenerator = new ProjectGenerator(realm, "Heos", new File("synthesize/testbild"), "CSFBGA285");
+		ProjectGenerator projectGenerator = new ProjectGenerator(realm, "Heos", new File("synthesize/heos"), "CSFBGA285");
 		projectGenerator.clean();
 		projectGenerator.generate();
 		projectGenerator.build();
