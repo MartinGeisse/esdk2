@@ -96,10 +96,11 @@ register vector[16] offBeatDataInRegister;
 register vector[2] sdramRegisterOffBeatDataOutMask;
 
 // bus interface
+register bit busRequestAcknowledgeRegister;
+register vector[32] busResponseReadDataRegister;
 do (*) {
-    busRequestAcknowledge = clockDivider == 3d0 & ((mainState == STATE_READ_DATA & waitCount == 16d0)
-            | (mainState == STATE_WRITE_POSTAMBLE & waitCount == 16d1));
-    busResponseReadData = sdram.dataIn _ offBeatDataInRegister;
+    busRequestAcknowledge = busRequestAcknowledgeRegister;
+    busResponseReadData = busResponseReadDataRegister;
 }
 
 /**
@@ -115,6 +116,7 @@ do (*) {
  */
 do (clk) {
     refreshAcknowledge = 0;
+    busRequestAcknowledgeRegister = 0;
     if (reset) {
         clockDivider = 0;
         mainState = STATE_START;
@@ -256,6 +258,8 @@ do (clk) {
                             mainState = STATE_READ_DATA;
 
                         case STATE_READ_DATA:
+                            busResponseReadDataRegister = sdram.dataIn _ offBeatDataInRegister;
+                            busRequestAcknowledgeRegister = 1;
                             waitCount = 8; // wait for data, after that wait a time that seems to be 0 according to
                                             // the manual, but for now we want to be on the safe side
                             mainState = STATE_IDLE;
@@ -308,6 +312,7 @@ do (clk) {
                         case STATE_WRITE_POSTAMBLE:
                             sdramRegisterDriveDataStrobe = 0;
                             sdramRegisterDriveData = 0;
+                            busRequestAcknowledgeRegister = 1;
                             waitCount = 10; // write recovery + precharging
                             mainState = STATE_IDLE;
 
