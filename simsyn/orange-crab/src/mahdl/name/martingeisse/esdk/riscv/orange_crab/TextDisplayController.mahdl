@@ -12,11 +12,11 @@ interface {
 
 // stage 1: VGA timing
 register vector[10] stage1x, stage1y;
-register vector[1] stage1p;
+register vector[2] stage1p;
 register bit stage1hblank, stage1vblank, stage1hsync, stage1vsync;
 do (clk) {
-    stage1p = stage1p + 1d1;
-    if (stage1p == 1d0) {
+    stage1p = stage1p + 2d1;
+    if (stage1p == 2d0) {
         if (stage1x == 10d799) {
             stage1hblank = 0;
             stage1x = 0;

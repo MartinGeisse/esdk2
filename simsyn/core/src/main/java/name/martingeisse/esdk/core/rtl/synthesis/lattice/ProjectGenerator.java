@@ -109,7 +109,7 @@ public class ProjectGenerator {
 	public void build() throws IOException, InterruptedException {
 		execTool("design.json", "synthesis", "yosys", "-p", "synth_ecp5 -json design.json", name + ".v");
 		execTool("design.config", "pnr", "nextpnr-ecp5", "--json", "design.json", "--textcfg", "design.config",
-				"--25k", "--package", fpgaPartId, "--lpf", "design.pcf");
+				"--25k", "--package", fpgaPartId, "--lpf", "design.pcf", "--placer", "sa");
 		execTool("design.bit", "ecppack", "ecppack", "--compress", "--freq", "38.8", "--input", "design.config",
 				"--bit", "design.bit",
 				nextBootAddress != null ? "--bootaddr" : null,

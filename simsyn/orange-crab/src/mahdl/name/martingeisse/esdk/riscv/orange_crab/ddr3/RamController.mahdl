@@ -87,7 +87,7 @@ constant vector[5] STATE_WRITE_POSTAMBLE = 19;
 
 // main and init state machines
 register bit refreshAcknowledge;
-register vector[3] clockDivider = 0;
+register vector[4] clockDivider = 0;
 register vector[5] mainState = STATE_START;
 register vector[16] waitCount = 0;
 
@@ -127,10 +127,10 @@ do (clk) {
         sdramRegisterDriveData = 0;
         sdramRegisterDriveDataStrobe = 0;
     } else {
-        clockDivider = clockDivider + 3d1;
+        clockDivider = clockDivider + 4d1;
         switch (clockDivider) {
 
-            case 3d0:
+            case 4d0:
                 sdramRegisterCSn = 1;
                 if (waitCount != 16d0) {
                     waitCount = waitCount - 16d1;
@@ -337,15 +337,15 @@ do (clk) {
                     }
                 }
 
-            case 3d2:
+            case 4d4:
                 sdramRegisterCK = 1;
 
-            case 3d4:
+            case 4d8:
                 sdramRegisterDataOut = busRequestWriteData[31:16];
                 offBeatDataInRegister = sdram.dataIn;
                 sdramRegisterDataOutMask = sdramRegisterOffBeatDataOutMask;
 
-            case 3d6:
+            case 4d12:
                 sdramRegisterCK = 0;
 
         }

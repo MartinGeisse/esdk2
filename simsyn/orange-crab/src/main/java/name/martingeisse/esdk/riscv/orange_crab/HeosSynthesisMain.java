@@ -66,7 +66,7 @@ public class HeosSynthesisMain {
 		pll.getParameters().put("CLKI_DIV", 2);
 		// output clock
 		pll.getParameters().put("CLKOP_ENABLE", "ENABLED");
-		pll.getParameters().put("CLKOP_DIV", 12);
+		pll.getParameters().put("CLKOP_DIV", 6);
 		pll.getParameters().put("CLKOP_FPHASE", 0);
 		pll.getParameters().put("CLKOP_CPHASE", 0);
 		// feedback clock
