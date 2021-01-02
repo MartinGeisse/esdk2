@@ -46,12 +46,14 @@ signal bit keyboardSelected = cpu.memoryWordAddress[29:22] == 8d64;
 signal bit gpioSelected = cpu.memoryWordAddress[29:22] == 8d65;
 signal bit signalLoggerSelected = cpu.memoryWordAddress[29:22] == 8d66;
 
-// bus / peripherals wiring
-do (*) {
+// bus decoder: low-priority devices delay logic
+signal vector[32] lowPriorityDevicesImmediateReadData;
+signal bit lowPriorityDevicesImmediateAcknowledge;
+register vector[32] lowPriorityDevicesReadDataRegister;
+register bit lowPriorityDevicesDelayCycleRegister = 0;
 
-    // control interface
-    cpu.clk = clk;
-    cpu.reset = 0;
+// bus and peripherals wiring
+do (*) {
 
     // data interface
     if (cpu.memoryWordAddress[29]) {
@@ -63,18 +65,8 @@ do (*) {
     } else if (cpu.memoryWordAddress[28]) {
 
         // low-priority devices
-        cpu.memoryReadData = switch (cpu.memoryWordAddress[27:22]) {
-            case 6d0: 24d0 _ keyboardController.busReadData
-            case 6d1: 32d0 // GPIO
-            case 6d2: signalLogger.busReadData
-            default: 32d0
-        };
-        cpu.memoryAcknowledge = switch (cpu.memoryWordAddress[27:22]) {
-            case 6d0: bit(1) // keyboard
-            case 6d1: bit(1) // GPIO
-            case 6d2: signalLogger.busAcknowledge
-            default: bit(1)
-        };
+        cpu.memoryReadData = lowPriorityDevicesReadDataRegister;
+        cpu.memoryAcknowledge = lowPriorityDevicesDelayCycleRegister;
 
     } else {
 
@@ -92,10 +84,26 @@ do (*) {
 
     }
 
-    // interrupts
+    // low-priority devices
+    lowPriorityDevicesImmediateReadData = switch (cpu.memoryWordAddress[27:22]) {
+        case 6d0: 24d0 _ keyboardController.busReadData
+        case 6d1: 32d0 // GPIO
+        case 6d2: signalLogger.busReadData
+        default: 32d0
+    };
+    lowPriorityDevicesImmediateAcknowledge = switch (cpu.memoryWordAddress[27:22]) {
+        case 6d0: bit(1) // keyboard
+        case 6d1: bit(1) // GPIO
+        case 6d2: signalLogger.busAcknowledge
+        default: bit(1)
+    };
+
+    // CPU
+    cpu.clk = clk;
+    cpu.reset = 0;
     cpu.interrupt = 0;
 
-    // display
+    // display (high prio)
     displayController.clk = clk;
     displayController.busEnable = cpu.memoryEnable & displaySelected;
     displayController.busWrite = cpu.memoryWrite;
@@ -107,18 +115,18 @@ do (*) {
     hsync = displayController.hsync;
     vsync = displayController.vsync;
 
-    // keyboard
+    // keyboard (low prio)
     keyboardController.clk = clk;
     keyboardController.ps2clk = ps2clk;
     keyboardController.ps2data = ps2data;
-    keyboardController.busEnable = cpu.memoryEnable & keyboardSelected;
+    keyboardController.busEnable = cpu.memoryEnable & keyboardSelected & ~lowPriorityDevicesDelayCycleRegister;
 
-    // signal logger
+    // signal logger (low prio)
     signalLogger.logClock = signalLogClock;
     signalLogger.logEnable = signalLogEnable;
     signalLogger.logData = signalLogData;
     signalLogger.busClock = clk;
-    signalLogger.busEnable = cpu.memoryEnable & signalLoggerSelected;
+    signalLogger.busEnable = cpu.memoryEnable & signalLoggerSelected & ~lowPriorityDevicesDelayCycleRegister;
     signalLogger.busWrite = cpu.memoryWrite;
     signalLogger.busWordAddress = cpu.memoryWordAddress[21:0];
     signalLogger.busWriteData = cpu.memoryWriteData;
@@ -165,5 +173,17 @@ do (clk) {
         internalMemorySecondReadCycle = ~internalMemorySecondReadCycle;
     } else {
         internalMemorySecondReadCycle = 0;
+    }
+}
+
+// delay logic for low-priority devices to reduce timing pressure
+do (clk) {
+    lowPriorityDevicesReadDataRegister = lowPriorityDevicesImmediateReadData;
+    if (cpu.memoryEnable & lowPriorityDevicesSelected) {
+        if (lowPriorityDevicesDelayCycleRegister) {
+            lowPriorityDevicesDelayCycleRegister = 0;
+        } else {
+            lowPriorityDevicesDelayCycleRegister = lowPriorityDevicesImmediateAcknowledge;
+        }
     }
 }
