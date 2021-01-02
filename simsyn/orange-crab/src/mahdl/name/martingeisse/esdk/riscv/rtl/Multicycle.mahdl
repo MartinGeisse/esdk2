@@ -29,6 +29,7 @@ constant vector[5] STATE_START = 0;
 constant vector[5] STATE_FETCH = 1;
 constant vector[5] STATE_DECODE_AND_READ1 = 2;
 constant vector[5] STATE_DECODE_AND_READ2 = 3;
+constant vector[5] STATE_PREPARE_EXECUTION = 23;
 constant vector[5] STATE_EXEC_OP_0 = 4;
 constant vector[5] STATE_EXEC_OP_1 = 5;
 constant vector[5] STATE_EXEC_OP_2 = 6;
@@ -90,24 +91,37 @@ signal bit operationIsMulDev = (opcode[3] & instructionRegister[25]);
 
 // execution helpers
 signal vector[32] sourceValue1 = firstRegisterValue;
-signal vector[32] sourceValue2 = opcode[3] ? registerReadValue : aluImmediate;
+register vector[32] sourceValue2; // set during STATE_PREPARE_EXECUTION
 signal bit isLTS = (~sourceValue1[31] _ sourceValue1[30:0]) < (~sourceValue2[31] _ sourceValue2[30:0]);
 signal bit isLTU = (sourceValue1 < sourceValue2);
 
 // memory interface
+register vector[32] memoryWriteDataRegister;
 do (*) {
 	memoryEnable = (state == STATE_MEM_ACCESS) | (state == STATE_FETCH) | (earlyFetchStarted & ~earlyFetchFinished);
 	memoryWrite = (state == STATE_MEM_ACCESS) & opcode[3];
 	memoryWordAddress = memoryAddressRegister[31:2];
+	memoryWriteData = memoryWriteDataRegister;
 	if (instructionRegister[13]) {
 		memoryWriteMask = 4b1111;
-		memoryWriteData = registerReadValue;
 	} else if (instructionRegister[12]) {
 		memoryWriteMask = memoryAddressRegister[1] ? 4b1100 : 4b0011;
-		memoryWriteData = registerReadValue[15:0] _ registerReadValue[15:0];
 	} else {
 		memoryWriteMask = memoryAddressRegister[1] ? (memoryAddressRegister[0] ? 4b1000 : 4b0100) : (memoryAddressRegister[0] ? 4b0010 : 4b0001);
-		memoryWriteData = registerReadValue[7:0] _ registerReadValue[7:0] _ registerReadValue[7:0] _ registerReadValue[7:0];
+	}
+}
+do (clk) {
+	// This assignment makes async paths shorter by adding decoupling registers, but it is only relevant in the
+	// STATE_MEM_COMPUTE_ADDRESS state. In that state, the registerReadValue has just been assigned its correct value,
+	// and the results are only needed in the next state, when memory access actually occurs.
+	// Note that we cannot do the same for the write mask since it depends on the address being computed in the
+	// relevant state, but timing is less tight for the mask, so it's okay.
+	if (instructionRegister[13]) {
+		memoryWriteDataRegister = registerReadValue;
+	} else if (instructionRegister[12]) {
+		memoryWriteDataRegister = registerReadValue[15:0] _ registerReadValue[15:0];
+	} else {
+		memoryWriteDataRegister = registerReadValue[7:0] _ registerReadValue[7:0] _ registerReadValue[7:0] _ registerReadValue[7:0];
 	}
 }
 
@@ -254,6 +268,10 @@ do (clk) {
 			case STATE_DECODE_AND_READ2:
 				firstRegisterValue = registerReadValue;
 				rightShiftInBit = (instructionRegister[30] ? registerReadValue[31] : bit(0));
+				state = STATE_PREPARE_EXECUTION;
+
+			case STATE_PREPARE_EXECUTION:
+				sourceValue2 = opcode[3] ? registerReadValue : aluImmediate;
 				memoryAddressRegister = pc; // for early fetching
 				earlyFetchFinished = 0;
 				switch (opcode) {
@@ -454,7 +472,8 @@ do (clk) {
 
 // register file BlockRAM support
 signal vector[6] registersAddress = state == STATE_DECODE_AND_READ1 ? sourceRegisterIndex1 :
-		(state == STATE_DECODE_AND_READ2 | state == STATE_EXEC_OP_0 | state == STATE_EXEC_OP_1 | state == STATE_EXEC_OP_2) ? sourceRegisterIndex2 : destinationRegisterIndex;
+		(state == STATE_DECODE_AND_READ2 | state == STATE_EXEC_OP_0 | state == STATE_EXEC_OP_1 |
+				state == STATE_PREPARE_EXECUTION | state == STATE_EXEC_OP_2) ? sourceRegisterIndex2 : destinationRegisterIndex;
 signal bit isRegisterWriteState = (state == STATE_EXEC_OP_3) | (state == STATE_EXEC_LUI) | (state == STATE_EXEC_AUIPC) |
 		(state == STATE_EXEC_JAL) | (state == STATE_EXEC_JALR) | (state == STATE_MEM_EXTEND) | (state == STATE_WRITE_MISC_VALUE_TO_REGISTER);
 signal vector[32] registerWriteValue = switch(state) {
