@@ -5,7 +5,7 @@
 void delay(int n);
 
 static unsigned int * const SCREEN = (unsigned int *)0x01000000;
-static volatile unsigned int * const SIGNAL_LOGGER = (unsigned int * const)0x04000000;
+static volatile unsigned int * const SIGNAL_LOGGER = (unsigned int * const)0x42000000;
 
 static int sample(int signalIndex, int sampleIndex) {
     return (SIGNAL_LOGGER[sampleIndex] >> signalIndex) & 1;

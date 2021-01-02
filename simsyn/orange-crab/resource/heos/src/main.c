@@ -7,8 +7,8 @@ void memoryTest(void);
 void memoryMaskTest(void);
 
 static volatile unsigned int * const SCREEN = (unsigned int *)0x01000000;
-static volatile unsigned int * const KEYBOARD = (unsigned int * const)0x02000000;
-static volatile unsigned int * const SIGNAL_LOGGER = (unsigned int * const)0x04000000;
+static volatile unsigned int * const KEYBOARD = (unsigned int * const)0x40000000;
+static volatile unsigned int * const SIGNAL_LOGGER = (unsigned int * const)0x42000000;
 
 static void printHexDigit(int digit) {
     if (digit < 10) {

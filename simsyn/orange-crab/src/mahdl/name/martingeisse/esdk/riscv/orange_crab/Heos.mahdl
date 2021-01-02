@@ -36,12 +36,15 @@ name.martingeisse.esdk.riscv.orange_crab.KeyboardController keyboardController;
 name.martingeisse.esdk.riscv.orange_crab.SignalLogger signalLogger;
 name.martingeisse.esdk.riscv.orange_crab.ddr3.RamController ramController;
 
-// bus decoder
+// bus decoder: high-priority devices
 signal bit internalMemorySelected = cpu.memoryWordAddress[29:22] == 8d0;
 signal bit displaySelected = cpu.memoryWordAddress[29:22] == 8d1;
-signal bit keyboardSelected = cpu.memoryWordAddress[29:22] == 8d2;
-signal bit gpioSelected = cpu.memoryWordAddress[29:22] == 8d3;
-signal bit signalLoggerSelected = cpu.memoryWordAddress[29:22] == 8d4;
+
+// bus decoder: low-priority devices
+signal bit lowPriorityDevicesSelected = cpu.memoryWordAddress[29:28] == 2b01;
+signal bit keyboardSelected = cpu.memoryWordAddress[29:22] == 8d64;
+signal bit gpioSelected = cpu.memoryWordAddress[29:22] == 8d65;
+signal bit signalLoggerSelected = cpu.memoryWordAddress[29:22] == 8d66;
 
 // bus / peripherals wiring
 do (*) {
@@ -52,25 +55,41 @@ do (*) {
 
     // data interface
     if (cpu.memoryWordAddress[29]) {
+
+        // big RAM
         cpu.memoryReadData = ramController.busResponseReadData;
         cpu.memoryAcknowledge = ramController.busRequestAcknowledge;
-    } else {
-        cpu.memoryReadData = switch (cpu.memoryWordAddress[28:22]) {
-            case 7d0: memoryReadData
-            case 7d1: 32d0 // display
-            case 7d2: 24d0 _ keyboardController.busReadData
-            case 7d3: 32d0 // GPIO
-            case 7d4: signalLogger.busReadData
+
+    } else if (cpu.memoryWordAddress[28]) {
+
+        // low-priority devices
+        cpu.memoryReadData = switch (cpu.memoryWordAddress[27:22]) {
+            case 6d0: 24d0 _ keyboardController.busReadData
+            case 6d1: 32d0 // GPIO
+            case 6d2: signalLogger.busReadData
             default: 32d0
         };
-        cpu.memoryAcknowledge = switch (cpu.memoryWordAddress[28:22]) {
-            case 7d0: cpu.memoryWrite | internalMemorySecondReadCycle
-            case 7d1: bit(1) // display
-            case 7d2: bit(1) // keyboard
-            case 7d3: bit(1) // GPIO
-            case 7d4: signalLogger.busAcknowledge
+        cpu.memoryAcknowledge = switch (cpu.memoryWordAddress[27:22]) {
+            case 6d0: bit(1) // keyboard
+            case 6d1: bit(1) // GPIO
+            case 6d2: signalLogger.busAcknowledge
             default: bit(1)
         };
+
+    } else {
+
+        // high-priority devices
+        cpu.memoryReadData = switch (cpu.memoryWordAddress[27:22]) {
+            case 6d0: memoryReadData
+            case 6d1: 32d0 // display
+            default: 32d0
+        };
+        cpu.memoryAcknowledge = switch (cpu.memoryWordAddress[27:22]) {
+            case 6d0: cpu.memoryWrite | internalMemorySecondReadCycle
+            case 6d1: bit(1) // display
+            default: bit(1)
+        };
+
     }
 
     // interrupts
