@@ -25,9 +25,9 @@ name.martingeisse.esdk.riscv.rtl.Multicycle cpu;
 name.martingeisse.esdk.riscv.orange_crab.TextDisplayController displayController;
 
 // bus decoder
-signal bit internalMemorySelected = cpu.memoryWordAddress[29:22] == 8d0;
-signal bit displaySelected = cpu.memoryWordAddress[29:22] == 8d1;
-signal bit gpioSelected = cpu.memoryWordAddress[29:22] == 8d3;
+signal bit internalMemorySelected = cpu.busWordAddress[29:22] == 8d0;
+signal bit displaySelected = cpu.busWordAddress[29:22] == 8d1;
+signal bit gpioSelected = cpu.busWordAddress[29:22] == 8d3;
 
 // bus / peripherals wiring
 do (*) {
@@ -37,13 +37,13 @@ do (*) {
     cpu.reset = 0;
 
     // data interface
-    cpu.memoryReadData = switch (cpu.memoryWordAddress[28:22]) {
+    cpu.busReadData = switch (cpu.busWordAddress[28:22]) {
         case 7d0: memoryReadData
         case 7d1: 32d0 // display
         default: 32d0
     };
-    cpu.memoryAcknowledge = switch (cpu.memoryWordAddress[28:22]) {
-        case 7d0: cpu.memoryWrite | internalMemorySecondReadCycle
+    cpu.busAcknowledge = switch (cpu.busWordAddress[28:22]) {
+        case 7d0: cpu.busWrite | internalMemorySecondReadCycle
         case 7d1: bit(1) // display
         default: bit(1)
     };
@@ -53,10 +53,10 @@ do (*) {
 
     // display
     displayController.clk = clk;
-    displayController.busEnable = cpu.memoryEnable & displaySelected;
-    displayController.busWrite = cpu.memoryWrite;
-    displayController.busWordAddress = cpu.memoryWordAddress[11:0];
-    displayController.busWriteData = cpu.memoryWriteData[7:0];
+    displayController.busEnable = cpu.busEnable & displaySelected;
+    displayController.busWrite = cpu.busWrite;
+    displayController.busWordAddress = cpu.busWordAddress[11:0];
+    displayController.busWriteData = cpu.busWriteData[7:0];
     r = displayController.r;
     g = displayController.g;
     b = displayController.b;
@@ -70,7 +70,7 @@ do (*) {
 register matrix[4096][8] memory0, memory1, memory2, memory3;
 signal vector[32] memoryReadData;
 register bit internalMemorySecondReadCycle = 0;
-signal vector[12] memoryDataWordAddress = cpu.memoryWordAddress[11:0];
+signal vector[12] memoryDataWordAddress = cpu.busWordAddress[11:0];
 register vector[8] memoryReadData0, memoryReadData1, memoryReadData2, memoryReadData3;
 do (*) memoryReadData = memoryReadData3 _ memoryReadData2 _ memoryReadData1 _ memoryReadData0;
 do (clk) {
@@ -78,21 +78,21 @@ do (clk) {
     memoryReadData1 = memory1[memoryDataWordAddress];
     memoryReadData2 = memory2[memoryDataWordAddress];
     memoryReadData3 = memory3[memoryDataWordAddress];
-    if (cpu.memoryEnable & cpu.memoryWrite & internalMemorySelected) {
-        if (cpu.memoryWriteMask[0]) {
-            memory0[memoryDataWordAddress] = cpu.memoryWriteData[7:0];
+    if (cpu.busEnable & cpu.busWrite & internalMemorySelected) {
+        if (cpu.busWriteMask[0]) {
+            memory0[memoryDataWordAddress] = cpu.busWriteData[7:0];
         }
-        if (cpu.memoryWriteMask[1]) {
-            memory1[memoryDataWordAddress] = cpu.memoryWriteData[15:8];
+        if (cpu.busWriteMask[1]) {
+            memory1[memoryDataWordAddress] = cpu.busWriteData[15:8];
         }
-        if (cpu.memoryWriteMask[2]) {
-            memory2[memoryDataWordAddress] = cpu.memoryWriteData[23:16];
+        if (cpu.busWriteMask[2]) {
+            memory2[memoryDataWordAddress] = cpu.busWriteData[23:16];
         }
-        if (cpu.memoryWriteMask[3]) {
-            memory3[memoryDataWordAddress] = cpu.memoryWriteData[31:24];
+        if (cpu.busWriteMask[3]) {
+            memory3[memoryDataWordAddress] = cpu.busWriteData[31:24];
         }
     }
-    if (cpu.memoryEnable & ~cpu.memoryWrite) {
+    if (cpu.busEnable & ~cpu.busWrite) {
         internalMemorySecondReadCycle = ~internalMemorySecondReadCycle;
     } else {
         internalMemorySecondReadCycle = 0;
