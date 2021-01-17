@@ -27,8 +27,8 @@ public class InstructionStepper extends RtlSimulationItem {
 		this.cpu = cpu;
 		this.instruction = new RtlSimulatedSettableVectorSignal(realm, 32);
 		this.instructionAcknowledge = new RtlSimulatedSettableBitSignal(realm);
-		cpu.setMemoryReadData(instruction);
-		cpu.setMemoryAcknowledge(instructionAcknowledge.or(cpu.getMemoryWrite()));
+		cpu.setBusReadData(instruction);
+		cpu.setBusAcknowledge(instructionAcknowledge.or(cpu.getBusWrite()));
 	}
 
 	public ClockStepper getClockStepper() {
@@ -47,7 +47,7 @@ public class InstructionStepper extends RtlSimulationItem {
 	/**
 	 * This method can be used to skip the "preamble" before fetching the first instruction without actually stepping
 	 * over the first instruction. Fetching is chosen as the starting point of the instruction because we can
-	 * observe the PC on the memory address port.
+	 * observe the PC on the bus address port.
 	 */
 	public void skipUntilFetching() {
 		while (!isFetching()) {

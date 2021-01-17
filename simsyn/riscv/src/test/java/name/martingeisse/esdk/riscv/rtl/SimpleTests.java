@@ -37,13 +37,13 @@ public class SimpleTests {
 	@Test
 	public void testPcIncrement() {
 		stepper.skipUntilFetching();
-		Assert.assertEquals(0, cpu.getMemoryWordAddress().getValue().getBitsAsInt());
+		Assert.assertEquals(0, cpu.getBusWordAddress().getValue().getBitsAsInt());
 		stepper.step(0x000_00_093); // ADDI x1, x0, 0
-		Assert.assertEquals(1, cpu.getMemoryWordAddress().getValue().getBitsAsInt());
+		Assert.assertEquals(1, cpu.getBusWordAddress().getValue().getBitsAsInt());
 		stepper.step(0x000_00_093); // ADDI x1, x0, 0
-		Assert.assertEquals(2, cpu.getMemoryWordAddress().getValue().getBitsAsInt());
+		Assert.assertEquals(2, cpu.getBusWordAddress().getValue().getBitsAsInt());
 		stepper.step(0x000_00_093); // ADDI x1, x0, 0
-		Assert.assertEquals(3, cpu.getMemoryWordAddress().getValue().getBitsAsInt());
+		Assert.assertEquals(3, cpu.getBusWordAddress().getValue().getBitsAsInt());
 	}
 
 	@Test

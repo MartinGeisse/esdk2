@@ -163,11 +163,11 @@ public class InstructionSmokeTests {
 
 		@Override
 		public void computeNextState() {
-			if (cpu.getMemoryEnable().getValue() && cpu.getMemoryWrite().getValue()) {
+			if (cpu.getBusEnable().getValue() && cpu.getBusWrite().getValue()) {
 				currentEntry = new StoreRecorderEntry();
-				currentEntry.wordAddress = cpu.getMemoryWordAddress().getValue().getBitsAsInt();
-				currentEntry.data = cpu.getMemoryWriteData().getValue().getBitsAsInt();
-				currentEntry.mask = cpu.getMemoryWriteMask().getValue().getBitsAsInt();
+				currentEntry.wordAddress = cpu.getBusWordAddress().getValue().getBitsAsInt();
+				currentEntry.data = cpu.getBusWriteData().getValue().getBitsAsInt();
+				currentEntry.mask = cpu.getBusWriteMask().getValue().getBitsAsInt();
 			} else {
 				currentEntry = null;
 			}

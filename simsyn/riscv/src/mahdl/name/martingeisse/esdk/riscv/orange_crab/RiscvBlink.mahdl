@@ -9,8 +9,8 @@ interface {
 name.martingeisse.esdk.riscv.rtl.Multicycle cpu;
 
 // bus decoder
-signal bit internalMemorySelected = cpu.memoryWordAddress[29:22] == 8d0;
-signal bit gpioSelected = cpu.memoryWordAddress[29:22] == 8d3;
+signal bit internalMemorySelected = cpu.busWordAddress[29:22] == 8d0;
+signal bit gpioSelected = cpu.busWordAddress[29:22] == 8d3;
 
 // bus / peripherals wiring
 do (*) {
@@ -20,12 +20,12 @@ do (*) {
     cpu.reset = 0;
 
     // data interface
-    cpu.memoryReadData = switch (cpu.memoryWordAddress[28:22]) {
+    cpu.busReadData = switch (cpu.busWordAddress[28:22]) {
         case 7d0: memoryReadData
         default: 32d0
     };
-    cpu.memoryAcknowledge = switch (cpu.memoryWordAddress[28:22]) {
-        case 7d0: cpu.memoryWrite | internalMemorySecondReadCycle
+    cpu.busAcknowledge = switch (cpu.busWordAddress[28:22]) {
+        case 7d0: cpu.busWrite | internalMemorySecondReadCycle
         default: bit(1)
     };
 
@@ -42,8 +42,8 @@ do (*) {
     ledBn = ~ledState[0];
 }
 do (clk) {
-    if (cpu.memoryEnable & cpu.memoryWrite & gpioSelected) {
-        ledState = cpu.memoryWriteData[2:0];
+    if (cpu.busEnable & cpu.busWrite & gpioSelected) {
+        ledState = cpu.busWriteData[2:0];
     }
 }
 
@@ -53,7 +53,7 @@ register matrix[4096][8] memory0, memory1, memory2, memory3;
 signal vector[32] memoryReadData;
 register bit internalMemorySecondReadCycle = 0;
 
-signal vector[12] memoryDataWordAddress = cpu.memoryWordAddress[11:0];
+signal vector[12] memoryDataWordAddress = cpu.busWordAddress[11:0];
 register vector[8] memoryReadData0, memoryReadData1, memoryReadData2, memoryReadData3;
 do (*) memoryReadData = memoryReadData3 _ memoryReadData2 _ memoryReadData1 _ memoryReadData0;
 do (clk) {
@@ -61,21 +61,21 @@ do (clk) {
     memoryReadData1 = memory1[memoryDataWordAddress];
     memoryReadData2 = memory2[memoryDataWordAddress];
     memoryReadData3 = memory3[memoryDataWordAddress];
-    if (cpu.memoryEnable & cpu.memoryWrite & internalMemorySelected) {
-        if (cpu.memoryWriteMask[0]) {
-            memory0[memoryDataWordAddress] = cpu.memoryWriteData[7:0];
+    if (cpu.busEnable & cpu.busWrite & internalMemorySelected) {
+        if (cpu.busWriteMask[0]) {
+            memory0[memoryDataWordAddress] = cpu.busWriteData[7:0];
         }
-        if (cpu.memoryWriteMask[1]) {
-            memory1[memoryDataWordAddress] = cpu.memoryWriteData[15:8];
+        if (cpu.busWriteMask[1]) {
+            memory1[memoryDataWordAddress] = cpu.busWriteData[15:8];
         }
-        if (cpu.memoryWriteMask[2]) {
-            memory2[memoryDataWordAddress] = cpu.memoryWriteData[23:16];
+        if (cpu.busWriteMask[2]) {
+            memory2[memoryDataWordAddress] = cpu.busWriteData[23:16];
         }
-        if (cpu.memoryWriteMask[3]) {
-            memory3[memoryDataWordAddress] = cpu.memoryWriteData[31:24];
+        if (cpu.busWriteMask[3]) {
+            memory3[memoryDataWordAddress] = cpu.busWriteData[31:24];
         }
     }
-    if (cpu.memoryEnable & ~cpu.memoryWrite) {
+    if (cpu.busEnable & ~cpu.busWrite) {
         internalMemorySecondReadCycle = ~internalMemorySecondReadCycle;
     } else {
         internalMemorySecondReadCycle = 0;

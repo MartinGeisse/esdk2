@@ -7,13 +7,13 @@ interface {
 	in bit reset;
 
 	// memory access interface
-	out bit memoryEnable;
-	out bit memoryWrite;
-	out vector[30] memoryWordAddress;
-	in vector[32] memoryReadData;
-	out vector[32] memoryWriteData;
-	out vector[4] memoryWriteMask;
-	in bit memoryAcknowledge;
+	out bit busEnable;
+	out bit busWrite;
+	out vector[30] busWordAddress;
+	in vector[32] busReadData;
+	out vector[32] busWriteData;
+	out vector[4] busWriteMask;
+	in bit busAcknowledge;
 
 	// interrupts
 	in bit interrupt;
@@ -96,18 +96,18 @@ signal bit isLTU = (sourceValue1 < sourceValue2);
 
 // memory interface
 do (*) {
-	memoryEnable = (state == STATE_MEM_ACCESS) | (state == STATE_FETCH) | (earlyFetchStarted & ~earlyFetchFinished);
-	memoryWrite = (state == STATE_MEM_ACCESS) & opcode[3];
-	memoryWordAddress = memoryAddressRegister[31:2];
+	busEnable = (state == STATE_MEM_ACCESS) | (state == STATE_FETCH) | (earlyFetchStarted & ~earlyFetchFinished);
+	busWrite = (state == STATE_MEM_ACCESS) & opcode[3];
+	busWordAddress = memoryAddressRegister[31:2];
 	if (instructionRegister[13]) {
-		memoryWriteMask = 4b1111;
-		memoryWriteData = registerReadValue;
+		busWriteMask = 4b1111;
+		busWriteData = registerReadValue;
 	} else if (instructionRegister[12]) {
-		memoryWriteMask = memoryAddressRegister[1] ? 4b1100 : 4b0011;
-		memoryWriteData = registerReadValue[15:0] _ registerReadValue[15:0];
+		busWriteMask = memoryAddressRegister[1] ? 4b1100 : 4b0011;
+		busWriteData = registerReadValue[15:0] _ registerReadValue[15:0];
 	} else {
-		memoryWriteMask = memoryAddressRegister[1] ? (memoryAddressRegister[0] ? 4b1000 : 4b0100) : (memoryAddressRegister[0] ? 4b0010 : 4b0001);
-		memoryWriteData = registerReadValue[7:0] _ registerReadValue[7:0] _ registerReadValue[7:0] _ registerReadValue[7:0];
+		busWriteMask = memoryAddressRegister[1] ? (memoryAddressRegister[0] ? 4b1000 : 4b0100) : (memoryAddressRegister[0] ? 4b0010 : 4b0001);
+		busWriteData = registerReadValue[7:0] _ registerReadValue[7:0] _ registerReadValue[7:0] _ registerReadValue[7:0];
 	}
 }
 
@@ -207,9 +207,9 @@ do (clk) {
 		pc = 0;
 		enableInterrupts = 0;
 	} else {
-		if (memoryAcknowledge) {
+		if (busAcknowledge) {
 			earlyFetchFinished = 1; // will be ignored for non-early-fetch ACKs
-			earlyFetchResult = memoryReadData;
+			earlyFetchResult = busReadData;
 		}
 		switch (state) {
 
@@ -224,8 +224,8 @@ do (clk) {
 				}
 
 			case STATE_FETCH:
-				instructionRegister = memoryReadData;
-				if (memoryAcknowledge) {
+				instructionRegister = busReadData;
+				if (busAcknowledge) {
 					state = STATE_DECODE_AND_READ1;
 					pc = pc + 32d4;
 				}
@@ -358,8 +358,8 @@ do (clk) {
 				state = STATE_MEM_ACCESS;
 
 			case STATE_MEM_ACCESS:
-				memoryReadDataRegister = memoryReadData;
-				if (memoryAcknowledge) {
+				memoryReadDataRegister = busReadData;
+				if (busAcknowledge) {
 					state = opcode[3] ? STATE_START : STATE_MEM_EXTEND;
 				}
 
