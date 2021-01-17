@@ -1,7 +1,6 @@
 package name.martingeisse.esdk.riscv.rtl;
 
 import name.martingeisse.esdk.core.rtl.RtlRealm;
-import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
 import name.martingeisse.esdk.core.rtl.simulation.RtlSimulatedSettableBitSignal;
 import name.martingeisse.esdk.core.rtl.simulation.RtlSimulatedSettableVectorSignal;
 import name.martingeisse.esdk.core.rtl.simulation.RtlSimulationItem;

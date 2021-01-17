@@ -1,6 +1,10 @@
 package name.martingeisse.esdk.riscv.rtl;
 
+import name.martingeisse.esdk.core.rtl.RtlRealm;
+import name.martingeisse.esdk.core.rtl.simulation.RtlSimulatedSettableBitSignal;
+import name.martingeisse.esdk.core.rtl.simulation.RtlSimulatedSettableVectorSignal;
 import name.martingeisse.esdk.core.rtl.simulation.RtlSimulationItem;
+import name.martingeisse.esdk.core.util.vector.VectorValue;
 import name.martingeisse.esdk.library.util.ClockStepper;
 
 /**
@@ -12,11 +16,18 @@ public class InstructionStepper extends RtlSimulationItem {
 
 	private final ClockStepper clockStepper;
 	private final Multicycle.Implementation cpu;
+	private final RtlSimulatedSettableVectorSignal instruction;
+	private final RtlSimulatedSettableBitSignal instructionAcknowledge;
 
 	public InstructionStepper(ClockStepper clockStepper, Multicycle.Implementation cpu) {
 		super(clockStepper.getRealm());
+		RtlRealm realm = clockStepper.getRealm();
 		this.clockStepper = clockStepper;
 		this.cpu = cpu;
+		this.instruction = new RtlSimulatedSettableVectorSignal(realm, 32);
+		this.instructionAcknowledge = new RtlSimulatedSettableBitSignal(realm);
+		cpu.setBusReadData(instruction);
+		cpu.setBusAcknowledge(instructionAcknowledge.or(cpu.getBusWrite()));
 	}
 
 	public ClockStepper getClockStepper() {
@@ -27,30 +38,32 @@ public class InstructionStepper extends RtlSimulationItem {
 		return cpu;
 	}
 
+	private boolean isFetching() {
+		return (cpu._state.getValue().equals(Multicycle.Implementation._STATE_FETCH) ||
+				cpu._state.getValue().equals(Multicycle.Implementation._STATE_FINISH_EARLY_FETCH));
+	}
+
 	/**
 	 * This method can be used to skip the "preamble" before fetching the first instruction without actually stepping
 	 * over the first instruction. Fetching is chosen as the starting point of the instruction because we can
-	 * observe the PC on the memory address port.
+	 * observe the PC on the bus address port.
 	 */
 	public void skipUntilFetching() {
-		while (cpu._state.getValue().getBitsAsInt() != 1) {
+		while (!isFetching()) {
 			clockStepper.step();
 		}
 	}
 
-	public void step() {
+	public void step(int instruction) {
 		skipUntilFetching();
-		while (cpu._state.getValue().getBitsAsInt() == 1) {
+		this.instruction.setValue(VectorValue.of(32, instruction & 0xffff_ffffL));
+		this.instructionAcknowledge.setValue(true);
+		while (isFetching()) {
 			clockStepper.step();
 		}
-		clockStepper.step();
+		this.instructionAcknowledge.setValue(false);
+		clockStepper.step(); // TODO unnecessary!?
 		skipUntilFetching();
-	}
-
-	public void step(int cycles) {
-		for (int i = 0; i < cycles; i++) {
-			step();
-		}
 	}
 
 }
