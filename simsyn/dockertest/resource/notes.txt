@@ -1,0 +1,15 @@
+
+docker save {image}
+docker load {file}
+
+-->
+use this to send the image to somebody without having a docker hub account.
+
+can invoke a code generator just by calling its docker image manually.
+
+
+I/O:
+- copying files in/out of containers is preferred as a long-term solution because the individual generator apps don't
+    have to deal with it then.
+- it is more complex though, and short-term it is easier to transfer ZIP files
+

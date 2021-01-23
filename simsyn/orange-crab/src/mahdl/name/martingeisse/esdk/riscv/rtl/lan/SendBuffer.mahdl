@@ -1,0 +1,19 @@
+native module name.martingeisse.esdk.riscv.rtl.lan.SendBuffer;
+
+/*
+This module is a dual-port RAM (to be implemented as a BlockRAM) with one 512x32 write port and
+one synchronous 4096x4 read port.
+ */
+
+interface {
+
+    in clock clk;
+
+    in bit writeEnable;
+    in vector[9] writeAddress;
+    in vector[32] writeData;
+
+    in vector[12] readAddress;
+    out vector[4] readData;
+
+}

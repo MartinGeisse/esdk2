@@ -1,0 +1,16 @@
+module name.martingeisse.esdk.riscv.orange_crab.Blink;
+
+interface {
+    in clock clk;
+    out bit ledRn, ledGn, ledBn;
+}
+
+register vector[26] counter = 0;
+do (clk) {
+    counter = counter + 26d1;
+}
+do (*) {
+    ledRn = counter[25];
+    ledGn = 1;
+    ledBn = 1;
+}

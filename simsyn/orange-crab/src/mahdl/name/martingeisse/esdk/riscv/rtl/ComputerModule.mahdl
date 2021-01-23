@@ -1,0 +1,218 @@
+module name.martingeisse.esdk.riscv.rtl.ComputerModule;
+
+interface {
+    in clock clk;
+    in bit reset;
+
+    in clock ddrClock0, ddrClock90, ddrClock180, ddrClock270;
+
+    in vector[8] buttonsAndSwitches;
+    in bit serialPortSignal;
+
+    out bit lanMdc, lanMdioOutWeak;
+    in bit lanMdioIn;
+    in bit lanRxDv, lanRxClk, lanRxEr;
+    in vector[4] lanRxd;
+    in bit lanTxClk;
+    out bit lanTxEn, lanTxEr;
+    out vector[4] lanTxd;
+
+}
+
+// CPU
+name.martingeisse.esdk.riscv.rtl.Multicycle cpu;
+
+// peripherals
+name.martingeisse.esdk.riscv.rtl.ram.RamController bigRam;
+name.martingeisse.esdk.riscv.rtl.ram.RamAgent ramAgent;
+name.martingeisse.esdk.riscv.rtl.simulation.SimulationDevice simulationDevice;
+name.martingeisse.esdk.riscv.rtl.terminal.PixelDisplayController display;
+name.martingeisse.esdk.riscv.rtl.terminal.KeyboardController keyboard;
+name.martingeisse.esdk.library.SignalLoggerBusInterface signalLogger;
+name.martingeisse.esdk.riscv.rtl.spi.SpiInterface spiInterface;
+name.martingeisse.esdk.riscv.rtl.serial.SerialPort serialPort;
+name.martingeisse.esdk.riscv.rtl.lan.LanController lanController;
+
+// bus decoder
+signal bit ramAgentSelected = cpu.busWordAddress[29];
+signal bit internalMemorySelected = cpu.busWordAddress[29:22] == 8d0;
+signal bit terminalSelected = cpu.busWordAddress[29:22] == 8d1;
+signal bit signalLoggerSelected = cpu.busWordAddress[29:22] == 8d2;
+signal bit gpioSelected = cpu.busWordAddress[29:22] == 8d3;
+signal bit spiSelected = cpu.busWordAddress[29:22] == 8d4;
+signal bit displayControllerSelected = cpu.busWordAddress[29:22] == 8d5;
+signal bit serialPortSelected = cpu.busWordAddress[29:22] == 8d6;
+signal bit hardwareClockSelected = cpu.busWordAddress[29:22] == 8d7;
+signal bit lanControllerSelected = cpu.busWordAddress[29:22] == 8d8;
+// ...
+signal bit simulationDeviceSelected = cpu.busWordAddress[29:22] == 8d127;
+
+do (*) {
+
+    // control interface
+    cpu.clk = clk;
+    cpu.reset = reset;
+
+    // data interface
+    if (ramAgentSelected) {
+        cpu.busReadData = ramAgent.cpuReadData;
+        cpu.busAcknowledge = ramAgent.cpuAcknowledge;
+    } else {
+        cpu.busReadData = switch (cpu.busWordAddress[28:22]) {
+            case 7d0: memoryReadData
+            case 7d1: 24d0 _ keyboard.inputData
+            case 7d2: signalLogger.busReadData
+            case 7d3: 24d0 _ buttonsAndSwitches
+            case 7d4: 32d0
+            case 7d5: 32d0
+            case 7d6: serialPort.busReadData
+            case 7d7: hardwareClock
+            case 7d8: lanController.busReadData
+            case 7d127: simulationDevice.busReadData
+            default: 32d0
+        };
+        cpu.busAcknowledge = switch (cpu.busWordAddress[28:22]) {
+            case 7d0: cpu.busWrite | internalMemorySecondReadCycle
+            case 7d1: bit(1)
+            case 7d2: signalLogger.busAcknowledge
+            case 7d3: bit(1)
+            case 7d4: spiInterface.busAcknowledge
+            case 7d5: bit(1)
+            case 7d6: serialPort.busAcknowledge
+            case 7d7: bit(1)
+            case 7d8: lanController.busAcknowledge
+            case 7d127: simulationDevice.busAcknowledge
+            default: bit(1)
+        };
+    }
+
+    // interrupts
+    cpu.interrupt = keyboard.ready;
+
+    // devices
+
+    display.clk = clk;
+    display.registerWriteEnable = cpu.busEnable & cpu.busWrite & displayControllerSelected;
+    display.registerWriteData = cpu.busWriteData[0];
+
+    keyboard.clk = clk;
+    keyboard.inputAcknowledge = cpu.busEnable & ~cpu.busWrite & terminalSelected;
+
+    ramAgent.clk = clk;
+    ramAgent.reset = reset;
+    ramAgent.cpuSelectCommandEngine = cpu.busWordAddress[28];
+    ramAgent.cpuCommandCode = cpu.busWordAddress[27:24];
+    ramAgent.cpuWordAddress = cpu.busWordAddress[23:0];
+    ramAgent.cpuEnable = cpu.busEnable & ramAgentSelected;
+    ramAgent.cpuWrite = cpu.busWrite;
+    ramAgent.cpuWriteData = cpu.busWriteData;
+    ramAgent.cpuWriteMask = cpu.busWriteMask;
+    ramAgent.ramRequestAcknowledge = bigRam.busRequestAcknowledge;
+    ramAgent.ramResponseReadData = bigRam.busResponseReadData;
+    ramAgent.ramResponseEnable = bigRam.busResponseEnable;
+
+    bigRam.clk0 = ddrClock0;
+    bigRam.clk90 = ddrClock90;
+    bigRam.clk180 = ddrClock180;
+    bigRam.clk270 = ddrClock270;
+    bigRam.reset = reset;
+    bigRam.busRequestEnable = ramAgent.ramRequestEnable;
+    bigRam.busRequestWrite = ramAgent.ramRequestWrite;
+    bigRam.busRequestWordAddress = ramAgent.ramRequestWordAddress;
+    bigRam.busRequestWriteData = ramAgent.ramRequestWriteData;
+    bigRam.busRequestWriteMask = ramAgent.ramRequestWriteMask;
+
+    signalLogger.busEnable = cpu.busEnable & signalLoggerSelected;
+    signalLogger.busWrite = cpu.busWrite;
+    signalLogger.busWriteData = cpu.busWriteData;
+
+    // RAMDAC connections
+    bigRam.ramdacRequestEnable = display.ramdacRequestEnable;
+    bigRam.ramdacRequestWordAddress = display.ramdacRequestWordAddress;
+    display.reset = reset;
+    display.ramdacRequestAcknowledge = bigRam.ramdacRequestAcknowledge;
+    display.ramdacResponseEnable = bigRam.ramdacResponseEnable;
+    display.ramdacResponseWordAddress = bigRam.ramdacResponseWordAddress;
+    display.ramdacResponseData = bigRam.ramdacResponseData;
+
+    spiInterface.clk = clk;
+    spiInterface.busEnable = cpu.busEnable & spiSelected;
+    spiInterface.busWrite = cpu.busWrite;
+    spiInterface.busWriteData = cpu.busWriteData;
+
+    simulationDevice.clk = clk;
+    simulationDevice.busEnable = cpu.busEnable & simulationDeviceSelected;
+    simulationDevice.busWrite = cpu.busWrite;
+    simulationDevice.busWordAddress = cpu.busWordAddress[23:0];
+    simulationDevice.busWriteData = cpu.busWriteData;
+    simulationDevice.busWriteMask = cpu.busWriteMask;
+
+    serialPort.clk = clk;
+    serialPort.reset = reset;
+    serialPort.busEnable = cpu.busEnable & serialPortSelected;
+    serialPort.serialSignal = serialPortSignal;
+
+    lanController.clk = clk;
+    lanController.reset = reset;
+    lanController.busEnable = cpu.busEnable & lanControllerSelected;
+    lanController.busWrite = cpu.busWrite;
+    lanController.busWordAddress = cpu.busWordAddress[21:0];
+    lanController.busWriteData = cpu.busWriteData;
+    lanController.mdioIn = lanMdioIn;
+    lanMdc = lanController.mdc;
+    lanMdioOutWeak = lanController.mdioOutWeak;
+    lanController.rxDv = lanRxDv;
+    lanController.rxClk = lanRxClk;
+    lanController.rxEr = lanRxEr;
+    lanController.rxd = lanRxd;
+    lanController.txClk = lanTxClk;
+    lanTxEn = lanController.txEn;
+    lanTxEr = lanController.txEr;
+    lanTxd = lanController.txd;
+
+}
+
+// hardware clock
+register vector[32] hardwareClock = 0;
+register vector[4] hardwareClockPrescaler = 0;
+do (clk) {
+    hardwareClockPrescaler = hardwareClockPrescaler + 4d1;
+    if (hardwareClockPrescaler == 4d0) {
+        hardwareClock = hardwareClock + 32d1;
+    }
+}
+
+// small memory: the number indicates the significance inside a word, NOT the position of a byte in a byte buffer (these
+// are different since RISC-V is little-endian).
+register matrix[4096][8] memory0, memory1, memory2, memory3;
+signal vector[32] memoryReadData;
+register bit internalMemorySecondReadCycle = 0;
+
+signal vector[12] memoryDataWordAddress = cpu.busWordAddress[11:0];
+register vector[8] memoryReadData0, memoryReadData1, memoryReadData2, memoryReadData3;
+do (*) memoryReadData = memoryReadData3 _ memoryReadData2 _ memoryReadData1 _ memoryReadData0;
+do (clk) {
+    memoryReadData0 = memory0[memoryDataWordAddress];
+    memoryReadData1 = memory1[memoryDataWordAddress];
+    memoryReadData2 = memory2[memoryDataWordAddress];
+    memoryReadData3 = memory3[memoryDataWordAddress];
+    if (cpu.busEnable & cpu.busWrite & internalMemorySelected) {
+        if (cpu.busWriteMask[0]) {
+            memory0[memoryDataWordAddress] = cpu.busWriteData[7:0];
+        }
+        if (cpu.busWriteMask[1]) {
+            memory1[memoryDataWordAddress] = cpu.busWriteData[15:8];
+        }
+        if (cpu.busWriteMask[2]) {
+            memory2[memoryDataWordAddress] = cpu.busWriteData[23:16];
+        }
+        if (cpu.busWriteMask[3]) {
+            memory3[memoryDataWordAddress] = cpu.busWriteData[31:24];
+        }
+    }
+    if (cpu.busEnable & ~cpu.busWrite) {
+        internalMemorySecondReadCycle = ~internalMemorySecondReadCycle;
+    } else {
+        internalMemorySecondReadCycle = 0;
+    }
+}

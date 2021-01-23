@@ -1,0 +1,142 @@
+module name.martingeisse.esdk.riscv.rtl.terminal.PixelDisplayController;
+
+interface {
+    in clock clk;
+    in bit reset;
+
+    in bit registerWriteEnable;
+    in bit registerWriteData;
+
+    out bit ramdacRequestEnable;
+    out vector[24] ramdacRequestWordAddress;
+    in bit ramdacRequestAcknowledge;
+    in bit ramdacResponseEnable;
+    in vector[24] ramdacResponseWordAddress;
+    in vector[32] ramdacResponseData;
+
+}
+
+//
+// control registers
+//
+register bit planeSelector = 0;
+do (clk) {
+    if (reset) {
+        planeSelector = 0;
+    } else if (registerWriteEnable) {
+        planeSelector = registerWriteData;
+    }
+}
+
+//
+// stage 1: VGA timing
+//
+
+// We need the v signals delayed by one row (compared to stage1y) since the Y position is used to fill the row buffer,
+// and that row will be displayed during the *next* monitor beam row. Hence stage1vblankDelayed / stage1vsyncDelayed.
+register vector[10] stage1x, stage1y;
+register vector[2] stage1p;
+register bit stage1hblank, stage1vblank, stage1vblankDelayed, stage1hsync, stage1vsync, stage1vsyncDelayed;
+do (clk) {
+    stage1p = stage1p + 2d1;
+    if (stage1p == 2d0) {
+        if (stage1x == 10d799) {
+            stage1hblank = 0;
+            stage1x = 0;
+            stage1vblankDelayed = stage1vblank;
+            stage1vsyncDelayed = stage1vsync;
+            if (stage1y == 10d524) {
+                stage1vblank = 0;
+                stage1y = 0;
+            } else {
+                if (stage1y == 10d479) {
+                    stage1vblank = 1;
+                } else if (stage1y == 10d489) {
+                    stage1vsync = 0;
+                } else if (stage1y == 10d491) {
+                    stage1vsync = 1;
+                }
+                stage1y = stage1y + 10d1;
+            }
+        } else {
+            if (stage1x == 10d639) {
+                stage1hblank = 1;
+            } else if (stage1x == 10d655) {
+                stage1hsync = 0;
+            } else if (stage1x == 10d751) {
+                stage1hsync = 1;
+            }
+            stage1x = stage1x + 10d1;
+        }
+    }
+}
+
+
+//
+// stage 2: row buffer
+//
+register matrix[512][32] rowBuffer;
+
+// read / pixel pipeline
+register bit stage2blank, stage2hsync, stage2vsync;
+register vector[32] stage2word;
+register vector[2] stage2byteSelector;
+do (clk) {
+    stage2blank = stage1hblank | stage1vblankDelayed;
+    stage2hsync = stage1hsync;
+    stage2vsync = stage1vsyncDelayed;
+    stage2word = rowBuffer[~stage1y[0] _ stage1x[9:2]];
+    stage2byteSelector = stage1x[1:0];
+}
+
+// refill
+register vector[8] refillPointer;
+register bit refillInProgress, refillFinished;
+do (*) {
+    ramdacRequestEnable = refillInProgress;
+    ramdacRequestWordAddress = 6d0 _ planeSelector _ stage1y[8:0] _ refillPointer;
+}
+do (clk) {
+    if (ramdacResponseEnable) {
+        rowBuffer[stage1y[0] _ ramdacResponseWordAddress[7:0]] = ramdacResponseData;
+    }
+}
+do (clk) {
+    if (refillInProgress) {
+        if (refillPointer == 8d159) {
+            refillInProgress = 0;
+            refillFinished = 1;
+        }
+        if (ramdacRequestAcknowledge) {
+            refillPointer = refillPointer + 8d1;
+        }
+    } else if (refillFinished) {
+        if (stage1hblank) {
+            refillFinished = 0;
+        }
+    } else {
+        refillInProgress = (~stage1vblank & ~stage1hblank);
+        refillPointer = 0;
+    }
+}
+
+
+//
+// stage 3 (non-registered): generate VGA signals
+//
+
+signal vector[8] pixelByte = switch(stage2byteSelector) {
+    case 2d0: stage2word[7:0]
+    case 2d1: stage2word[15:8]
+    case 2d2: stage2word[23:16]
+    case 2d3: stage2word[31:24]
+};
+
+name.martingeisse.esdk.riscv.rtl.terminal.VgaConnector vgaConnector;
+do (*) {
+    vgaConnector.r = pixelByte[2] & ~stage2blank;
+    vgaConnector.g = pixelByte[1] & ~stage2blank;
+    vgaConnector.b = pixelByte[0] & ~stage2blank;
+    vgaConnector.hsync = stage2hsync;
+    vgaConnector.vsync = stage2vsync;
+}

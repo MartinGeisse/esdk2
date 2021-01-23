@@ -1,0 +1,60 @@
+
+module name.martingeisse.esdk.riscv.orange_crab.SignalLogger;
+
+interface {
+
+    in clock logClock;
+    in bit logEnable;
+    in vector[32] logData;
+
+    in clock busClock;
+    in bit busEnable, busWrite;
+    in vector[22] busWordAddress;
+    in vector[32] busWriteData;
+    out vector[32] busReadData;
+    out bit busAcknowledge;
+
+}
+
+register matrix[8192][32] memory;
+
+// logging interface
+register vector[13] logPointer;
+do (logClock) {
+    if (clearMode | (loggingActive & logEnable)) {
+        memory[logPointer] = clearMode ? 32d0 : logData;
+    }
+}
+do (logClock) {
+    if (resetLogPointer) {
+        logPointer = 0;
+    } else if (loggingActive & logEnable & logPointer != 13b1111111111111) {
+        logPointer = logPointer + 13d1;
+    }
+}
+
+// bus read interface
+register vector[32] busReadDataRegister;
+do (*) busReadData = busReadDataRegister;
+do (busClock) {
+    if (busEnable & ~busWrite) {
+        busReadDataRegister = memory[busWordAddress[12:0]];
+    }
+}
+
+// bus write interface
+register bit resetLogPointer = 0, clearMode = 0, loggingActive = 1;
+do (busClock) {
+    if (busEnable & busWrite) {
+        resetLogPointer = busWriteData[0];
+        clearMode = busWriteData[2];
+        loggingActive = busWriteData[3];
+    }
+}
+
+// bus acknowledge
+register bit secondBusReadCycle = 0;
+do (*) busAcknowledge = busWrite | secondBusReadCycle;
+do (busClock) {
+    secondBusReadCycle = (~busEnable | busWrite) ? bit(0) : ~secondBusReadCycle;
+}

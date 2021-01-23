@@ -1,0 +1,388 @@
+module name.martingeisse.esdk.riscv.orange_crab.ddr3.RamController;
+
+interface {
+
+    // system signals
+    in clock clk;
+    in bit reset;
+
+    // Wishbone interface
+    in bit busRequestEnable;
+    in vector[25] busRequestWordAddress;
+    in bit busRequestWrite;
+    in vector[32] busRequestWriteData;
+    in vector[4] busRequestWriteMask;
+    out bit busRequestAcknowledge;
+    // out bit busResponseEnable;
+    out vector[32] busResponseReadData; // for now, read data is sent immediately when the request gets acknowledged
+
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+// interface to SDRAM
+// --------------------------------------------------------------------------------------------------------------------
+
+name.martingeisse.esdk.riscv.orange_crab.ddr3.SdramConnector sdram;
+
+// SDRAM output registers for the main and init state machine
+register bit sdramRegisterRESETn = 0;
+register bit sdramRegisterCK = 0;
+register bit sdramRegisterCKE = 0;
+register bit sdramRegisterCSn;
+register vector[3] sdramRegisterBA;
+register vector[13] sdramRegisterA;
+register bit sdramRegisterRASn;
+register bit sdramRegisterCASn;
+register bit sdramRegisterWEn;
+do (*) {
+    sdram.RESETn = sdramRegisterRESETn;
+    sdram.CK = sdramRegisterCK;
+    sdram.CKE = sdramRegisterCKE;
+    sdram.CSn = sdramRegisterCSn;
+    sdram.BA = sdramRegisterBA;
+    sdram.A = 3d0 _ sdramRegisterA;
+    sdram.RASn = sdramRegisterRASn;
+    sdram.CASn = sdramRegisterCASn;
+    sdram.WEn = sdramRegisterWEn;
+    sdram.ODT = 0;
+}
+
+// output registers for DDR signals
+register vector[16] sdramRegisterDataOut;
+register vector[2] sdramRegisterDataOutMask;
+register bit sdramRegisterDriveData = 0;
+register bit sdramRegisterDriveDataStrobe = 0;
+do (*) {
+    sdram.dataOut = sdramRegisterDataOut;
+    sdram.dataOutMask = sdramRegisterDataOutMask;
+    sdram.driveData = sdramRegisterDriveData;
+    sdram.dataStrobeOut = sdramRegisterCK; // nominal DQS-out is identical to the main clock (later we might
+        // time-shift this within the allowed range of +/- one quarter clock cycle)
+    sdram.driveDataStrobe = sdramRegisterDriveDataStrobe;
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// main state machine
+// --------------------------------------------------------------------------------------------------------------------
+
+// main state machine states
+constant vector[5] STATE_START = 0;
+constant vector[5] STATE_INIT_FINISH_RESET = 1;
+constant vector[5] STATE_INIT_CLOCK_ENABLE = 2;
+constant vector[5] STATE_INIT_LMR_2 = 3;
+constant vector[5] STATE_INIT_LMR_3 = 4;
+constant vector[5] STATE_INIT_LMR_1 = 5;
+constant vector[5] STATE_INIT_LMR_0 = 6;
+constant vector[5] STATE_INIT_ZQCL = 7;
+constant vector[5] STATE_IDLE = 10;
+constant vector[5] STATE_REFRESH = 11;
+constant vector[5] STATE_READ_RAS = 13;
+constant vector[5] STATE_READ_CAS = 14;
+constant vector[5] STATE_READ_DATA = 15;
+constant vector[5] STATE_WRITE_RAS = 16;
+constant vector[5] STATE_WRITE_CAS = 17;
+constant vector[5] STATE_WRITE_DATA = 18;
+constant vector[5] STATE_WRITE_POSTAMBLE = 19;
+
+// main and init state machines
+register bit refreshAcknowledge;
+register vector[4] clockDivider = 0;
+register vector[5] mainState = STATE_START;
+register vector[16] waitCount = 0;
+
+// off-beat (falling RAM CK edge) data input/output
+register vector[16] offBeatDataInRegister;
+register vector[2] sdramRegisterOffBeatDataOutMask;
+
+// bus interface
+register bit busRequestAcknowledgeRegister;
+register vector[32] busResponseReadDataRegister;
+do (*) {
+    busRequestAcknowledge = busRequestAcknowledgeRegister;
+    busResponseReadData = busResponseReadDataRegister;
+}
+
+/**
+ * Main state machine.
+ *
+ * Clock divider: a 3-bit counter to slow things down for the SDRAM until basic operation is working. We also use
+ * it to handle DDR timing (i.e. change outputs to be ready on the negative edge of the SDRAM's CK signal) and to
+ * change our outputs with a delay with respect to the CK so we don't violate hold times.
+ *   0: advance main state machine and change outputs
+ *   2: positive CK edge
+ *   4: change outputs for "off-beat" data
+ *   6: negative CK edge
+ */
+do (clk) {
+    refreshAcknowledge = 0;
+    busRequestAcknowledgeRegister = 0;
+    if (reset) {
+        clockDivider = 0;
+        mainState = STATE_START;
+        waitCount = 0;
+        sdramRegisterRESETn = 0;
+        sdramRegisterCK = 0;
+        sdramRegisterCKE = 0;
+        sdramRegisterDriveData = 0;
+        sdramRegisterDriveDataStrobe = 0;
+    } else {
+        clockDivider = clockDivider + 4d1;
+        switch (clockDivider) {
+
+            case 4d0:
+                sdramRegisterCSn = 1;
+                if (waitCount != 16d0) {
+                    waitCount = waitCount - 16d1;
+                } else {
+                    switch (mainState) {
+
+                        // --------------------------------------------------------------------------------------------------------
+                        // initialization
+                        // --------------------------------------------------------------------------------------------------------
+
+                        case STATE_START:
+                            sdramRegisterRESETn = 0;
+                            waitCount = 20000; // min. 200µs RESET pulse
+                            mainState = STATE_INIT_FINISH_RESET;
+
+                        case STATE_INIT_FINISH_RESET:
+                            sdramRegisterRESETn = 1;
+                            waitCount = 50000; // min. 500µs after reset
+                            mainState = STATE_INIT_CLOCK_ENABLE;
+
+                        case STATE_INIT_CLOCK_ENABLE:
+                            sdramRegisterCKE = 1;
+                            waitCount = 12; // min. 10ns+tRFC = 120ns, min. 5 clocks
+                            mainState = STATE_INIT_LMR_2;
+
+                        case STATE_INIT_LMR_2:
+                            sdramRegisterCSn = 0;
+                            sdramRegisterRASn = 0;
+                            sdramRegisterCASn = 0;
+                            sdramRegisterWEn = 0;
+                            sdramRegisterBA = 3d2;
+                            // CWL=5; ASR disabled; SRT=normal; dynamic ODT disabled
+                            sdramRegisterA = 13h0000;
+                            waitCount = 4; // tMRD = 4 clock cycles
+                            mainState = STATE_INIT_LMR_3;
+
+                        case STATE_INIT_LMR_3:
+                            sdramRegisterCSn = 0;
+                            sdramRegisterRASn = 0;
+                            sdramRegisterCASn = 0;
+                            sdramRegisterWEn = 0;
+                            sdramRegisterBA = 3d3;
+                            // MPR disabled
+                            sdramRegisterA = 13h0000;
+                            waitCount = 4; // tMRD = 4 clock cycles
+                            mainState = STATE_INIT_LMR_1;
+
+                        case STATE_INIT_LMR_1:
+                            sdramRegisterCSn = 0;
+                            sdramRegisterRASn = 0;
+                            sdramRegisterCASn = 0;
+                            sdramRegisterWEn = 0;
+                            sdramRegisterBA = 3d1;
+                            // disable DLL; 34ohm output driver; no additive latency; write leveling disabled;
+                            // termination resistors disabled; TDQS disabled; output enabled
+                            sdramRegisterA = 13h0003;
+                            waitCount = 4; // tMRD = 4 clock cycles
+                            mainState = STATE_INIT_LMR_0;
+
+                        case STATE_INIT_LMR_0:
+                            sdramRegisterCSn = 0;
+                            sdramRegisterRASn = 0;
+                            sdramRegisterCASn = 0;
+                            sdramRegisterWEn = 0;
+                            sdramRegisterBA = 3d0;
+                            // fixed burst length 8; sequential burst; CL=5; DLL reset yes
+                            // write recovery=5; precharge PD: DLL off
+                            // The DLL reset probably does not matter. CL=5 is not supported with the DLL disabled
+                            // according to the manual, but I configured it by accident and it seems to work. The
+                            // manual says something about DQSCK "starting earlier" with the DLL off and this seems
+                            // to mean that we actually have CL=4 when CL=5 is configured.
+                            // Note: data on the wire looks like in "interleave" mode but I don't know why
+                            sdramRegisterA = 13h0310;
+                            waitCount = 12; // tMOD = 12 clock cycles
+                            mainState = STATE_INIT_ZQCL;
+
+                        case STATE_INIT_ZQCL:
+                            sdramRegisterCSn = 0;
+                            sdramRegisterRASn = 1;
+                            sdramRegisterCASn = 1;
+                            sdramRegisterWEn = 0;
+                            sdramRegisterA[10] = 1;
+                            waitCount = 512; // time needed for ZQ calibration
+                            mainState = STATE_IDLE;
+
+                        // --------------------------------------------------------------------------------------------------------
+                        // refresh
+                        // --------------------------------------------------------------------------------------------------------
+
+                        case STATE_REFRESH:
+                            sdramRegisterCSn = 0;
+                            sdramRegisterRASn = 0;
+                            sdramRegisterCASn = 0;
+                            sdramRegisterWEn = 1;
+                            refreshAcknowledge = 1;
+                            // right now, one RAM cycle is 160ns which is longer than the required delay
+                            // waitCount = 10; // 110 ns, but one cycle has passed already
+                            mainState = STATE_IDLE;
+
+                        // --------------------------------------------------------------------------------------------------------
+                        // reading
+                        // --------------------------------------------------------------------------------------------------------
+
+                        case STATE_READ_RAS:
+                            sdramRegisterCSn = 0;
+                            sdramRegisterRASn = 0;
+                            sdramRegisterCASn = 1;
+                            sdramRegisterWEn = 1;
+                            sdramRegisterBA = busRequestWordAddress[24:22];
+                            sdramRegisterA = busRequestWordAddress[21:9];
+                            sdramRegisterDriveData = 0; // should be the case already, but just to be sure
+                            sdramRegisterDriveDataStrobe = 0; // should be the case already, but just to be sure
+                            waitCount = 1; // tRCD >= 15ns
+                            mainState = STATE_READ_CAS;
+
+                        case STATE_READ_CAS:
+                            sdramRegisterCSn = 0;
+                            sdramRegisterRASn = 1;
+                            sdramRegisterCASn = 0;
+                            sdramRegisterWEn = 1;
+                            sdramRegisterA[10] = 1; // use auto-precharge
+                            sdramRegisterA[9:1] = busRequestWordAddress[8:0];
+                            sdramRegisterA[0] = 0;
+                            waitCount = 4;
+                            mainState = STATE_READ_DATA;
+
+                        case STATE_READ_DATA:
+                            busResponseReadDataRegister = sdram.dataIn _ offBeatDataInRegister;
+                            busRequestAcknowledgeRegister = 1;
+                            waitCount = 8; // wait for data, after that wait a time that seems to be 0 according to
+                                            // the manual, but for now we want to be on the safe side
+                            mainState = STATE_IDLE;
+
+                        // --------------------------------------------------------------------------------------------------------
+                        // writing
+                        // --------------------------------------------------------------------------------------------------------
+
+                        case STATE_WRITE_RAS:
+                            // RAS
+                            sdramRegisterCSn = 0;
+                            sdramRegisterRASn = 0;
+                            sdramRegisterCASn = 1;
+                            sdramRegisterWEn = 1;
+                            sdramRegisterBA = busRequestWordAddress[24:22];
+                            sdramRegisterA = busRequestWordAddress[21:9];
+                            waitCount = 1; // tRCD >= 15ns
+                            mainState = STATE_WRITE_CAS;
+
+                        case STATE_WRITE_CAS:
+                            // CAS
+                            sdramRegisterCSn = 0;
+                            sdramRegisterRASn = 1;
+                            sdramRegisterCASn = 0;
+                            sdramRegisterWEn = 0;
+                            sdramRegisterA[10] = 1; // use auto-precharge
+                            sdramRegisterA[9:3] = busRequestWordAddress[8:2];
+                            sdramRegisterA[2:0] = 0;
+                            sdramRegisterDriveData = 1;
+                            sdramRegisterDriveDataStrobe = 1;
+                            waitCount = 4; // CWL = 5, means wait 4 cycles then act 1 cycle. The -1 from DLL disable
+                                // does not seem to apply to WRITEs
+                            mainState = STATE_WRITE_DATA;
+
+                        case STATE_WRITE_DATA:
+                            if (sdramRegisterA[2:1] == 2d3) {
+                                waitCount = 1;
+                                mainState = STATE_WRITE_POSTAMBLE;
+                            }
+                            sdramRegisterDataOut = busRequestWriteData[15:0];
+                            if (sdramRegisterA[2:1] == busRequestWordAddress[1:0]) {
+                                sdramRegisterDataOutMask = ~busRequestWriteMask[1:0];
+                                sdramRegisterOffBeatDataOutMask = ~busRequestWriteMask[3:2];
+                            } else {
+                                sdramRegisterDataOutMask = 2b11;
+                                sdramRegisterOffBeatDataOutMask = 2b11;
+                            }
+                            sdramRegisterA = sdramRegisterA + 13d2;
+
+                        case STATE_WRITE_POSTAMBLE:
+                            sdramRegisterDriveDataStrobe = 0;
+                            sdramRegisterDriveData = 0;
+                            busRequestAcknowledgeRegister = 1;
+                            waitCount = 10; // write recovery + precharging
+                            mainState = STATE_IDLE;
+
+                        // --------------------------------------------------------------------------------------------------------
+                        // idle
+                        // --------------------------------------------------------------------------------------------------------
+
+                        case STATE_IDLE:
+                            if (highPriorityRefreshRequest) {
+                                mainState = STATE_REFRESH;
+                            } else if (busRequestEnable & ~busRequestWrite) {
+                                mainState = STATE_READ_RAS;
+                            } else if (busRequestEnable & busRequestWrite) {
+                                mainState = STATE_WRITE_RAS;
+                            } else if (lowPriorityRefreshRequest) {
+                                mainState = STATE_REFRESH;
+                            }
+
+                        default:
+                            mainState = STATE_IDLE;
+
+                    }
+                }
+
+            case 4d4:
+                sdramRegisterCK = 1;
+
+            case 4d8:
+                sdramRegisterDataOut = busRequestWriteData[31:16];
+                offBeatDataInRegister = sdram.dataIn;
+                sdramRegisterDataOutMask = sdramRegisterOffBeatDataOutMask;
+
+            case 4d12:
+                sdramRegisterCK = 0;
+
+        }
+    }
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+// refresh timer state machine
+// --------------------------------------------------------------------------------------------------------------------
+
+// Each row needs to be refreshed every 64ms. This means a refresh command is needed every 7.8125µs.
+// With a (RAM) clock cycle being 8 main clock cycles which are 50MHz, the RAM is clocked at 6.25 MHz (0.16 µs).
+// This means we need a refresh command every 48 clock cycles.
+
+signal bit lowPriorityRefreshRequest, highPriorityRefreshRequest;
+do (*) {
+    lowPriorityRefreshRequest = refreshQueue != 3d7;
+    highPriorityRefreshRequest = ~refreshQueue[2];
+}
+
+register vector[10] refreshCounter;
+register vector[3] refreshQueue;
+do (clk) {
+    if (refreshAcknowledge) {
+        if (refreshQueue != 3d7) {
+            refreshQueue = refreshQueue + 3d1;
+        }
+    } else if (reset) {
+        refreshCounter = 0;
+        refreshQueue = 0;
+    } else {
+        refreshCounter = refreshCounter + 10d1;
+        if (refreshCounter == 10d48) {
+            refreshCounter = 0;
+            if (refreshQueue != 3d0) {
+                refreshQueue = refreshQueue - 3d1;
+            }
+        }
+    }
+}

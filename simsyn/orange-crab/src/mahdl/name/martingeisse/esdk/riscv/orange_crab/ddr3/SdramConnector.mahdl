@@ -1,0 +1,25 @@
+native module name.martingeisse.esdk.riscv.orange_crab.ddr3.SdramConnector;
+
+interface {
+
+    // SDRAM control interface
+    in bit RESETn;
+    in bit CK;
+    in bit CKE;
+    in bit CSn;
+    in vector[3] BA;
+    in vector[16] A; // upper 3 lines not connected for the default SDRAM chip
+    in bit RASn;
+    in bit CASn;
+    in bit WEn;
+    in bit ODT;
+
+    // SDRAM data interface
+    in vector[16] dataOut;
+    in vector[2] dataOutMask;
+    out vector[16] dataIn;
+    in bit driveData;
+    in bit dataStrobeOut;
+    in bit driveDataStrobe;
+
+}

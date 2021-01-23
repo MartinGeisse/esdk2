@@ -1,0 +1,61 @@
+module name.martingeisse.esdk.riscv.rtl.serial.SerialPort;
+
+interface {
+    in clock clk;
+    in bit reset;
+    in bit serialSignal;
+    in bit busEnable;
+    out bit busAcknowledge;
+    out vector[32] busReadData;
+}
+
+// Using my own software-serial. Idle is HIGH; start bit is LOW; stop bit is HIGH (equivalent to minimum idle time
+// between bits, so we don't have to process it explicitly). Data is transmitted active-HIGH, lowest bit first.
+constant integer INITIAL_DELAY_CLOCKS = 210;
+constant integer BIT_DURATION_CLOCKS = 477;
+
+// state is (number of sampled bits + 2); 0 = idle, 1 = first part of start bit;
+// 2 = second part of start bit and first half of bit 0 (equivalent to "0 bits sampled").
+// After bit 7 we're going directly to IDLE since the stop bit is HIGH, like idle.
+register vector[4] state = 0;
+
+register vector[8] receiveBuffer, finishedByte;
+register bit hasFinishedByte = 0;
+register vector[10] delayCounter = 0;
+
+do (*) {
+    busAcknowledge = 1;
+    busReadData = hasFinishedByte ? (24d0 _ finishedByte) : (16hffff _ 16hffff);
+}
+
+do (clk) {
+    if (reset) {
+        state = 0;
+        hasFinishedByte = 0;
+    } else {
+        if (delayCounter == 10d0) {
+            switch (state) {
+                case 4d0:
+                    if (serialSignal == bit(0)) {
+                        delayCounter = INITIAL_DELAY_CLOCKS;
+                        state = 1;
+                    }
+
+                case 4d10:
+                    state = 0;
+                    finishedByte = receiveBuffer;
+                    hasFinishedByte = 1;
+
+                default:
+                    state = state + 4d1;
+                    delayCounter = BIT_DURATION_CLOCKS;
+                    receiveBuffer = serialSignal _ receiveBuffer[7:1];
+            }
+        } else {
+            delayCounter = delayCounter - 10d1;
+        }
+        if (busEnable) {
+            hasFinishedByte = (delayCounter == 10d0 & state == 4d10);
+        }
+    }
+}

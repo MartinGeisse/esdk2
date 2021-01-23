@@ -1,0 +1,72 @@
+module name.martingeisse.esdk.riscv.rtl.ram.RamAgent;
+
+interface {
+
+    in clock clk;
+    in bit reset;
+
+    // CPU interface
+    in bit cpuSelectCommandEngine;
+    in vector[4] cpuCommandCode;
+    in vector[24] cpuWordAddress;
+    in bit cpuEnable, cpuWrite;
+    in vector[32] cpuWriteData;
+    in vector[4] cpuWriteMask;
+    out vector[32] cpuReadData;
+    out bit cpuAcknowledge;
+
+    // RAM controller interface
+    out vector[24] ramRequestWordAddress;
+    out bit ramRequestEnable, ramRequestWrite;
+    out vector[32] ramRequestWriteData;
+    out vector[4] ramRequestWriteMask;
+    in bit ramRequestAcknowledge;
+    in vector[32] ramResponseReadData;
+    in bit ramResponseEnable;
+
+}
+
+name.martingeisse.esdk.riscv.rtl.ram.RamAgentCommandEngine commandEngine;
+do (*) {
+    commandEngine.clk = clk;
+    commandEngine.reset = reset;
+    commandEngine.cpuCommandCode = cpuCommandCode;
+    commandEngine.cpuWordAddress = cpuWordAddress;
+    commandEngine.cpuEnable = cpuEnable & cpuSelectCommandEngine;
+    commandEngine.cpuWrite = cpuWrite;
+    commandEngine.cpuWriteData = cpuWriteData;
+    commandEngine.cpuWriteMask = cpuWriteMask;
+    commandEngine.ramRequestAcknowledge = ramRequestAcknowledge;
+    commandEngine.ramResponseEnable = ramResponseEnable;
+    commandEngine.ramResponseReadData = ramResponseReadData;
+}
+
+// The RAM wants to acknowledge a read request and send the response later, but the CPU wants the response immediately.
+// So we only acknowledge to the CPU when the response is available. However, we must still stop requesting once the
+// RAM acknowledges the request, otherwise it interprets it as a second request, so this register remembers whether
+// the request has been acknowledged.
+register bit requestAcknowledgedRegister;
+do (clk) {
+    if (reset) {
+        requestAcknowledgedRegister = 0;
+    } else if (cpuAcknowledge) {
+        // cpuAcknowledge indicates that a cpuEnable in the next cycle belongs to a new request
+        // To simplify the logic, this branch may be taken for command processing, but the flag should stay at 0 for
+        // commands anyway, so overwriting with 0 here should not matter.
+        requestAcknowledgedRegister = 0;
+    } else if (~cpuSelectCommandEngine & ~commandEngine.lockRamInterface & ramRequestAcknowledge) {
+        requestAcknowledgedRegister = 1;
+    }
+}
+
+do (*) {
+    ramRequestWordAddress = commandEngine.lockRamInterface ? commandEngine.ramRequestWordAddress : cpuWordAddress;
+    ramRequestEnable = commandEngine.lockRamInterface ? commandEngine.ramRequestEnable : (cpuEnable & ~requestAcknowledgedRegister);
+    ramRequestWrite = commandEngine.lockRamInterface ? commandEngine.ramRequestWrite : cpuWrite;
+    ramRequestWriteData = commandEngine.lockRamInterface ? commandEngine.ramRequestWriteData : cpuWriteData;
+    ramRequestWriteMask = commandEngine.lockRamInterface ? commandEngine.ramRequestWriteMask : cpuWriteMask;
+    cpuReadData = cpuSelectCommandEngine ? commandEngine.cpuReadData : ramResponseReadData;
+    cpuAcknowledge = cpuSelectCommandEngine ? commandEngine.cpuAcknowledge :
+            commandEngine.lockRamInterface ? bit(0) :
+            (cpuWrite ? ramRequestAcknowledge : ramResponseEnable);
+}
