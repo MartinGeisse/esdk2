@@ -53,7 +53,6 @@ public class HeosSynthesisMain {
 //		pll.createBitInputPort("ENCLKOS", false);
 //		pll.createBitInputPort("ENCLKOS2", false);
 		pll.createBitInputPort("ENCLKOS3", true); // not clear if this is needed when using S3 as feedback, probably not
-		RtlClockNetwork clock = realm.createClockNetwork(pll.createBitOutputPort("CLKOP"));
 		// "make it work" attributes and parameters
 		pll.getAttributes().put("FREQUENCY_PIN_CLKI", 48);
 		// The following settings are seemingly used by foboot, but for some reason cause extremely long startup times.
@@ -66,7 +65,7 @@ public class HeosSynthesisMain {
 		pll.getParameters().put("CLKI_DIV", 2);
 		// output clock
 		pll.getParameters().put("CLKOP_ENABLE", "ENABLED");
-		pll.getParameters().put("CLKOP_DIV", 6);
+		pll.getParameters().put("CLKOP_DIV", 3);
 		pll.getParameters().put("CLKOP_FPHASE", 0);
 		pll.getParameters().put("CLKOP_CPHASE", 0);
 		// feedback clock
@@ -76,6 +75,23 @@ public class HeosSynthesisMain {
 		pll.getParameters().put("CLKOS3_FPHASE", 0);
 		pll.getParameters().put("CLKOS3_CPHASE", 0);
 		pll.getParameters().put("CLKFB_DIV", 25);
+		RtlBitSignal pllLocked = pll.createBitOutputPort("LOCK");
+
+		// edge clock stop block: allows the startup state machine to stop the edge clock
+		// TODO use half the divider for the edge clock
+		RtlModuleInstance edgeClockSyncBlock = new RtlModuleInstance(realm, "ECLKSYNCB");
+		edgeClockSyncBlock.createBitInputPort("ECLKI", pll.createBitOutputPort("CLKOP"));
+		edgeClockSyncBlock.createBitInputPort("STOP", false); // TODO should be controlled by startup state machine
+		RtlBitSignal edgeClockSignal = edgeClockSyncBlock.createBitOutputPort("ECLKO");
+
+		// generate the system clock from the edge clock
+		RtlModuleInstance clockDivider = new RtlModuleInstance(realm, "CLKDIVF");
+		clockDivider.createBitInputPort("ALIGNWD", false);
+		clockDivider.createBitInputPort("RST", pllLocked.not()); // TODO should be controlled by startup state machine
+		clockDivider.createBitInputPort("CLKI", edgeClockSignal);
+		RtlBitSignal systemClockSignal = clockDivider.createBitOutputPort("CDIVX");
+
+		RtlClockNetwork clock = realm.createClockNetwork(systemClockSignal);
 
 		// create main RTL
 		SdramConnector.Connector sdramConnector = new SdramConnector.Connector(realm);
