@@ -10,25 +10,17 @@ import name.martingeisse.esdk.core.rtl.pin.RtlInputPin;
 import name.martingeisse.esdk.core.rtl.pin.RtlOutputPin;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitConstant;
 import name.martingeisse.esdk.core.rtl.signal.RtlBitSignal;
-import name.martingeisse.esdk.core.rtl.signal.RtlVectorConstant;
 import name.martingeisse.esdk.core.rtl.synthesis.lattice.LatticePinConfiguration;
 import name.martingeisse.esdk.core.rtl.synthesis.lattice.ProjectGenerator;
-import name.martingeisse.esdk.core.util.vector.VectorValue;
-import name.martingeisse.esdk.riscv.rtl.CeeCompilerInvoker;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 
 /**
  *
  */
-public class RiscvBlinkSynthesisMain {
+public class TestbildSynthesisMain {
 
 	public static void main(String[] args) throws Exception {
-
-		CeeCompilerInvoker.invoke("riscv/resource/lattice-riscv-blink");
 
 		// create design and realm
 		Design design = new Design();
@@ -76,45 +68,34 @@ public class RiscvBlinkSynthesisMain {
 		pll.getParameters().put("CLKFB_DIV", 25);
 
 		// create main RTL
-		RiscvBlink.Implementation riscvBlink = new RiscvBlink.Implementation(realm, clock);
+		Testbild.Implementation testbild = new Testbild.Implementation(realm, clock);
 
 		// LED pins
-		outputPin(realm, "K4", "LVCMOS33", null, riscvBlink.getLedRn());
-		outputPin(realm, "M3", "LVCMOS33", null, riscvBlink.getLedGn());
-		outputPin(realm, "J3", "LVCMOS33", null, riscvBlink.getLedBn());
+		outputPin(realm, "K4", "LVCMOS33", null, testbild.getLedRn());
+		outputPin(realm, "M3", "LVCMOS33", null, testbild.getLedGn());
+		outputPin(realm, "J3", "LVCMOS33", null, testbild.getLedBn());
+
+		// VGA pins
+		outputPin(realm, "C8", "LVCMOS33", null, testbild.getR().select(1)); // IO 9
+		outputPin(realm, "B8", "LVCMOS33", null, testbild.getG().select(1)); // IO 10
+		outputPin(realm, "A8", "LVCMOS33", null, testbild.getB().select(1)); // IO 11
+		outputPin(realm, "H2", "LVCMOS33", null, testbild.getHsync()); // IO 12
+		outputPin(realm, "J2", "LVCMOS33", null, testbild.getVsync()); // IO 13
+		outputPin(realm, "N17", "LVCMOS33", null, testbild.getR().select(0)); // IO 0
+		outputPin(realm, "M18", "LVCMOS33", null, testbild.getG().select(0)); // IO 1
+		outputPin(realm, "B9", "LVCMOS33", null, testbild.getB().select(0)); // IO 6
 
 		// use the pushbutton to reconfigure the FPGA
 		RtlBitSignal button = inputPin(realm, "J17", "SSTL135_I");
 		inOutPin(realm, "V17", "LVCMOS33", null, new RtlBitConstant(realm, false), button.not());
 
-		// load the program into small memory
-		try (FileInputStream in = new FileInputStream("riscv/resource/lattice-riscv-blink/build/program.bin")) {
-			int index = 0;
-			while (true) {
-				int first = in.read();
-				if (first < 0) {
-					break;
-				}
-				riscvBlink._memory0.getMatrix().setRow(index, VectorValue.of(8, first));
-				riscvBlink._memory1.getMatrix().setRow(index, VectorValue.of(8, readByteEofSafe(in)));
-				riscvBlink._memory2.getMatrix().setRow(index, VectorValue.of(8, readByteEofSafe(in)));
-				riscvBlink._memory3.getMatrix().setRow(index, VectorValue.of(8, readByteEofSafe(in)));
-				index++;
-			}
-		}
-
 		// generate Verilog and ISE project files
-		ProjectGenerator projectGenerator = new ProjectGenerator(realm, "RiscvBlink", new File("synthesize/riscv-blink"), "CSFBGA285");
+		ProjectGenerator projectGenerator = new ProjectGenerator(realm, "Testbild", new File("synthesize/testbild"), "CSFBGA285");
 		projectGenerator.clean();
 		projectGenerator.generate();
 		projectGenerator.build();
 		projectGenerator.program();
 
-	}
-
-	private static int readByteEofSafe(InputStream in) throws IOException {
-		int x = in.read();
-		return (x < 0 ? 0 : x);
 	}
 
 	private static <T extends Item> T withName(T item, String name) {

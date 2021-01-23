@@ -52,11 +52,19 @@ public interface RtlVectorSignal extends RtlSignal {
 		return new RtlVectorOperation(getRtlItem().getRealm(), operator, this, rightOperand);
 	}
 
+	default RtlVectorSignal operation(RtlVectorOperation.Operator operator, VectorValue rightOperand) {
+		return operation(operator, new RtlVectorConstant(getRtlItem().getRealm(), rightOperand));
+	}
+
 	default RtlVectorSignal operation(RtlVectorOperation.Operator operator, int rightOperand) {
 		return operation(operator, RtlVectorConstant.of(getRtlItem().getRealm(), getWidth(), rightOperand));
 	}
 
 	default RtlVectorSignal add(RtlVectorSignal rightOperand) {
+		return operation(RtlVectorOperation.Operator.ADD, rightOperand);
+	}
+
+	default RtlVectorSignal add(VectorValue rightOperand) {
 		return operation(RtlVectorOperation.Operator.ADD, rightOperand);
 	}
 
@@ -68,11 +76,19 @@ public interface RtlVectorSignal extends RtlSignal {
 		return operation(RtlVectorOperation.Operator.SUBTRACT, rightOperand);
 	}
 
+	default RtlVectorSignal subtract(VectorValue rightOperand) {
+		return operation(RtlVectorOperation.Operator.SUBTRACT, rightOperand);
+	}
+
 	default RtlVectorSignal subtract(int rightOperand) {
 		return operation(RtlVectorOperation.Operator.SUBTRACT, rightOperand);
 	}
 
 	default RtlVectorSignal multiply(RtlVectorSignal rightOperand) {
+		return operation(RtlVectorOperation.Operator.MULTIPLY, rightOperand);
+	}
+
+	default RtlVectorSignal multiply(VectorValue rightOperand) {
 		return operation(RtlVectorOperation.Operator.MULTIPLY, rightOperand);
 	}
 
@@ -84,6 +100,10 @@ public interface RtlVectorSignal extends RtlSignal {
 		return operation(RtlVectorOperation.Operator.AND, rightOperand);
 	}
 
+	default RtlVectorSignal and(VectorValue rightOperand) {
+		return operation(RtlVectorOperation.Operator.AND, rightOperand);
+	}
+
 	default RtlVectorSignal and(int rightOperand) {
 		return operation(RtlVectorOperation.Operator.AND, rightOperand);
 	}
@@ -92,11 +112,19 @@ public interface RtlVectorSignal extends RtlSignal {
 		return operation(RtlVectorOperation.Operator.OR, rightOperand);
 	}
 
+	default RtlVectorSignal or(VectorValue rightOperand) {
+		return operation(RtlVectorOperation.Operator.OR, rightOperand);
+	}
+
 	default RtlVectorSignal or(int rightOperand) {
 		return operation(RtlVectorOperation.Operator.OR, rightOperand);
 	}
 
 	default RtlVectorSignal xor(RtlVectorSignal rightOperand) {
+		return operation(RtlVectorOperation.Operator.XOR, rightOperand);
+	}
+
+	default RtlVectorSignal xor(VectorValue rightOperand) {
 		return operation(RtlVectorOperation.Operator.XOR, rightOperand);
 	}
 
@@ -112,11 +140,19 @@ public interface RtlVectorSignal extends RtlSignal {
 		return new RtlVectorComparison(getRtlItem().getRealm(), operator, this, rightOperand);
 	}
 
+	default RtlBitSignal comparison(RtlVectorComparison.Operator operator, VectorValue rightOperand) {
+		return comparison(operator, new RtlVectorConstant(getRtlItem().getRealm(), rightOperand));
+	}
+
 	default RtlBitSignal comparison(RtlVectorComparison.Operator operator, int rightOperand) {
 		return comparison(operator, RtlVectorConstant.of(getRtlItem().getRealm(), getWidth(), rightOperand));
 	}
 
 	default RtlBitSignal compareEqual(RtlVectorSignal rightOperand) {
+		return comparison(RtlVectorComparison.Operator.EQUAL, rightOperand);
+	}
+
+	default RtlBitSignal compareEqual(VectorValue rightOperand) {
 		return comparison(RtlVectorComparison.Operator.EQUAL, rightOperand);
 	}
 
@@ -128,11 +164,19 @@ public interface RtlVectorSignal extends RtlSignal {
 		return comparison(RtlVectorComparison.Operator.NOT_EQUAL, rightOperand);
 	}
 
+	default RtlBitSignal compareNotEqual(VectorValue rightOperand) {
+		return comparison(RtlVectorComparison.Operator.NOT_EQUAL, rightOperand);
+	}
+
 	default RtlBitSignal compareNotEqual(int rightOperand) {
 		return comparison(RtlVectorComparison.Operator.NOT_EQUAL, rightOperand);
 	}
 
 	default RtlBitSignal compareUnsignedLessThan(RtlVectorSignal rightOperand) {
+		return comparison(RtlVectorComparison.Operator.UNSIGNED_LESS_THAN, rightOperand);
+	}
+
+	default RtlBitSignal compareUnsignedLessThan(VectorValue rightOperand) {
 		return comparison(RtlVectorComparison.Operator.UNSIGNED_LESS_THAN, rightOperand);
 	}
 
@@ -144,6 +188,10 @@ public interface RtlVectorSignal extends RtlSignal {
 		return comparison(RtlVectorComparison.Operator.UNSIGNED_LESS_THAN_OR_EQUAL, rightOperand);
 	}
 
+	default RtlBitSignal compareUnsignedLessThanOrEqual(VectorValue rightOperand) {
+		return comparison(RtlVectorComparison.Operator.UNSIGNED_LESS_THAN_OR_EQUAL, rightOperand);
+	}
+
 	default RtlBitSignal compareUnsignedLessThanOrEqual(int rightOperand) {
 		return comparison(RtlVectorComparison.Operator.UNSIGNED_LESS_THAN_OR_EQUAL, rightOperand);
 	}
@@ -152,11 +200,19 @@ public interface RtlVectorSignal extends RtlSignal {
 		return comparison(RtlVectorComparison.Operator.UNSIGNED_GREATER_THAN, rightOperand);
 	}
 
+	default RtlBitSignal compareUnsignedGreaterThan(VectorValue rightOperand) {
+		return comparison(RtlVectorComparison.Operator.UNSIGNED_GREATER_THAN, rightOperand);
+	}
+
 	default RtlBitSignal compareUnsignedGreaterThan(int rightOperand) {
 		return comparison(RtlVectorComparison.Operator.UNSIGNED_GREATER_THAN, rightOperand);
 	}
 
 	default RtlBitSignal compareUnsignedGreaterThanOrEqual(RtlVectorSignal rightOperand) {
+		return comparison(RtlVectorComparison.Operator.UNSIGNED_GREATER_THAN_OR_EQUAL, rightOperand);
+	}
+
+	default RtlBitSignal compareUnsignedGreaterThanOrEqual(VectorValue rightOperand) {
 		return comparison(RtlVectorComparison.Operator.UNSIGNED_GREATER_THAN_OR_EQUAL, rightOperand);
 	}
 

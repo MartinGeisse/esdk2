@@ -27,8 +27,9 @@ import java.util.Map;
 public final class RtlModuleInstance extends RtlItem {
 
 	private String moduleName;
-	private final Map<String, Object> parameters = new HashMap<>();
 	private final Map<String, RtlInstancePort> ports = new HashMap<>();
+	private final Map<String, Object> parameters = new HashMap<>();
+	private final Map<String, Object> attributes = new HashMap<>();
 
 	public RtlModuleInstance(RtlRealm realm) {
 		super(realm);
@@ -74,6 +75,10 @@ public final class RtlModuleInstance extends RtlItem {
 
 	public Map<String, Object> getParameters() {
 		return parameters;
+	}
+
+	public Map<String, Object> getAttributes() {
+		return attributes;
 	}
 
 	public Iterable<RtlInstancePort> getPorts() {
@@ -143,6 +148,16 @@ public final class RtlModuleInstance extends RtlItem {
 
 			@Override
 			public void printImplementation(VerilogWriter out) {
+				if (!attributes.isEmpty()) {
+					for (Map.Entry<String, Object> attribute : attributes.entrySet()) {
+						out.print("(* ");
+						out.print(attribute.getKey());
+						out.print('=');
+						writeAttributeOrParameterValue(out, attribute.getValue());
+						out.print(" *) ");
+					}
+					out.println();
+				}
 				if (parameters.isEmpty()) {
 					out.print(moduleName + ' ');
 					out.printName(RtlModuleInstance.this);
@@ -158,16 +173,7 @@ public final class RtlModuleInstance extends RtlItem {
 							out.println(",");
 						}
 						out.print("\t." + entry.getKey() + '(');
-						Object value = entry.getValue();
-						if (value instanceof String) {
-							out.print("\"" + value + "\"");
-						} else if (value instanceof Integer) {
-							out.print(value);
-						} else if (value instanceof VectorValue) {
-							((VectorValue) value).printVerilogExpression(out);
-						} else {
-							throw new RuntimeException("invalid module parameter value: " + value);
-						}
+						writeAttributeOrParameterValue(out, entry.getValue());
 						out.print(')');
 					}
 					out.println();
@@ -188,6 +194,18 @@ public final class RtlModuleInstance extends RtlItem {
 				}
 				out.println();
 				out.println(");");
+			}
+
+			private void writeAttributeOrParameterValue(VerilogWriter out, Object value) {
+				if (value instanceof String) {
+					out.print("\"" + value + "\"");
+				} else if (value instanceof Integer) {
+					out.print(value);
+				} else if (value instanceof VectorValue) {
+					((VectorValue) value).printVerilogExpression(out);
+				} else {
+					throw new RuntimeException("invalid module attribute or parameter value: " + value);
+				}
 			}
 
 		};
