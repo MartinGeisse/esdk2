@@ -5,6 +5,9 @@ plugins {
 apply plugin: 'org.jetbrains.intellij'
 apply plugin: 'java'
 
+group 'name.martingeisse.mahdl'
+version '1.0'
+
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 compileJava {
@@ -15,13 +18,10 @@ compileJava {
 }
 
 intellij {
-    version '2021.3.2'
-    pluginName 'MaHDL IntelliJ Plugin'
+    version = '2021.3.2'
+    pluginName = 'MaHDL IntelliJ Plugin'
     buildSearchableOptions.enabled = false
 }
-
-group 'name.martingeisse.mahdl'
-version '1.0'
 
 sourceSets {
     main {
