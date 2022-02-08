@@ -5,7 +5,8 @@
     <vendor email="martingeisse@googlemail.com" url="https://github.com/MartinGeisse">Martin Geisse</vendor>
 
     <description><![CDATA[
-        MaHDL support for IntelliJ
+        MaHDL support for IntelliJ (syntax highlighting, autocomplete etc.) Does NOT include the compiler, because
+        right now MaHDL can only be compiled from Gradle.
   ]]></description>
 
     <change-notes><![CDATA[
