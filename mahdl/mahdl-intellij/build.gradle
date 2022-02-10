@@ -8,12 +8,9 @@ apply plugin: 'java'
 group 'name.martingeisse.mahdl'
 version '1.0'
 
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
-compileJava {
-    if (JavaVersion.current() != JavaVersion.VERSION_1_8) {
-        options.compilerArgs << '--release'
-        options.compilerArgs << '8'
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(11)
     }
 }
 
