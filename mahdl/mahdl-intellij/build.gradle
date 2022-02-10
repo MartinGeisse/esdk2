@@ -39,6 +39,5 @@ repositories {
 dependencies {
 
     implementation project(':mahdl-common')
-    implementation project(':mahdl-compiler')
 
 }

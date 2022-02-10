@@ -11,6 +11,7 @@ import name.martingeisse.mahdl.input.cm.impl.IElementType;
  * <a href="http://www.jflex.de/">JFlex</a> 1.7.0
  * from the specification file <tt>mahdl.flex</tt>
  */
+@SuppressWarnings("ALL")
 public class FlexGeneratedMahdlLexer {
 
   /** This character denotes the end of file */
@@ -635,12 +636,12 @@ public class FlexGeneratedMahdlLexer {
       else {
         switch (zzAction < 0 ? zzAction : ZZ_ACTION[zzAction]) {
           case 1: 
-            { return TokenType.BAD_CHARACTER;
+            { return IElementType.BAD_CHARACTER;
             } 
             // fall through
           case 59: break;
           case 2: 
-            { return TokenType.WHITE_SPACE;
+            { return IElementType.WHITE_SPACE;
             } 
             // fall through
           case 60: break;

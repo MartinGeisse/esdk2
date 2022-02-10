@@ -13,6 +13,7 @@ import com.intellij.psi.tree.IElementType;
  * <a href="http://www.jflex.de/">JFlex</a> 1.7.0
  * from the specification file <tt>mahdl.flex</tt>
  */
+@SuppressWarnings("ALL")
 public class FlexGeneratedMahdlLexer implements FlexLexer {
 
 	/** This character denotes the end of file */
