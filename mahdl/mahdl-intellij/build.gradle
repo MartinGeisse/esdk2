@@ -23,6 +23,18 @@ intellij {
     buildSearchableOptions.enabled = false
 }
 
+sourceSets {
+    main {
+        java {
+            srcDir 'src/generated/java'
+        }
+        resources {
+            srcDir 'src/generated/java'
+            srcDir 'src/generated/resources'
+        }
+    }
+}
+
 repositories {
     mavenCentral()
 }
