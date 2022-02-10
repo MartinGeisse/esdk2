@@ -28,12 +28,13 @@ public class MahdlFileType extends LanguageFileType {
 	@NotNull
 	@Override
 	public String getName() {
-		return "MAHDL";
+		return "MaHDL";
 	}
 
 	@NotNull
 	@Override
 	public String getDescription() {
+		//noinspection ConstantConditions
 		return MahdlBundle.message("filetype.description.mahdl");
 	}
 

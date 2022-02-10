@@ -15,7 +15,7 @@ public final class MahdlLanguage extends Language {
 	public static final MahdlLanguage INSTANCE = new MahdlLanguage();
 
 	public MahdlLanguage() {
-		super("MAHDL", "text/x-mahdl");
+		super("MaHDL", "text/x-mahdl");
 	}
 
 	@NotNull

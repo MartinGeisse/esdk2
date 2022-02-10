@@ -8,6 +8,7 @@ import com.intellij.psi.PsiNamedElement;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.util.IncorrectOperationException;
 import name.martingeisse.mahdl.input.cm.*;
+import name.martingeisse.mahdl.input.cm.Module;
 import org.jetbrains.annotations.NotNull;
 
 public final class ModuleImpl extends ASTWrapperPsiElement implements Module, PsiCm, PsiNamedElement, PsiNameIdentifierOwner {

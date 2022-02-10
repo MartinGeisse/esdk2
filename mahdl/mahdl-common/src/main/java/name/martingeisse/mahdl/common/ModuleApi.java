@@ -8,6 +8,7 @@ import name.martingeisse.mahdl.common.processor.definition.PortDirection;
 import name.martingeisse.mahdl.common.processor.type.DataTypeProcessor;
 import name.martingeisse.mahdl.common.processor.type.ProcessedDataType;
 import name.martingeisse.mahdl.input.cm.*;
+import name.martingeisse.mahdl.input.cm.Module;
 
 import java.util.ArrayList;
 import java.util.List;
