@@ -1,20 +1,8 @@
-package name.martingeisse.mahdl.input;
-
-import java.lang.Error;
-import com.intellij.lexer.FlexLexer;
-import com.intellij.psi.TokenType;
-import com.intellij.psi.tree.IElementType;
-
+// --------------------------------------------------------------------------------------------------------------------
+// replace this whole block ...
 %%
-
-%class FlexGeneratedMahdlLexer
-%implements FlexLexer
-%public
-%unicode
-%function advance
-%type IElementType
-%eof{ return;
-%eof}
+// ... with the appropriate header
+// --------------------------------------------------------------------------------------------------------------------
 
 // whitespace
 Whitespace = [\ \n\r\t\f]

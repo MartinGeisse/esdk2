@@ -1,0 +1,17 @@
+package name.martingeisse.mahdl.input;
+
+import java.lang.Error;
+import com.intellij.lexer.FlexLexer;
+import com.intellij.psi.TokenType;
+import com.intellij.psi.tree.IElementType;
+
+%%
+
+%class FlexGeneratedMahdlLexer
+%implements FlexLexer
+%public
+%unicode
+%function advance
+%type IElementType
+%eof{ return;
+%eof}
