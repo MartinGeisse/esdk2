@@ -19,11 +19,10 @@
 
     <extensions defaultExtensionNs="com.intellij">
 
-        <fileType name="MaHDL" extensions="mahdl" implementationClass="name.martingeisse.mahdl.intellij.MahdlFileType"
-                  fieldName="INSTANCE" language="MaHDL"  />
+        <fileType name="MaHDL" extensions="mahdl" implementationClass="name.martingeisse.mahdl.intellij.MahdlFileType" fieldName="INSTANCE" language="MaHDL"  />
+        <lang.syntaxHighlighterFactory language="MaHDL" implementationClass="name.martingeisse.mahdl.intellij.MahdlSyntaxHighlighterFactory" />
 
         <!--
-        <lang.syntaxHighlighterFactory language="MaHDL" implementationClass="name.martingeisse.mahdl.intellij.MahdlSyntaxHighlighterFactory" />
         <lang.parserDefinition language="MaHDL" implementationClass="name.martingeisse.mahdl.intellij.input.MahdlParserDefinition" />
         <lang.findUsagesProvider language="MaHDL" implementationClass="name.martingeisse.mahdl.intellij.input.MahdlFindUsagesProvider" />
         <lang.refactoringSupport language="MaHDL" implementationClass="name.martingeisse.mahdl.intellij.input.MahdlRefactoringSupportProvider" />
