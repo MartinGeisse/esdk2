@@ -32,18 +32,18 @@ public final class LocalReference implements PsiReference {
 	}
 
 	@Override
-	public LeafPsiElement getElement() {
+	public @NotNull LeafPsiElement getElement() {
 		return element;
 	}
 
 	// note: may only return true for PsiNamedElement objects!
-	protected final boolean isElementTargetable(@NotNull PsiElement potentialTarget) {
+	private boolean isElementTargetable(@NotNull PsiElement potentialTarget) {
 		return (potentialTarget instanceof PortDefinitionImpl || potentialTarget instanceof SignalLikeDefinitionImpl ||
 			potentialTarget instanceof ModuleInstanceDefinitionImpl);
 	}
 
 	@Override
-	public TextRange getRangeInElement() {
+	public @NotNull TextRange getRangeInElement() {
 		return new TextRange(0, getCanonicalText().length());
 	}
 
@@ -147,7 +147,7 @@ public final class LocalReference implements PsiReference {
 	 */
 	@NotNull
 	@Override
-	public Object[] getVariants() {
+	public Object @NotNull [] getVariants() {
 
 		// obtain the module
 		ModuleImpl module = PsiUtil.getAncestor(element, ModuleImpl.class);

@@ -37,9 +37,9 @@ public class MahdlSyntaxHighlighterFactory extends SyntaxHighlighterFactory {
 
 			@NotNull
 			@Override
-			public TextAttributesKey[] getTokenHighlights(@Nullable IElementType tokenType) {
+			public TextAttributesKey @NotNull [] getTokenHighlights(@Nullable IElementType tokenType) {
 				if (tokenType == null) {
-					return EMPTY;
+					return TextAttributesKey.EMPTY_ARRAY;
 				}
 				if (TokenGroups.KEYWORDS.contains(tokenType)) {
 					return MahdlTextAttributeKeys.KEYWORD;
@@ -78,7 +78,7 @@ public class MahdlSyntaxHighlighterFactory extends SyntaxHighlighterFactory {
 				} else if (tokenType == TokenType.BAD_CHARACTER) {
 					return MahdlTextAttributeKeys.BAD_CHARACTER;
 				}
-				return EMPTY;
+				return TextAttributesKey.EMPTY_ARRAY;
 			}
 
 		};

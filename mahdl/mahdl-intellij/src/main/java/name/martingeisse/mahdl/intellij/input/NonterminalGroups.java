@@ -10,6 +10,7 @@ import name.martingeisse.mahdl.input.Symbols;
 /**
  *
  */
+@SuppressWarnings("unused")
 public final class NonterminalGroups {
 
 	// prevent instantiation

@@ -17,6 +17,6 @@ public final class Icons {
 	private Icons() {
 	}
 
-	public static final Icon MAHDL_FILE = IconLoader.getIcon("/icons/mahdl.png");
+	public static final Icon MAHDL_FILE = IconLoader.getIcon("/icons/mahdl.png", Icons.class);
 
 }

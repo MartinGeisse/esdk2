@@ -95,7 +95,7 @@ public class ModuleReference implements PsiReference {
 
 	@NotNull
 	@Override
-	public Object[] getVariants() {
+	public Object @NotNull [] getVariants() {
 
 		// note: if this returns PSI elements, they must be PsiNamedElement or contain the name in meta-data
 
@@ -106,7 +106,7 @@ public class ModuleReference implements PsiReference {
 		VirtualFile[] sourceRoots = PsiUtil.getSourceRoots(moduleName);
 		if (sourceRoots != null) {
 			for (VirtualFile sourceRoot : sourceRoots) {
-				VfsUtilCore.visitChildrenRecursively(sourceRoot, new VirtualFileVisitor<Object>(VirtualFileVisitor.SKIP_ROOT) {
+				VfsUtilCore.visitChildrenRecursively(sourceRoot, new VirtualFileVisitor<>(VirtualFileVisitor.SKIP_ROOT) {
 					@Override
 					public boolean visitFile(@NotNull VirtualFile file) {
 						String name = file.getName();

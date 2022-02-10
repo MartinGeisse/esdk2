@@ -34,6 +34,7 @@ import java.util.List;
 /**
  *
  */
+@SuppressWarnings("unused")
 public final class PsiUtil {
 
 	// prevent instantiation
@@ -107,6 +108,7 @@ public final class PsiUtil {
 		return sourceRoots.toArray(new VirtualFile[0]);
 	}
 
+	@SuppressWarnings("UnnecessaryLabelOnContinueStatement")
 	@NotNull
 	public static ModuleImpl resolveModuleName(QualifiedModuleNameImpl moduleName) throws ReferenceResolutionException {
 		String[] segments = CmUtil.parseQualifiedModuleName(moduleName);

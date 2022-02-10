@@ -140,7 +140,7 @@ public class ModuleInstancePortReference implements PsiReference {
 
 	@NotNull
 	@Override
-	public Object[] getVariants() {
+	public Object @NotNull [] getVariants() {
 		// note: if this returns PSI elements, they must be PsiNamedElement or contain the name in meta-data
 		List<String> portNames = new ArrayList<>();
 		PsiElement resolvedModule = resolveModule();

@@ -6,6 +6,7 @@ package name.martingeisse.mahdl.intellij;
 
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
+import com.intellij.lang.annotation.HighlightSeverity;
 import com.intellij.psi.PsiElement;
 import name.martingeisse.mahdl.common.processor.ErrorHandler;
 import name.martingeisse.mahdl.common.processor.ModuleProcessor;
@@ -41,7 +42,9 @@ public class MahdlAnnotator implements Annotator {
 				if (node == null) {
 					node = module;
 				}
-				annotationHolder.createErrorAnnotation(InternalPsiUtil.getPsiFromCm(node), message);
+				annotationHolder.newAnnotation(HighlightSeverity.ERROR, message)
+					.range(InternalPsiUtil.getPsiFromCm(node))
+					.create();
 			}
 
 			@Override

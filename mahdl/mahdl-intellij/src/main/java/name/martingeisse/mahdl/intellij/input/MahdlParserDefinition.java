@@ -84,8 +84,7 @@ public class MahdlParserDefinition implements ParserDefinition {
 	}
 
 	@Override
-	@NotNull
-	public SpaceRequirements spaceExistanceTypeBetweenTokens(@Nullable ASTNode left, @Nullable ASTNode right) {
+	public @NotNull SpaceRequirements spaceExistenceTypeBetweenTokens(ASTNode left, ASTNode right) {
 		return SpaceRequirements.MAY;
 	}
 
