@@ -155,7 +155,6 @@ public class MahdlFormattingModelBuilder implements FormattingModelBuilder {
 				return Indent.getNormalIndent();
 			}
 
-			// TODO check if we can just return "no indent" for all -- exact behaviour of null is unclear, so try
 			if (NOT_INDENTED_SYMBOLS.contains(type)) {
 				return Indent.getNoneIndent();
 			}
@@ -188,6 +187,9 @@ public class MahdlFormattingModelBuilder implements FormattingModelBuilder {
 			// unknown level inside the CM tree.
 			node1 = AstUtil.getLastToken(node1);
 			node2 = AstUtil.getFirstToken(node2);
+			if (node1 == null || node2 == null) {
+				return null;
+			}
 
 			// some tokens are excluded from formatting
 			IElementType type1 = node1.getElementType();
