@@ -27,9 +27,9 @@
         <lang.refactoringSupport language="MaHDL" implementationClass="name.martingeisse.mahdl.intellij.input.MahdlRefactoringSupportProvider" />
         <lang.formatter language="MaHDL" implementationClass="name.martingeisse.mahdl.intellij.formatting.MahdlFormattingModelBuilder" />
         <annotator language="MaHDL" implementationClass="name.martingeisse.mahdl.intellij.MahdlAnnotator" />
+        <lang.braceMatcher language="MaHDL" implementationClass="name.martingeisse.mahdl.intellij.MahdlBraceMatcher" />
 
         <!--
-        <lang.braceMatcher language="MaHDL" implementationClass="name.martingeisse.mahdl.intellij.MahdlBraceMatcher" />
         <lang.foldingBuilder language="MaHDL" implementationClass="name.martingeisse.mahdl.intellij.MahdlFoldingBuilder" />
         <lang.commenter language="MaHDL" implementationClass="name.martingeisse.mahdl.intellij.MahdlCommenter" />
         <fileBasedIndex implementation="name.martingeisse.mahdl.intellij.MahdlModuleIndex" />

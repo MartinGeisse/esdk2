@@ -19,7 +19,7 @@ public class MahdlBraceMatcher implements PairedBraceMatcher {
 
 	@NotNull
 	@Override
-	public BracePair[] getPairs() {
+	public BracePair @NotNull [] getPairs() {
 		return new BracePair[]{
 			new BracePair(Symbols.OPENING_CURLY_BRACE, Symbols.CLOSING_CURLY_BRACE, true),
 			new BracePair(Symbols.OPENING_SQUARE_BRACKET, Symbols.CLOSING_SQUARE_BRACKET, false),
