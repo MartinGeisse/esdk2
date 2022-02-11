@@ -2,20 +2,19 @@
  * Copyright (c) 2018 Martin Geisse
  * This file is distributed under the terms of the MIT license.
  */
-package name.martingeisse.mahdl.intellij;
+package name.martingeisse.mahdl.intellij.formatting;
 
 import com.intellij.formatting.*;
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.TokenType;
-import com.intellij.psi.codeStyle.CodeStyleSettings;
 import com.intellij.psi.formatter.common.AbstractBlock;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import com.intellij.util.containers.ContainerUtil;
 import name.martingeisse.mahdl.input.Symbols;
+import name.martingeisse.mahdl.intellij.input.AstUtil;
 import name.martingeisse.mahdl.intellij.input.NonterminalGroups;
 import name.martingeisse.mahdl.intellij.input.TokenGroups;
 import org.jetbrains.annotations.NotNull;
@@ -77,19 +76,13 @@ public class MahdlFormattingModelBuilder implements FormattingModelBuilder {
 
 	));
 
-	private static final TokenSet POSTFIX_OPERATORS = TokenSet.create(
-//		Symbols.ASTERISK, Symbols.PLUS, Symbols.QUESTION_MARK
-	);
-
-	private static final TokenSet INFIX_OPERATORS = TokenSet.create(
-//		Symbols.BAR
-	);
-
-	@NotNull
 	@Override
-	public FormattingModel createModel(PsiElement element, CodeStyleSettings settings) {
-		MyBlock block = new MyBlock(element.getNode(), null);
-		return FormattingModelProvider.createFormattingModelForPsiFile(element.getContainingFile(), block, settings);
+	public @NotNull FormattingModel createModel(@NotNull FormattingContext formattingContext) {
+		MyBlock block = new MyBlock(formattingContext.getPsiElement().getNode(), null);
+		return FormattingModelProvider.createFormattingModelForPsiFile(
+				formattingContext.getPsiElement().getContainingFile(),
+				block,
+				formattingContext.getCodeStyleSettings());
 	}
 
 	@Nullable
@@ -146,7 +139,7 @@ public class MahdlFormattingModelBuilder implements FormattingModelBuilder {
 			if (TokenGroups.COMMENTS.contains(type)) {
 				// Comment symbols are not handled by the parser, but rather implicitly attached to the AST produced
 				// by the parser. This sometimes produces a wrong result, especially for comments in an AST list node:
-				// in such a case, a comment before the first list node is wrongly attached outside of the list, and
+				// in such a case, a comment before the first list node is wrongly attached outside the list, and
 				// thus not indented. We solve this by looking for the first non-comment token to see if it is
 				// normally indented.
 				ASTNode node = getNode();
@@ -161,6 +154,8 @@ public class MahdlFormattingModelBuilder implements FormattingModelBuilder {
 			if (NORMALLY_INDENTED_SYMBOLS.contains(type)) {
 				return Indent.getNormalIndent();
 			}
+
+			// TODO check if we can just return "no indent" for all -- exact behaviour of null is unclear, so try
 			if (NOT_INDENTED_SYMBOLS.contains(type)) {
 				return Indent.getNoneIndent();
 			}
@@ -181,30 +176,31 @@ public class MahdlFormattingModelBuilder implements FormattingModelBuilder {
 		@Nullable
 		@Override
 		public Spacing getSpacing(@Nullable Block block1, @NotNull Block block2) {
+
+			// get block AST nodes
 			ASTNode node1 = (block1 instanceof MyBlock) ? ((MyBlock) block1).getNode() : null;
-			IElementType type1 = node1 != null ? node1.getElementType() : null;
 			ASTNode node2 = (block2 instanceof MyBlock) ? ((MyBlock) block2).getNode() : null;
-			IElementType type2 = node2 != null ? node2.getElementType() : null;
+			if (node1 == null || node2 == null) {
+				return null;
+			}
 
-			if (type1 == Symbols.COMMA || POSTFIX_OPERATORS.contains(type1)) {
-				return Spacing.createSpacing(1, 1, 0, true, 2);
-			}
-			if (type2 == Symbols.COMMA || POSTFIX_OPERATORS.contains(type2)) {
-				return Spacing.createSpacing(0, 0, 0, false, 0);
-			}
-//			if (type1 == Symbols.EXPANDS_TO || type2 == Symbols.EXPANDS_TO) {
-//				return Spacing.createSpacing(1, 1, 0, false, 0);
-//			}
-			if (INFIX_OPERATORS.contains(type1) || INFIX_OPERATORS.contains(type2)) {
-				return Spacing.createSpacing(1, 1, 0, true, 1);
-			}
-//			if (node1 != null && node2 != null && node1.getTreeParent() != null && node1.getTreeParent() == node2.getTreeParent()) {
-//				if (node1.getTreeParent().getElementType() == Symbols.expression_Sequence) {
-//					return Spacing.createSpacing(1, 1, 0, true, 1);
-//				}
-//			}
+			// Drill down to actual tokens, then bubble up from there. This is to avoid the hassle of being on some
+			// unknown level inside the CM tree.
+			node1 = AstUtil.getLastToken(node1);
+			node2 = AstUtil.getFirstToken(node2);
 
-			return null;
+			// some tokens are excluded from formatting
+			IElementType type1 = node1.getElementType();
+			IElementType type2 = node2.getElementType();
+			if (WHITESPACE_AND_COMMENT_SYMBOLS.contains(type1) || WHITESPACE_AND_COMMENT_SYMBOLS.contains(type2)) {
+				return null;
+			}
+
+			// use SymbolRules to determine spaces and linefeeds
+			int spaces = (SymbolRules.isRightAttached(node1) || SymbolRules.isLeftAttached(node2)) ? 0 : 1;
+			int lineFeeds = (SymbolRules.isLineEnder(node1) || SymbolRules.isLineStarter(node2)) ? 1 : 0;
+			return Spacing.createSpacing(spaces, spaces, lineFeeds, true, 1);
+
 		}
 
 		@Override

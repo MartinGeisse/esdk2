@@ -19,6 +19,7 @@ public class MahdlRefactoringSupportProvider extends RefactoringSupportProvider 
 
 	@Override
 	public boolean isSafeDeleteAvailable(@NotNull PsiElement element) {
+		// TODO does not get called at all, and no safe-delete is available
 		return (element instanceof ModuleImpl) || (element instanceof PortDefinitionImpl) ||
 			(element instanceof SignalLikeDefinitionImpl) || (element instanceof ModuleInstanceDefinitionImpl);
 	}
