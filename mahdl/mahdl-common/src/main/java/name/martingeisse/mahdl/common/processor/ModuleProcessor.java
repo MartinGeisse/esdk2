@@ -39,6 +39,7 @@ import java.util.Map;
  * same errors in various sub-steps, so they would take an annotation holder to report these errors -- but there would
  * need to be an agreement which step reports which errors. And so on.
  */
+@SuppressWarnings("FieldCanBeLocal")
 public final class ModuleProcessor {
 
 	private final Module module;
@@ -97,6 +98,7 @@ public final class ModuleProcessor {
 		// process module definitions
 		definitionProcessor.processPorts(module.getPortDefinitionGroups());
 		if (isNative) {
+			//noinspection ConstantConditions
 			return new ModuleDefinition(isNative, moduleIdentifier, ImmutableMap.copyOf(getDefinitions()), ImmutableList.of());
 		}
 		for (ImplementationItem implementationItem : module.getImplementationItems().getAll()) {
@@ -158,6 +160,7 @@ public final class ModuleProcessor {
 		// now check that all ports and signals without initializer have been assigned to
 		assignmentValidator.checkMissingAssignments(getDefinitions().values());
 
+		//noinspection ConstantConditions
 		return new ModuleDefinition(isNative, moduleIdentifier, ImmutableMap.copyOf(getDefinitions()), ImmutableList.copyOf(processedDoBlocks));
 	}
 

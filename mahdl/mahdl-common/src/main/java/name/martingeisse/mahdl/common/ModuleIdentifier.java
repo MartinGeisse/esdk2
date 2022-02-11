@@ -4,6 +4,7 @@ import name.martingeisse.mahdl.input.cm.CmToken;
 import name.martingeisse.mahdl.input.cm.QualifiedModuleName;
 import org.apache.commons.collections4.iterators.ArrayIterator;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -16,6 +17,7 @@ public final class ModuleIdentifier implements Iterable<String> {
     private static final Pattern SEGMENT_PATTERN = Pattern.compile(SEGMENT_PATTERN_TEXT);
     private static final Pattern FULL_PATTERN = Pattern.compile(SEGMENT_PATTERN_TEXT + "(\\." + SEGMENT_PATTERN_TEXT + ")*");
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean isValidSegment(String s) {
         return SEGMENT_PATTERN.matcher(s).matches();
     }
@@ -103,7 +105,7 @@ public final class ModuleIdentifier implements Iterable<String> {
     }
 
     @Override
-    public Iterator<String> iterator() {
+    public @NotNull Iterator<String> iterator() {
         return new ArrayIterator<>(segments);
     }
 

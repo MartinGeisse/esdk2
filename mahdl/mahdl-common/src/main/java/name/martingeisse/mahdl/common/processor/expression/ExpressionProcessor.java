@@ -23,6 +23,6 @@ public interface ExpressionProcessor {
 	ProcessingSidekick getSidekick();
 
 	// returns null on failure
-	ConstantValue.Vector processCaseSelectorValue(Expression expression, ProcessedDataType selectorDataType);
+	ConstantValue.Vector processCaseConstant(Expression caseConstantExpression, ProcessedDataType selectorDataType);
 
 }

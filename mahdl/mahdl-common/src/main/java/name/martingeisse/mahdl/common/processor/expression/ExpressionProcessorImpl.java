@@ -44,7 +44,7 @@ public class ExpressionProcessorImpl implements ExpressionProcessor {
 				return error(expression, "unknown expression type");
 			}
 		} catch (TypeErrorException e) {
-			return error(expression, "internal error during type-check", e);
+			return error(expression, "internal error during type-check of extended expression", e);
 		}
 	}
 
@@ -75,13 +75,13 @@ public class ExpressionProcessorImpl implements ExpressionProcessor {
 
 				// process selector values
 				List<ConstantValue.Vector> caseSelectorValues = new ArrayList<>();
-				for (Expression currentCaseSelectorExpression : typedCaseItem.getSelectorValues().getAll()) {
-					ConstantValue.Vector selectorVectorValue = processCaseSelectorValue(currentCaseSelectorExpression, selector.getDataType());
+				for (Expression currentCaseConstantExpression : typedCaseItem.getSelectorValues().getAll()) {
+					ConstantValue.Vector selectorVectorValue = processCaseConstant(currentCaseConstantExpression, selector.getDataType());
 					if (selectorVectorValue != null) {
 						if (foundSelectorValues.add(selectorVectorValue)) {
 							caseSelectorValues.add(selectorVectorValue);
 						} else {
-							error(currentCaseSelectorExpression, "duplicate selector value");
+							error(currentCaseConstantExpression, "duplicate selector value");
 							errorInCases = true;
 						}
 					}
@@ -187,7 +187,7 @@ public class ExpressionProcessorImpl implements ExpressionProcessor {
 				return error(expression, "unknown expression type");
 			}
 		} catch (TypeErrorException e) {
-			return error(expression, "internal error during type-check", e);
+			return error(expression, "internal error during type-check of expression", e);
 		}
 	}
 
@@ -581,17 +581,26 @@ public class ExpressionProcessorImpl implements ExpressionProcessor {
 	}
 
 	@Override
-	public ConstantValue.Vector processCaseSelectorValue(Expression expression, ProcessedDataType selectorDataType) {
-		ProcessedExpression processedSelectorValueExpression = process(expression);
-		ConstantValue selectorValue = evaluateLocalExpressionThatMustBeFormallyConstant(processedSelectorValueExpression);
-		if (selectorValue instanceof ConstantValue.Unknown) {
+	public ConstantValue.Vector processCaseConstant(Expression caseConstantExpression, ProcessedDataType selectorDataType) {
+		ProcessedExpression processedCaseConstantExpression = process(caseConstantExpression);
+		ConstantValue caseConstantValue = evaluateLocalExpressionThatMustBeFormallyConstant(processedCaseConstantExpression);
+		if (caseConstantValue instanceof ConstantValue.Unknown) {
 			return null;
 		}
-		if (!(selectorValue instanceof ConstantValue.Vector)) {
-			error(expression, "selector value must be a vector, found " + selectorValue.getDataType());
+		if (!(caseConstantValue instanceof ConstantValue.Vector)) {
+			error(caseConstantExpression, "case constant must be a vector, found " + caseConstantValue.getDataType());
 			return null;
 		}
-		return (ConstantValue.Vector) selectorValue;
+		if (selectorDataType instanceof ProcessedDataType.Vector) {
+			int caseConstantVectorSize = ((ConstantValue.Vector) caseConstantValue).getSize();
+			int selectorVectorSize = ((ProcessedDataType.Vector) selectorDataType).getSize();
+			if (caseConstantVectorSize != selectorVectorSize) {
+				error(caseConstantExpression, "case constant vector size (" + caseConstantVectorSize +
+						") does not match selector vector size (" + selectorVectorSize + ")");
+				return null;
+			}
+		}
+		return (ConstantValue.Vector) caseConstantValue;
 	}
 
 }

@@ -1,2 +1,4 @@
+
 rename PsiCm to PsiCmNode -- makes its role much clearer
 
+rename switch-case selector expression and selector values (naming clash). Proposal: selector expression, case constant.

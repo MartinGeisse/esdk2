@@ -153,13 +153,13 @@ public final class StatementProcessor {
 
 				// process selector values
 				List<ConstantValue.Vector> caseSelectorValues = new ArrayList<>();
-				for (Expression currentCaseSelectorExpression : typedCaseItem.getSelectorValues().getAll()) {
-					ConstantValue.Vector selectorVectorValue = expressionProcessor.processCaseSelectorValue(currentCaseSelectorExpression, selector.getDataType());
+				for (Expression currentCaseConstantExpression : typedCaseItem.getSelectorValues().getAll()) {
+					ConstantValue.Vector selectorVectorValue = expressionProcessor.processCaseConstant(currentCaseConstantExpression, selector.getDataType());
 					if (selectorVectorValue != null) {
 						if (foundSelectorValues.add(selectorVectorValue)) {
 							caseSelectorValues.add(selectorVectorValue);
 						} else {
-							error(currentCaseSelectorExpression, "duplicate selector value");
+							error(currentCaseConstantExpression, "duplicate selector value");
 							errorInCases = true;
 						}
 					}
@@ -195,7 +195,7 @@ public final class StatementProcessor {
 		try {
 			return new ProcessedSwitchStatement(switchStatement, selector, ImmutableList.copyOf(processedCases), processedDefaultCase);
 		} catch (TypeErrorException e) {
-			return error(switchStatement, "internal error during type-check", e);
+			return error(switchStatement, "internal error during type-check of switch statement", e);
 		}
 
 	}
