@@ -11,7 +11,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.regex.Pattern;
 
 /**
- *
+ * TODO renaming modules and module files does not work yet. It's unclear to me why the rename PSI element processor
+ * accepts local names and port names, but it works.
  */
 public class MahdlModuleNameRenameInputValidator implements RenameInputValidator {
 

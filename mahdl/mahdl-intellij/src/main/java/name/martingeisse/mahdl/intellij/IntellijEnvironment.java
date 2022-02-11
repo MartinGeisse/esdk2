@@ -92,8 +92,11 @@ public class IntellijEnvironment implements Environment {
 		// analyze the path just determined
 		String expectedPrefix = "src/mahdl/";
 		String expectedSuffix = ".mahdl";
-		if (!path.startsWith(expectedPrefix) || !path.endsWith(expectedSuffix)) {
-			return;
+		if (!path.startsWith(expectedPrefix)) {
+			throw new IOException("file should be located within src/mahdl");
+		}
+		if (!path.endsWith(expectedSuffix)) {
+			throw new IOException("file should have extension .mahdl");
 		}
 		String qualifiedNameFromPath = path.substring(expectedPrefix.length(), path.length() - expectedSuffix.length()).replace('/', '.');
 		String qualifiedNameFromCm = CmUtil.canonicalizeQualifiedModuleName(name);

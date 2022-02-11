@@ -30,13 +30,9 @@
         <lang.braceMatcher language="MaHDL" implementationClass="name.martingeisse.mahdl.intellij.MahdlBraceMatcher" />
         <lang.foldingBuilder language="MaHDL" implementationClass="name.martingeisse.mahdl.intellij.MahdlFoldingBuilder" />
         <lang.commenter language="MaHDL" implementationClass="name.martingeisse.mahdl.intellij.MahdlCommenter" />
-
-        <!--
         <fileBasedIndex implementation="name.martingeisse.mahdl.intellij.MahdlModuleIndex" />
         <renamePsiElementProcessor implementation="name.martingeisse.mahdl.intellij.MahdlModuleNameRenamePsiElementProcessor" />
         <renameInputValidator implementation="name.martingeisse.mahdl.intellij.MahdlModuleNameRenameInputValidator" />
-        -->
-
     </extensions>
 
     <actions>
