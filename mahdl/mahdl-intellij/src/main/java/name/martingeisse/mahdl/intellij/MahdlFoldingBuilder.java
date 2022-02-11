@@ -24,10 +24,10 @@ public class MahdlFoldingBuilder implements FoldingBuilder {
 
 	@NotNull
 	@Override
-	public FoldingDescriptor[] buildFoldRegions(@NotNull ASTNode astNode, @NotNull Document document) {
+	public FoldingDescriptor @NotNull [] buildFoldRegions(@NotNull ASTNode astNode, @NotNull Document document) {
 		List<FoldingDescriptor> foldingDescriptors = new ArrayList<>();
 		collectFoldingRegions(astNode.getPsi(), foldingDescriptors);
-		return foldingDescriptors.toArray(new FoldingDescriptor[foldingDescriptors.size()]);
+		return foldingDescriptors.toArray(new FoldingDescriptor[0]);
 	}
 
 	private void collectFoldingRegions(PsiElement psiElement, List<FoldingDescriptor> destination) {
@@ -46,7 +46,7 @@ public class MahdlFoldingBuilder implements FoldingBuilder {
 		PsiElement psiElement = astNode.getPsi();
 		if (psiElement instanceof ImplementationItem_DoBlockImpl) {
 			ImplementationItem_DoBlockImpl doBlock = (ImplementationItem_DoBlockImpl) psiElement;
-			return "do (" + doBlock.getTriggerPsi().getText() + ") do {...}";
+			return "do (" + doBlock.getTriggerPsi().getText() + ") {...}";
 		}
 		return psiElement.toString();
 	}
