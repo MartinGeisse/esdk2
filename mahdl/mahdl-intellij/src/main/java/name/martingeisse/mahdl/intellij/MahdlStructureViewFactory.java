@@ -65,7 +65,7 @@ public class MahdlStructureViewFactory implements PsiStructureViewFactory {
 
 					@NotNull
 					@Override
-					protected Class[] getSuitableClasses() {
+					protected Class<?> @NotNull [] getSuitableClasses() {
 						throw new UnsupportedOperationException();
 					}
 
@@ -161,10 +161,10 @@ public class MahdlStructureViewFactory implements PsiStructureViewFactory {
 
 		@NotNull
 		@Override
-		public TreeElement[] getChildren() {
+		public TreeElement @NotNull [] getChildren() {
 			List<TreeElement> children = new ArrayList<>();
 			checkIncludeChildrenOf(element, children);
-			return children.toArray(new TreeElement[children.size()]);
+			return children.toArray(new TreeElement[0]);
 		}
 
 		private static void checkIncludeChildrenOf(PsiElement psiParent, List<TreeElement> destination) {

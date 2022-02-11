@@ -21,14 +21,14 @@
 
         <fileType name="MaHDL" extensions="mahdl" implementationClass="name.martingeisse.mahdl.intellij.MahdlFileType" fieldName="INSTANCE" language="MaHDL"  />
         <lang.syntaxHighlighterFactory language="MaHDL" implementationClass="name.martingeisse.mahdl.intellij.MahdlSyntaxHighlighterFactory" />
+        <lang.parserDefinition language="MaHDL" implementationClass="name.martingeisse.mahdl.intellij.input.MahdlParserDefinition" />
+        <lang.psiStructureViewFactory language="MaHDL" implementationClass="name.martingeisse.mahdl.intellij.MahdlStructureViewFactory" />
 
         <!--
-        <lang.parserDefinition language="MaHDL" implementationClass="name.martingeisse.mahdl.intellij.input.MahdlParserDefinition" />
         <lang.findUsagesProvider language="MaHDL" implementationClass="name.martingeisse.mahdl.intellij.input.MahdlFindUsagesProvider" />
         <lang.refactoringSupport language="MaHDL" implementationClass="name.martingeisse.mahdl.intellij.input.MahdlRefactoringSupportProvider" />
         <lang.formatter language="MaHDL" implementationClass="name.martingeisse.mahdl.intellij.MahdlFormattingModelBuilder" />
         <annotator language="MaHDL" implementationClass="name.martingeisse.mahdl.intellij.MahdlAnnotator" />
-        <lang.psiStructureViewFactory language="MaHDL" implementationClass="name.martingeisse.mahdl.intellij.MahdlStructureViewFactory" />
         <lang.braceMatcher language="MaHDL" implementationClass="name.martingeisse.mahdl.intellij.MahdlBraceMatcher" />
         <lang.foldingBuilder language="MaHDL" implementationClass="name.martingeisse.mahdl.intellij.MahdlFoldingBuilder" />
         <lang.commenter language="MaHDL" implementationClass="name.martingeisse.mahdl.intellij.MahdlCommenter" />

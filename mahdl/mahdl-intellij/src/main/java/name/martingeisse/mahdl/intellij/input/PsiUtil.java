@@ -206,12 +206,12 @@ public final class PsiUtil {
 
 	@NotNull
 	public static PsiReference getReference(@NotNull Expression_IdentifierImpl node) {
-		return new LocalReference(node.getIdentifierPsi());
+		return new LocalReference(node, node.getIdentifierPsi());
 	}
 
 	@NotNull
 	public static PsiReference getReference(@NotNull InstanceReferenceNameImpl node) {
-		return new LocalReference(node.getIdentifierPsi());
+		return new LocalReference(node, node.getIdentifierPsi());
 	}
 
 	//

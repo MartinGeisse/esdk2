@@ -25,15 +25,17 @@ import java.util.List;
  */
 public final class LocalReference implements PsiReference {
 
-	private final LeafPsiElement element;
+	private final PsiElement referenceElement;
+	private final LeafPsiElement leafElement;
 
-	public LocalReference(LeafPsiElement element) {
-		this.element = element;
+	public LocalReference(PsiElement referenceElement, LeafPsiElement leafElement) {
+		this.referenceElement = referenceElement;
+		this.leafElement = leafElement;
 	}
 
 	@Override
-	public @NotNull LeafPsiElement getElement() {
-		return element;
+	public @NotNull PsiElement getElement() {
+		return referenceElement;
 	}
 
 	// note: may only return true for PsiNamedElement objects!
@@ -51,11 +53,11 @@ public final class LocalReference implements PsiReference {
 	@Override
 	public PsiElement resolve() {
 
-		ModuleImpl module = PsiUtil.getAncestor(element, ModuleImpl.class);
+		ModuleImpl module = PsiUtil.getAncestor(referenceElement, ModuleImpl.class);
 		if (module == null) {
 			return null;
 		}
-		String identifier = element.getText();
+		String identifier = leafElement.getText();
 
 		// ports
 		for (PortDefinitionGroupImpl group : module.getPortDefinitionGroupsPsi().getAllPsi()) {
@@ -94,7 +96,7 @@ public final class LocalReference implements PsiReference {
 	@NotNull
 	@Override
 	public String getCanonicalText() {
-		return element.getText();
+		return leafElement.getText();
 	}
 
 	@Override
@@ -102,30 +104,30 @@ public final class LocalReference implements PsiReference {
 		if (newName == null) {
 			throw new IncorrectOperationException("new name is null");
 		}
-		return PsiUtil.setText(element, newName);
+		return PsiUtil.setText(leafElement, newName);
 	}
 
 	@Override
 	@NotNull
-	public PsiElement bindToElement(@NotNull PsiElement psiElement) throws IncorrectOperationException {
-		if (isElementTargetable(psiElement)) {
-			String newName = ((PsiNamedElement) psiElement).getName();
+	public PsiElement bindToElement(@NotNull PsiElement bindTarget) throws IncorrectOperationException {
+		if (isElementTargetable(bindTarget)) {
+			String newName = ((PsiNamedElement) bindTarget).getName();
 			if (newName != null) {
-				return PsiUtil.setText(element, newName);
+				return PsiUtil.setText(leafElement, newName);
 			}
 		}
 		throw new IncorrectOperationException();
 	}
 
 	@Override
-	public boolean isReferenceTo(@Nullable PsiElement psiElement) {
-		if (psiElement != null && isElementTargetable(psiElement)) {
-			String elementName = ((PsiNamedElement) psiElement).getName();
+	public boolean isReferenceTo(@Nullable PsiElement potentialTarget) {
+		if (potentialTarget != null && isElementTargetable(potentialTarget)) {
+			String elementName = ((PsiNamedElement) potentialTarget).getName();
 			if (elementName != null) {
 				String thisName = getCanonicalText();
 				if (elementName.equals(thisName)) {
 					PsiElement resolved = resolve();
-					return (resolved != null && resolved.equals(psiElement));
+					return (resolved != null && resolved.equals(potentialTarget));
 				}
 			}
 		}
@@ -150,7 +152,7 @@ public final class LocalReference implements PsiReference {
 	public Object @NotNull [] getVariants() {
 
 		// obtain the module
-		ModuleImpl module = PsiUtil.getAncestor(element, ModuleImpl.class);
+		ModuleImpl module = PsiUtil.getAncestor(referenceElement, ModuleImpl.class);
 		if (module == null) {
 			return new Object[0];
 		}
