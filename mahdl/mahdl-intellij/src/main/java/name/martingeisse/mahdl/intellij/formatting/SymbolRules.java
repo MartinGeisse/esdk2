@@ -17,8 +17,6 @@ final class SymbolRules {
 /*
 TODO:
 
-	colon is line ender if part of a switch-case, but not if further embedded (only after case value)
-	colon is also right-attached if it is the separator in a range
 	switch is line starter if it is a switch statement, but not if it is a switch expression
 		generally, the first token if a statement is a line-starter. This covers switch statements.
 	generally, the first token of an implementation item is a line starter
