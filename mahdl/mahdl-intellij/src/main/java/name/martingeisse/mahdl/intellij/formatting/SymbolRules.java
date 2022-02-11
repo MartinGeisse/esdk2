@@ -17,8 +17,6 @@ final class SymbolRules {
 /*
 TODO:
 
-	switch is line starter if it is a switch statement, but not if it is a switch expression
-		generally, the first token if a statement is a line-starter. This covers switch statements.
 	generally, the first token of an implementation item is a line starter
 	generally, the last token of an implementation item or statement is a line ender
 	OP_TIMES, identifier are used as do-block triggers
