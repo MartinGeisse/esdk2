@@ -2,42 +2,18 @@ package name.martingeisse.mahdl.intellij.formatting;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.tree.IElementType;
-import com.intellij.psi.tree.TokenSet;
 import name.martingeisse.mahdl.input.Symbols;
+import name.martingeisse.mahdl.input.cm.ImplementationItem_ModuleInstanceDefinitionGroup;
 import name.martingeisse.mahdl.input.cm.Statement;
 import name.martingeisse.mahdl.intellij.input.AstUtil;
 
 import java.util.function.Predicate;
 
+@SuppressWarnings("RedundantIfStatement")
 final class SymbolRules {
 
     private SymbolRules() {
     }
-
-/*
-TODO:
-
-	generally, the first token of an implementation item is a line starter
-	generally, the last token of an implementation item or statement is a line ender
-	OP_TIMES, identifier are used as do-block triggers
-
-	public static final MahdlElementType KW_CONSTANT = new MahdlElementType("KW_CONSTANT");
-	public static final MahdlElementType KW_DEFAULT = new MahdlElementType("KW_DEFAULT");
-	public static final MahdlElementType KW_DO = new MahdlElementType("KW_DO");
-	public static final MahdlElementType KW_ELSE = new MahdlElementType("KW_ELSE");
-	public static final MahdlElementType KW_IF = new MahdlElementType("KW_IF");
-	public static final MahdlElementType KW_IN = new MahdlElementType("KW_IN");
-	public static final MahdlElementType KW_INTEGER = new MahdlElementType("KW_INTEGER");
-	public static final MahdlElementType KW_INTERFACE = new MahdlElementType("KW_INTERFACE");
-	public static final MahdlElementType KW_MATRIX = new MahdlElementType("KW_MATRIX");
-	public static final MahdlElementType KW_MODULE = new MahdlElementType("KW_MODULE");
-	public static final MahdlElementType KW_NATIVE = new MahdlElementType("KW_NATIVE");
-	public static final MahdlElementType KW_OUT = new MahdlElementType("KW_OUT");
-	public static final MahdlElementType KW_REGISTER = new MahdlElementType("KW_REGISTER");
-	public static final MahdlElementType KW_SIGNAL = new MahdlElementType("KW_SIGNAL");
-	public static final MahdlElementType KW_SWITCH = new MahdlElementType("KW_SWITCH");
-
- */
 
     static boolean isLeftAttached(ASTNode tokenNode) {
         IElementType type = tokenNode.getElementType();
@@ -49,6 +25,8 @@ TODO:
                 type == Symbols.DOT) {
             return true;
         }
+
+        // OP_TIMES may be a combinatorial do-block trigger, but the parantheses already attach to it
         return false;
     }
 
@@ -68,11 +46,33 @@ TODO:
             IElementType parentType = tokenNode.getTreeParent().getElementType();
             return parentType == Symbols.expression_RangeSelection;
         }
+
+        // OP_TIMES may be a combinatorial do-block trigger, but the parantheses already attach to it
         return false;
     }
 
     static boolean isLineStarter(ASTNode tokenNode) {
         IElementType type = tokenNode.getElementType();
+
+        // start of interface block, as well as lines in it
+        if (type == Symbols.KW_INTERFACE || type == Symbols.KW_IN || type == Symbols.KW_OUT) {
+            return true;
+        }
+
+        // keywords that start an implementation item
+        if (type == Symbols.KW_CONSTANT ||
+                type == Symbols.KW_SIGNAL ||
+                type == Symbols.KW_REGISTER ||
+                type == Symbols.KW_DO) {
+            return true;
+        }
+
+        // an identifier can start an implementation item (as part of a qualified module name)
+        if (type == Symbols.IDENTIFIER) {
+            if (isFirstTokenOf(tokenNode, node -> node.getPsi() instanceof ImplementationItem_ModuleInstanceDefinitionGroup)) {
+                return true;
+            }
+        }
 
         // Closing curly brace goes in the next line and starts it.
         if (type == Symbols.CLOSING_CURLY_BRACE) {
@@ -82,6 +82,11 @@ TODO:
         // Statements can unfortunately start with a lot of tokens, so we check for start of statement.
         // Special rule: Opening curly brace goes in the same line, even at start of statement (block).
         if (type != Symbols.OPENING_CURLY_BRACE && isFirstTokenOf(tokenNode, node -> node.getPsi() instanceof Statement)) {
+            return true;
+        }
+
+        // value cases and default cases start on a new line
+        if (type == Symbols.KW_CASE || type == Symbols.KW_DEFAULT) {
             return true;
         }
 
@@ -103,7 +108,8 @@ TODO:
 
         // Closing curly brace sometimes ends statements.
         if (type == Symbols.CLOSING_CURLY_BRACE) {
-            // TODO handle the case that parent is module (end of interface clause)
+            // the closing curly brace of the interface block is handled by the fact that it can only be followed by
+            // implementation items, which are already line starters
             return isLastTokenOf(tokenNode, node -> node.getPsi() instanceof Statement);
         }
 
