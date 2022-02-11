@@ -68,6 +68,10 @@ TODO:
             IElementType parentType = tokenNode.getTreeParent().getElementType();
             return parentType == Symbols.expression_UnaryPlus || parentType == Symbols.expression_UnaryMinus;
         }
+        if (type == Symbols.COLON) {
+            IElementType parentType = tokenNode.getTreeParent().getElementType();
+            return parentType == Symbols.expression_RangeSelection;
+        }
         return false;
     }
 
@@ -105,6 +109,11 @@ TODO:
         if (type == Symbols.CLOSING_CURLY_BRACE) {
             // TODO handle the case that parent is module (end of interface clause)
             return isLastTokenOf(tokenNode, node -> node.getPsi() instanceof Statement);
+        }
+
+        if (type == Symbols.COLON) {
+            IElementType parentType = tokenNode.getTreeParent().getElementType();
+            return parentType == Symbols.statementCaseItem_Value || parentType == Symbols.statementCaseItem_Default;
         }
 
         return false;
