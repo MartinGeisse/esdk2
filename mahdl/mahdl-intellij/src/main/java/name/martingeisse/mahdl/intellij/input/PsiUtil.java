@@ -46,8 +46,8 @@ public final class PsiUtil {
 	//
 
 	@NotNull
-	public static PsiElement setText(@NotNull LeafPsiElement element, @NotNull String newText) {
-		return (PsiElement) element.replaceWithText(newText);
+	public static PsiElement setText(@NotNull PsiElement element, @NotNull String newText) {
+		return ElementTextReplaceOperation.run(element, newText);
 	}
 
 	@Nullable
@@ -166,7 +166,7 @@ public final class PsiUtil {
 	}
 
 	public static PsiElement setName(@NotNull ModuleImpl node, @NotNull String newName) {
-		throw new IncorrectOperationException("renaming module not yet implemented");
+		return setText(node.getModuleNamePsi(), newName);
 	}
 
 	@Nullable

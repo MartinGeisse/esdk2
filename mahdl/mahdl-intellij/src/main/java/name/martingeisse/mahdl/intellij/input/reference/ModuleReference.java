@@ -9,6 +9,7 @@ import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileVisitor;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiNamedElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.util.IncorrectOperationException;
 import name.martingeisse.mahdl.common.ReferenceResolutionException;
@@ -64,20 +65,20 @@ public class ModuleReference implements PsiReference {
 
 	@Override
 	@NotNull
-	public PsiElement handleElementRename(@Nullable String newName) throws IncorrectOperationException {
-		// TODO check PSI afterwards
-		// return (PsiElement) moduleName.replaceWithText(newName);
-		// moduleName.getNode().addLeaf(Symbols.qualifiedModuleName, "foo.bar", null);
-		throw new IncorrectOperationException("not yet supported");
+	public PsiElement handleElementRename(@NotNull String newName) throws IncorrectOperationException {
+		return PsiUtil.setText(moduleName, newName);
 	}
 
 	@Override
 	@NotNull
 	public PsiElement bindToElement(@NotNull PsiElement psiElement) throws IncorrectOperationException {
 		if (psiElement instanceof ModuleImpl) {
-			throw new IncorrectOperationException("cannot bind this reference to a non-module PSI node");
+			String newName = ((PsiNamedElement) psiElement).getName();
+			if (newName != null) {
+				return PsiUtil.setText(moduleName, newName);
+			}
 		}
-		throw new IncorrectOperationException("not yet supported"); // TODO I have no idea how to manipulate the PSI that way
+		throw new IncorrectOperationException();
 	}
 
 	@Override
