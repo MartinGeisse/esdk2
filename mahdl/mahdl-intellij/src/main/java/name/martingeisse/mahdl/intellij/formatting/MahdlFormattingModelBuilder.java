@@ -201,7 +201,7 @@ public class MahdlFormattingModelBuilder implements FormattingModelBuilder {
 			// use SymbolRules to determine spaces and linefeeds
 			int spaces = (SymbolRules.isRightAttached(node1) || SymbolRules.isLeftAttached(node2)) ? 0 : 1;
 			int lineFeeds = (SymbolRules.isLineEnder(node1) || SymbolRules.isLineStarter(node2)) ? 1 : 0;
-			return Spacing.createSpacing(spaces, spaces, lineFeeds, true, 1);
+			return Spacing.createSpacing(spaces, spaces, lineFeeds, false, 1);
 
 		}
 
