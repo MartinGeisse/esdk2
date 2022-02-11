@@ -10,17 +10,16 @@ import com.intellij.lang.findUsages.FindUsagesProvider;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNamedElement;
 import com.intellij.psi.PsiReference;
+import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.psi.tree.TokenSet;
 import name.martingeisse.mahdl.input.Symbols;
-import name.martingeisse.mahdl.input.cm.impl.ModuleImpl;
-import name.martingeisse.mahdl.input.cm.impl.ModuleInstanceDefinitionImpl;
-import name.martingeisse.mahdl.input.cm.impl.PortDefinitionImpl;
-import name.martingeisse.mahdl.input.cm.impl.SignalLikeDefinitionImpl;
+import name.martingeisse.mahdl.input.cm.QualifiedModuleName;
+import name.martingeisse.mahdl.input.cm.impl.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- *
+ * TODO for module port declarations, this does not find places where the port is assigned for a module instance
  */
 public class MahdlFindUsagesProvider implements FindUsagesProvider {
 
@@ -36,8 +35,14 @@ public class MahdlFindUsagesProvider implements FindUsagesProvider {
 
 	@Override
 	public boolean canFindUsagesFor(@NotNull PsiElement psiElement) {
-		return (psiElement instanceof ModuleImpl || psiElement instanceof PortDefinitionImpl ||
-			psiElement instanceof SignalLikeDefinitionImpl || psiElement instanceof ModuleInstanceDefinitionImpl);
+		if (psiElement instanceof LeafPsiElement) {
+			psiElement = psiElement.getParent();
+		}
+		return (psiElement instanceof QualifiedModuleName ||
+				psiElement instanceof ModuleImpl ||
+				psiElement instanceof PortDefinitionImpl ||
+				psiElement instanceof SignalLikeDefinitionImpl ||
+				psiElement instanceof ModuleInstanceDefinitionImpl);
 	}
 
 	@Nullable

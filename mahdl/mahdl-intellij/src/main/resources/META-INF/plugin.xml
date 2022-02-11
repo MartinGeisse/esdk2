@@ -23,9 +23,9 @@
         <lang.syntaxHighlighterFactory language="MaHDL" implementationClass="name.martingeisse.mahdl.intellij.MahdlSyntaxHighlighterFactory" />
         <lang.parserDefinition language="MaHDL" implementationClass="name.martingeisse.mahdl.intellij.input.MahdlParserDefinition" />
         <lang.psiStructureViewFactory language="MaHDL" implementationClass="name.martingeisse.mahdl.intellij.MahdlStructureViewFactory" />
+        <lang.findUsagesProvider language="MaHDL" implementationClass="name.martingeisse.mahdl.intellij.input.MahdlFindUsagesProvider" />
 
         <!--
-        <lang.findUsagesProvider language="MaHDL" implementationClass="name.martingeisse.mahdl.intellij.input.MahdlFindUsagesProvider" />
         <lang.refactoringSupport language="MaHDL" implementationClass="name.martingeisse.mahdl.intellij.input.MahdlRefactoringSupportProvider" />
         <lang.formatter language="MaHDL" implementationClass="name.martingeisse.mahdl.intellij.MahdlFormattingModelBuilder" />
         <annotator language="MaHDL" implementationClass="name.martingeisse.mahdl.intellij.MahdlAnnotator" />
